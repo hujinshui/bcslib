@@ -61,7 +61,7 @@ namespace bcs
 		{
 			size_t c = 0;
 
-			while (e.next() && c < n)
+			while (c < n && e.next())
 			{
 				if (e.get() != *it++) return false;
 				++ c;

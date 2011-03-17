@@ -25,6 +25,8 @@ namespace bcs
 		public:
 			base_test_unit(const char *name) : m_name(name) { }
 
+			virtual ~base_test_unit() { }
+
 			std::string name() const
 			{
 				return m_name;
@@ -43,6 +45,8 @@ namespace bcs
 		public:
 			base_test_case(const char *name) : base_test_unit(name) { }
 
+			virtual ~base_test_case() { }
+
 			virtual void run() = 0;
 
 			virtual int num_cases() const { return 1; }
@@ -58,9 +62,19 @@ namespace bcs
 			{
 			}
 
+			virtual ~test_suite()
+			{
+				for (std::vector<base_test_unit*>::iterator it = m_tunits.begin();
+						it != m_tunits.end(); ++it)
+				{
+					delete(*it);
+				}
+				m_tunits.clear();
+			}
+
 			void add(base_test_unit *tunit)
 			{
-				m_tunits.push_back(tr1::shared_ptr<base_test_unit>(tunit));
+				m_tunits.push_back(tunit);
 				m_ncases += tunit->num_cases();
 			}
 
@@ -71,11 +85,11 @@ namespace bcs
 
 			base_test_unit* get_unit(int i) const
 			{
-				return m_tunits[i].get();
+				return m_tunits[i];
 			}
 
 		private:
-			std::vector<tr1::shared_ptr<base_test_unit> > m_tunits;
+			std::vector<base_test_unit*> m_tunits;
 			int m_ncases;
 
 		}; // end class test_suite
@@ -90,6 +104,7 @@ namespace bcs
 	class case_name : public base_test_case { \
 		public: \
 			case_name() : base_test_case( #case_name ) { } \
+			virtual ~case_name() { } \
 			virtual void run(); \
 	}; \
 	void case_name::run()
