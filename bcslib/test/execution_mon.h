@@ -43,7 +43,7 @@ namespace bcs
 				std::printf("BCS Testing\n");
 				std::printf("----------------------------------------\n");
 
-				int nsucc = execute_suite(tsuite->name(), 1, 1, tsuite);
+				int nsucc = execute_suite("MAIN", 1, 1, tsuite);
 				int nfail = tsuite->num_cases() - nsucc;
 
 				if (nfail == 0)
@@ -60,9 +60,9 @@ namespace bcs
 		private:
 			int execute_suite(const std::string& parent, int i0, int n0, test_suite* tsuite)
 			{
-				int n = tsuite->num_cases();
+				int n = tsuite->num_units();
 				std::printf("[%s %d/%d] test suite: %s (with %d cases) ...\n",
-						parent.c_str(), i0, n0, tsuite->name().c_str(), n);
+						parent.c_str(), i0, n0, tsuite->name().c_str(), tsuite->num_cases());
 
 				int nsucc = 0;
 

@@ -83,6 +83,11 @@ namespace bcs
 				return m_ncases;
 			}
 
+			int num_units() const
+			{
+				return (int)m_tunits.size();
+			}
+
 			base_test_unit* get_unit(int i) const
 			{
 				return m_tunits[i];
