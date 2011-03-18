@@ -10,7 +10,11 @@
 #define BCSLIB_TEST_ASSERTION_H
 
 #include <bcslib/base/basic_defs.h>
+#include <bcslib/base/basic_funcs.h>
+#include <bcslib/array/array1d.h>
+
 #include <string>
+#include <algorithm>
 
 namespace bcs
 {
@@ -56,6 +60,23 @@ namespace bcs
 		}
 
 
+		template<typename TIter0, typename TIter>
+		bool collection_equal(TIter0 begin, TIter0 end, TIter src, size_t n)
+		{
+			TIter0 it = begin;
+			for (size_t i = 0; i < n; ++i)
+			{
+				if (it == end) return false;
+				if (*it != *src) return false;
+
+				++it;
+				++src;
+			}
+
+			return it == end;
+		}
+
+
 		template<typename TEnum, typename TIter>
 		bool enumerate_equal(TEnum e, TIter it, size_t n)
 		{
@@ -72,8 +93,36 @@ namespace bcs
 
 			return true;
 		}
+
+
+		template<typename T, class TIndexer>
+		bool array_view_equal(const bcs::const_aview1d<T, TIndexer>& view, const T* src, size_t n)
+		{
+			if (view.nelems() != n) return false;
+
+			for (index_t i = 0; i < (index_t)n; ++i)
+			{
+				if (view(i) != src[i]) return false;
+			}
+
+			return true;
+		}
+
+		template<typename T, class TIndexer>
+		bool array_view_approx(const bcs::const_aview1d<T, TIndexer>& view, const T* src, size_t n, double eps = 1e-12)
+		{
+			if (view.nelems() != n) return false;
+
+			for (index_t i = 0; i < (index_t)n; ++i)
+			{
+				if (!test_approx(view(i), src[i], eps)) return false;
+			}
+
+			return true;
+		}
 	}
 }
+
 
 
 // useful assertion macros

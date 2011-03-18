@@ -160,6 +160,19 @@ namespace bcs
 		}
 	}
 
+	template<typename Iter>
+	size_t count(Iter first, Iter last)
+	{
+		size_t c = 0;
+		while(first != last)
+		{
+			++ c;
+			++ first;
+		}
+		return c;
+	}
+
+
 }
 
 #endif

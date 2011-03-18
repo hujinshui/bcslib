@@ -189,9 +189,7 @@ namespace bcs
 
 		shape_type shape() const
 		{
-			shape_type shape;
-			shape[0] = m_ne;
-			return shape;
+			return arr_shape(m_ne);
 		}
 
 		const indexer_type& get_indexer() const

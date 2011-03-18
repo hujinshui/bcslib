@@ -24,6 +24,44 @@ namespace bcs
 	typedef uint8_t dim_num_t;
 
 
+	// make array shape
+
+	inline tr1::array<size_t, 1> arr_shape(size_t n)
+	{
+		tr1::array<size_t, 1> shape;
+		shape[0] = n;
+		return shape;
+	}
+
+	inline tr1::array<size_t, 2> arr_shape(size_t d0, size_t d1)
+	{
+		tr1::array<size_t, 2> shape;
+		shape[0] = d0;
+		shape[1] = d1;
+		return shape;
+	}
+
+	inline tr1::array<size_t, 3> arr_shape(size_t d0, size_t d1, size_t d2)
+	{
+		tr1::array<size_t, 3> shape;
+		shape[0] = d0;
+		shape[1] = d1;
+		shape[2] = d2;
+		return shape;
+	}
+
+	inline tr1::array<size_t, 4> arr_shape(size_t d0, size_t d1, size_t d2, size_t d3)
+	{
+		tr1::array<size_t, 4> shape;
+		shape[0] = d0;
+		shape[1] = d1;
+		shape[2] = d2;
+		shape[3] = d3;
+		return shape;
+	}
+
+
+
 	// Exception classes
 
 	class array_exception : public base_exception

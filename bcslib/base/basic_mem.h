@@ -88,6 +88,16 @@ namespace bcs
 			return m_base;
 		}
 
+		const_pointer pend() const
+		{
+			return m_base + m_n;
+		}
+
+		pointer pend()
+		{
+			return m_base + m_n;
+		}
+
 		const_reference operator[](difference_type i) const
 		{
 			return m_base[i];

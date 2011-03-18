@@ -11,13 +11,14 @@
 using namespace bcs::test;
 
 extern test_suite* test_index_selection_suite();
-
+extern test_suite* test_array1d_suite();
 
 test_suite* master_suite()
 {
 	test_suite* msuite = new test_suite( "array_basics" );
 
 	msuite->add( test_index_selection_suite() );
+	msuite->add( test_array1d_suite() );
 
 	return msuite;
 }
