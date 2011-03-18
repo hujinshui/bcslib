@@ -11,7 +11,7 @@
 #define BCSLIB_INDEX_SELECTION_H
 
 #include <bcslib/array/array_base.h>
-#include <vector>
+#include <bcslib/base/shared_vector.h>
 
 namespace bcs
 {
@@ -293,6 +293,11 @@ namespace bcs
 		}
 
 		indices(const std::vector<index_t>& src)
+		: m_pinds(&(src[0])), m_n((size_t)src.size())
+		{
+		}
+
+		indices(const shared_vector<index_t>& src)
 		: m_pinds(&(src[0])), m_n((size_t)src.size())
 		{
 		}
