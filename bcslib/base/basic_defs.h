@@ -29,6 +29,9 @@
 
 #endif
 
+#include <string>
+
+
 namespace bcs
 {
 
@@ -59,6 +62,27 @@ namespace bcs
 	using ::size_t;
 
 	typedef uint8_t byte;
+
+
+	class base_exception
+	{
+	public:
+		virtual ~base_exception() { }
+
+		base_exception(const char *msg) : m_message(msg)
+		{
+		}
+
+		const char *message() const
+		{
+			return m_message.c_str();
+		}
+
+	private:
+		std::string m_message;
+	};
+
+
 
 	namespace tr1
 	{

@@ -47,67 +47,68 @@ namespace bcs
      *  The class to refer to a block of read/write memory that
      *  it takes care of its management by itself
      */
-    template<typename T, typename TAlloc=std::allocator<T> >
-    class block
-    {
-    public:
-            typedef T value_type;
-            typedef size_t size_type;
-            typedef ptrdiff_t difference_type;
+    template<typename T, typename TAlloc = std::allocator<T> >
+	class block
+	{
+	public:
+		typedef T value_type;
+		typedef size_t size_type;
+		typedef ptrdiff_t difference_type;
 
-            typedef T* pointer;
-            typedef T& reference;
-            typedef const T* const_pointer;
-            typedef const T& const_reference;
+		typedef T* pointer;
+		typedef T& reference;
+		typedef const T* const_pointer;
+		typedef const T& const_reference;
 
-            typedef TAlloc allocator_type;
+		typedef TAlloc allocator_type;
 
-    public:
-            block(size_type n) : m_base(_alloc.allocate(n)), m_n(n)
-            {
-            }
+	public:
+		block(size_type n) :
+			m_base(_alloc.allocate(n)), m_n(n)
+		{
+		}
 
-            ~block()
-            {
-                    _alloc.deallocate(this->ptr_base(), this->num_elements());
-            }
+		~block()
+		{
+			_alloc.deallocate(this->pbase(), this->nelems());
+		}
 
-            size_type num_elements() const
-            {
-                    return m_n;
-            }
+		size_type nelems() const
+		{
+			return m_n;
+		}
 
-            const_pointer ptr_base() const
-            {
-                    return m_base;
-            }
+		const_pointer pbase() const
+		{
+			return m_base;
+		}
 
-            pointer ptr_base()
-            {
-                    return m_base;
-            }
+		pointer pbase()
+		{
+			return m_base;
+		}
 
-            const_reference operator[] (difference_type i) const
-            {
-                    return m_base[i];
-            }
+		const_reference operator[](difference_type i) const
+		{
+			return m_base[i];
+		}
 
-            reference operator[] (difference_type i)
-            {
-                    return m_base[i];
-            }
+		reference operator[](difference_type i)
+		{
+			return m_base[i];
+		}
 
-    private:
-            block(const block<T>& );
-            block<T>& operator = (const block<T>& );
+	private:
+		block(const block<T>&);
+		block<T>& operator =(const block<T>&);
 
-    private:
-            pointer m_base;
-            size_type m_n;
+	private:
+		pointer m_base;
+		size_type m_n;
 
-            allocator_type _alloc;
+		allocator_type _alloc;
 
-    }; // end class block
+	}; // end class block
 
 }
 

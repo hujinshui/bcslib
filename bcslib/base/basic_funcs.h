@@ -146,6 +146,20 @@ namespace bcs
 		ssort(a, b);
 	}
 
+
+	// copy_n
+
+	template<typename InputIter, typename OutputIter>
+	void copy_n(InputIter src, size_t n, OutputIter dst)
+	{
+		for (size_t i = 0; i < n; ++i)
+		{
+			*dst = *src;
+			++ src;
+			++ dst;
+		}
+	}
+
 }
 
 #endif

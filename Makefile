@@ -16,6 +16,6 @@ all: test_array
 
 test_array : bin/test_array_basics
 
-ARRAY_BASIC_TESTS = test/test_array_basics.cpp test/test_index_selection.cpp
+ARRAY_BASIC_TESTS = test/test_array_basics.cpp test/test_index_selection.cpp test/test_array1d.cpp
 bin/test_array_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 
 	$(CC) $(CFLAGS) $(ARRAY_BASIC_TESTS) -o bin/test_array_basics
