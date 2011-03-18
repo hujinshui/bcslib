@@ -13,6 +13,12 @@
 using namespace bcs;
 using namespace bcs::test;
 
+// Explicit instantiation for syntax checking
+
 template class array1d<double>;
+template class aview1d<double, step_ind>;
+template class aview1d<double, array_ind>;
+
+
 
 

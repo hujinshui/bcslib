@@ -60,22 +60,23 @@ namespace bcs
 		pointer m_base;
 		const TIndexer *m_pindexer;
 		index_t m_i;
+
 	}; // end class aview1d_iter_implementer
 
 
 	template<typename T, bool IsConst>
-	class aview1d_iter_implementer<T, step_ind, IsConst>
+	class aview1d_step_iter_implementer
 	{
 	public:
-		typedef aview1d_iter_implementer<T, step_ind, IsConst> self_type;
+		typedef aview1d_step_iter_implementer<T, IsConst> self_type;
 		typedef T value_type;
 		typedef typename pointer_and_reference<T, IsConst>::pointer pointer;
 		typedef typename pointer_and_reference<T, IsConst>::reference reference;
 
 	public:
-		aview1d_iter_implementer() : m_p(0), m_step(0) { }
+		aview1d_step_iter_implementer() : m_p(0), m_step(0) { }
 
-		aview1d_iter_implementer(pointer p, index_t step) : m_p(p), m_step(step) { }
+		aview1d_step_iter_implementer(pointer p, index_t step) : m_p(p), m_step(step) { }
 
 		pointer ptr() const { return m_p; }
 		reference ref() const { return *m_p; }
@@ -104,14 +105,17 @@ namespace bcs
 
 		static const_iterator get_const_iterator(const T *base, const TIndexer& indexer, index_t i)
 		{
-			return const_iterator(base, indexer, i);
+			typedef aview1d_iter_implementer<T, TIndexer, true> impl;
+			return impl(base, indexer, i);
 		}
 
 		static iterator get_iterator(T *base, const TIndexer& indexer, index_t i)
 		{
-			return iterator(base, indexer, i);
+			typedef aview1d_iter_implementer<T, TIndexer, false> impl;
+			return impl(base, indexer, i);
 		}
 	};
+
 
 	template<typename T>
 	struct aview1d_iterators<T, id_ind>
@@ -130,6 +134,24 @@ namespace bcs
 		}
 	};
 
+	template<typename T>
+	struct aview1d_iterators<T, step_ind>
+	{
+		typedef random_access_iterator_wrapper<aview1d_step_iter_implementer<T, true> > const_iterator;
+		typedef random_access_iterator_wrapper<aview1d_step_iter_implementer<T, false> > iterator;
+
+		static const_iterator get_const_iterator(const T *base, const step_ind& indexer, index_t i)
+		{
+			typedef aview1d_step_iter_implementer<T, true> impl;
+			return impl(base + indexer[i], indexer.step());
+		}
+
+		static iterator get_iterator(T *base, const step_ind& indexer, index_t i)
+		{
+			typedef aview1d_step_iter_implementer<T, false> impl;
+			return impl(base + indexer[i], indexer.step());
+		}
+	};
 
 
 
