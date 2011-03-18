@@ -169,7 +169,7 @@ namespace bcs
 		public:
 			typedef index_t value_type;
 
-			enumerator(index_t b, index_t e, index_t s) : m_e(e), m_i(b-s), m_s(s) { }
+			enumerator(index_t b, index_t e, index_t s) : m_e(e), m_s(s), m_i(b-s) { }
 
 			bool next()
 			{
