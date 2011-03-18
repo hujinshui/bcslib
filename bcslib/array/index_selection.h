@@ -308,7 +308,7 @@ namespace bcs
 
 		bool is_contained_in(size_t n) const
 		{
-			for (index_t i = 0; i < m_n; ++i)
+			for (index_t i = 0; i < (index_t)m_n; ++i)
 			{
 				index_t v = m_pinds[i];
 				if (v < 0 || v >= (index_t)n) return false;
@@ -335,7 +335,7 @@ namespace bcs
 			bool next()
 			{
 				++ m_i;
-				return m_i < m_inds.size();
+				return m_i < (index_t)m_inds.size();
 			}
 
 			value_type get()
