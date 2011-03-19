@@ -24,7 +24,7 @@
                 #error GCC (G++) of version lower than 4.0.0 is not supported
         #endif
         #define BCSLIB_COMPILER BCSLIB_GCC
-#elif
+#else
         #error BCSLib can only be used with Microsoft Visual C++ or GCC (G++)
 #endif
 

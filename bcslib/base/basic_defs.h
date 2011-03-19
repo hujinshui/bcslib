@@ -63,8 +63,8 @@ namespace bcs
 
 	typedef uint8_t byte;
 
-	typedef struct clone_t { };
-	typedef struct own_t { };
+	struct clone_t { };
+	struct own_t { };
 
 	class base_exception
 	{
@@ -94,7 +94,6 @@ namespace bcs
 		using std::tr1::shared_ptr;
 		using std::tr1::array;
 		using std::tr1::tuple;
-		using std::tr1::result_of;
 
 	}
 

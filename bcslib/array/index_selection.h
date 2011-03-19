@@ -222,7 +222,7 @@ namespace bcs
 
 		bool is_contained_in(size_t n) const
 		{
-			return rep_i >= 0 && rep_i < n;
+			return rep_i >= 0 && rep_i < (index_t)n;
 		}
 
 		bool operator == (const rep_range& rhs) const
