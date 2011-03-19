@@ -481,13 +481,13 @@ namespace bcs
 
 	public:
 		explicit array1d(size_type n)
-		: view_type(0, id_ind(n)), m_pblock(new block<value_type>(n))
+		: view_type(0, n), m_pblock(new block<value_type>(n))
 		{
 			this->m_base = m_pblock->pbase();
 		}
 
 		array1d(size_type n, const T& x)
-		: view_type(0, id_ind(n)), m_pblock(new block<value_type>(n))
+		: view_type(0, n), m_pblock(new block<value_type>(n))
 		{
 			this->m_base = m_pblock->pbase();
 
@@ -496,7 +496,7 @@ namespace bcs
 
 		template<typename InputIter>
 		array1d(size_type n, InputIter src)
-		: view_type(0, id_ind(n)), m_pblock(new block<value_type>(n))
+		: view_type(0, n), m_pblock(new block<value_type>(n))
 		{
 			this->m_base = m_pblock->pbase();
 

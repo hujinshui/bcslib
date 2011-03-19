@@ -23,6 +23,9 @@ namespace bcs
 
 	typedef uint8_t dim_num_t;
 
+	struct row_major_t { };
+	struct column_major_t { };
+
 
 	// make array shape
 
