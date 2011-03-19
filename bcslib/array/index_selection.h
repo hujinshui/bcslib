@@ -432,6 +432,11 @@ namespace bcs
 			return m_pinds[i];
 		}
 
+		index_t step_at(index_t i) const
+		{
+			return m_pinds[i+1] - m_pinds[i];
+		}
+
 	public:
 
 		class enumerator

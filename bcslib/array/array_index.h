@@ -22,6 +22,7 @@ namespace bcs
 	 *
 	 * - I.size();	// the number of elements along the dimension
 	 * - I[i];		// the mapped index of i
+	 * - step_at(i);  // return I[i+1] - I[i];
 	 *
 	 *
 	 * We note that the class indices (defined in index_selection.h)
@@ -45,6 +46,11 @@ namespace bcs
 		index_t operator[] (index_t i) const
 		{
 			return i;
+		}
+
+		index_t step_at(index_t i) const
+		{
+			return 1;
 		}
 
 	private:
@@ -75,6 +81,11 @@ namespace bcs
 			return i * m_step;
 		}
 
+		index_t step_at(index_t i) const
+		{
+			return m_step;
+		}
+
 	private:
 		size_t m_n;
 		index_t m_step;
@@ -95,6 +106,11 @@ namespace bcs
 		}
 
 		index_t operator[] (index_t i) const
+		{
+			return 0;
+		}
+
+		index_t step_at(index_t i) const
 		{
 			return 0;
 		}

@@ -60,7 +60,171 @@ namespace bcs
 
 	// iterations
 
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1> struct aview2d_iterators;
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, bool IsConst> class aview2d_iter_implementer;
+
+	template<typename T, class TIndexer0, class TIndexer1, bool IsConst>
+	class aview2d_iter_implementer<T, row_major_t, TIndexer0, TIndexer1, IsConst>
+	{
+	public:
+		typedef aview2d_iter_implementer<T, row_major_t, TIndexer0, IsConst> self_type;
+		typedef T value_type;
+		typedef typename pointer_and_reference<T, IsConst>::pointer pointer;
+		typedef typename pointer_and_reference<T, IsConst>::reference reference;
+
+	public:
+		aview2d_iter_implementer()
+		: m_pidx0(0), m_pidx1(0), m_d0_m1(0), m_d1_m1(0), m_i(0), m_j(0), m_pbase(0), m_p(0)
+		{
+		}
+
+		aview2d_iter_implementer(pointer pbase, const TIndexer0& idx0, const TIndexer1& idx1, index_t i, index_t j)
+		: m_pidx0(&idx0), m_pidx1(&idx1)
+		, m_d0_m1((index_t)idx0->size() - 1), m_d1_m1((index_t)idx1->size() - 1)
+		, m_i(i), m_j(j)
+		, m_pbase(pbase)
+		, m_p(m_pbase + _detail::layout_aux2d<row_major_t>::offset(i, j))
+		{
+		}
+
+		pointer ptr() const
+		{
+			return m_p;
+		}
+
+		reference ref() const
+		{
+			return *m_p;
+		}
+
+		void move_next()
+		{
+			if (m_j < m_d1_m1)
+			{
+				m_p += m_pidx1->step_at(m_j);
+				++ m_j;
+			}
+			else
+			{
+				++ m_i;
+				m_j = 0;
+				m_p = m_pbase + m_pidx0[m_i] * (m_d1_m1 + 1);
+			}
+		}
+
+	private:
+		const TIndexer0 *m_pidx0;
+		const TIndexer1 *m_pidx1;
+		const index_t m_d0_m1;
+		const index_t m_d1_m1;
+		const index_t m_i;
+		const index_t m_j;
+
+		pointer m_pbase;
+		pointer m_p;
+
+	}; // end class aview2d_iter_implementer for row_major
+
+
+	template<typename T, class TIndexer0, class TIndexer1, bool IsConst>
+	class aview2d_iter_implementer<T, column_major_t, TIndexer0, TIndexer1, IsConst>
+	{
+	public:
+		typedef aview2d_iter_implementer<T, column_major_t, TIndexer0, IsConst> self_type;
+		typedef T value_type;
+		typedef typename pointer_and_reference<T, IsConst>::pointer pointer;
+		typedef typename pointer_and_reference<T, IsConst>::reference reference;
+
+	public:
+		aview2d_iter_implementer()
+		: m_pidx0(0), m_pidx1(0), m_d0_m1(0), m_d1_m1(0), m_i(0), m_j(0), m_pbase(0), m_p(0)
+		{
+		}
+
+		aview2d_iter_implementer(pointer pbase, const TIndexer0& idx0, const TIndexer1& idx1, index_t i, index_t j)
+		: m_pidx0(&idx0), m_pidx1(&idx1)
+		, m_d0_m1((index_t)idx0->size() - 1), m_d1_m1((index_t)idx1->size() - 1)
+		, m_i(i), m_j(j)
+		, m_pbase(pbase)
+		, m_p(m_pbase + _detail::layout_aux2d<column_major_t>::offset(i, j))
+		{
+		}
+
+		pointer ptr() const
+		{
+			return m_p;
+		}
+
+		reference ref() const
+		{
+			return *m_p;
+		}
+
+		void move_next()
+		{
+			if (m_i < m_d0_m1)
+			{
+				m_p += m_pidx0->step_at(m_i);
+				++ m_i;
+			}
+			else
+			{
+				++ m_j;
+				m_i = 0;
+				m_p = m_pbase + m_pidx1[m_j] * (m_d0_m1 + 1);
+			}
+		}
+
+	private:
+		const TIndexer0 *m_pidx0;
+		const TIndexer1 *m_pidx1;
+		const index_t m_d0_m1;
+		const index_t m_d1_m1;
+		const index_t m_i;
+		const index_t m_j;
+
+		pointer m_pbase;
+		pointer m_p;
+
+	}; // end class aview2d_iter_implementer for column_major
+
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	struct aview2d_iterators
+	{
+		typedef forward_iterator_wrapper<aview2d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, true> > const_iterator;
+		typedef forward_iterator_wrapper<aview2d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, false> > iterator;
+
+		static const_iterator get_const_iterator(const T *pbase, const TIndexer0& indexer0, const TIndexer1& indexer1, index_t i, index_t j)
+		{
+			typedef aview2d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, true> impl;
+			return impl(pbase, indexer0, indexer1, i, j);
+		}
+
+		static iterator get_iterator(T *pbase, const TIndexer0& indexer0, const TIndexer0& indexer1, index_t i, index_t j)
+		{
+			typedef aview1d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, false> impl;
+			return impl(pbase, indexer0, indexer1, i, j);
+		}
+	};
+
+	template<typename T, typename TOrd>
+	struct aview2d_iterators<T, TOrd, id_ind, id_ind>
+	{
+		typedef const T* const_iterator;
+		typedef T* iterator;
+
+		static const_iterator get_const_iterator(const T *pbase, const id_ind& indexer0, const id_ind& indexer1, index_t i, index_t j)
+		{
+			return pbase + _detail::layout_aux2d<TOrd>::offset(indexer0.size(), indexer1.size(), i, j);
+		}
+
+		static iterator get_iterator(T *pbase, const id_ind& indexer0, const id_ind& indexer1, index_t i, index_t j)
+		{
+			return pbase + _detail::layout_aux2d<TOrd>::offset(indexer0.size(), indexer1.size(), i, j);
+		}
+	};
+
+
 
 	// main classes
 
@@ -254,6 +418,110 @@ namespace bcs
 		indexer1_type m_indexer1;
 
 	}; // end class aview2d
+
+
+	// Overloaded operators and array manipulation
+
+	// element-wise comparison
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline bool is_same_shape(
+			const const_aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const const_aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return lhs.dim0() == rhs.dim0() && lhs.dim1() == rhs.dim1();
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline bool operator == (
+			const const_aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const const_aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return is_same_shape(lhs, rhs) && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+	}
+
+	template<typename T, typename TOrd>
+	inline bool operator == (const const_aview2d<T, TOrd, id_ind, id_ind>& lhs, const const_aview2d<T, TOrd, id_ind, id_ind>& rhs)
+	{
+		return is_same_shape(lhs, rhs) &&  elements_equal(lhs.pbase(), rhs.pbase(), lhs.nelems());
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline bool operator != (
+			const const_aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const const_aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return !(lhs == rhs);
+	}
+
+	// export
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename OutputIter>
+	inline void export_to(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& a, OutputIter dst)
+	{
+		std::copy(a.begin(), a.end(), dst);
+	}
+
+	template<typename T, typename TOrd>
+	inline void export_to(const const_aview2d<T, TOrd, id_ind, id_ind>& a, T *dst)
+	{
+		copy_elements(a.pbase(), dst, a.nelems());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, class RView>
+	inline const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& operator >> (const const_aview1d<T, TOrd, TIndexer0, TIndexer1>& a, RView& b)
+	{
+		if (is_same_shape(a, b))
+		{
+			throw array_size_mismatch();
+		}
+		export_to(a, b.begin());
+		return a;
+	}
+
+	// import or fill
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename InputIter>
+	inline void import_from(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, InputIter src)
+	{
+		copy_n(src, a.nelems(), a.begin());
+	}
+
+	template<typename T, typename TOrd>
+	inline void import_from(aview2d<T, TOrd, id_ind, id_ind>& a, const T *src)
+	{
+		copy_elements(src, a.pbase(), a.nelems());
+	}
+
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, class RView>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& operator << (aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const RView& b)
+	{
+		if (a.nelems() != b.nelems())
+		{
+			throw array_size_mismatch();
+		}
+		import_from(a, b.begin());
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline void fill(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& x)
+	{
+		std::fill(a.begin(), a.end(), x);
+	}
+
+	template<typename T, typename TOrd>
+	inline void fill(aview2d<T, TOrd, id_ind, id_ind>& a, const T& x)
+	{
+		fill_elements(a.pbase(), a.nelems(), x);
+	}
+
+	template<typename T, typename TOrd>
+	inline void set_zeros(aview2d<T, TOrd, id_ind, id_ind>& a)
+	{
+		set_zeros_to_elements(a.pbase(), a.nelems());
+	}
 
 
 	// stand-alone array class
