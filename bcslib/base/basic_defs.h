@@ -63,6 +63,7 @@ namespace bcs
 
 	typedef uint8_t byte;
 
+	typedef struct clone_t { };
 
 	class base_exception
 	{

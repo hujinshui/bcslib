@@ -19,7 +19,7 @@ using namespace bcs::test;
 
 template class array1d<double>;
 template class aview1d<double, step_ind>;
-template class aview1d<double, array_ind>;
+template class aview1d<double, indices>;
 
 
 template<typename T, class TIndexer>
@@ -44,8 +44,6 @@ bool array_integrity_test(const bcs::const_aview1d<T, TIndexer>& view)
 
 	if (view.ndims() != 1) return false;
 	if (view.shape() != arr_shape(n)) return false;
-
-	if (view.pbase() != &(view[0])) return false;
 
 	for (index_t i = 0; i < (index_t)n; ++i)
 	{

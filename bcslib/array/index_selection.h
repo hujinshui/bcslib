@@ -11,7 +11,7 @@
 #define BCSLIB_INDEX_SELECTION_H
 
 #include <bcslib/array/array_base.h>
-#include <bcslib/base/shared_vector.h>
+#include <vector>
 
 namespace bcs
 {
@@ -288,19 +288,33 @@ namespace bcs
 	public:
 		static const bool is_open_end = false;
 
-		indices(const index_t *p, size_t n) : m_pinds(p), m_n(n)
+		indices(const index_t *p, size_t n)
+		: m_pblock(), m_pinds(p), m_n(n)
 		{
 		}
 
-		indices(const std::vector<index_t>& src)
-		: m_pinds(&(src[0])), m_n((size_t)src.size())
+		indices(const std::vector<index_t>& refvec)
+		: m_pblock(), m_pinds(&(refvec[0])), m_n((size_t)refvec.size())
 		{
 		}
 
-		indices(const shared_vector<index_t>& src)
-		: m_pinds(&(src[0])), m_n((size_t)src.size())
+		indices(const index_t *src, size_t n, clone_t)
+		: m_pblock(new block<index_t>(n)), m_pinds(m_pblock->pbase()), m_n(n)
+		{
+			copy_elements(src, const_cast<index_t*>(m_pinds), n);
+		}
+
+		indices(const std::vector<index_t>& src, clone_t)
+		: m_pblock(new block<index_t>(src.size())), m_pinds(m_pblock->pbase()), m_n(src.size())
+		{
+			copy_elements(&(src[0]), const_cast<index_t*>(m_pinds), src.size());
+		}
+
+		indices(block<index_t>* p_newblk)  // with this construction, this object takes the ownership of p_newblk
+		: m_pblock(p_newblk), m_pinds(p_newblk->pbase()), m_n(p_newblk->nelems())
 		{
 		}
+
 
 		size_t size() const { return m_n; }
 
@@ -354,8 +368,10 @@ namespace bcs
 
 
 	private:
+		tr1::shared_ptr<block<index_t> > m_pblock;
 		const index_t *m_pinds;
 		size_t m_n;
+
 
 	}; // end class indices
 
