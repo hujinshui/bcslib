@@ -142,6 +142,17 @@ namespace bcs
 	};
 
 	template<>
+	struct sub_indexer<id_ind, rev_whole>
+	{
+		typedef step_ind type;
+		static type get(const id_ind& base_indexer, const rev_whole& selector, index_t& offset)
+		{
+			return sub_indexer<id_ind, step_range>::get(base_indexer, selector.close(base_indexer.size()), offset);
+		}
+	};
+
+
+	template<>
 	struct sub_indexer<id_ind, indices>
 	{
 		typedef indices type;
@@ -190,6 +201,16 @@ namespace bcs
 	{
 		typedef step_ind type;
 		static type get(const step_ind& base_indexer, const open_step_range& selector, index_t& offset)
+		{
+			return sub_indexer<step_ind, step_range>::get(base_indexer, selector.close(base_indexer.size()), offset);
+		}
+	};
+
+	template<>
+	struct sub_indexer<step_ind, rev_whole>
+	{
+		typedef step_ind type;
+		static type get(const step_ind& base_indexer, const rev_whole& selector, index_t& offset)
 		{
 			return sub_indexer<step_ind, step_range>::get(base_indexer, selector.close(base_indexer.size()), offset);
 		}

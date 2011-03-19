@@ -209,6 +209,19 @@ namespace bcs
 	}; // end struct whole
 
 
+	struct rev_whole
+	{
+		static const bool is_open_end = true;
+
+		step_range close(size_t n) const
+		{
+			return step_range((index_t)n - 1, -1, -1);
+		}
+
+	}; // end struct rev_whole
+
+
+
 	struct open_range
 	{
 		static const bool is_open_end = true;
