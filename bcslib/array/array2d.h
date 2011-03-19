@@ -66,7 +66,7 @@ namespace bcs
 	class aview2d_iter_implementer<T, row_major_t, TIndexer0, TIndexer1, IsConst>
 	{
 	public:
-		typedef aview2d_iter_implementer<T, row_major_t, TIndexer0, IsConst> self_type;
+		typedef aview2d_iter_implementer<T, row_major_t, TIndexer0, TIndexer1, IsConst> self_type;
 		typedef T value_type;
 		typedef typename pointer_and_reference<T, IsConst>::pointer pointer;
 		typedef typename pointer_and_reference<T, IsConst>::reference reference;
@@ -79,10 +79,10 @@ namespace bcs
 
 		aview2d_iter_implementer(pointer pbase, const TIndexer0& idx0, const TIndexer1& idx1, index_t i, index_t j)
 		: m_pidx0(&idx0), m_pidx1(&idx1)
-		, m_d0_m1((index_t)idx0->size() - 1), m_d1_m1((index_t)idx1->size() - 1)
+		, m_d0_m1((index_t)idx0.size() - 1), m_d1_m1((index_t)idx1.size() - 1)
 		, m_i(i), m_j(j)
 		, m_pbase(pbase)
-		, m_p(m_pbase + _detail::layout_aux2d<row_major_t>::offset(i, j))
+		, m_p(m_pbase + _detail::layout_aux2d<row_major_t>::offset(idx0.size(), idx1.size(), i, j))
 		{
 		}
 
@@ -114,10 +114,10 @@ namespace bcs
 	private:
 		const TIndexer0 *m_pidx0;
 		const TIndexer1 *m_pidx1;
-		const index_t m_d0_m1;
-		const index_t m_d1_m1;
-		const index_t m_i;
-		const index_t m_j;
+		index_t m_d0_m1;
+		index_t m_d1_m1;
+		index_t m_i;
+		index_t m_j;
 
 		pointer m_pbase;
 		pointer m_p;
@@ -129,7 +129,7 @@ namespace bcs
 	class aview2d_iter_implementer<T, column_major_t, TIndexer0, TIndexer1, IsConst>
 	{
 	public:
-		typedef aview2d_iter_implementer<T, column_major_t, TIndexer0, IsConst> self_type;
+		typedef aview2d_iter_implementer<T, column_major_t, TIndexer0, TIndexer1, IsConst> self_type;
 		typedef T value_type;
 		typedef typename pointer_and_reference<T, IsConst>::pointer pointer;
 		typedef typename pointer_and_reference<T, IsConst>::reference reference;
@@ -142,10 +142,10 @@ namespace bcs
 
 		aview2d_iter_implementer(pointer pbase, const TIndexer0& idx0, const TIndexer1& idx1, index_t i, index_t j)
 		: m_pidx0(&idx0), m_pidx1(&idx1)
-		, m_d0_m1((index_t)idx0->size() - 1), m_d1_m1((index_t)idx1->size() - 1)
+		, m_d0_m1((index_t)idx0.size() - 1), m_d1_m1((index_t)idx1.size() - 1)
 		, m_i(i), m_j(j)
 		, m_pbase(pbase)
-		, m_p(m_pbase + _detail::layout_aux2d<column_major_t>::offset(i, j))
+		, m_p(m_pbase + _detail::layout_aux2d<column_major_t>::offset(idx0.size(), idx1.size(), i, j))
 		{
 		}
 
@@ -177,10 +177,10 @@ namespace bcs
 	private:
 		const TIndexer0 *m_pidx0;
 		const TIndexer1 *m_pidx1;
-		const index_t m_d0_m1;
-		const index_t m_d1_m1;
-		const index_t m_i;
-		const index_t m_j;
+		index_t m_d0_m1;
+		index_t m_d1_m1;
+		index_t m_i;
+		index_t m_j;
 
 		pointer m_pbase;
 		pointer m_p;
@@ -200,9 +200,9 @@ namespace bcs
 			return impl(pbase, indexer0, indexer1, i, j);
 		}
 
-		static iterator get_iterator(T *pbase, const TIndexer0& indexer0, const TIndexer0& indexer1, index_t i, index_t j)
+		static iterator get_iterator(T *pbase, const TIndexer0& indexer0, const TIndexer1& indexer1, index_t i, index_t j)
 		{
-			typedef aview1d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, false> impl;
+			typedef aview2d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, false> impl;
 			return impl(pbase, indexer0, indexer1, i, j);
 		}
 	};
@@ -237,8 +237,8 @@ namespace bcs
 		typedef TOrd layout_order;
 		typedef TIndexer0 indexer0_type;
 		typedef TIndexer1 indexer1_type;
-		typedef const_aview2d<value_type, indexer0_type, indexer1_type> const_view_type;
-		typedef aview2d<value_type, indexer0_type, indexer1_type> view_type;
+		typedef const_aview2d<value_type, layout_order, indexer0_type, indexer1_type> const_view_type;
+		typedef aview2d<value_type, layout_order, indexer0_type, indexer1_type> view_type;
 
 		typedef aview2d_iterators<T, TOrd, TIndexer0, TIndexer1> _iterators;
 		typedef typename _iterators::const_iterator const_iterator;
@@ -352,8 +352,8 @@ namespace bcs
 		typedef TOrd layout_order;
 		typedef TIndexer0 indexer0_type;
 		typedef TIndexer1 indexer1_type;
-		typedef const_aview2d<value_type, indexer0_type, indexer1_type> const_view_type;
-		typedef aview2d<value_type, indexer0_type, indexer1_type> view_type;
+		typedef const_aview2d<value_type, layout_order, indexer0_type, indexer1_type> const_view_type;
+		typedef aview2d<value_type, layout_order, indexer0_type, indexer1_type> view_type;
 
 		typedef aview2d_iterators<T, TOrd, TIndexer0, TIndexer1> _iterators;
 		typedef typename _iterators::const_iterator const_iterator;
@@ -411,12 +411,6 @@ namespace bcs
 			return _iterators::get_const_iterator(this->m_base, this->m_indexer0, this->m_indexer1, e_i, e_j);
 		}
 
-	protected:
-		pointer m_base;
-		size_type m_ne;
-		indexer0_type m_indexer0;
-		indexer1_type m_indexer1;
-
 	}; // end class aview2d
 
 
@@ -469,7 +463,7 @@ namespace bcs
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, class RView>
-	inline const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& operator >> (const const_aview1d<T, TOrd, TIndexer0, TIndexer1>& a, RView& b)
+	inline const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& operator >> (const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& a, RView& b)
 	{
 		if (is_same_shape(a, b))
 		{
@@ -533,12 +527,12 @@ namespace bcs
 		BCS_ARRAY_BASIC_TYPEDEFS(2u, T)
 
 		typedef TOrd layout_order;
-		typedef TIndexer0 indexer0_type;
-		typedef TIndexer1 indexer1_type;
-		typedef const_aview2d<value_type, indexer0_type, indexer1_type> const_view_type;
-		typedef aview2d<value_type, indexer0_type, indexer1_type> view_type;
+		typedef id_ind indexer0_type;
+		typedef id_ind indexer1_type;
+		typedef const_aview2d<value_type, layout_order, indexer0_type, indexer1_type> const_view_type;
+		typedef aview2d<value_type, layout_order, indexer0_type, indexer1_type> view_type;
 
-		typedef aview2d_iterators<T, TOrd, TIndexer0, TIndexer1> _iterators;
+		typedef aview2d_iterators<T, TOrd, id_ind, id_ind> _iterators;
 		typedef typename _iterators::const_iterator const_iterator;
 		typedef typename _iterators::iterator iterator;
 
