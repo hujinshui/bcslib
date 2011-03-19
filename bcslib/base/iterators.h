@@ -94,7 +94,7 @@ namespace bcs
 
 		bool operator != (const self_type& rhs) const
 		{
-			return !(m_impl != rhs.m_impl);
+			return !(m_impl == rhs.m_impl);
 		}
 
 		reference operator * () const

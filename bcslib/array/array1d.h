@@ -231,6 +231,20 @@ namespace bcs
 			return _iterators::get_const_iterator(m_base, m_indexer, m_ne);
 		}
 
+		// Sub-view
+
+		template<class TSelector>
+		const_aview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>
+		sub_view(const TSelector& selector) const
+		{
+			index_t offset = 0;
+			typename sub_indexer<indexer_type, TSelector>::type sindexer =
+					sub_indexer<indexer_type, TSelector>::get(m_indexer, selector, offset);
+
+			return const_aview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>(
+					m_base + offset, sindexer);
+		}
+
 
 	protected:
 		pointer m_base;
@@ -322,6 +336,32 @@ namespace bcs
 		iterator end()
 		{
 			return _iterators::get_iterator(this->m_base, this->m_indexer, this->m_ne);
+		}
+
+		// Sub-view
+
+		template<class TSelector>
+		const_aview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>
+		sub_view(const TSelector& selector) const
+		{
+			index_t offset = 0;
+			typename sub_indexer<indexer_type, TSelector>::type sindexer =
+					sub_indexer<indexer_type, TSelector>::get(this->m_indexer, selector, offset);
+
+			return const_aview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>(
+					this->m_base + offset, sindexer);
+		}
+
+		template<class TSelector>
+		aview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>
+		sub_view(const TSelector& selector)
+		{
+			index_t offset = 0;
+			typename sub_indexer<indexer_type, TSelector>::type sindexer =
+					sub_indexer<indexer_type, TSelector>::get(this->m_indexer, selector, offset);
+
+			return aview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>(
+					this->m_base + offset, sindexer);
 		}
 
 	}; // end class aview1d

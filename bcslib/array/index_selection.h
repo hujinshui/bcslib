@@ -310,7 +310,7 @@ namespace bcs
 			copy_elements(&(src[0]), const_cast<index_t*>(m_pinds), src.size());
 		}
 
-		indices(block<index_t>* p_newblk)  // with this construction, this object takes the ownership of p_newblk
+		indices(block<index_t>* p_newblk, own_t)
 		: m_pblock(p_newblk), m_pinds(p_newblk->pbase()), m_n(p_newblk->nelems())
 		{
 		}

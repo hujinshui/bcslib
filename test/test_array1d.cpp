@@ -98,11 +98,87 @@ BCS_TEST_CASE( test_dense_array1d )
 }
 
 
+BCS_TEST_CASE( test_step_array1d )
+{
+	double src0[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	double src1[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+	aview1d<double, step_ind> a1(src1, step_ind(3, 1));
+	double r1[] = {1, 2, 3};
+
+	BCS_CHECK( array_integrity_test(a1) );
+	BCS_CHECK( array_view_equal(a1, r1, 3) );
+	BCS_CHECK( array_iteration_test(a1) );
+
+	aview1d<double, step_ind> a2(src1, step_ind(4, 2));
+	double r2[] = {1, 3, 5, 7};
+
+	BCS_CHECK( array_integrity_test(a2) );
+	BCS_CHECK( array_view_equal(a2, r2, 4) );
+	BCS_CHECK( array_iteration_test(a2) );
+
+	aview1d<double, step_ind> a3(src1 + 7, step_ind(3, -2));
+	double r3[] = {8, 6, 4};
+
+	BCS_CHECK( array_integrity_test(a3) );
+	BCS_CHECK( array_view_equal(a3, r3, 3) );
+	BCS_CHECK( array_iteration_test(a3) );
+
+	aview1d<double, step_ind> a0(src0, step_ind(4, 2));
+
+	import_from(a0, src1);
+	double g1[10] = {1, 0, 2, 0, 3, 0, 4, 0, 0, 0};
+	BCS_CHECK( collection_equal(src0, src0 + 10, g1, 10) );
+
+	fill(a0, 0.0);
+	double g2[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	BCS_CHECK( collection_equal(src0, src0 + 10, g2, 10) );
+}
+
+
+BCS_TEST_CASE( test_indices_array1d )
+{
+	double src0[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	double src1[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+	index_t inds1[4] = {1, 3, 6, 7};
+	aview1d<double, indices> a1(src1, indices(inds1, 4));
+	double r1[] = {2, 4, 7, 8};
+
+	BCS_CHECK( array_integrity_test(a1) );
+	BCS_CHECK( array_view_equal(a1, r1, 4) );
+	BCS_CHECK( array_iteration_test(a1) );
+
+	index_t inds2[6] = {5, 1, 4, 2, 2, 3};
+	aview1d<double, indices> a2(src1, indices(inds2, 6));
+	double r2[] = {6, 2, 5, 3, 3, 4};
+
+	BCS_CHECK( array_integrity_test(a2) );
+	BCS_CHECK( array_view_equal(a2, r2, 6) );
+	BCS_CHECK( array_iteration_test(a2) );
+
+	index_t inds0[5] = {0, 2, 3, 5, 7};
+	aview1d<double, indices> a0(src0, indices(inds0, 5));
+
+	import_from(a0, src1);
+	double g1[10] = {1, 0, 2, 3, 0, 4, 0, 5, 0, 0};
+	BCS_CHECK( collection_equal(src0, src0 + 10, g1, 10) );
+
+	fill(a0, 0.0);
+	double g2[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	BCS_CHECK( collection_equal(src0, src0 + 10, g2, 10) );
+}
+
+
+
+
 test_suite *test_array1d_suite()
 {
 	test_suite *suite = new test_suite( "test_array1d" );
 
 	suite->add( new test_dense_array1d() );
+	suite->add( new test_step_array1d() );
+	suite->add( new test_indices_array1d() );
 
 	return suite;
 }
