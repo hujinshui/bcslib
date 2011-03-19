@@ -21,7 +21,7 @@ namespace bcs
 	// forward declaration
 
 	template<typename T, class TIndexer=id_ind> class const_aview1d;
-	template<typename T, class TIndexer> class aview1d;
+	template<typename T, class TIndexer=id_ind> class aview1d;
 	template<typename T, class Alloc=std::allocator<T> > class array1d;
 
 	// iterators
@@ -235,7 +235,7 @@ namespace bcs
 
 		template<class TSelector>
 		const_aview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>
-		sub_view(const TSelector& selector) const
+		V(const TSelector& selector) const
 		{
 			index_t offset = 0;
 			typename sub_indexer<indexer_type, TSelector>::type sindexer =
@@ -342,7 +342,7 @@ namespace bcs
 
 		template<class TSelector>
 		const_aview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>
-		sub_view(const TSelector& selector) const
+		V(const TSelector& selector) const
 		{
 			index_t offset = 0;
 			typename sub_indexer<indexer_type, TSelector>::type sindexer =
@@ -354,7 +354,7 @@ namespace bcs
 
 		template<class TSelector>
 		aview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>
-		sub_view(const TSelector& selector)
+		V(const TSelector& selector)
 		{
 			index_t offset = 0;
 			typename sub_indexer<indexer_type, TSelector>::type sindexer =
@@ -372,8 +372,8 @@ namespace bcs
 
 	// element-wise comparison
 
-	template<typename T, class TIndexer>
-	inline bool operator == (const const_aview1d<T, TIndexer>& lhs, const const_aview1d<T, TIndexer>& rhs)
+	template<typename T, class TIndexer, class TIndexer2>
+	inline bool operator == (const const_aview1d<T, TIndexer>& lhs, const const_aview1d<T, TIndexer2>& rhs)
 	{
 		return lhs.nelems() == rhs.nelems() &&
 				std::equal(lhs.begin(), lhs.end(), rhs.begin());
@@ -383,11 +383,11 @@ namespace bcs
 	inline bool operator == (const const_aview1d<T, id_ind>& lhs, const const_aview1d<T, id_ind>& rhs)
 	{
 		return lhs.nelems() == rhs.nelems() &&
-				elements_equal(lhs.pbase(), lhs.pbase() + lhs.nelems(), rhs.ptr_base());
+				elements_equal(lhs.pbase(), rhs.pbase(), lhs.nelems());
 	}
 
-	template<typename T, class TIndexer>
-	inline bool operator != (const const_aview1d<T, TIndexer>& lhs, const const_aview1d<T, TIndexer>& rhs)
+	template<typename T, class TIndexer, class TIndexer2>
+	inline bool operator != (const const_aview1d<T, TIndexer>& lhs, const const_aview1d<T, TIndexer2>& rhs)
 	{
 		return !(lhs == rhs);
 	}

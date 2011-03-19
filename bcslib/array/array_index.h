@@ -91,7 +91,7 @@ namespace bcs
 	template<class TIndexer>
 	struct sub_indexer<TIndexer, whole>
 	{
-		typedef id_ind type;
+		typedef TIndexer type;
 		static type get(const TIndexer& base_indexer, whole, index_t& offset)
 		{
 			offset = 0;

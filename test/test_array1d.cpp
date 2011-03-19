@@ -170,6 +170,53 @@ BCS_TEST_CASE( test_indices_array1d )
 }
 
 
+BCS_TEST_CASE( test_regular_subview )
+{
+	double src[16];
+	for (int i = 0; i < 16; ++i) src[i] = i;  // 0, 1, 2, ..., 15
+
+	aview1d<double, id_ind> a1(src, 8);
+
+	double r1a[] = {0, 1, 2, 3, 4, 5, 6, 7};
+	BCS_CHECK_EQUAL( a1.V(whole()),  aview1d<double>(r1a, 8) );
+
+	double r1b[] = {1, 2, 3, 4, 5};
+	BCS_CHECK_EQUAL( a1.V(rgn(1, 6)), aview1d<double>(r1b, 5) );
+
+	double r1c[] = {1, 3, 5};
+	BCS_CHECK_EQUAL( a1.V(rgn(1, 7, 2)), aview1d<double>(r1c, 3));
+
+	double r1d[] = {2, 3, 4, 5, 6};
+	BCS_CHECK_EQUAL( a1.V(rgn(2, aend() - 1)), aview1d<double>(r1d, 5));
+
+	double r1e[] = {1, 3, 5, 7};
+	BCS_CHECK_EQUAL( a1.V(rgn(1, aend(), 2)), aview1d<double>(r1e, 4));
+
+	aview1d<double, step_ind> a2(src, step_ind(8, 2));
+
+	double r2a[] = {0, 2, 4, 6, 8, 10, 12, 14};
+	BCS_CHECK_EQUAL( a2.V(whole()), aview1d<double>(r2a, 8) );
+
+	double r2b[] = {2, 4, 6, 8, 10};
+	BCS_CHECK_EQUAL( a2.V(rgn(1, 6)), aview1d<double>(r2b, 5) );
+
+	double r2c[] = {2, 6, 10};
+	BCS_CHECK_EQUAL( a2.V(rgn(1, 7, 2)), aview1d<double>(r2c, 3));
+
+	double r2d[] = {4, 6, 8, 10, 12};
+	BCS_CHECK_EQUAL( a2.V(rgn(2, aend() - 1)), aview1d<double>(r2d, 5));
+
+	double r2e[] = {2, 6, 10, 14};
+	BCS_CHECK_EQUAL( a2.V(rgn(1, aend(), 2)), aview1d<double>(r2e, 4));
+}
+
+
+BCS_TEST_CASE( test_indices_subview )
+{
+
+}
+
+
 
 
 test_suite *test_array1d_suite()
@@ -179,6 +226,8 @@ test_suite *test_array1d_suite()
 	suite->add( new test_dense_array1d() );
 	suite->add( new test_step_array1d() );
 	suite->add( new test_indices_array1d() );
+	suite->add( new test_regular_subview() );
+	suite->add( new test_indices_subview() );
 
 	return suite;
 }
