@@ -19,6 +19,7 @@ using namespace bcs::test;
 
 template class array1d<double>;
 template class aview1d<double, step_ind>;
+template class aview1d<double, rep_ind>;
 template class aview1d<double, indices>;
 
 
@@ -136,6 +137,27 @@ BCS_TEST_CASE( test_step_array1d )
 }
 
 
+BCS_TEST_CASE( test_rep_array1d )
+{
+	double v = 2;
+
+	aview1d<double, rep_ind> a0(&v, rep_ind(0));
+
+	BCS_CHECK( a0.nelems() == 0 );
+	BCS_CHECK( array_integrity_test(a0) );
+	BCS_CHECK( array_iteration_test(a0) );
+
+	aview1d<double, rep_ind> a1(&v, rep_ind(5));
+	double r1[5] = {2, 2, 2, 2, 2};
+
+	BCS_CHECK( array_integrity_test(a1) );
+	BCS_CHECK( array_view_equal(a1, r1, 5) );
+	BCS_CHECK( array_iteration_test(a1) );
+}
+
+
+
+
 BCS_TEST_CASE( test_indices_array1d )
 {
 	double src0[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -195,6 +217,9 @@ BCS_TEST_CASE( test_regular_subview )
 	double r1f[] = {7, 6, 5, 4, 3, 2, 1, 0};
 	BCS_CHECK_EQUAL( a1.V(rev_whole()),  aview1d<double>(r1f, 8) );
 
+	double r1r[] = {2, 2, 2, 2, 2};
+	BCS_CHECK_EQUAL( a1.V(rep(2, 5)), aview1d<double>(r1r, 5));
+
 
 	aview1d<double, step_ind> a2(src, step_ind(8, 2));
 
@@ -215,6 +240,9 @@ BCS_TEST_CASE( test_regular_subview )
 
 	double r2f[] = {14, 12, 10, 8, 6, 4, 2, 0};
 	BCS_CHECK_EQUAL( a2.V(rev_whole()),  aview1d<double>(r2f, 8) );
+
+	double r2r[] = {4, 4, 4, 4, 4};
+	BCS_CHECK_EQUAL( a2.V(rep(2, 5)), aview1d<double>(r2r, 5));
 
 
 	aview1d<double, step_ind> a3(src + 8, step_ind(8, -1));
@@ -237,6 +265,33 @@ BCS_TEST_CASE( test_regular_subview )
 	double r3f[] = {1, 2, 3, 4, 5, 6, 7, 8};
 	BCS_CHECK_EQUAL( a3.V(rev_whole()),  aview1d<double>(r3f, 8));
 
+	double r3r[] = {6, 6, 6, 6, 6};
+	BCS_CHECK_EQUAL( a3.V(rep(2, 5)), aview1d<double>(r3r, 5));
+
+
+	aview1d<double, rep_ind> a4(src + 2, rep_ind(8));
+
+	double r4a[] = {2, 2, 2, 2, 2, 2, 2, 2};
+	BCS_CHECK_EQUAL( a4.V(whole()), aview1d<double>(r4a, 8) );
+
+	double r4b[] = {2, 2, 2, 2, 2};
+	BCS_CHECK_EQUAL( a4.V(rgn(1, 6)), aview1d<double>(r4b, 5) );
+
+	double r4c[] = {2, 2, 2};
+	BCS_CHECK_EQUAL( a4.V(rgn(1, 7, 2)), aview1d<double>(r4c, 3));
+
+	double r4d[] = {2, 2, 2, 2, 2};
+	BCS_CHECK_EQUAL( a4.V(rgn(2, aend() - 1)), aview1d<double>(r4d, 5));
+
+	double r4e[] = {2, 2, 2, 2};
+	BCS_CHECK_EQUAL( a4.V(rgn(1, aend(), 2)), aview1d<double>(r4e, 4));
+
+	double r4f[] = {2, 2, 2, 2, 2, 2, 2, 2};
+	BCS_CHECK_EQUAL( a4.V(rev_whole()),  aview1d<double>(r4f, 8));
+
+	double r4r[] = {2, 2, 2, 2, 2};
+	BCS_CHECK_EQUAL( a4.V(rep(2, 5)), aview1d<double>(r4r, 5));
+
 }
 
 
@@ -255,7 +310,41 @@ BCS_TEST_CASE( test_indices_subview )
 	double r2i[4] = {2, 6, 12, 14};
 	BCS_CHECK_EQUAL( a2.V(indices(inds, 4)), aview1d<double>(r2i, 4));
 
+	aview1d<double, step_ind> a3(src + 8, step_ind(8, -1));
+	double r3i[4] = {7, 5, 2, 1};
+	BCS_CHECK_EQUAL( a3.V(indices(inds, 4)), aview1d<double>(r3i, 4));
 
+	aview1d<double, rep_ind> a4(src + 2, rep_ind(8));
+	double r4i[4] = {2, 2, 2, 2};
+	BCS_CHECK_EQUAL( a4.V(indices(inds, 4)), aview1d<double>(r4i, 4));
+
+
+	index_t inds_i[8] = {1, 3, 6, 7, 9, 13, 15, 16};
+	aview1d<double, indices> ai(src, indices(inds_i, 8));
+
+	double ria[8] = {1, 3, 6, 7, 9, 13, 15, 16};
+	BCS_CHECK_EQUAL( ai.V(whole()), aview1d<double>(ria, 8) );
+
+	double rib[5] = {3, 6, 7, 9, 13};
+	BCS_CHECK_EQUAL( ai.V(rgn(1, 6)), aview1d<double>(rib, 5) );
+
+	double ric[3] = {3, 7, 13};
+	BCS_CHECK_EQUAL( ai.V(rgn(1, 7, 2)), aview1d<double>(ric, 3) );
+
+	double rid[5] = {6, 7, 9, 13, 15};
+	BCS_CHECK_EQUAL( ai.V(rgn(2, aend() - 1)), aview1d<double>(rid, 5));
+
+	double rie[4] = {3, 7, 13, 16};
+	BCS_CHECK_EQUAL( ai.V(rgn(1, aend(), 2)), aview1d<double>(rie, 4));
+
+	double rif[8] = {16, 15, 13, 9, 7, 6, 3, 1};
+	BCS_CHECK_EQUAL( ai.V(rev_whole()),  aview1d<double>(rif, 8) );
+
+	double rir[5] = {6, 6, 6, 6, 6};
+	BCS_CHECK_EQUAL( ai.V(rep(2, 5)),  aview1d<double>(rir, 5) );
+
+	double rig[4] = {3, 7, 15, 16};
+	BCS_CHECK_EQUAL( ai.V(indices(inds, 4)), aview1d<double>(rig, 4));
 
 }
 
@@ -268,6 +357,7 @@ test_suite *test_array1d_suite()
 
 	suite->add( new test_dense_array1d() );
 	suite->add( new test_step_array1d() );
+	suite->add( new test_rep_array1d() );
 	suite->add( new test_indices_array1d() );
 	suite->add( new test_regular_subview() );
 	suite->add( new test_indices_subview() );

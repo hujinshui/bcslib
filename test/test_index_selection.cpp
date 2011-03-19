@@ -121,6 +121,20 @@ BCS_TEST_CASE( test_step_range )
 }
 
 
+BCS_TEST_CASE( test_rep_range )
+{
+	rep_range rg1(3, 5);
+	int rg1_s[] = {3, 3, 3, 3, 3};
+
+	BCS_CHECK_EQUAL( rg1.rep_i, 3 );
+	BCS_CHECK_EQUAL( rg1.rep_n, 5 );
+	BCS_CHECK_EQUAL( rg1.size(), 5 );
+	BCS_CHECK( !rg1.is_empty() );
+	BCS_CHECK( enumerate_equal(rg1.get_enumerator(), rg1_s, 5) );
+}
+
+
+
 BCS_TEST_CASE( test_whole )
 {
 	BCS_CHECK( is_open_end_selector(whole()) );
@@ -175,6 +189,7 @@ test_suite *test_index_selection_suite()
 
 	suite->add( new test_range() );
 	suite->add( new test_step_range() );
+	suite->add( new test_rep_range() );
 	suite->add( new test_whole() );
 	suite->add( new test_open_range() );
 	suite->add( new test_open_step_range() );

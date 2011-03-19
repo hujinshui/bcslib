@@ -38,6 +38,7 @@ namespace bcs
 	 *
 	 * 		Let s be an open-end selector. It should support:
 	 *
+	 *		0. a typedef of the close-end selector type, close_end_type;
 	 * 		1. s.close(n);		// return a close-end selector given dimension n
 	 *
 	 * In both cases, the selector classes should define a static boolean constant
@@ -197,6 +198,80 @@ namespace bcs
 
 
 
+	struct rep_range
+	{
+	public:
+		static const bool is_open_end = false;
+
+		index_t rep_i;
+		size_t rep_n;
+
+		rep_range(index_t i, size_t n) : rep_i(i), rep_n(n)
+		{
+		}
+
+		size_t size() const
+		{
+			return rep_n;
+		}
+
+		bool is_empty() const
+		{
+			return rep_n == 0;
+		}
+
+		bool is_contained_in(size_t n) const
+		{
+			return rep_i >= 0 && rep_i < n;
+		}
+
+		bool operator == (const rep_range& rhs) const
+		{
+			return rep_i == rhs.rep_i && rep_n == rhs.rep_n;
+		}
+
+		bool operator != (const rep_range& rhs) const
+		{
+			return !(operator == (rhs));
+		}
+
+		class enumerator
+		{
+		public:
+			typedef index_t value_type;
+
+			enumerator(index_t ri, size_t n) : m_ri(ri), m_n((index_t)n), m_i(-1)
+			{
+			}
+
+			bool next()
+			{
+				++ m_i;
+				return m_i < m_n;
+			}
+
+			value_type get() const
+			{
+				return m_ri;
+			}
+
+		private:
+			index_t m_ri;
+			index_t m_n;
+			index_t m_i;
+		};
+
+		enumerator get_enumerator() const
+		{
+			return enumerator(rep_i, rep_n);
+		}
+
+	};  // end struct rep_range
+
+
+
+
+
 	struct whole
 	{
 		static const bool is_open_end = true;
@@ -212,6 +287,7 @@ namespace bcs
 	struct rev_whole
 	{
 		static const bool is_open_end = true;
+		typedef step_range close_end_type;
 
 		step_range close(size_t n) const
 		{
@@ -225,6 +301,7 @@ namespace bcs
 	struct open_range
 	{
 		static const bool is_open_end = true;
+		typedef range close_end_type;
 
 		index_t begin;
 		index_t end_shift;
@@ -243,6 +320,7 @@ namespace bcs
 	struct open_step_range
 	{
 		static const bool is_open_end = true;
+		typedef step_range close_end_type;
 
 		index_t begin;
 		index_t end_shift;
@@ -292,6 +370,12 @@ namespace bcs
 	{
 		return open_step_range(begin, end.shift, step);
 	}
+
+	inline rep_range rep(index_t i, size_t n)
+	{
+		return rep_range(i, n);
+	}
+
 
 
 	// the selector based on a sequence of indices
