@@ -367,6 +367,33 @@ namespace bcs
 	}; // end class aview1d
 
 
+	// dense_view judgment
+
+	template<typename T, class TIndexer1, class TIndexer2>
+	bool is_same_shape(const const_aview1d<T, TIndexer1>& a, const const_aview1d<T, TIndexer2>& b)
+	{
+		return a.nelems() == b.nelems();
+	}
+
+
+	template<typename T, class TIndexer>
+	bool is_dense_view(const const_aview1d<T, TIndexer>& a)
+	{
+		return false;
+	}
+
+	template<typename T>
+	bool is_dense_view(const const_aview1d<T, id_ind>& a)
+	{
+		return true;
+	}
+
+	template<typename T>
+	bool is_dense_view(const const_aview1d<T, step_ind>& a)
+	{
+		return a.get_indexer().step() == 1;
+	}
+
 
 	// Overloaded operators and array manipulation
 
@@ -375,15 +402,15 @@ namespace bcs
 	template<typename T, class TIndexer, class TIndexer2>
 	inline bool operator == (const const_aview1d<T, TIndexer>& lhs, const const_aview1d<T, TIndexer2>& rhs)
 	{
-		return lhs.nelems() == rhs.nelems() &&
-				std::equal(lhs.begin(), lhs.end(), rhs.begin());
-	}
-
-	template<typename T>
-	inline bool operator == (const const_aview1d<T, id_ind>& lhs, const const_aview1d<T, id_ind>& rhs)
-	{
-		return lhs.nelems() == rhs.nelems() &&
-				elements_equal(lhs.pbase(), rhs.pbase(), lhs.nelems());
+		if (!is_same_shape(lhs, rhs)) return false;
+		if (is_dense_view(lhs) && is_dense_view(rhs))
+		{
+			return elements_equal(lhs.pbase(), rhs.pbase(), lhs.nelems());
+		}
+		else
+		{
+			return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+		}
 	}
 
 	template<typename T, class TIndexer, class TIndexer2>
@@ -400,10 +427,17 @@ namespace bcs
 		std::copy(a.begin(), a.end(), dst);
 	}
 
-	template<typename T>
-	inline void export_to(const const_aview1d<T, id_ind>& a, T *dst)
+	template<typename T, class TIndexer>
+	inline void export_to(const const_aview1d<T, TIndexer>& a, T *dst)
 	{
-		copy_elements(a.pbase(), dst, a.nelems());
+		if (is_dense_view(a))
+		{
+			copy_elements(a.pbase(), dst, a.nelems());
+		}
+		else
+		{
+			std::copy(a.begin(), a.end(), dst);
+		}
 	}
 
 	template<typename T, class TIndexer, class RView>
@@ -413,7 +447,15 @@ namespace bcs
 		{
 			throw array_size_mismatch();
 		}
-		export_to(a, b.begin());
+
+		if (is_dense_view(b))
+		{
+			export_to(a, b.pbase());
+		}
+		else
+		{
+			export_to(a, b.begin());
+		}
 		return a;
 	}
 
@@ -426,12 +468,18 @@ namespace bcs
 		copy_n(src, a.nelems(), a.begin());
 	}
 
-	template<typename T>
-	inline void import_from(aview1d<T, id_ind>& a, const T *src)
+	template<typename T, class TIndexer>
+	inline void import_from(aview1d<T, TIndexer>& a, const T *src)
 	{
-		copy_elements(src, a.pbase(), a.nelems());
+		if (is_dense_view(a))
+		{
+			copy_elements(src, a.pbase(), a.nelems());
+		}
+		else
+		{
+			copy_n(src, a.nelems(), a.begin());
+		}
 	}
-
 
 	template<typename T, class TIndexer, class RView>
 	inline aview1d<T, TIndexer>& operator << (aview1d<T, TIndexer>& a, const RView& b)
@@ -440,21 +488,32 @@ namespace bcs
 		{
 			throw array_size_mismatch();
 		}
-		import_from(a, b.begin());
+
+		if (is_dense_view(b))
+		{
+			import_from(a, b.pbase());
+		}
+		else
+		{
+			import_from(a, b.begin());
+		}
+
 		return a;
 	}
 
 	template<typename T, class TIndexer>
 	inline void fill(aview1d<T, TIndexer>& a, const T& x)
 	{
-		std::fill(a.begin(), a.end(), x);
+		if (is_dense_view(a))
+		{
+			fill_elements(a.pbase(), a.nelems(), x);
+		}
+		else
+		{
+			std::fill(a.begin(), a.end(), x);
+		}
 	}
 
-	template<typename T>
-	inline void fill(aview1d<T, id_ind>& a, const T& x)
-	{
-		fill_elements(a.pbase(), a.nelems(), x);
-	}
 
 	template<typename T>
 	inline void set_zeros(aview1d<T, id_ind>& a)

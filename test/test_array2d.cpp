@@ -119,10 +119,12 @@ BCS_TEST_CASE( test_dense_array2d  )
 	// row major
 
 	array2d<double, row_major_t> a0_rm(0, 0);
+	BCS_CHECK( is_dense_view(a0_rm) );
 	BCS_CHECK( array_integrity_test(a0_rm) );
 	BCS_CHECK( array_iteration_test(a0_rm) );
 
 	array2d<double, row_major_t> a1_rm(2, 3, src);
+	BCS_CHECK( is_dense_view(a1_rm) );
 	BCS_CHECK( array_integrity_test(a1_rm) );
 	BCS_CHECK( array_view_equal(a1_rm, r1, 2, 3) );
 	BCS_CHECK( array_iteration_test(a1_rm) );
@@ -137,10 +139,12 @@ BCS_TEST_CASE( test_dense_array2d  )
 	// column major
 
 	array2d<double, column_major_t> a0_cm(0, 0);
+	BCS_CHECK( is_dense_view(a0_cm) );
 	BCS_CHECK( array_integrity_test(a0_cm) );
 	BCS_CHECK( array_iteration_test(a0_cm) );
 
 	array2d<double, column_major_t> a1_cm(2, 3, src);
+	BCS_CHECK( is_dense_view(a1_cm) );
 	BCS_CHECK( array_integrity_test(a1_cm) );
 	BCS_CHECK( array_view_equal(a1_cm, r1, 2, 3) );
 	BCS_CHECK( array_iteration_test(a1_cm) );
@@ -155,6 +159,21 @@ BCS_TEST_CASE( test_dense_array2d  )
 }
 
 
+BCS_TEST_CASE( test_gen_array2d )
+{
+	double src[24];
+	for (int i = 0; i < 24; ++i) src[i] = i+1;
+
+	// row major
+
+
+
+
+}
+
+
+
+
 
 
 test_suite *test_array2d_suite()
@@ -162,6 +181,7 @@ test_suite *test_array2d_suite()
 	test_suite *suite = new test_suite( "test_array2d" );
 
 	suite->add( new test_dense_array2d() );
+	suite->add( new test_gen_array2d() );
 
 	return suite;
 }
