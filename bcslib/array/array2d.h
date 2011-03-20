@@ -174,6 +174,11 @@ namespace bcs
 			}
 		}
 
+		bool operator == (const self_type& rhs) const
+		{
+			return m_i == rhs.m_i && m_j == rhs.m_j;
+		}
+
 	private:
 		const TIndexer0 *m_pidx0;
 		const TIndexer1 *m_pidx1;
