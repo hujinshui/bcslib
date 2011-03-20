@@ -12,7 +12,9 @@
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/basic_funcs.h>
 #include <bcslib/array/array1d.h>
+#include <bcslib/array/array2d.h>
 
+#include <cstdio>
 #include <string>
 #include <algorithm>
 
@@ -66,8 +68,14 @@ namespace bcs
 			TIter0 it = begin;
 			for (size_t i = 0; i < n; ++i)
 			{
-				if (it == end) return false;
-				if (*it != *src) return false;
+				if (it == end)
+				{
+					return false;
+				}
+				if (*it != *src)
+				{
+					return false;
+				}
 
 				++it;
 				++src;
@@ -95,6 +103,9 @@ namespace bcs
 		}
 
 
+		// array comparison
+
+
 		template<typename T, class TIndexer>
 		bool array_view_equal(const bcs::const_aview1d<T, TIndexer>& view, const T* src, size_t n)
 		{
@@ -120,6 +131,73 @@ namespace bcs
 
 			return true;
 		}
+
+
+		template<typename T, class TIndexer0, class TIndexer1>
+		bool array_view_equal(const bcs::const_aview2d<T, row_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n)
+		{
+			if (!(view.dim0() == m && view.dim1() == n)) return false;
+
+			for (index_t i = 0; i < (index_t)m; ++i)
+			{
+				for (index_t j = 0; j < (index_t)n; ++j)
+				{
+					if (view(i, j) != *src++) return false;
+				}
+			}
+
+			return true;
+		}
+
+		template<typename T, class TIndexer0, class TIndexer1>
+		bool array_view_equal(const bcs::const_aview2d<T, column_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n)
+		{
+			if (!(view.dim0() == m && view.dim1() == n)) return false;
+
+			for (index_t j = 0; j < (index_t)n; ++j)
+			{
+				for (index_t i = 0; i < (index_t)m; ++i)
+				{
+					if (view(i, j) != *src++) return false;
+				}
+			}
+
+			return true;
+		}
+
+		template<typename T, class TIndexer0, class TIndexer1>
+		bool array_view_approx(const bcs::const_aview2d<T, row_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n, double eps = 1e-12)
+		{
+			if (!(view.dim0() == m && view.dim1() == n)) return false;
+
+			for (index_t i = 0; i < (index_t)m; ++i)
+			{
+				for (index_t j = 0; j < (index_t)n; ++j)
+				{
+					if (!test_approx(view(i, j), *src++)) return false;
+				}
+			}
+
+			return true;
+		}
+
+		template<typename T, class TIndexer0, class TIndexer1>
+		bool array_view_approx(const bcs::const_aview2d<T, column_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n, double eps=1e-12)
+		{
+			if (!(view.dim0() == m && view.dim1() == n)) return false;
+
+			for (index_t j = 0; j < (index_t)n; ++j)
+			{
+				for (index_t i = 0; i < (index_t)m; ++i)
+				{
+					if (!test_approx(view(i, j), *src++)) return false;
+				}
+			}
+
+			return true;
+		}
+
+
 	}
 }
 

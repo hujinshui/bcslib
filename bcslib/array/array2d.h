@@ -35,7 +35,7 @@ namespace bcs
 
 			static void pass_by_end(size_t m, size_t n, index_t& i, index_t& j)
 			{
-				i = (index_t)m + 1;
+				i = (index_t)m;
 				j = 0;
 			}
 		};
@@ -51,7 +51,7 @@ namespace bcs
 			static void pass_by_end(size_t m, size_t n, index_t& i, index_t& j)
 			{
 				i = 0;
-				j = (index_t)n + 1;
+				j = (index_t)n;
 			}
 		};
 	}
@@ -404,11 +404,23 @@ namespace bcs
 			return _iterators::get_const_iterator(this->m_base, this->m_indexer0, this->m_indexer1, 0, 0);
 		}
 
+		iterator begin()
+		{
+			return _iterators::get_iterator(this->m_base, this->m_indexer0, this->m_indexer1, 0, 0);
+		}
+
 		const_iterator end() const
 		{
 			index_t e_i, e_j;
 			_detail::layout_aux2d<layout_order>::pass_by_end(this->dim0(), this->dim1(), e_i, e_j);
 			return _iterators::get_const_iterator(this->m_base, this->m_indexer0, this->m_indexer1, e_i, e_j);
+		}
+
+		iterator end()
+		{
+			index_t e_i, e_j;
+			_detail::layout_aux2d<layout_order>::pass_by_end(this->dim0(), this->dim1(), e_i, e_j);
+			return _iterators::get_iterator(this->m_base, this->m_indexer0, this->m_indexer1, e_i, e_j);
 		}
 
 	}; // end class aview2d
@@ -538,13 +550,13 @@ namespace bcs
 
 	public:
 		explicit array2d(size_type m, size_type n)
-		: view_type(0, m, n), m_pblock(new block<value_type>(n))
+		: view_type(0, m, n), m_pblock(new block<value_type>(m * n))
 		{
 			this->m_base = m_pblock->pbase();
 		}
 
 		array2d(size_type m, size_type n, const T& x)
-		: view_type(0, m, n), m_pblock(new block<value_type>(n))
+		: view_type(0, m, n), m_pblock(new block<value_type>(m * n))
 		{
 			this->m_base = m_pblock->pbase();
 
@@ -553,7 +565,7 @@ namespace bcs
 
 		template<typename InputIter>
 		array2d(size_type m, size_type n, InputIter src)
-		: view_type(0, m, n), m_pblock(new block<value_type>(n))
+		: view_type(0, m, n), m_pblock(new block<value_type>(m * n))
 		{
 			this->m_base = m_pblock->pbase();
 
