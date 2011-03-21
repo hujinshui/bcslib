@@ -194,7 +194,8 @@ namespace bcs
 
 		index_t offset_at(index_t i, index_t j) const
 		{
-			return _detail::layout_aux2d<layout_order>::offset(base_dim0(), base_dim1(), i, j);
+			return _detail::layout_aux2d<layout_order>::offset(
+					base_dim0(), base_dim1(), m_indexer0[i], m_indexer1[j]);
 		}
 
 		const_pointer ptr(index_t i, index_t j) const
@@ -409,7 +410,7 @@ namespace bcs
 
 		bool operator == (const self_type& rhs) const
 		{
-			return m_p == rhs.m_p;
+			return m_i == rhs.m_i && m_j == rhs.m_j;
 		}
 
 		void move_next()
@@ -478,7 +479,7 @@ namespace bcs
 
 		bool operator == (const self_type& rhs) const
 		{
-			return m_p == rhs.m_p;
+			return m_i == rhs.m_i && m_j == rhs.m_j;
 		}
 
 		void move_next()
