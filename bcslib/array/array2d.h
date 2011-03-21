@@ -19,6 +19,7 @@ namespace bcs
 	template<typename T, typename TOrd, class TIndexer0=id_ind, class TIndexer1=id_ind> class aview2d;
 	template<typename T, typename TOrd, class Alloc=std::allocator<T> > class array2d;
 
+
 	// order-specific offset calculation
 
 	namespace _detail
@@ -54,6 +55,25 @@ namespace bcs
 				j = (index_t)n;
 			}
 		};
+
+
+		template<typename T, typename TOrd, class TIndexer0, class TIndexer1, bool IsConst> struct view2d_types;
+
+		template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+		struct view2d_types<T, TOrd, TIndexer0, TIndexer1, true>
+		{
+			typedef const_aview2d<T, TOrd, TIndexer0, TIndexer1> view_type;
+			typedef const view_type& view_reference;
+			typedef const view_type* view_pointer;
+		};
+
+		template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+		struct view2d_types<T, TOrd, TIndexer0, TIndexer1, false>
+		{
+			typedef aview2d<T, TOrd, TIndexer0, TIndexer1> view_type;
+			typedef view_type& view_reference;
+			typedef view_type* view_pointer;
+		};
 	}
 
 
@@ -62,175 +82,17 @@ namespace bcs
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, bool IsConst> class aview2d_iter_implementer;
 
-	template<typename T, class TIndexer0, class TIndexer1, bool IsConst>
-	class aview2d_iter_implementer<T, row_major_t, TIndexer0, TIndexer1, IsConst>
-	{
-	public:
-		typedef row_major_t layout_order;
-		typedef aview2d_iter_implementer<T, layout_order, TIndexer0, TIndexer1, IsConst> self_type;
-
-		typedef T value_type;
-		typedef typename pointer_and_reference<T, IsConst>::pointer pointer;
-		typedef typename pointer_and_reference<T, IsConst>::reference reference;
-
-	public:
-		aview2d_iter_implementer()
-		: m_pbase(0), m_base_d0(0), m_base_d1(0)
-		, m_pidx0(0), m_pidx1(0), m_d0_m1(0), m_d1_m1(0)
-		, m_i(0), m_j(0), m_p(0)
-		{
-		}
-
-		aview2d_iter_implementer(pointer pbase, size_t base_d0, size_t base_d1,
-				const TIndexer0& idx0, const TIndexer1& idx1, index_t i, index_t j)
-		: m_pbase(pbase), m_base_d0(base_d0), m_base_d1(base_d1)
-		, m_pidx0(&idx0), m_pidx1(&idx1), m_d0_m1((index_t)idx0.size()-1), m_d1_m1((index_t)idx1.size()-1)
-		, m_i(i), m_j(j), m_p(pbase + _detail::layout_aux2d<layout_order>::offset(base_d0, base_d1, i, j))
-		{
-		}
-
-		pointer ptr() const
-		{
-			return m_p;
-		}
-
-		reference ref() const
-		{
-			return *m_p;
-		}
-
-		bool operator == (const self_type& rhs) const
-		{
-			return m_i == rhs.m_i && m_j == rhs.m_j;
-		}
-
-		void move_next()
-		{
-			if (m_j < m_d1_m1)
-			{
-				m_p += m_pidx1->step_at(m_j);
-				++ m_j;
-			}
-			else
-			{
-				++ m_i;
-				m_j = 0;
-				m_p = m_pbase + m_pidx0->operator[](m_i) * m_base_d1;
-			}
-		}
-
-	private:
-		pointer m_pbase;
-		size_t m_base_d0;
-		size_t m_base_d1;
-
-		const TIndexer0 *m_pidx0;
-		const TIndexer1 *m_pidx1;
-		index_t m_d0_m1;
-		index_t m_d1_m1;
-
-		index_t m_i;
-		index_t m_j;
-		pointer m_p;
-
-	}; // end class aview2d_iter_implementer for row_major
-
-
-	template<typename T, class TIndexer0, class TIndexer1, bool IsConst>
-	class aview2d_iter_implementer<T, column_major_t, TIndexer0, TIndexer1, IsConst>
-	{
-	public:
-		typedef column_major_t layout_order;
-		typedef aview2d_iter_implementer<T, layout_order, TIndexer0, TIndexer1, IsConst> self_type;
-
-		typedef T value_type;
-		typedef typename pointer_and_reference<T, IsConst>::pointer pointer;
-		typedef typename pointer_and_reference<T, IsConst>::reference reference;
-
-	public:
-		aview2d_iter_implementer()
-		: m_pbase(0), m_base_d0(0), m_base_d1(0)
-		, m_pidx0(0), m_pidx1(0), m_d0_m1(0), m_d1_m1(0)
-		, m_i(0), m_j(0), m_p(0)
-		{
-		}
-
-		aview2d_iter_implementer(pointer pbase, size_t base_d0, size_t base_d1,
-				const TIndexer0& idx0, const TIndexer1& idx1, index_t i, index_t j)
-		: m_pbase(pbase), m_base_d0(base_d0), m_base_d1(base_d1)
-		, m_pidx0(&idx0), m_pidx1(&idx1), m_d0_m1((index_t)idx0.size()-1), m_d1_m1((index_t)idx1.size()-1)
-		, m_i(i), m_j(j), m_p(pbase + _detail::layout_aux2d<layout_order>::offset(base_d0, base_d1, i, j))
-		{
-		}
-
-		pointer ptr() const
-		{
-			return m_p;
-		}
-
-		reference ref() const
-		{
-			return *m_p;
-		}
-
-		bool operator == (const self_type& rhs) const
-		{
-			return m_i == rhs.m_i && m_j == rhs.m_j;
-		}
-
-		void move_next()
-		{
-			if (m_i < m_d0_m1)
-			{
-				m_p += m_pidx0->step_at(m_i);
-				++ m_i;
-			}
-			else
-			{
-				++ m_j;
-				m_i = 0;
-				m_p = m_pbase + m_pidx1->operator[](m_j) * m_base_d0;
-			}
-		}
-
-	private:
-		pointer m_pbase;
-		size_t m_base_d0;
-		size_t m_base_d1;
-
-		const TIndexer0 *m_pidx0;
-		const TIndexer1 *m_pidx1;
-		index_t m_d0_m1;
-		index_t m_d1_m1;
-
-		index_t m_i;
-		index_t m_j;
-		pointer m_p;
-
-	}; // end class aview2d_iter_implementer for column_major
-
-
-
-
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	struct aview2d_iterators
 	{
 		typedef forward_iterator_wrapper<aview2d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, true> > const_iterator;
 		typedef forward_iterator_wrapper<aview2d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, false> > iterator;
 
-		static const_iterator get_const_iterator(const T *pbase, size_t base_d0, size_t base_d1,
-				const TIndexer0& indexer0, const TIndexer1& indexer1, index_t i, index_t j)
-		{
-			typedef aview2d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, true> impl;
-			return impl(pbase, base_d0, base_d1, indexer0, indexer1, i, j);
-		}
+		typedef const_aview2d<T, TOrd, TIndexer0, TIndexer1> const_view_type;
+		typedef aview2d<T, TOrd, TIndexer0, TIndexer1> view_type;
 
-		static iterator get_iterator(T *pbase, size_t base_d0, size_t base_d1,
-				const TIndexer0& indexer0, const TIndexer1& indexer1, index_t i, index_t j)
-		{
-			typedef aview2d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, false> impl;
-			return impl(pbase, base_d0, base_d1, indexer0, indexer1, i, j);
-		}
+		static inline const_iterator get_const_iterator(const const_view_type& view, index_t i, index_t j);
+		static inline iterator get_iterator(view_type& view, index_t i, index_t j);
 	};
 
 
@@ -349,14 +211,14 @@ namespace bcs
 
 		const_iterator begin() const
 		{
-			return _iterators::get_const_iterator(m_base, m_base_d0, m_base_d1, m_indexer0, m_indexer1, 0, 0);
+			return _iterators::get_const_iterator(*this, 0, 0);
 		}
 
 		const_iterator end() const
 		{
 			index_t e_i, e_j;
 			_detail::layout_aux2d<layout_order>::pass_by_end(dim0(), dim1(), e_i, e_j);
-			return _iterators::get_const_iterator(m_base, m_base_d0, m_base_d1, m_indexer0, m_indexer1, e_i, e_j);
+			return _iterators::get_const_iterator(*this, e_i, e_j);
 		}
 
 	protected:
@@ -431,30 +293,26 @@ namespace bcs
 
 		const_iterator begin() const
 		{
-			return _iterators::get_const_iterator(this->m_base, this->m_base_d0, this->m_base_d1,
-					this->m_indexer0, this->m_indexer1, 0, 0);
+			return _iterators::get_const_iterator(*this, 0, 0);
 		}
 
 		iterator begin()
 		{
-			return _iterators::get_iterator(this->m_base, this->m_base_d0, this->m_base_d1,
-					this->m_indexer0, this->m_indexer1, 0, 0);
+			return _iterators::get_iterator(*this, 0, 0);
 		}
 
 		const_iterator end() const
 		{
 			index_t e_i, e_j;
 			_detail::layout_aux2d<layout_order>::pass_by_end(this->dim0(), this->dim1(), e_i, e_j);
-			return _iterators::get_const_iterator(this->m_base, this->m_base_d0, this->m_base_d1,
-					this->m_indexer0, this->m_indexer1, e_i, e_j);
+			return _iterators::get_const_iterator(*this, e_i, e_j);
 		}
 
 		iterator end()
 		{
 			index_t e_i, e_j;
 			_detail::layout_aux2d<layout_order>::pass_by_end(this->dim0(), this->dim1(), e_i, e_j);
-			return _iterators::get_iterator(this->m_base, this->m_base_d0, this->m_base_d1,
-					this->m_indexer0, this->m_indexer1, e_i, e_j);
+			return _iterators::get_iterator(*this, e_i, e_j);
 		}
 
 	}; // end class aview2d
@@ -505,6 +363,163 @@ namespace bcs
 	{
 		return view.dim0() == view.base_dim0() && view.dim1() == view.base_dim1()
 				&& view.get_indexer0().step() == 1 && view.get_indexer1().step() == 1;
+	}
+
+	// Iterations
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, bool IsConst>
+	class aview2d_iter_implementer;
+
+	template<typename T, class TIndexer0, class TIndexer1, bool IsConst>
+	class aview2d_iter_implementer<T, row_major_t, TIndexer0, TIndexer1, IsConst>
+	{
+	public:
+
+		typedef T value_type;
+		typedef typename pointer_and_reference<T, IsConst>::pointer pointer;
+		typedef typename pointer_and_reference<T, IsConst>::reference reference;
+
+		typedef row_major_t layout_order;
+		typedef typename _detail::view2d_types<T, layout_order, TIndexer0, TIndexer1, IsConst>::view_reference view_reference;
+		typedef typename _detail::view2d_types<T, layout_order, TIndexer0, TIndexer1, IsConst>::view_pointer view_pointer;
+
+		typedef aview2d_iter_implementer<T, layout_order, TIndexer0, TIndexer1, IsConst> self_type;
+
+	public:
+		aview2d_iter_implementer()
+		: m_pView(0), m_d0_m1(0), m_d1_m1(0), m_i(0), m_j(0), m_p(0)
+		{
+		}
+
+		aview2d_iter_implementer(view_reference view, index_t i, index_t j)
+		: m_pView(&view), m_d0_m1((index_t)view.dim0() - 1), m_d1_m1((index_t)view.dim1() - 1), m_i(i), m_j(j)
+		, m_p(view.ptr(i, j))
+		{
+		}
+
+		pointer ptr() const
+		{
+			return m_p;
+		}
+
+		reference ref() const
+		{
+			return *m_p;
+		}
+
+		bool operator == (const self_type& rhs) const
+		{
+			return m_p == rhs.m_p;
+		}
+
+		void move_next()
+		{
+			if (m_j < m_d1_m1)
+			{
+				m_p += m_pView->get_indexer1().step_at(m_j ++);
+			}
+			else
+			{
+				++ m_i;
+				m_j = 0;
+				m_p = m_pView->ptr(m_i, m_j);
+			}
+		}
+
+	private:
+		view_pointer m_pView;
+
+		index_t m_d0_m1;
+		index_t m_d1_m1;
+
+		index_t m_i;
+		index_t m_j;
+		pointer m_p;
+
+	}; // end class aview2d_iter_implementer for row_major
+
+
+	template<typename T, class TIndexer0, class TIndexer1, bool IsConst>
+	class aview2d_iter_implementer<T, column_major_t, TIndexer0, TIndexer1, IsConst>
+	{
+	public:
+
+		typedef T value_type;
+		typedef typename pointer_and_reference<T, IsConst>::pointer pointer;
+		typedef typename pointer_and_reference<T, IsConst>::reference reference;
+
+		typedef column_major_t layout_order;
+		typedef typename _detail::view2d_types<T, layout_order, TIndexer0, TIndexer1, IsConst>::view_reference view_reference;
+		typedef typename _detail::view2d_types<T, layout_order, TIndexer0, TIndexer1, IsConst>::view_pointer view_pointer;
+
+		typedef aview2d_iter_implementer<T, layout_order, TIndexer0, TIndexer1, IsConst> self_type;
+
+	public:
+		aview2d_iter_implementer()
+		: m_pView(0), m_d0_m1(0), m_d1_m1(0), m_i(0), m_j(0), m_p(0)
+		{
+		}
+
+		aview2d_iter_implementer(view_reference view, index_t i, index_t j)
+		: m_pView(&view), m_d0_m1((index_t)view.dim0() - 1), m_d1_m1((index_t)view.dim1() - 1), m_i(i), m_j(j)
+		, m_p(view.ptr(i, j))
+		{
+		}
+
+		pointer ptr() const
+		{
+			return m_p;
+		}
+
+		reference ref() const
+		{
+			return *m_p;
+		}
+
+		bool operator == (const self_type& rhs) const
+		{
+			return m_p == rhs.m_p;
+		}
+
+		void move_next()
+		{
+			if (m_i < m_d0_m1)
+			{
+				m_p += m_pView->get_indexer0().step_at(m_i ++);
+			}
+			else
+			{
+				++ m_j;
+				m_i = 0;
+				m_p = m_pView->ptr(m_i, m_j);
+			}
+		}
+
+	private:
+		view_pointer m_pView;
+
+		index_t m_d0_m1;
+		index_t m_d1_m1;
+
+		index_t m_i;
+		index_t m_j;
+		pointer m_p;
+
+	}; // end class aview2d_iter_implementer for row_major
+
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline typename aview2d_iterators<T, TOrd, TIndexer0, TIndexer1>::const_iterator
+	aview2d_iterators<T, TOrd, TIndexer0, TIndexer1>::get_const_iterator(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& view, index_t i, index_t j)
+	{
+		return aview2d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, true>(view, i, j);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline typename aview2d_iterators<T, TOrd, TIndexer0, TIndexer1>::iterator
+	aview2d_iterators<T, TOrd, TIndexer0, TIndexer1>::get_iterator(aview2d<T, TOrd, TIndexer0, TIndexer1>& view, index_t i, index_t j)
+	{
+		return aview2d_iter_implementer<T, TOrd, TIndexer0, TIndexer1, false>(view, i, j);
 	}
 
 
