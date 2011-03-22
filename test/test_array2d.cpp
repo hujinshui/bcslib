@@ -308,12 +308,159 @@ BCS_TEST_CASE( test_gen_array2d )
 
 }
 
+
+BCS_TEST_CASE( test_array2d_slices )
+{
+	double src[36];
+	for (int i = 0; i < 36; ++i) src[i] = i+1;
+
+	// (id_ind, id_ind)
+
+	aview2d<double, row_major_t, id_ind, id_ind> a1_rm(src, 5, 6, id_ind(3), id_ind(4));
+
+	double a1_rm_r1[] = {1, 2, 3, 4};
+	double a1_rm_r2[] = {7, 8, 9, 10};
+	BCS_CHECK_EQUAL( a1_rm.row(0), const_aview1d<double>(a1_rm_r1, 4) );
+	BCS_CHECK_EQUAL( a1_rm.row(1), const_aview1d<double>(a1_rm_r2, 4) );
+
+	double a1_rm_c1[] = {1, 7, 13};
+	double a1_rm_c2[] = {2, 8, 14};
+	BCS_CHECK_EQUAL( a1_rm.column(0), const_aview1d<double>(a1_rm_c1, 3) );
+	BCS_CHECK_EQUAL( a1_rm.column(1), const_aview1d<double>(a1_rm_c2, 3) );
+
+	aview2d<double, column_major_t, id_ind, id_ind> a1_cm(src, 5, 6, id_ind(3), id_ind(4));
+
+	double a1_cm_r1[] = {1, 6, 11, 16};
+	double a1_cm_r2[] = {2, 7, 12, 17};
+	BCS_CHECK_EQUAL( a1_cm.row(0), const_aview1d<double>(a1_cm_r1, 4) );
+	BCS_CHECK_EQUAL( a1_cm.row(1), const_aview1d<double>(a1_cm_r2, 4) );
+
+	double a1_cm_c1[] = {1, 2, 3};
+	double a1_cm_c2[] = {6, 7, 8};
+	BCS_CHECK_EQUAL( a1_cm.column(0), const_aview1d<double>(a1_cm_c1, 3) );
+	BCS_CHECK_EQUAL( a1_cm.column(1), const_aview1d<double>(a1_cm_c2, 3) );
+
+	// (step_ind, step_ind)
+
+	aview2d<double, row_major_t, step_ind, step_ind> a2_rm(src, 5, 6, step_ind(2, 2), step_ind(3, 2));
+
+	double a2_rm_r1[] = {1, 3, 5};
+	double a2_rm_r2[] = {13, 15, 17};
+	BCS_CHECK_EQUAL( a2_rm.row(0), const_aview1d<double>(a2_rm_r1, 3) );
+	BCS_CHECK_EQUAL( a2_rm.row(1), const_aview1d<double>(a2_rm_r2, 3) );
+
+	double a2_rm_c1[] = {1, 13};
+	double a2_rm_c2[] = {3, 15};
+	BCS_CHECK_EQUAL( a2_rm.column(0), const_aview1d<double>(a2_rm_c1, 2) );
+	BCS_CHECK_EQUAL( a2_rm.column(1), const_aview1d<double>(a2_rm_c2, 2) );
+
+	aview2d<double, column_major_t, step_ind, step_ind> a2_cm(src, 5, 6, step_ind(2, 2), step_ind(3, 2));
+
+	double a2_cm_r1[] = {1, 11, 21};
+	double a2_cm_r2[] = {3, 13, 23};
+	BCS_CHECK_EQUAL( a2_cm.row(0), const_aview1d<double>(a2_cm_r1, 3) );
+	BCS_CHECK_EQUAL( a2_cm.row(1), const_aview1d<double>(a2_cm_r2, 3) );
+
+	double a2_cm_c1[] = {1, 3};
+	double a2_cm_c2[] = {11, 13};
+	BCS_CHECK_EQUAL( a2_cm.column(0), const_aview1d<double>(a2_cm_c1, 2) );
+	BCS_CHECK_EQUAL( a2_cm.column(1), const_aview1d<double>(a2_cm_c2, 2) );
+
+
+	// (rep_ind, step_ind)
+
+	aview2d<double, row_major_t, rep_ind, step_ind> a3_rm(src, 5, 6, rep_ind(4), step_ind(3, 2));
+
+	double a3_rm_r1[] = {1, 3, 5};
+	double a3_rm_r2[] = {1, 3, 5};
+	BCS_CHECK_EQUAL( a3_rm.row(0), const_aview1d<double>(a3_rm_r1, 3) );
+	BCS_CHECK_EQUAL( a3_rm.row(1), const_aview1d<double>(a3_rm_r2, 3) );
+
+	double a3_rm_c1[] = {1, 1, 1, 1};
+	double a3_rm_c2[] = {3, 3, 3, 3};
+	BCS_CHECK_EQUAL( a3_rm.column(0), const_aview1d<double>(a3_rm_c1, 4) );
+	BCS_CHECK_EQUAL( a3_rm.column(1), const_aview1d<double>(a3_rm_c2, 4) );
+
+	aview2d<double, column_major_t, rep_ind, step_ind> a3_cm(src, 5, 6, rep_ind(4), step_ind(3, 2));
+
+	double a3_cm_r1[] = {1, 11, 21};
+	double a3_cm_r2[] = {1, 11, 21};
+	BCS_CHECK_EQUAL( a3_cm.row(0), const_aview1d<double>(a3_cm_r1, 3) );
+	BCS_CHECK_EQUAL( a3_cm.row(1), const_aview1d<double>(a3_cm_r2, 3) );
+
+	double a3_cm_c1[] = {1, 1, 1, 1};
+	double a3_cm_c2[] = {11, 11, 11, 11};
+	BCS_CHECK_EQUAL( a3_cm.column(0), const_aview1d<double>(a3_cm_c1, 4) );
+	BCS_CHECK_EQUAL( a3_cm.column(1), const_aview1d<double>(a3_cm_c2, 4) );
+
+
+	// (step_ind, indices)
+
+	index_t rinds[] = {0, 2, 4};
+	index_t cinds[] = {0, 2, 3, 5};
+
+	aview2d<double, row_major_t, step_ind, indices> a4_rm(src, 5, 6, step_ind(3, 2), indices(cinds, 4));
+
+	double a4_rm_r1[] = {1, 3, 4, 6};
+	double a4_rm_r2[] = {13, 15, 16, 18};
+	BCS_CHECK_EQUAL( a4_rm.row(0), const_aview1d<double>(a4_rm_r1, 4) );
+	BCS_CHECK_EQUAL( a4_rm.row(1), const_aview1d<double>(a4_rm_r2, 4) );
+
+	double a4_rm_c1[] = {1, 13, 25};
+	double a4_rm_c2[] = {3, 15, 27};
+	BCS_CHECK_EQUAL( a4_rm.column(0), const_aview1d<double>(a4_rm_c1, 3) );
+	BCS_CHECK_EQUAL( a4_rm.column(1), const_aview1d<double>(a4_rm_c2, 3) );
+
+	aview2d<double, column_major_t, step_ind, indices> a4_cm(src, 5, 6, step_ind(3, 2), indices(cinds, 4));
+
+	double a4_cm_r1[] = {1, 11, 16, 26};
+	double a4_cm_r2[] = {3, 13, 18, 28};
+	BCS_CHECK_EQUAL( a4_cm.row(0), const_aview1d<double>(a4_cm_r1, 4) );
+	BCS_CHECK_EQUAL( a4_cm.row(1), const_aview1d<double>(a4_cm_r2, 4) );
+
+	double a4_cm_c1[] = {1, 3, 5};
+	double a4_cm_c2[] = {11, 13, 15};
+	BCS_CHECK_EQUAL( a4_cm.column(0), const_aview1d<double>(a4_cm_c1, 3) );
+	BCS_CHECK_EQUAL( a4_cm.column(1), const_aview1d<double>(a4_cm_c2, 3) );
+
+
+	// (indices, indices)
+
+	aview2d<double, row_major_t, indices, indices> a5_rm(src, 5, 6, indices(rinds, 3), indices(cinds, 4));
+
+	double a5_rm_r1[] = {1, 3, 4, 6};
+	double a5_rm_r2[] = {13, 15, 16, 18};
+	BCS_CHECK_EQUAL( a5_rm.row(0), const_aview1d<double>(a5_rm_r1, 4) );
+	BCS_CHECK_EQUAL( a5_rm.row(1), const_aview1d<double>(a5_rm_r2, 4) );
+
+	double a5_rm_c1[] = {1, 13, 25};
+	double a5_rm_c2[] = {3, 15, 27};
+	BCS_CHECK_EQUAL( a5_rm.column(0), const_aview1d<double>(a5_rm_c1, 3) );
+	BCS_CHECK_EQUAL( a5_rm.column(1), const_aview1d<double>(a5_rm_c2, 3) );
+
+	aview2d<double, column_major_t, indices, indices> a5_cm(src, 5, 6, indices(rinds, 3), indices(cinds, 4));
+
+	double a5_cm_r1[] = {1, 11, 16, 26};
+	double a5_cm_r2[] = {3, 13, 18, 28};
+	BCS_CHECK_EQUAL( a5_cm.row(0), const_aview1d<double>(a5_cm_r1, 4) );
+	BCS_CHECK_EQUAL( a5_cm.row(1), const_aview1d<double>(a5_cm_r2, 4) );
+
+	double a5_cm_c1[] = {1, 3, 5};
+	double a5_cm_c2[] = {11, 13, 15};
+	BCS_CHECK_EQUAL( a5_cm.column(0), const_aview1d<double>(a5_cm_c1, 3) );
+	BCS_CHECK_EQUAL( a5_cm.column(1), const_aview1d<double>(a5_cm_c2, 3) );
+
+}
+
+
+
 test_suite *test_array2d_suite()
 {
 	test_suite *suite = new test_suite( "test_array2d" );
 
 	suite->add( new test_dense_array2d() );
 	suite->add( new test_gen_array2d() );
+	suite->add( new test_array2d_slices() );
 
 	return suite;
 }

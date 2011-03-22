@@ -88,7 +88,7 @@ namespace bcs
 				return step_injecter<TIndexer0>::get(idx0, base_d1);
 			}
 
-			static index_t slice_offset(size_t base_d0, size_t base_d1, const TIndexer0& idx1, index_t j)
+			static index_t slice_offset(size_t base_d0, size_t base_d1, const TIndexer1& idx1, index_t j)
 			{
 				return idx1[j];
 			}
@@ -122,7 +122,7 @@ namespace bcs
 				return idx0;
 			}
 
-			static index_t slice_offset(size_t base_d0, size_t base_d1, const TIndexer0& idx1, index_t j)
+			static index_t slice_offset(size_t base_d0, size_t base_d1, const TIndexer1& idx1, index_t j)
 			{
 				return idx1[j] * base_d0;
 			}
@@ -318,6 +318,16 @@ namespace bcs
 					_slices::get_indexer(m_base_d0, m_base_d1, m_indexer0));
 		}
 
+		const_aview1d<value_type, slices0_indexer_type> row(index_t i) const
+		{
+			return sliceI0(i);
+		}
+
+		const_aview1d<value_type, slices1_indexer_type> column(index_t j) const
+		{
+			return sliceI1(j);
+		}
+
 
 	protected:
 		pointer m_base;
@@ -453,6 +463,26 @@ namespace bcs
 			return aview1d<value_type, slices1_indexer_type>(
 					this->m_base + _slices::slice_offset(this->m_base_d0, this->m_base_d1, this->m_indexer1, j),
 					_slices::get_indexer(this->m_base_d0, this->m_base_d1, this->m_indexer0));
+		}
+
+		const_aview1d<value_type, slices0_indexer_type> row(index_t i) const
+		{
+			return sliceI0(i);
+		}
+
+		aview1d<value_type, slices0_indexer_type> row(index_t i)
+		{
+			return sliceI0(i);
+		}
+
+		const_aview1d<value_type, slices1_indexer_type> column(index_t j) const
+		{
+			return sliceI1(j);
+		}
+
+		aview1d<value_type, slices1_indexer_type> column(index_t j)
+		{
+			return sliceI1(j);
 		}
 
 	}; // end class aview2d
