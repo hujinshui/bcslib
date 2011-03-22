@@ -568,6 +568,17 @@ namespace bcs
 	}; // end class array1d
 
 
+	// make copy
+
+	template<typename T, class TIndexer>
+	array1d<T> make_copy(const const_aview1d<T, TIndexer>& a)
+	{
+		array1d<T> ac(a.nelems());
+		ac << a;
+		return ac;
+	}
+
+
 }
 
 #endif 

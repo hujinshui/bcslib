@@ -73,6 +73,10 @@ bool array_integrity_test(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1
 			if (view.ptr(i, j) != &(view(i, j))) return false;
 		}
 	}
+
+	array2d<T, TOrd> acopy = make_copy(view);
+	if (!(acopy == view)) return false;
+
 	return true;
 }
 

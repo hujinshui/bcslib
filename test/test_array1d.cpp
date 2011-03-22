@@ -51,6 +51,10 @@ bool array_integrity_test(const bcs::const_aview1d<T, TIndexer>& view)
 		if (view.ptr(i) != &(view(i))) return false;
 		if (view.ptr(i) != &(view[i])) return false;
 	}
+
+	array1d<T> acopy = make_copy(view);
+	if (!(acopy == view)) return false;
+
 	return true;
 }
 

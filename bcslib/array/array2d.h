@@ -1006,9 +1006,18 @@ namespace bcs
 	}; // end class array2d
 
 
+	// make copy
 
-
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> make_copy(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		array2d<T, TOrd> ac(a.dim0(), a.dim1());
+		ac << a;
+		return ac;
+	}
 
 }
 
+
 #endif
+
