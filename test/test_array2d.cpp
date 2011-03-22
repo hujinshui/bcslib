@@ -453,14 +453,7 @@ BCS_TEST_CASE( test_array2d_slices )
 }
 
 
-BCS_TEST_CASE( test_array2d_subviews_1d )
-{
-
-
-}
-
-
-BCS_TEST_CASE( test_array2d_subviews_2d )
+BCS_TEST_CASE( test_array2d_subviews )
 {
 
 	double src0[144];
@@ -476,6 +469,39 @@ BCS_TEST_CASE( test_array2d_subviews_2d )
 
 	BCS_CHECK_EQUAL( a0_rm.V(whole(), whole()),  dense_aview2d(src0, 6, 6, row_major_t()) );
 	BCS_CHECK_EQUAL( a0_cm.V(whole(), whole()),  dense_aview2d(src0, 6, 6, column_major_t()) );
+
+	// dense => (i, whole)
+
+	double a0_rm_v1[] = {13, 14, 15, 16, 17, 18};
+	double a0_cm_v1[] = {3, 9, 15, 21, 27, 33};
+
+	BCS_CHECK_EQUAL( a0_rm.V(2, whole()), aview1d<double>(a0_rm_v1, 6) );
+	BCS_CHECK_EQUAL( a0_cm.V(2, whole()), aview1d<double>(a0_cm_v1, 6) );
+
+	// dense => (whole, j)
+
+	double a0_rm_v2[] = {4, 10, 16, 22, 28, 34};
+	double a0_cm_v2[] = {19, 20, 21, 22, 23, 24};
+
+	BCS_CHECK_EQUAL( a0_rm.V(whole(), 3), aview1d<double>(a0_rm_v2, 6) );
+	BCS_CHECK_EQUAL( a0_cm.V(whole(), 3), aview1d<double>(a0_cm_v2, 6) );
+
+	// dense => (i, range)
+
+	double a0_rm_v3[] = {8, 9, 10, 11};
+	double a0_cm_v3[] = {8, 14, 20, 26};
+
+	BCS_CHECK_EQUAL( a0_rm.V(1, rgn(1, 5)), aview1d<double>(a0_rm_v3, 4) );
+	BCS_CHECK_EQUAL( a0_cm.V(1, rgn(1, 5)), aview1d<double>(a0_cm_v3, 4) );
+
+	// dense => (step_range, i)
+
+	double a0_rm_v4[] = {3, 15, 27};
+	double a0_cm_v4[] = {13, 15, 17};
+
+	BCS_CHECK_EQUAL( a0_rm.V(rgn(0, aend(), 2), 2), aview1d<double>(a0_rm_v4, 3) );
+	BCS_CHECK_EQUAL( a0_cm.V(rgn(0, aend(), 2), 2), aview1d<double>(a0_cm_v4, 3) );
+
 
 	// dense => (range, whole)
 
@@ -574,6 +600,40 @@ BCS_TEST_CASE( test_array2d_subviews_2d )
 	BCS_CHECK_EQUAL( a1_rm.V(whole(), whole()), dense_aview2d(a1_all, 6, 6, row_major_t()) );
 	BCS_CHECK_EQUAL( a1_cm.V(whole(), whole()), dense_aview2d(a1_all, 6, 6, column_major_t()) );
 
+	// step => (i, whole)
+
+	double a1_rm_v1[] = {49, 51, 53, 55, 57, 59};
+	double a1_cm_v1[] = {5, 29, 53, 77, 101, 125};
+
+	BCS_CHECK_EQUAL( a1_rm.V(2, whole()), aview1d<double>(a1_rm_v1, 6) );
+	BCS_CHECK_EQUAL( a1_cm.V(2, whole()), aview1d<double>(a1_cm_v1, 6) );
+
+	// step => (whole, j)
+
+	double a1_rm_v2[] = {7, 31, 55, 79, 103, 127};
+	double a1_cm_v2[] = {73, 75, 77, 79, 81, 83};
+
+	BCS_CHECK_EQUAL( a1_rm.V(whole(), 3), aview1d<double>(a1_rm_v2, 6) );
+	BCS_CHECK_EQUAL( a1_cm.V(whole(), 3), aview1d<double>(a1_cm_v2, 6) );
+
+	// step => (i, range)
+
+	double a1_rm_v3[] = {27, 29, 31, 33};
+	double a1_cm_v3[] = {27, 51, 75, 99};
+
+	BCS_CHECK_EQUAL( a1_rm.V(1, rgn(1, 5)), aview1d<double>(a1_rm_v3, 4) );
+	BCS_CHECK_EQUAL( a1_cm.V(1, rgn(1, 5)), aview1d<double>(a1_cm_v3, 4) );
+
+	// step => (step_range, i)
+
+	double a1_rm_v4[] = {5, 53, 101};
+	double a1_cm_v4[] = {49, 53, 57};
+
+	BCS_CHECK_EQUAL( a1_rm.V(rgn(0, aend(), 2), 2), aview1d<double>(a1_rm_v4, 3) );
+	BCS_CHECK_EQUAL( a1_cm.V(rgn(0, aend(), 2), 2), aview1d<double>(a1_cm_v4, 3) );
+
+
+
 	// step => (range, step_range)
 
 	double a1_rm_s1[] = {25, 29, 33, 49, 53, 57, 73, 77, 81, 97, 101, 105};
@@ -635,6 +695,41 @@ BCS_TEST_CASE( test_array2d_subviews_2d )
 
 	BCS_CHECK_EQUAL( a2_rm.V(whole(), whole()), dense_aview2d(a2_rm_all, 5, 6, row_major_t()) );
 	BCS_CHECK_EQUAL( a2_cm.V(whole(), whole()), dense_aview2d(a2_cm_all, 5, 6, column_major_t()) );
+
+
+	// rep x -step => (i, whole)
+
+	double a2_rm_v1[] = {48, 46, 44, 42, 40, 38};
+	double a2_cm_v1[] = {136, 112, 88, 64, 40, 16};
+
+	BCS_CHECK_EQUAL( a2_rm.V(2, whole()), aview1d<double>(a2_rm_v1, 6) );
+	BCS_CHECK_EQUAL( a2_cm.V(2, whole()), aview1d<double>(a2_cm_v1, 6) );
+
+	// rep x -step => (whole, j)
+
+	double a2_rm_v2[] = {42, 42, 42, 42, 42};
+	double a2_cm_v2[] = {64, 64, 64, 64, 64};
+
+	BCS_CHECK_EQUAL( a2_rm.V(whole(), 3), aview1d<double>(a2_rm_v2, 5) );
+	BCS_CHECK_EQUAL( a2_cm.V(whole(), 3), aview1d<double>(a2_cm_v2, 5) );
+
+	// rep x -step => (i, range)
+
+	double a2_rm_v3[] = {46, 44, 42, 40};
+	double a2_cm_v3[] = {112, 88, 64, 40};
+
+	BCS_CHECK_EQUAL( a2_rm.V(1, rgn(1, 5)), aview1d<double>(a2_rm_v3, 4) );
+	BCS_CHECK_EQUAL( a2_cm.V(1, rgn(1, 5)), aview1d<double>(a2_cm_v3, 4) );
+
+	// rep x -step => (step_range, i)
+
+	double a2_rm_v4[] = {44, 44, 44};
+	double a2_cm_v4[] = {88, 88, 88};
+
+	BCS_CHECK_EQUAL( a2_rm.V(rgn(0, aend(), 2), 2), aview1d<double>(a2_rm_v4, 3) );
+	BCS_CHECK_EQUAL( a2_cm.V(rgn(0, aend(), 2), 2), aview1d<double>(a2_cm_v4, 3) );
+
+
 
 	// rep x -step => (range, range)
 
@@ -704,6 +799,40 @@ BCS_TEST_CASE( test_array2d_subviews_2d )
 	BCS_CHECK_EQUAL( a3_rm.V(whole(), whole()), dense_aview2d(a3_rm_all, 5, 6, row_major_t()) );
 	BCS_CHECK_EQUAL( a3_cm.V(whole(), whole()), dense_aview2d(a3_cm_all, 5, 6, column_major_t()) );
 
+
+	// indices x step => (i, whole)
+
+	double a3_rm_v1[] = {50, 52, 54, 56, 58, 60};
+	double a3_cm_v1[] = {17, 41, 65, 89, 113, 137};
+
+	BCS_CHECK_EQUAL( a3_rm.V(2, whole()), aview1d<double>(a3_rm_v1, 6) );
+	BCS_CHECK_EQUAL( a3_cm.V(2, whole()), aview1d<double>(a3_cm_v1, 6) );
+
+	// indices x step => (whole, j)
+
+	double a3_rm_v2[] = {20, 44, 56, 92, 116};
+	double a3_cm_v2[] = {86, 88, 89, 92, 94};
+
+	BCS_CHECK_EQUAL( a3_rm.V(whole(), 3), aview1d<double>(a3_rm_v2, 5) );
+	BCS_CHECK_EQUAL( a3_cm.V(whole(), 3), aview1d<double>(a3_cm_v2, 5) );
+
+	// indices x step => (i, range)
+
+	double a3_rm_v3[] = {40, 42, 44, 46};
+	double a3_cm_v3[] = {40, 64, 88, 112};
+
+	BCS_CHECK_EQUAL( a3_rm.V(1, rgn(1, 5)), aview1d<double>(a3_rm_v3, 4) );
+	BCS_CHECK_EQUAL( a3_cm.V(1, rgn(1, 5)), aview1d<double>(a3_cm_v3, 4) );
+
+	// indices x step => (step_range, i)
+
+	double a3_rm_v4[] = {18, 54, 114};
+	double a3_cm_v4[] = {62, 65, 70};
+
+	BCS_CHECK_EQUAL( a3_rm.V(rgn(0, aend(), 2), 2), aview1d<double>(a3_rm_v4, 3) );
+	BCS_CHECK_EQUAL( a3_cm.V(rgn(0, aend(), 2), 2), aview1d<double>(a3_cm_v4, 3) );
+
+
 	// indices x step => (-step_range, range)
 
 	double a3_rm_s1[15] = {112, 114, 116, 88, 90, 92, 52, 54, 56, 40, 42, 44, 16, 18, 20};
@@ -744,8 +873,7 @@ test_suite *test_array2d_suite()
 	suite->add( new test_dense_array2d() );
 	suite->add( new test_gen_array2d() );
 	suite->add( new test_array2d_slices() );
-	suite->add( new test_array2d_subviews_1d() );
-	suite->add( new test_array2d_subviews_2d() );
+	suite->add( new test_array2d_subviews() );
 
 	return suite;
 }

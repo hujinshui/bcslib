@@ -331,6 +331,20 @@ namespace bcs
 
 		// Sub-View
 
+		template<class TSelector>
+		const_aview1d<value_type, typename sub_indexer<slices0_indexer_type, TSelector>::type>
+		V(index_t i, const TSelector& sel) const
+		{
+			return sliceI0(i).V(sel);
+		}
+
+		template<class TSelector>
+		const_aview1d<value_type, typename sub_indexer<slices1_indexer_type, TSelector>::type>
+		V(const TSelector& sel, index_t j) const
+		{
+			return sliceI1(j).V(sel);
+		}
+
 		template<class TSelector0, class TSelector1>
 		const_aview2d<value_type, layout_order,
 			typename sub_indexer<indexer0_type, TSelector0>::type,
@@ -510,6 +524,35 @@ namespace bcs
 		}
 
 		// Sub-view
+
+		template<class TSelector>
+		const_aview1d<value_type, typename sub_indexer<slices0_indexer_type, TSelector>::type>
+		V(index_t i, const TSelector& sel) const
+		{
+			return sliceI0(i).V(sel);
+		}
+
+		template<class TSelector>
+		aview1d<value_type, typename sub_indexer<slices0_indexer_type, TSelector>::type>
+		V(index_t i, const TSelector& sel)
+		{
+			return sliceI0(i).V(sel);
+		}
+
+		template<class TSelector>
+		const_aview1d<value_type, typename sub_indexer<slices1_indexer_type, TSelector>::type>
+		V(const TSelector& sel, index_t j) const
+		{
+			return sliceI1(j).V(sel);
+		}
+
+		template<class TSelector>
+		aview1d<value_type, typename sub_indexer<slices1_indexer_type, TSelector>::type>
+		V(const TSelector& sel, index_t j)
+		{
+			return sliceI1(j).V(sel);
+		}
+
 
 		template<class TSelector0, class TSelector1>
 		const_aview2d<value_type, layout_order,
