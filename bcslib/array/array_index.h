@@ -24,7 +24,6 @@ namespace bcs
 	 * - I[i];		// the mapped index of i
 	 * - step_at(i);  // return I[i+1] - I[i];
 	 *
-	 *
 	 * We note that the class indices (defined in index_selection.h)
 	 * is already an indexer class.
 	 *
@@ -120,6 +119,66 @@ namespace bcs
 
 	}; // end class rep_ind
 
+
+	// step injection
+
+	template<class TIndexer> struct step_injecter;
+
+	template<>
+	struct step_injecter<id_ind>
+	{
+		typedef step_ind type;
+
+		static type get(const id_ind& idx0, index_t step)
+		{
+			return step_ind(idx0.size(), step);
+		}
+	};
+
+
+	template<>
+	struct step_injecter<step_ind>
+	{
+		typedef step_ind type;
+
+		static type get(const step_ind& idx0, index_t step)
+		{
+			return step_ind(idx0.size(), idx0.step() * step);
+		}
+	};
+
+
+	template<>
+	struct step_injecter<rep_ind>
+	{
+		typedef rep_ind type;
+
+		static type get(const rep_ind& idx0, index_t step)
+		{
+			return idx0;
+		}
+	};
+
+
+	template<>
+	struct step_injecter<indices>
+	{
+		typedef indices type;
+
+		static type get(const indices& idx0, index_t step)
+		{
+			size_t n = idx0.size();
+			block<index_t> *pb = new block<index_t>(n);
+			index_t *dst = pb->pbase();
+
+			for (index_t i = 0; i < (index_t)n; ++i)
+			{
+				dst[i] = idx0[i] * step;
+			}
+
+			return indices(pb, own_t());
+		}
+	};
 
 
 

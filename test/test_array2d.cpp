@@ -308,11 +308,6 @@ BCS_TEST_CASE( test_gen_array2d )
 
 }
 
-
-
-
-
-
 test_suite *test_array2d_suite()
 {
 	test_suite *suite = new test_suite( "test_array2d" );

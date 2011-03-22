@@ -41,6 +41,7 @@ namespace bcs
 			}
 		};
 
+
 		template<>
 		struct layout_aux2d<column_major_t>
 		{
@@ -53,6 +54,77 @@ namespace bcs
 			{
 				i = 0;
 				j = (index_t)n;
+			}
+		};
+
+
+		template<typename TOrd, class TIndexer0, class TIndexer1> struct array2d_slices0;
+		template<typename TOrd, class TIndexer0, class TIndexer1> struct array2d_slices1;
+
+		template<class TIndexer0, class TIndexer1>
+		struct array2d_slices0<row_major_t, TIndexer0, TIndexer1>
+		{
+			typedef TIndexer1 indexer_type;
+
+			static indexer_type get_indexer(size_t base_d0, size_t base_d1, const TIndexer1& idx1)
+			{
+				return idx1;
+			}
+
+			static index_t slice_offset(size_t base_d0, size_t base_d1, const TIndexer0& idx0, index_t i)
+			{
+				return idx0[i] * base_d1;
+			}
+
+		};
+
+		template<class TIndexer0, class TIndexer1>
+		struct array2d_slices1<row_major_t, TIndexer0, TIndexer1>
+		{
+			typedef typename step_injecter<TIndexer0>::type indexer_type;
+
+			static indexer_type get_indexer(size_t base_d0, size_t base_d1, const TIndexer0& idx0)
+			{
+				return step_injecter<TIndexer0>::get(idx0, base_d1);
+			}
+
+			static index_t slice_offset(size_t base_d0, size_t base_d1, const TIndexer0& idx1, index_t j)
+			{
+				return idx1[j];
+			}
+		};
+
+
+		template<class TIndexer0, class TIndexer1>
+		struct array2d_slices0<column_major_t, TIndexer0, TIndexer1>
+		{
+			typedef typename step_injecter<TIndexer1>::type indexer_type;
+
+			static indexer_type get_indexer(size_t base_d0, size_t base_d1, const TIndexer1& idx1)
+			{
+				return step_injecter<TIndexer1>::get(idx1, base_d0);
+			}
+
+			static index_t slice_offset(size_t base_d0, size_t base_d1, const TIndexer0& idx0, index_t i)
+			{
+				return idx0[i];
+			}
+
+		};
+
+		template<class TIndexer0, class TIndexer1>
+		struct array2d_slices1<column_major_t, TIndexer0, TIndexer1>
+		{
+			typedef TIndexer0 indexer_type;
+
+			static indexer_type get_indexer(size_t base_d0, size_t base_d1, const TIndexer0& idx0)
+			{
+				return idx0;
+			}
+
+			static index_t slice_offset(size_t base_d0, size_t base_d1, const TIndexer0& idx1, index_t j)
+			{
+				return idx1[j] * base_d0;
 			}
 		};
 
@@ -78,7 +150,7 @@ namespace bcs
 
 
 
-	// iterations
+	// iterations (declaration)
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, bool IsConst> class aview2d_iter_implementer;
 
@@ -113,6 +185,9 @@ namespace bcs
 		typedef aview2d_iterators<T, TOrd, TIndexer0, TIndexer1> _iterators;
 		typedef typename _iterators::const_iterator const_iterator;
 		typedef typename _iterators::iterator iterator;
+
+		typedef typename _detail::array2d_slices0<TOrd, TIndexer0, TIndexer1>::indexer_type slices0_indexer_type;
+		typedef typename _detail::array2d_slices1<TOrd, TIndexer0, TIndexer1>::indexer_type slices1_indexer_type;
 
 	public:
 		const_aview2d(const_pointer base, size_type base_d0, size_type base_d1,
@@ -222,6 +297,28 @@ namespace bcs
 			return _iterators::get_const_iterator(*this, e_i, e_j);
 		}
 
+
+		// Slice
+
+		const_aview1d<value_type, slices0_indexer_type> sliceI0(index_t i) const
+		{
+			typedef _detail::array2d_slices0<layout_order, indexer0_type, indexer1_type> _slices;
+
+			return const_aview1d<value_type, slices0_indexer_type>(
+					m_base + _slices::slice_offset(m_base_d0, m_base_d1, m_indexer0, i),
+					_slices::get_indexer(m_base_d0, m_base_d1, m_indexer1));
+		}
+
+		const_aview1d<value_type, slices1_indexer_type> sliceI1(index_t j) const
+		{
+			typedef _detail::array2d_slices1<layout_order, indexer0_type, indexer1_type> _slices;
+
+			return const_aview1d<value_type, slices1_indexer_type>(
+					m_base + _slices::slice_offset(m_base_d0, m_base_d1, m_indexer1, j),
+					_slices::get_indexer(m_base_d0, m_base_d1, m_indexer0));
+		}
+
+
 	protected:
 		pointer m_base;
 		size_type m_base_d0;
@@ -250,6 +347,9 @@ namespace bcs
 		typedef aview2d_iterators<T, TOrd, TIndexer0, TIndexer1> _iterators;
 		typedef typename _iterators::const_iterator const_iterator;
 		typedef typename _iterators::iterator iterator;
+
+		typedef typename _detail::array2d_slices0<TOrd, TIndexer0, TIndexer1>::indexer_type slices0_indexer_type;
+		typedef typename _detail::array2d_slices1<TOrd, TIndexer0, TIndexer1>::indexer_type slices1_indexer_type;
 
 	public:
 		aview2d(const_pointer base, size_type base_d0, size_type base_d1,
@@ -314,6 +414,45 @@ namespace bcs
 			index_t e_i, e_j;
 			_detail::layout_aux2d<layout_order>::pass_by_end(this->dim0(), this->dim1(), e_i, e_j);
 			return _iterators::get_iterator(*this, e_i, e_j);
+		}
+
+
+		// Slice
+
+		const_aview1d<value_type, slices0_indexer_type> sliceI0(index_t i) const
+		{
+			typedef _detail::array2d_slices0<layout_order, indexer0_type, indexer1_type> _slices;
+
+			return const_aview1d<value_type, slices0_indexer_type>(
+					this->m_base + _slices::slice_offset(this->m_base_d0, this->m_base_d1, this->m_indexer0, i),
+					_slices::get_indexer(this->m_base_d0, this->m_base_d1, this->m_indexer1));
+		}
+
+		aview1d<value_type, slices0_indexer_type> sliceI0(index_t i)
+		{
+			typedef _detail::array2d_slices0<layout_order, indexer0_type, indexer1_type> _slices;
+
+			return aview1d<value_type, slices0_indexer_type>(
+					this->m_base + _slices::slice_offset(this->m_base_d0, this->m_base_d1, this->m_indexer0, i),
+					_slices::get_indexer(this->m_base_d0, this->m_base_d1, this->m_indexer1));
+		}
+
+		const_aview1d<value_type, slices1_indexer_type> sliceI1(index_t j) const
+		{
+			typedef _detail::array2d_slices1<layout_order, indexer0_type, indexer1_type> _slices;
+
+			return const_aview1d<value_type, slices1_indexer_type>(
+					this->m_base + _slices::slice_offset(this->m_base_d0, this->m_base_d1, this->m_indexer1, j),
+					_slices::get_indexer(this->m_base_d0, this->m_base_d1, this->m_indexer0));
+		}
+
+		aview1d<value_type, slices1_indexer_type> sliceI1(index_t j)
+		{
+			typedef _detail::array2d_slices1<layout_order, indexer0_type, indexer1_type> _slices;
+
+			return aview1d<value_type, slices1_indexer_type>(
+					this->m_base + _slices::slice_offset(this->m_base_d0, this->m_base_d1, this->m_indexer1, j),
+					_slices::get_indexer(this->m_base_d0, this->m_base_d1, this->m_indexer0));
 		}
 
 	}; // end class aview2d
