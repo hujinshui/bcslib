@@ -453,6 +453,289 @@ BCS_TEST_CASE( test_array2d_slices )
 }
 
 
+BCS_TEST_CASE( test_array2d_subviews_1d )
+{
+
+
+}
+
+
+BCS_TEST_CASE( test_array2d_subviews_2d )
+{
+
+	double src0[144];
+	for (int i = 0; i < 144; ++i) src0[i] = i+1;
+
+
+	// dense base
+
+	aview2d<double, row_major_t> a0_rm = dense_aview2d(src0, 6, 6, row_major_t());
+	aview2d<double, column_major_t> a0_cm = dense_aview2d(src0, 6, 6, column_major_t());
+
+	// dense => (whole, whole)
+
+	BCS_CHECK_EQUAL( a0_rm.V(whole(), whole()),  dense_aview2d(src0, 6, 6, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(whole(), whole()),  dense_aview2d(src0, 6, 6, column_major_t()) );
+
+	// dense => (range, whole)
+
+	double a0_rm_s1[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
+	double a0_cm_s1[] = {1, 2, 3, 7, 8, 9, 13, 14, 15, 19, 20, 21, 25, 26, 27, 31, 32, 33};
+
+	BCS_CHECK_EQUAL( a0_rm.V(rgn(0, 3), whole()),  dense_aview2d(a0_rm_s1, 3, 6, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(rgn(0, 3), whole()),  dense_aview2d(a0_cm_s1, 3, 6, column_major_t()) );
+
+	// dense => (whole, range)
+
+	double a0_rm_s2[] = {2, 3, 4, 8, 9, 10, 14, 15, 16, 20, 21, 22, 26, 27, 28, 32, 33, 34};
+	double a0_cm_s2[] = {7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+
+	BCS_CHECK_EQUAL( a0_rm.V(whole(), rgn(1, 4)),  dense_aview2d(a0_rm_s2, 6, 3, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(whole(), rgn(1, 4)),  dense_aview2d(a0_cm_s2, 6, 3, column_major_t()) );
+
+
+	// dense => (range, range)
+
+	double a0_rm_s3[] = {14, 15, 16, 17, 20, 21, 22, 23, 26, 27, 28, 29};
+	double a0_cm_s3[] = {9, 10, 11, 15, 16, 17, 21, 22, 23, 27, 28, 29};
+
+	BCS_CHECK_EQUAL( a0_rm.V(rgn(2, 5), rgn(1, 5)),  dense_aview2d(a0_rm_s3, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(rgn(2, 5), rgn(1, 5)),  dense_aview2d(a0_cm_s3, 3, 4, column_major_t()) );
+
+	// dense => (range, step_range)
+
+	double a0_rm_s4[] = {14, 16, 18, 20, 22, 24, 26, 28, 30};
+	double a0_cm_s4[] = {9, 10, 11, 21, 22, 23, 33, 34, 35};
+
+	BCS_CHECK_EQUAL( a0_rm.V(rgn(2, 5), rgn(1, 6, 2)),  dense_aview2d(a0_rm_s4, 3, 3, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(rgn(2, 5), rgn(1, 6, 2)),  dense_aview2d(a0_cm_s4, 3, 3, column_major_t()) );
+
+
+	// dense => (step_range, step_range)
+
+	double a0_rm_s5[] = {2, 4, 6, 14, 16, 18, 26, 28, 30};
+	double a0_cm_s5[] = {7, 9, 11, 19, 21, 23, 31, 33, 35};
+
+	BCS_CHECK_EQUAL( a0_rm.V(rgn(0, 5, 2), rgn(1, 6, 2)),  dense_aview2d(a0_rm_s5, 3, 3, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(rgn(0, 5, 2), rgn(1, 6, 2)),  dense_aview2d(a0_cm_s5, 3, 3, column_major_t()) );
+
+
+	// dense => (step_range, indices)
+
+	double a0_rm_s6[] = {1, 3, 4, 5, 13, 15, 16, 17, 25, 27, 28, 29};
+	double a0_cm_s6[] = {1, 3, 5, 13, 15, 17, 19, 21, 23, 25, 27, 29};
+
+	index_t a0_cinds_s6[] = {0, 2, 3, 4};
+
+	BCS_CHECK_EQUAL( a0_rm.V(rgn(0, aend(), 2), indices(a0_cinds_s6, 4)),  dense_aview2d(a0_rm_s6, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(rgn(0, aend(), 2), indices(a0_cinds_s6, 4)),  dense_aview2d(a0_cm_s6, 3, 4, column_major_t()) );
+
+	// dense => (rep_range, indices)
+
+	index_t a0_cinds_s7[] = {0, 2, 3, 4};
+
+	double a0_rm_s7[] = {7, 9, 10, 11, 7, 9, 10, 11, 7, 9, 10, 11};
+	double a0_cm_s7[] = {2, 2, 2, 14, 14, 14, 20, 20, 20, 26, 26, 26};
+
+	BCS_CHECK_EQUAL( a0_rm.V(rep(1, 3), indices(a0_cinds_s7, 4)),  dense_aview2d(a0_rm_s7, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(rep(1, 3), indices(a0_cinds_s7, 4)),  dense_aview2d(a0_cm_s7, 3, 4, column_major_t()) );
+
+	// dense => (indices, indices)
+
+	index_t a0_rinds_s8[] = {1, 3, 4};
+	index_t a0_cinds_s8[] = {0, 2, 3, 5};
+
+	double a0_rm_s8[] = {7, 9, 10, 12, 19, 21, 22, 24, 25, 27, 28, 30};
+	double a0_cm_s8[] = {2, 4, 5, 14, 16, 17, 20, 22, 23, 32, 34, 35};
+
+	BCS_CHECK_EQUAL( a0_rm.V(indices(a0_rinds_s8, 3), indices(a0_cinds_s8, 4)),  dense_aview2d(a0_rm_s8, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(indices(a0_rinds_s8, 3), indices(a0_cinds_s8, 4)),  dense_aview2d(a0_cm_s8, 3, 4, column_major_t()) );
+
+
+	// step base
+
+	aview2d<double, row_major_t> Arm = dense_aview2d(src0, 12, 12, row_major_t());
+	aview2d<double, column_major_t> Acm = dense_aview2d(src0, 12, 12, column_major_t());
+
+	aview2d<double, row_major_t, step_ind, step_ind> a1_rm = Arm.V(rgn(0, aend(), 2), rgn(0, aend(), 2));
+	aview2d<double, column_major_t, step_ind, step_ind> a1_cm = Acm.V(rgn(0, aend(), 2), rgn(0, aend(), 2));
+
+	// step => (whole, whole)
+
+	double a1_all[36] = {
+			1, 3, 5, 7, 9, 11,
+			25, 27, 29, 31, 33, 35,
+			49, 51, 53, 55, 57, 59,
+			73, 75, 77, 79, 81, 83,
+			97, 99, 101, 103, 105, 107,
+			121, 123, 125, 127, 129, 131
+	};
+
+	BCS_CHECK_EQUAL( a1_rm.V(whole(), whole()), dense_aview2d(a1_all, 6, 6, row_major_t()) );
+	BCS_CHECK_EQUAL( a1_cm.V(whole(), whole()), dense_aview2d(a1_all, 6, 6, column_major_t()) );
+
+	// step => (range, step_range)
+
+	double a1_rm_s1[] = {25, 29, 33, 49, 53, 57, 73, 77, 81, 97, 101, 105};
+	double a1_cm_s1[] = {3, 5, 7, 9, 51, 53, 55, 57, 99, 101, 103, 105};
+
+	BCS_CHECK_EQUAL( a1_rm.V(rgn(1, 5), rgn(0, aend(), 2)),  dense_aview2d(a1_rm_s1, 4, 3, row_major_t()) );
+	BCS_CHECK_EQUAL( a1_cm.V(rgn(1, 5), rgn(0, aend(), 2)),  dense_aview2d(a1_cm_s1, 4, 3, column_major_t()) );
+
+	// step => (rep_range, range)
+
+	double a1_rm_s2[] = {51, 53, 55, 57, 51, 53, 55, 57, 51, 53, 55, 57};
+	double a1_cm_s2[] = {29, 29, 29, 53, 53, 53, 77, 77, 77, 101, 101, 101};
+
+	BCS_CHECK_EQUAL( a1_rm.V(rep(2, 3), rgn(1, 5)),  dense_aview2d(a1_rm_s2, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a1_cm.V(rep(2, 3), rgn(1, 5)),  dense_aview2d(a1_cm_s2, 3, 4, column_major_t()) );
+
+	// step => (step_range, -step_range)
+
+	double a1_rm_s3[] = {59, 55, 51, 107, 103, 99};
+	double a1_cm_s3[] = {125, 129, 77, 81, 29, 33};
+
+	BCS_CHECK_EQUAL( a1_rm.V(rgn(2, 5, 2), rgn(5, 0, -2)), dense_aview2d(a1_rm_s3, 2, 3, row_major_t()) );
+	BCS_CHECK_EQUAL( a1_cm.V(rgn(2, 5, 2), rgn(5, 0, -2)), dense_aview2d(a1_cm_s3, 2, 3, column_major_t()) );
+
+	// step => (indices, indices)
+
+	index_t a1_s4_rinds[3] = {2, 0, 3};
+	index_t a1_s4_cinds[4] = {4, 1, 5, 2};
+
+	double a1_rm_s4[] = {57, 51, 59, 53, 9, 3, 11, 5, 81, 75, 83, 77};
+	double a1_cm_s4[] = {101, 97, 103, 29, 25, 31, 125, 121, 127, 53, 49, 55};
+
+	BCS_CHECK_EQUAL( a1_rm.V(indices(a1_s4_rinds, 3), indices(a1_s4_cinds, 4)), dense_aview2d(a1_rm_s4, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a1_cm.V(indices(a1_s4_rinds, 3), indices(a1_s4_cinds, 4)), dense_aview2d(a1_cm_s4, 3, 4, column_major_t()) );
+
+
+	// rep x -step base
+
+	aview2d<double, row_major_t, rep_ind, step_ind> a2_rm = Arm.V(rep(3, 5), rgn(11, 0, -2));
+	aview2d<double, column_major_t, rep_ind, step_ind> a2_cm = Acm.V(rep(3, 5), rgn(11, 0, -2));
+
+	// rep x -step => (whole, whole)
+
+	double a2_rm_all[30] = {
+			48, 46, 44, 42, 40, 38,
+			48, 46, 44, 42, 40, 38,
+			48, 46, 44, 42, 40, 38,
+			48, 46, 44, 42, 40, 38,
+			48, 46, 44, 42, 40, 38
+	};
+	double a2_cm_all[30] = {
+			136, 136, 136, 136, 136,
+			112, 112, 112, 112, 112,
+			88, 88, 88, 88, 88,
+			64, 64, 64, 64, 64,
+			40, 40, 40, 40, 40,
+			16, 16, 16, 16, 16
+	};
+
+	BCS_CHECK_EQUAL( a2_rm.V(whole(), whole()), dense_aview2d(a2_rm_all, 5, 6, row_major_t()) );
+	BCS_CHECK_EQUAL( a2_cm.V(whole(), whole()), dense_aview2d(a2_cm_all, 5, 6, column_major_t()) );
+
+	// rep x -step => (range, range)
+
+	double a2_rm_s1[] = {46, 44, 42, 40, 46, 44, 42, 40};
+	double a2_cm_s1[] = {112, 112, 88, 88, 64, 64, 40, 40};
+
+	BCS_CHECK_EQUAL( a2_rm.V(rgn(1, 3), rgn(1, 5)), dense_aview2d(a2_rm_s1, 2, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a2_cm.V(rgn(1, 3), rgn(1, 5)), dense_aview2d(a2_cm_s1, 2, 4, column_major_t()) );
+
+	// rep x -step => (step_range, -step_range)
+
+	double a2_rm_s2[] = {38, 40, 42, 44, 46, 48, 38, 40, 42, 44, 46, 48};
+	double a2_cm_s2[] = {16, 16, 40, 40, 64, 64, 88, 88, 112, 112, 136, 136};
+
+	BCS_CHECK_EQUAL( a2_rm.V(rgn(0, 3, 2), rev_whole()), dense_aview2d(a2_rm_s2, 2, 6, row_major_t()) );
+	BCS_CHECK_EQUAL( a2_cm.V(rgn(0, 3, 2), rev_whole()), dense_aview2d(a2_cm_s2, 2, 6, column_major_t()) );
+
+	// rep x -step => (range, indices)
+
+	index_t a2_s3_cinds[4] = {0, 2, 3, 5};
+
+	double a2_rm_s3[] = {48, 44, 42, 38, 48, 44, 42, 38, 48, 44, 42, 38};
+	double a2_cm_s3[] = {136, 136, 136, 88, 88, 88, 64, 64, 64, 16, 16, 16};
+
+	BCS_CHECK_EQUAL( a2_rm.V(rgn(0, 3), indices(a2_s3_cinds, 4)), dense_aview2d(a2_rm_s3, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a2_cm.V(rgn(0, 3), indices(a2_s3_cinds, 4)), dense_aview2d(a2_cm_s3, 3, 4, column_major_t()) );
+
+
+	// rep x -step => (indices, indices)
+
+	index_t a2_s4_rinds[3] = {0, 2, 3};
+	index_t a2_s4_cinds[4] = {0, 2, 3, 5};
+
+	double a2_rm_s4[] = {48, 44, 42, 38, 48, 44, 42, 38, 48, 44, 42, 38};
+	double a2_cm_s4[] = {136, 136, 136, 88, 88, 88, 64, 64, 64, 16, 16, 16};
+
+	BCS_CHECK_EQUAL( a2_rm.V(indices(a2_s4_rinds, 3), indices(a2_s4_cinds, 4)), dense_aview2d(a2_rm_s4, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a2_cm.V(indices(a2_s4_rinds, 3), indices(a2_s4_cinds, 4)), dense_aview2d(a2_cm_s4, 3, 4, column_major_t()) );
+
+
+	// indices x step base
+
+	index_t a3_rinds[5] = {1, 3, 4, 7, 9};
+
+	aview2d<double, row_major_t, indices, step_ind> a3_rm = Arm.V(indices(a3_rinds, 5), rgn(1, aend(), 2));
+	aview2d<double, column_major_t, indices, step_ind> a3_cm = Acm.V(indices(a3_rinds, 5), rgn(1, aend(), 2));
+
+	// indices x step => (whole, whole)
+
+	double a3_rm_all[30] = {
+			14, 16, 18, 20, 22, 24,
+			38, 40, 42, 44, 46, 48,
+			50, 52, 54, 56, 58, 60,
+			86, 88, 90, 92, 94, 96,
+			110, 112, 114, 116, 118, 120
+	};
+
+	double a3_cm_all[30] = {
+			14, 16, 17, 20, 22,
+			38, 40, 41, 44, 46,
+			62, 64, 65, 68, 70,
+			86, 88, 89, 92, 94,
+			110, 112, 113, 116, 118,
+			134, 136, 137, 140, 142
+	};
+
+	BCS_CHECK_EQUAL( a3_rm.V(whole(), whole()), dense_aview2d(a3_rm_all, 5, 6, row_major_t()) );
+	BCS_CHECK_EQUAL( a3_cm.V(whole(), whole()), dense_aview2d(a3_cm_all, 5, 6, column_major_t()) );
+
+	// indices x step => (-step_range, range)
+
+	double a3_rm_s1[15] = {112, 114, 116, 88, 90, 92, 52, 54, 56, 40, 42, 44, 16, 18, 20};
+	double a3_cm_s1[15] = {46, 44, 41, 40, 38, 70, 68, 65, 64, 62, 94, 92, 89, 88, 86};
+
+	BCS_CHECK_EQUAL( a3_rm.V(rev_whole(), rgn(1, 4)), dense_aview2d(a3_rm_s1, 5, 3, row_major_t()) );
+	BCS_CHECK_EQUAL( a3_cm.V(rev_whole(), rgn(1, 4)), dense_aview2d(a3_cm_s1, 5, 3, column_major_t()) );
+
+	// indices x step => (indices, indices)
+
+	index_t a3_s2_rinds[3] = {0, 2, 3};
+	index_t a3_s2_cinds[3] = {1, 3, 4};
+
+	double a3_rm_s2[9] = {16, 20, 22, 52, 56, 58, 88, 92, 94};
+	double a3_cm_s2[9] = {38, 41, 44, 86, 89, 92, 110, 113, 116};
+
+	BCS_CHECK_EQUAL( a3_rm.V(indices(a3_s2_rinds, 3), indices(a3_s2_cinds, 3)), dense_aview2d(a3_rm_s2, 3, 3, row_major_t()) );
+	BCS_CHECK_EQUAL( a3_cm.V(indices(a3_s2_rinds, 3), indices(a3_s2_cinds, 3)), dense_aview2d(a3_cm_s2, 3, 3, column_major_t()) );
+
+	// indices x step => (step_range, rep)
+
+	double a3_rm_s3[6] = {18, 18, 54, 54, 114, 114};
+	double a3_cm_s3[6] = {62, 65, 70, 62, 65, 70};
+
+	BCS_CHECK_EQUAL( a3_rm.V(rgn(0, aend(), 2), rep(2, 2)), dense_aview2d(a3_rm_s3, 3, 2, row_major_t()) );
+	BCS_CHECK_EQUAL( a3_cm.V(rgn(0, aend(), 2), rep(2, 2)), dense_aview2d(a3_cm_s3, 3, 2, column_major_t()) );
+
+}
+
+
+
+
 
 test_suite *test_array2d_suite()
 {
@@ -461,6 +744,8 @@ test_suite *test_array2d_suite()
 	suite->add( new test_dense_array2d() );
 	suite->add( new test_gen_array2d() );
 	suite->add( new test_array2d_slices() );
+	suite->add( new test_array2d_subviews_1d() );
+	suite->add( new test_array2d_subviews_2d() );
 
 	return suite;
 }

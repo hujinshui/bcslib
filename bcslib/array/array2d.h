@@ -329,6 +329,30 @@ namespace bcs
 		}
 
 
+		// Sub-View
+
+		template<class TSelector0, class TSelector1>
+		const_aview2d<value_type, layout_order,
+			typename sub_indexer<indexer0_type, TSelector0>::type,
+			typename sub_indexer<indexer1_type, TSelector1>::type>
+		V(const TSelector0& sel0, const TSelector1& sel1) const
+		{
+			typedef typename sub_indexer<indexer0_type, TSelector0>::type sub_indexer0_t;
+			typedef typename sub_indexer<indexer1_type, TSelector1>::type sub_indexer1_t;
+
+			index_t o0 = 0;
+			index_t o1 = 0;
+
+			sub_indexer0_t si0 = sub_indexer<indexer0_type, TSelector0>::get(m_indexer0, sel0, o0);
+			sub_indexer1_t si1 = sub_indexer<indexer1_type, TSelector1>::get(m_indexer1, sel1, o1);
+
+			index_t offset = _detail::layout_aux2d<layout_order>::offset(m_base_d0, m_base_d1, o0, o1);
+
+			return const_aview2d<value_type, layout_order, sub_indexer0_t, sub_indexer1_t>(
+					m_base + offset, m_base_d0, m_base_d1, si0, si1);
+		}
+
+
 	protected:
 		pointer m_base;
 		size_type m_base_d0;
@@ -485,19 +509,64 @@ namespace bcs
 			return sliceI1(j);
 		}
 
+		// Sub-view
+
+		template<class TSelector0, class TSelector1>
+		const_aview2d<value_type, layout_order,
+			typename sub_indexer<indexer0_type, TSelector0>::type,
+			typename sub_indexer<indexer1_type, TSelector1>::type>
+		V(const TSelector0& sel0, const TSelector1& sel1) const
+		{
+			typedef typename sub_indexer<indexer0_type, TSelector0>::type sub_indexer0_t;
+			typedef typename sub_indexer<indexer1_type, TSelector1>::type sub_indexer1_t;
+
+			index_t o0 = 0;
+			index_t o1 = 0;
+
+			sub_indexer0_t si0 = sub_indexer<indexer0_type, TSelector0>::get(this->m_indexer0, sel0, o0);
+			sub_indexer1_t si1 = sub_indexer<indexer1_type, TSelector1>::get(this->m_indexer1, sel1, o1);
+
+			index_t offset = _detail::layout_aux2d<layout_order>::offset(this->m_base_d0, this->m_base_d1, o0, o1);
+
+			return const_aview2d<value_type, layout_order, sub_indexer0_t, sub_indexer1_t>(
+					this->m_base + offset, this->m_base_d0, this->m_base_d1, si0, si1);
+		}
+
+		template<class TSelector0, class TSelector1>
+		aview2d<value_type, layout_order,
+			typename sub_indexer<indexer0_type, TSelector0>::type,
+			typename sub_indexer<indexer1_type, TSelector1>::type>
+		V(const TSelector0& sel0, const TSelector1& sel1)
+		{
+			typedef typename sub_indexer<indexer0_type, TSelector0>::type sub_indexer0_t;
+			typedef typename sub_indexer<indexer1_type, TSelector1>::type sub_indexer1_t;
+
+			index_t o0 = 0;
+			index_t o1 = 0;
+
+			sub_indexer0_t si0 = sub_indexer<indexer0_type, TSelector0>::get(this->m_indexer0, sel0, o0);
+			sub_indexer1_t si1 = sub_indexer<indexer1_type, TSelector1>::get(this->m_indexer1, sel1, o1);
+
+			index_t offset = _detail::layout_aux2d<layout_order>::offset(this->m_base_d0, this->m_base_d1, o0, o1);
+
+			return aview2d<value_type, layout_order, sub_indexer0_t, sub_indexer1_t>(
+					this->m_base + offset, this->m_base_d0, this->m_base_d1, si0, si1);
+		}
+
+
 	}; // end class aview2d
 
 
 	// functions to make dense view
 
 	template<typename T, typename TOrd>
-	const_aview2d<T, TOrd, id_ind, id_ind> dense_const_aview2d(const T *pbase, size_t m, size_t n)
+	const_aview2d<T, TOrd, id_ind, id_ind> dense_const_aview2d(const T *pbase, size_t m, size_t n, TOrd ord)
 	{
 		return const_aview2d<T, TOrd, id_ind, id_ind>(pbase, m, n, m, n);
 	}
 
 	template<typename T, typename TOrd>
-	aview2d<T, TOrd, id_ind, id_ind> dense_const_aview2d(T *pbase, size_t m, size_t n)
+	aview2d<T, TOrd, id_ind, id_ind> dense_aview2d(T *pbase, size_t m, size_t n, TOrd ord)
 	{
 		return aview2d<T, TOrd, id_ind, id_ind>(pbase, m, n, m, n);
 	}
