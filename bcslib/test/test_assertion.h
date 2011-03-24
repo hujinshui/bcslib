@@ -174,7 +174,7 @@ namespace bcs
 			{
 				for (index_t j = 0; j < (index_t)n; ++j)
 				{
-					if (!test_approx(view(i, j), *src++)) return false;
+					if (!test_approx(view(i, j), *src++, eps)) return false;
 				}
 			}
 
@@ -190,7 +190,7 @@ namespace bcs
 			{
 				for (index_t i = 0; i < (index_t)m; ++i)
 				{
-					if (!test_approx(view(i, j), *src++)) return false;
+					if (!test_approx(view(i, j), *src++, eps)) return false;
 				}
 			}
 

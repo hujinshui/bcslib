@@ -85,6 +85,15 @@ namespace bcs
 	};
 
 
+	class invalid_argument : public base_exception
+	{
+	public:
+		invalid_argument(const char *msg) : base_exception(msg)
+		{
+		}
+	};
+
+
 
 	namespace tr1
 	{
