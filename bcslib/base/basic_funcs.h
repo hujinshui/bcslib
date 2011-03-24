@@ -14,6 +14,7 @@
 
 #include <utility>
 #include <functional>
+#include <cstdlib>
 #include <cmath>
 
 namespace bcs
@@ -73,27 +74,11 @@ namespace bcs
 	{
 		T operator() (const T& x) const
 		{
-			return x >= 0 ? x : -x;
+			return std::abs(x);
 		}
 	};
 
-	template<>
-	struct abs_fun<double> : public std::unary_function<double, double>
-	{
-		double operator() (const double& x) const
-		{
-			return std::fabs(x);
-		}
-	};
 
-	template<>
-	struct abs_fun<float> : public std::unary_function<float, float>
-	{
-		float operator() (const float& x) const
-		{
-			return std::fabs(x);
-		}
-	};
 
 	template<typename T>
 	struct sqrt_fun : public std::unary_function<T, T>

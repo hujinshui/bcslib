@@ -248,11 +248,11 @@ namespace bcs
 	template<typename T>
 	inline void vec_pow(size_t n, const T *x, const T& e, T *y)
 	{
-		vec_calc(n, x, e, y, abs_fun<T>());
+		vec_calc(n, x, e, y, pow_fun<T>());
 	}
 
 	template<typename T>
-	inline void vec_pow(size_t n, const T *x, int e, T *y)
+	inline void vec_pow_n(size_t n, const T *x, int e, T *y)
 	{
 		vec_calc(n, x, y, pow_n_fun<T>(e));
 	}

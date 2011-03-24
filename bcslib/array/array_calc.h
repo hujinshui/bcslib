@@ -17,7 +17,12 @@
 namespace bcs
 {
 
-	// generic functions
+	/******************************************************
+	 *
+	 *  Generic functions
+	 *
+	 ******************************************************/
+
 
 	template<typename T, class TIndexer, typename TVecFunc>
 	inline array1d<T> array_calc(const const_aview1d<T, TIndexer>& x, TVecFunc vecfunc)
@@ -367,7 +372,13 @@ namespace bcs
 	}
 
 
-	// Calculation operators overloading: add, sub, mul, div, negate
+	/******************************************************
+	 *
+	 * Calculation operators overloading:
+	 *
+	 *  add, sub, mul, div, negate
+	 *
+	 ******************************************************/
 
 	// add
 
@@ -846,6 +857,515 @@ namespace bcs
 	void be_negated(aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
 	{
 		array_calc_inplace(x, vec_neg_fun<T>());
+	}
+
+
+
+	/******************************************************
+	 *
+	 *  Elementary functions
+	 *
+	 ******************************************************/
+
+	// abs
+
+	template<typename T>
+	struct vec_abs_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_abs(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> abs(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_abs_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> abs(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_abs_fun<T>());
+	}
+
+
+	// sqr
+
+	template<typename T>
+	struct vec_sqr_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_sqr(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> sqr(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_sqr_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> sqr(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_sqr_fun<T>());
+	}
+
+
+	// sqrt
+
+	template<typename T>
+	struct vec_sqrt_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_sqrt(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> sqrt(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_sqrt_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> sqrt(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_sqrt_fun<T>());
+	}
+
+
+	// pow
+
+	template<typename T>
+	struct vec_pow_fun
+	{
+		void operator() (size_t n, const T *x, const T *e, T *y)
+		{
+			vec_pow(n, x, e, y);
+		}
+
+		void operator() (size_t n, const T *x, const T &e, T *y)
+		{
+			vec_pow(n, x, e, y);
+		}
+	};
+
+	template<typename T>
+	struct vec_pow_n_fun
+	{
+		int e;
+		vec_pow_n_fun(int e_) : e(e_) { }
+
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_pow_n(n, x, e, y);
+		}
+	};
+
+	template<typename T, class LIndexer, class RIndexer>
+	array1d<T> pow(const const_aview1d<T, LIndexer>& x, const const_aview1d<T, RIndexer>& e)
+	{
+		return array_calc(x, e, vec_pow_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	array2d<T, TOrd> pow(
+			const const_aview2d<T, TOrd, LIndexer0, LIndexer1>& x,
+			const const_aview2d<T, TOrd, RIndexer0, RIndexer1>& e)
+	{
+		return array_calc(x, e, vec_pow_fun<T>());
+	}
+
+
+	template<typename T, class TIndexer>
+	array1d<T> pow(const const_aview1d<T, TIndexer>& x, const T& e)
+	{
+		return array_calc(x, e, vec_pow_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> pow(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x, const T &e)
+	{
+		return array_calc(x, e, vec_pow_fun<T>());
+	}
+
+	template<typename T, class TIndexer>
+	array1d<T> pow_n(const const_aview1d<T, TIndexer>& x, const int& e)
+	{
+		return array_calc(x, vec_pow_n_fun<T>(e));
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> pow_n(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x, const int& e)
+	{
+		return array_calc(x, vec_pow_n_fun<T>(e));
+	}
+
+
+	// exp
+
+	template<typename T>
+	struct vec_exp_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_exp(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> exp(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_exp_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> exp(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_exp_fun<T>());
+	}
+
+
+	// log
+
+	template<typename T>
+	struct vec_log_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_log(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> log(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_log_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> log(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_log_fun<T>());
+	}
+
+
+	// log10
+
+	template<typename T>
+	struct vec_log10_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_log10(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> log10(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_log10_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> log10(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_log10_fun<T>());
+	}
+
+
+	// ceil
+
+	template<typename T>
+	struct vec_ceil_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_ceil(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> ceil(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_ceil_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> ceil(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_ceil_fun<T>());
+	}
+
+
+	// floor
+
+	template<typename T>
+	struct vec_floor_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_floor(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> floor(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_floor_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> floor(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_floor_fun<T>());
+	}
+
+
+	// sin
+
+	template<typename T>
+	struct vec_sin_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_sin(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> sin(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_sin_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> sin(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_sin_fun<T>());
+	}
+
+
+	// cos
+
+	template<typename T>
+	struct vec_cos_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_cos(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> cos(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_cos_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> cos(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_cos_fun<T>());
+	}
+
+
+	// tan
+
+	template<typename T>
+	struct vec_tan_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_tan(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> tan(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_tan_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> tan(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_tan_fun<T>());
+	}
+
+
+	// asin
+
+	template<typename T>
+	struct vec_asin_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_asin(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> asin(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_asin_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> asin(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_asin_fun<T>());
+	}
+
+
+	// acos
+
+	template<typename T>
+	struct vec_acos_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_acos(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> acos(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_acos_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> acos(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_acos_fun<T>());
+	}
+
+
+	// atan
+
+	template<typename T>
+	struct vec_atan_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_atan(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> atan(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_atan_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> atan(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_atan_fun<T>());
+	}
+
+
+	// atan2
+
+	template<typename T>
+	struct vec_atan2_fun
+	{
+		void operator() (size_t n, const T *x1, const T *x2, T *y)
+		{
+			vec_atan2(n, x1, x2, y);
+		}
+	};
+
+	template<typename T, class LIndexer, class RIndexer>
+	array1d<T> atan2(const const_aview1d<T, LIndexer>& x1, const const_aview1d<T, RIndexer>& x2)
+	{
+		return array_calc(x1, x2, vec_atan2_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	array2d<T, TOrd> atan2(
+			const const_aview2d<T, TOrd, LIndexer0, LIndexer1>& x1,
+			const const_aview2d<T, TOrd, RIndexer0, RIndexer1>& x2)
+	{
+		return array_calc(x1, x2, vec_atan2_fun<T>());
+	}
+
+
+	// sinh
+
+	template<typename T>
+	struct vec_sinh_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_sinh(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> sinh(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_sinh_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> sinh(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_sinh_fun<T>());
+	}
+
+
+	// cosh
+
+	template<typename T>
+	struct vec_cosh_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_cosh(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> cosh(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_cosh_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> cosh(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_cosh_fun<T>());
+	}
+
+
+	// tanh
+
+	template<typename T>
+	struct vec_tanh_fun
+	{
+		void operator() (size_t n, const T *x, T *y)
+		{
+			vec_tanh(n, x, y);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	array1d<T> tanh(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_calc(x, vec_tanh_fun<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array2d<T, TOrd> tanh(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_calc(x, vec_tanh_fun<T>());
 	}
 
 

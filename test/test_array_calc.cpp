@@ -385,6 +385,282 @@ BCS_TEST_CASE( test_array_neg )
 }
 
 
+BCS_TEST_CASE( test_array_abs )
+{
+	const int N = 6;
+	double src[N] = {1, -2, -3, 4, -5, 6};
+	double res[N];
+	for (int i = 0; i < N; ++i) res[i] = std::abs(src[i]);
+
+	array1d<double> x(6, src);
+	BCS_CHECK( array_view_approx( abs(x), res, 6 ) );
+
+	array2d<double, row_major_t> Xr(2, 3, src);
+	BCS_CHECK( array_view_approx( abs(Xr), res, 2, 3) );
+
+	array2d<double, column_major_t> Xc(2, 3, src);
+	BCS_CHECK( array_view_approx( abs(Xc), res, 2, 3) );
+}
+
+
+BCS_TEST_CASE( test_array_sqr_sqrt )
+{
+	const int N = 6;
+	double src[N] = {1, 2, 3, 4, 5, 6};
+	double res[N];
+
+	array1d<double> x(6, src);
+	array2d<double, row_major_t> Xr(2, 3, src);
+	array2d<double, column_major_t> Xc(2, 3, src);
+
+	// sqr
+
+	for (int i = 0; i < N; ++i) res[i] = src[i] * src[i];
+
+	BCS_CHECK( array_view_approx( sqr(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( sqr(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( sqr(Xc), res, 2, 3) );
+
+	// sqrt
+
+	for (int i = 0; i < N; ++i) res[i] = std::sqrt(src[i]);
+
+	BCS_CHECK( array_view_approx( sqrt(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( sqrt(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( sqrt(Xc), res, 2, 3) );
+}
+
+
+BCS_TEST_CASE( test_array_pow )
+{
+	const int N = 6;
+	double src[N] = {1.2, 1.8, 2.3, 2.6, 2.9, 3.5};
+	double src_e[N] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
+	double res[N];
+
+	array1d<double> x(6, src);
+	array2d<double, row_major_t> Xr(2, 3, src);
+	array2d<double, column_major_t> Xc(2, 3, src);
+
+	array1d<double> e(6, src_e);
+	array2d<double, row_major_t> Er(2, 3, src_e);
+	array2d<double, column_major_t> Ec(2, 3, src_e);
+
+	// pow
+
+	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], src_e[i]);
+
+	BCS_CHECK( array_view_approx( pow(x, e),   res, 6 ) );
+	BCS_CHECK( array_view_approx( pow(Xr, Er), res, 2, 3) );
+	BCS_CHECK( array_view_approx( pow(Xc, Ec), res, 2, 3) );
+
+	// pow (e)
+
+	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], 3.2);
+
+	BCS_CHECK( array_view_approx( pow(x, 3.2),  res, 6 ) );
+	BCS_CHECK( array_view_approx( pow(Xr, 3.2), res, 2, 3) );
+	BCS_CHECK( array_view_approx( pow(Xc, 3.2), res, 2, 3) );
+
+	// pow_n
+
+	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], 3);
+
+	BCS_CHECK( array_view_approx( pow_n(x,  3), res, 6 ) );
+	BCS_CHECK( array_view_approx( pow_n(Xr, 3), res, 2, 3) );
+	BCS_CHECK( array_view_approx( pow_n(Xc, 3), res, 2, 3) );
+
+}
+
+
+BCS_TEST_CASE( test_array_exp_log )
+{
+	const int N = 6;
+	double src[N] = {1, 2, 3, 4, 5, 6};
+	double res[N];
+
+	array1d<double> x(6, src);
+	array2d<double, row_major_t> Xr(2, 3, src);
+	array2d<double, column_major_t> Xc(2, 3, src);
+
+	// exp
+
+	for (int i = 0; i < N; ++i) res[i] = std::exp(src[i]);
+
+	BCS_CHECK( array_view_approx( exp(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( exp(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( exp(Xc), res, 2, 3) );
+
+	// log
+
+	for (int i = 0; i < N; ++i) res[i] = std::log(src[i]);
+
+	BCS_CHECK( array_view_approx( log(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( log(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( log(Xc), res, 2, 3) );
+
+	// log10
+
+	for (int i = 0; i < N; ++i) res[i] = std::log10(src[i]);
+
+	BCS_CHECK( array_view_approx( log10(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( log10(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( log10(Xc), res, 2, 3) );
+}
+
+
+BCS_TEST_CASE( test_array_ceil_floor )
+{
+	const int N = 6;
+	double src[N] = {1.2, 2, 3.4, -4.1, 5.7, 6.01};
+	double res[N];
+
+	array1d<double> x(6, src);
+	array2d<double, row_major_t> Xr(2, 3, src);
+	array2d<double, column_major_t> Xc(2, 3, src);
+
+	// ceil
+
+	for (int i = 0; i < N; ++i) res[i] = std::ceil(src[i]);
+
+	BCS_CHECK( array_view_approx( ceil(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( ceil(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( ceil(Xc), res, 2, 3) );
+
+	// floor
+
+	for (int i = 0; i < N; ++i) res[i] = std::floor(src[i]);
+
+	BCS_CHECK( array_view_approx( floor(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( floor(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( floor(Xc), res, 2, 3) );
+
+}
+
+
+BCS_TEST_CASE( test_array_trifuncs )
+{
+	const int N = 6;
+	double src[N] = {1, 2, 3, 4, 5, 6};
+	double res[N];
+
+	array1d<double> x(6, src);
+	array2d<double, row_major_t> Xr(2, 3, src);
+	array2d<double, column_major_t> Xc(2, 3, src);
+
+	// sin
+
+	for (int i = 0; i < N; ++i) res[i] = std::sin(src[i]);
+
+	BCS_CHECK( array_view_approx( sin(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( sin(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( sin(Xc), res, 2, 3) );
+
+	// cos
+
+	for (int i = 0; i < N; ++i) res[i] = std::cos(src[i]);
+
+	BCS_CHECK( array_view_approx( cos(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( cos(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( cos(Xc), res, 2, 3) );
+
+	// tan
+
+	for (int i = 0; i < N; ++i) res[i] = std::tan(src[i]);
+
+	BCS_CHECK( array_view_approx( tan(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( tan(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( tan(Xc), res, 2, 3) );
+}
+
+
+BCS_TEST_CASE( test_array_arc_trifuncs )
+{
+	const int N = 6;
+	double src[N] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6};
+	double src2[N] = {0.3, 0.5, 0.6, 0.4, 0.1, 0.2};
+	double res[N];
+
+	array1d<double> x(6, src);
+	array2d<double, row_major_t> Xr(2, 3, src);
+	array2d<double, column_major_t> Xc(2, 3, src);
+
+	array1d<double> x2(6, src2);
+	array2d<double, row_major_t> Xr2(2, 3, src2);
+	array2d<double, column_major_t> Xc2(2, 3, src2);
+
+	// asin
+
+	for (int i = 0; i < N; ++i) res[i] = std::asin(src[i]);
+
+	BCS_CHECK( array_view_approx( asin(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( asin(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( asin(Xc), res, 2, 3) );
+
+	// acos
+
+	for (int i = 0; i < N; ++i) res[i] = std::acos(src[i]);
+
+	BCS_CHECK( array_view_approx( acos(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( acos(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( acos(Xc), res, 2, 3) );
+
+	// atan
+
+	for (int i = 0; i < N; ++i) res[i] = std::atan(src[i]);
+
+	BCS_CHECK( array_view_approx( atan(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( atan(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( atan(Xc), res, 2, 3) );
+
+	// atan2
+
+	for (int i = 0; i < N; ++i) res[i] = std::atan2(src[i], src2[i]);
+
+	BCS_CHECK( array_view_approx( atan2(x, x2), res, 6 ) );
+	BCS_CHECK( array_view_approx( atan2(Xr, Xr2), res, 2, 3) );
+	BCS_CHECK( array_view_approx( atan2(Xc, Xc2), res, 2, 3) );
+
+}
+
+
+BCS_TEST_CASE( test_array_htrifuncs )
+{
+	const int N = 6;
+	double src[N] = {1, 2, 3, 4, 5, 6};
+	double res[N];
+
+	array1d<double> x(6, src);
+	array2d<double, row_major_t> Xr(2, 3, src);
+	array2d<double, column_major_t> Xc(2, 3, src);
+
+	// sin
+
+	for (int i = 0; i < N; ++i) res[i] = std::sinh(src[i]);
+
+	BCS_CHECK( array_view_approx( sinh(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( sinh(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( sinh(Xc), res, 2, 3) );
+
+	// cos
+
+	for (int i = 0; i < N; ++i) res[i] = std::cosh(src[i]);
+
+	BCS_CHECK( array_view_approx( cosh(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( cosh(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( cosh(Xc), res, 2, 3) );
+
+	// tan
+
+	for (int i = 0; i < N; ++i) res[i] = std::tanh(src[i]);
+
+	BCS_CHECK( array_view_approx( tanh(x), res, 6 ) );
+	BCS_CHECK( array_view_approx( tanh(Xr), res, 2, 3) );
+	BCS_CHECK( array_view_approx( tanh(Xc), res, 2, 3) );
+}
+
+
+
 test_suite *test_array_calc_suite()
 {
 	test_suite *suite = new test_suite( "test_array_calc" );
@@ -394,6 +670,15 @@ test_suite *test_array_calc_suite()
 	suite->add( new test_array_mul() );
 	suite->add( new test_array_div() );
 	suite->add( new test_array_neg() );
+
+	suite->add( new test_array_abs() );
+	suite->add( new test_array_sqr_sqrt() );
+	suite->add( new test_array_pow() );
+	suite->add( new test_array_exp_log() );
+	suite->add( new test_array_ceil_floor() );
+	suite->add( new test_array_trifuncs() );
+	suite->add( new test_array_arc_trifuncs() );
+	suite->add( new test_array_htrifuncs() );
 
 	return suite;
 }
