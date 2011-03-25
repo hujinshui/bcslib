@@ -64,6 +64,37 @@ BCS_TEST_CASE( test_array_sum )
 }
 
 
+BCS_TEST_CASE( test_array_prod )
+{
+	double src[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+	// 1D
+
+	array1d<double> x(5, src);
+	BCS_CHECK_APPROX( prod(x),  120.0 );
+
+	// 2D
+
+	array2d<double, row_major_t> Xr(2, 3, src);
+	double Xr_re[] = {6, 120};
+	double Xr_ce[] = {4, 10, 18};
+
+	BCS_CHECK_APPROX( prod(Xr), 720.0 );
+	BCS_CHECK( array_view_approx(row_prod(Xr), Xr_re, 2) );
+	BCS_CHECK( array_view_approx(column_prod(Xr), Xr_ce, 3) );
+
+	array2d<double, column_major_t> Xc(2, 3, src);
+	double Xc_re[] = {15, 48};
+	double Xc_ce[] = {2, 12, 30};
+
+	BCS_CHECK_APPROX( prod(Xc), 720.0 );
+	BCS_CHECK( array_view_approx(row_prod(Xc), Xc_re, 2) );
+	BCS_CHECK( array_view_approx(column_prod(Xc), Xc_ce, 3) );
+}
+
+
+
+
 BCS_TEST_CASE( test_array_max_min )
 {
 	double src[6] = {7, 3, 2, 9, 8, 1};
@@ -182,6 +213,7 @@ test_suite *test_array_eval_suite()
 	test_suite *msuite = new test_suite( "test_array_eval" );
 
 	msuite->add( new test_array_sum() );
+	msuite->add( new test_array_prod() );
 	msuite->add( new test_array_max_min() );
 
 	return msuite;

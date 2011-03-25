@@ -152,6 +152,44 @@ namespace bcs
 	}
 
 
+	// prod
+
+	template<typename T>
+	struct vec_prod_evaluator
+	{
+		typedef T result_type;
+
+		result_type operator() (size_t n, const T *x) const
+		{
+			return vec_prod(n, x);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	T prod(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_eval(x, vec_prod_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T prod(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_eval(x, vec_prod_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> row_prod(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_rows_eval(x, vec_prod_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> column_prod(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_columns_eval(x, vec_prod_evaluator<T>());
+	}
+
+
 	// max
 
 	template<typename T>
