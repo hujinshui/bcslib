@@ -865,7 +865,7 @@ namespace bcs
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename OutputIter>
 	inline void export_to(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& a, OutputIter dst)
 	{
-		std::copy(a.begin(), a.end(), dst);
+		copy_n(a.begin(), a.nelems(), dst);
 
 	}
 
@@ -878,7 +878,7 @@ namespace bcs
 		}
 		else
 		{
-			std::copy(a.begin(), a.end(), dst);
+			copy_n(a.begin(), a.nelems(), dst);
 		}
 	}
 

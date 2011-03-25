@@ -17,7 +17,7 @@ ARRAY_COMP_HEADERS = bcslib/array/array_calc.h bcslib/array/array_eval.h
 
 all: test_array
 
-test_array : bin/test_array_basics bin/test_array_comp
+test_array : bin/test_array_basics bin/test_array_comp bin/test_access_performance
 
 ARRAY_BASIC_TESTS = test/test_array_basics.cpp test/test_index_selection.cpp test/test_array1d.cpp test/test_array2d.cpp
 bin/test_array_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 
@@ -27,3 +27,10 @@ bin/test_array_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(
 ARRAY_COMP_TESTS = test/test_array_comp.cpp test/test_array_calc.cpp test/test_array_eval.cpp
 bin/test_array_comp: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
 	$(CC) $(CFLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp
+	
+
+bin/test_access_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) test/test_access_performance.cpp
+	$(CC) $(CFLAGS) -O2 test/test_access_performance.cpp -o bin/test_access_performance
+
+	
+	
