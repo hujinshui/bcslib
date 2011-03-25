@@ -54,7 +54,7 @@ namespace bcs
 
 
 	template<typename T>
-	inline void vec_abs_sum(size_t n, const T *x)
+	inline T vec_abs_sum(size_t n, const T *x)
 	{
 		T s(0);
 		for (size_t i = 0; i < n; ++i) s += std::abs(x[i]);
@@ -62,7 +62,7 @@ namespace bcs
 	}
 
 	template<typename T>
-	inline void vec_sqr_sum(size_t n, const T *x)
+	inline T vec_sqr_sum(size_t n, const T *x)
 	{
 		T s(0);
 		for (size_t i = 0; i < n; ++i) s += sqr(x[i]);
@@ -70,7 +70,7 @@ namespace bcs
 	}
 
 	template<typename T>
-	inline void vec_abs_max(size_t n, const T *x)
+	inline T vec_abs_max(size_t n, const T *x)
 	{
 		T s(0);
 		for (size_t i = 0; i < n; ++i)
@@ -110,13 +110,13 @@ namespace bcs
 	}
 
 
-	template<typename T, typename TPower>
+	template<typename T>
 	inline T vec_L1norm(size_t n, const T *x)
 	{
 		return vec_abs_sum(n, x);
 	}
 
-	template<typename T, typename TPower>
+	template<typename T>
 	inline T vec_L2norm(size_t n, const T *x)
 	{
 		return std::sqrt(vec_sqr_sum(n, x));

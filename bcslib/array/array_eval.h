@@ -14,6 +14,7 @@
 
 #include <bcslib/veccomp/vecstat.h>
 #include <bcslib/veccomp/vecnorm.h>
+#include <bcslib/array/array_calc.h>
 
 
 namespace bcs
@@ -150,6 +151,35 @@ namespace bcs
 	{
 		return array_columns_eval(x, vec_sum_evaluator<T>());
 	}
+
+
+	// mean
+
+	template<typename T, class TIndexer>
+	T mean(const const_aview1d<T, TIndexer>& x)
+	{
+		return sum(x) / x.nelems();
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T mean(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return sum(x) / x.nelems();
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> row_mean(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return row_sum(x) / (T)(x.ncolumns());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> column_mean(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return column_sum(x) / (T)(x.nrows());
+	}
+
+
 
 
 	// prod
@@ -384,6 +414,240 @@ namespace bcs
 		return array_columns_eval(x, vec_index_min_evaluator<T>());
 	}
 
+
+	// L1norm
+
+	template<typename T>
+	struct vec_L1norm_evaluator
+	{
+		typedef T result_type;
+
+		result_type operator() (size_t n, const T *x) const
+		{
+			return vec_L1norm(n, x);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	T L1norm(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_eval(x, vec_L1norm_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T L1norm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_eval(x, vec_L1norm_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> row_L1norm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_rows_eval(x, vec_L1norm_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> column_L1norm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_columns_eval(x, vec_L1norm_evaluator<T>());
+	}
+
+
+	// sqr_sum
+
+	template<typename T>
+	struct vec_sqr_sum_evaluator
+	{
+		typedef T result_type;
+
+		result_type operator() (size_t n, const T *x) const
+		{
+			return vec_sqr_sum(n, x);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	T sqr_sum(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_eval(x, vec_sqr_sum_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T sqr_sum(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_eval(x, vec_sqr_sum_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> row_sqr_sum(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_rows_eval(x, vec_sqr_sum_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> column_sqr_sum(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_columns_eval(x, vec_sqr_sum_evaluator<T>());
+	}
+
+
+
+	// L2norm
+
+	template<typename T>
+	struct vec_L2norm_evaluator
+	{
+		typedef T result_type;
+
+		result_type operator() (size_t n, const T *x) const
+		{
+			return vec_L2norm(n, x);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	T L2norm(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_eval(x, vec_L2norm_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T L2norm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_eval(x, vec_L2norm_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> row_L2norm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_rows_eval(x, vec_L2norm_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> column_L2norm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_columns_eval(x, vec_L2norm_evaluator<T>());
+	}
+
+
+	// pow_sum
+
+	template<typename T, typename TPower>
+	struct vec_pow_sum_evaluator
+	{
+		typedef T result_type;
+
+		TPower power;
+		vec_pow_sum_evaluator(const TPower& p) : power(p) { }
+
+		result_type operator() (size_t n, const T *x) const
+		{
+			return vec_pow_sum(n, x, power);
+		}
+	};
+
+	template<typename T, class TIndexer, typename TPower>
+	T pow_sum(const const_aview1d<T, TIndexer>& x, const TPower& e)
+	{
+		return array_eval(x, vec_pow_sum_evaluator<T, TPower>(e));
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename TPower>
+	T pow_sum(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x, const TPower& e)
+	{
+		return array_eval(x, vec_pow_sum_evaluator<T, TPower>(e));
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename TPower>
+	array1d<T> row_pow_sum(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x, const TPower& e)
+	{
+		return array_rows_eval(x, vec_pow_sum_evaluator<T, TPower>(e));
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename TPower>
+	array1d<T> column_pow_sum(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x, const TPower& e)
+	{
+		return array_columns_eval(x, vec_pow_sum_evaluator<T, TPower>(e));
+	}
+
+
+	// Lp norm
+
+	template<typename T, typename TPower>
+	struct vec_Lpnorm_evaluator
+	{
+		typedef T result_type;
+
+		TPower power;
+		vec_Lpnorm_evaluator(const TPower& p) : power(p) { }
+
+		result_type operator() (size_t n, const T *x) const
+		{
+			return vec_Lpnorm(n, x, power);
+		}
+	};
+
+	template<typename T, class TIndexer, typename TPower>
+	T Lpnorm(const const_aview1d<T, TIndexer>& x, const TPower& e)
+	{
+		return array_eval(x, vec_Lpnorm_evaluator<T, TPower>(e));
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename TPower>
+	T Lpnorm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x, const TPower& e)
+	{
+		return array_eval(x, vec_Lpnorm_evaluator<T, TPower>(e));
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename TPower>
+	array1d<T> row_Lpnorm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x, const TPower& e)
+	{
+		return array_rows_eval(x, vec_Lpnorm_evaluator<T, TPower>(e));
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename TPower>
+	array1d<T> column_Lpnorm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x, const TPower& e)
+	{
+		return array_columns_eval(x, vec_Lpnorm_evaluator<T, TPower>(e));
+	}
+
+
+	// Linfnorm
+
+	template<typename T>
+	struct vec_Linfnorm_evaluator
+	{
+		typedef T result_type;
+
+		result_type operator() (size_t n, const T *x) const
+		{
+			return vec_Linfnorm(n, x);
+		}
+	};
+
+	template<typename T, class TIndexer>
+	T Linfnorm(const const_aview1d<T, TIndexer>& x)
+	{
+		return array_eval(x, vec_Linfnorm_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T Linfnorm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_eval(x, vec_Linfnorm_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> row_Linfnorm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_rows_eval(x, vec_Linfnorm_evaluator<T>());
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	array1d<T> column_Linfnorm(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x)
+	{
+		return array_columns_eval(x, vec_Linfnorm_evaluator<T>());
+	}
 
 
 };
