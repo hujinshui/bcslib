@@ -13,8 +13,7 @@
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/basic_funcs.h>
 
-
-namespace bcslib
+namespace bcs
 {
 	template<typename T>
 	inline T vec_dot_prod(size_t n, const T *x, const T *y)
@@ -57,9 +56,8 @@ namespace bcslib
 	template<typename T>
 	inline void vec_abs_sum(size_t n, const T *x)
 	{
-		abs_fun f;
 		T s(0);
-		for (size_t i = 0; i < n; ++i) s += f(x[i]);
+		for (size_t i = 0; i < n; ++i) s += std::abs(x[i]);
 		return s;
 	}
 
@@ -74,12 +72,10 @@ namespace bcslib
 	template<typename T>
 	inline void vec_abs_max(size_t n, const T *x)
 	{
-		abs_fun f;
-
 		T s(0);
 		for (size_t i = 0; i < n; ++i)
 		{
-			T a = f(x[i]);
+			T a = std::abs(x[i]);
 			if (a > s) s = a;
 		}
 

@@ -387,8 +387,8 @@ namespace bcs
 	{
 		typedef std::pair<T, T> value_type;
 
-		value_type min_value;
-		value_type max_value;
+		T min_value;
+		T max_value;
 
 		minmax_accumulator(const T& v) : min_value(v), max_value(v)
 		{
@@ -420,7 +420,7 @@ namespace bcs
 			return std::make_pair(min_value, max_value);
 		}
 
-		static T empty_value()
+		static value_type empty_value()
 		{
 			throw empty_accumulation("Cannot take minimum and maximum over empty collection.");
 		}

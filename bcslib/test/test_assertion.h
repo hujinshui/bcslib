@@ -213,7 +213,8 @@ namespace bcs
 
 #define BCS_CHECK_EQUAL( lhs, rhs ) BCS_CHECK_MESSAGE( (lhs) == (rhs), #lhs " == " #rhs )
 
-#define BCS_CHECK_APPROX( lhs, rhs, eps ) BCS_CHECK_MESSAGE( test_approx, #lhs " ~= " #rhs)
+#define BCS_CHECK_APPROX_( lhs, rhs, eps ) BCS_CHECK_MESSAGE( test_approx(lhs, rhs, eps), #lhs " ~= " #rhs)
+#define BCS_CHECK_APPROX( lhs, rhs ) BCS_CHECK_APPROX_( lhs, rhs, 1e-12 )
 
 
 #endif 

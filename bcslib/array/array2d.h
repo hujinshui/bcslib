@@ -34,6 +34,14 @@ namespace bcs
 				return i * n + j;
 			}
 
+			static index_pair ind2sub(size_t m, size_t n, index_t idx)
+			{
+				index_t i = idx / (index_t)n;
+				index_t j = idx - i * n;
+
+				return index_pair(i, j);
+			}
+
 			static void pass_by_end(size_t m, size_t n, index_t& i, index_t& j)
 			{
 				i = (index_t)m;
@@ -48,6 +56,14 @@ namespace bcs
 			static index_t offset(size_t m, size_t n, index_t i, index_t j)
 			{
 				return i + j * m;
+			}
+
+			static index_pair ind2sub(size_t m, size_t n, index_t idx)
+			{
+				index_t j = idx / (index_t)m;
+				index_t i = idx - j * m;
+
+				return index_pair(i, j);
 			}
 
 			static void pass_by_end(size_t m, size_t n, index_t& i, index_t& j)

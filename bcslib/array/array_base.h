@@ -26,6 +26,49 @@ namespace bcs
 	struct row_major_t { };
 	struct column_major_t { };
 
+	struct index_pair
+	{
+		index_t i0;
+		index_t i1;
+
+		index_pair() : i0(0), i1(0) { }
+
+		index_pair(index_t i0_, index_t i1_) : i0(i0_), i1(i1_) { }
+
+		bool operator == (const index_pair& rhs) const
+		{
+			return i0 == rhs.i0 && i1 == rhs.i1;
+		}
+
+		bool operator != (const index_pair& rhs) const
+		{
+			return !(operator == (rhs));
+		}
+	};
+
+
+	struct index_triple
+	{
+		index_t i0;
+		index_t i1;
+		index_t i2;
+
+		index_triple() : i0(0), i1(0), i2(0) { }
+
+		index_triple(index_t i0_, index_t i1_, index_t i2_) : i0(i0_), i1(i1_), i2(i2_) { }
+
+		bool operator == (const index_triple& rhs) const
+		{
+			return i0 == rhs.i0 && i1 == rhs.i1 && i2 == rhs.i2;
+		}
+
+		bool operator != (const index_triple& rhs) const
+		{
+			return !(operator == (rhs));
+		}
+	};
+
+
 
 	// make array shape
 

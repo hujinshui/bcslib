@@ -13,7 +13,7 @@
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/basic_funcs.h>
 
-namespace bcslib
+namespace bcs
 {
 
 	// generic stats functions
@@ -43,7 +43,7 @@ namespace bcslib
 	}
 
 	template<typename T, typename Accumulator, typename TInit>
-	inline typename Accumulator::value_type vec_stat(size_t n, const T *x, const TInit& x0)
+	inline typename Accumulator::value_type vec_stat_with_init(size_t n, const T *x, const TInit& x0)
 	{
 		Accumulator accum(x0);
 		vec_accumulate(accum, n, x);
@@ -62,7 +62,7 @@ namespace bcslib
 	template<typename T>
 	inline T vec_sum(size_t n, const T *x, const T& x0)
 	{
-		return vec_stat<T, sum_accumulator<T> >(n, x, x0);
+		return vec_stat_with_init<T, sum_accumulator<T>, T>(n, x, x0);
 	}
 
 	template<typename T>
@@ -74,7 +74,7 @@ namespace bcslib
 	template<typename T>
 	inline T vec_prod(size_t n, const T *x, const T& x0)
 	{
-		return vec_stat<T, prod_accumulator<T> >(n, x, x0);
+		return vec_stat_with_init<T, prod_accumulator<T>, T>(n, x, x0);
 	}
 
 	template<typename T>
@@ -86,7 +86,7 @@ namespace bcslib
 	template<typename T>
 	inline T vec_min(size_t n, const T *x, const T& x0)
 	{
-		return vec_stat<T, min_accumulator<T> >(n, x, x0);
+		return vec_stat_with_init<T, min_accumulator<T>, T>(n, x, x0);
 	}
 
 	template<typename T>
@@ -98,7 +98,7 @@ namespace bcslib
 	template<typename T>
 	inline T vec_max(size_t n, const T *x, const T& x0)
 	{
-		return vec_stat<T, max_accumulator<T> >(n, x, x0);
+		return vec_stat_with_init<T, max_accumulator<T>, T>(n, x, x0);
 	}
 
 	template<typename T>
@@ -110,7 +110,7 @@ namespace bcslib
 	template<typename T>
 	inline std::pair<T, T> vec_minmax(size_t n, const T *x, const T& min0, const T& max0)
 	{
-		return vec_stat<T, max_accumulator<T> >(n, x, std::make_pair(min0, max0));
+		return vec_stat_with_init<T, max_accumulator<T>, std::pair<T, T> >(n, x, std::make_pair(min0, max0));
 	}
 
 
@@ -164,9 +164,6 @@ namespace bcslib
 			throw empty_accumulation("Cannot take maximum over an empty collection.");
 		}
 	}
-
-
-	//
 
 
 }
