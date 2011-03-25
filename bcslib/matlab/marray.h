@@ -348,9 +348,9 @@ namespace matlab
 	inline marray create_marray(size_t ndim, const size_t *dims)
 	{
 		const size_t ndim0 = 8;
-		const mwSize _dims[ndim0];
+		mwSize _dims[ndim0];
 
-		const mwSize *pdims = 0;
+		mwSize *pdims = 0;
 		if (ndim <= ndim0)
 		{
 			pdims = _dims;
@@ -377,9 +377,9 @@ namespace matlab
 	inline marray create_marray<bool>(size_t ndim, const size_t *dims)
 	{
 		const size_t ndim0 = 8;
-		const mwSize _dims[ndim0];
+		mwSize _dims[ndim0];
 
-		const mwSize *pdims = 0;
+		mwSize *pdims = 0;
 		if (ndim <= ndim0)
 		{
 			pdims = _dims;

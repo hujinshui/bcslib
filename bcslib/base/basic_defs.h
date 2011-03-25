@@ -30,6 +30,7 @@
 #endif
 
 #include <string>
+#include <utility>
 
 
 namespace bcs
@@ -65,6 +66,29 @@ namespace bcs
 
 	struct clone_t { };
 	struct own_t { };
+
+
+	template<typename T1, typename T2>
+	struct ref_bind
+	{
+		T1& r1;
+		T2& r2;
+
+		ref_bind(T1& r1_, T2& r2_) : r1(r1_), r2(r2_) { };
+
+		ref_bind& operator = (const std::pair<T1, T2>& in)
+		{
+			r1 = in.first;
+			r2 = in.second;
+		}
+	};
+
+	template<typename T1, typename T2>
+	inline ref_bind<T1, T2> rbind(T1& r1, T2& r2)
+	{
+		return ref_bind<T1, T2>(r1, r2);
+	}
+
 
 	class base_exception
 	{

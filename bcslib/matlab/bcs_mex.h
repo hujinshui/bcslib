@@ -23,16 +23,30 @@ namespace matlab
 	// view from marray
 
 	template<typename T>
-	const_aview1d<T> view(const_marray a)
+	const_aview1d<T> view1d(const_marray a)
 	{
 		return const_aview1d<T>(a.data<T>(), a.nelems());
 	}
 
 
 	template<typename T>
-	aview1d<T> view(marray a)
+	aview1d<T> view1d(marray a)
 	{
 		return aview1d<T>(a.data<T>(), a.nelems());
+	}
+
+
+	template<typename T>
+	const_aview2d<T, column_major_t> view2d(const_marray a)
+	{
+		return const_aview2d<T, column_major_t>(a.data<T>(), a.nrows(), a.ncolumns(), a.nrows(), a.ncolumns());
+	}
+
+
+	template<typename T>
+	aview2d<T, column_major_t> view2d(marray a)
+	{
+		return aview2d<T, column_major_t>(a.data<T>(), a.nrows(), a.ncolumns(), a.nrows(), a.ncolumns());
 	}
 
 
@@ -42,7 +56,7 @@ namespace matlab
 	marray to_matlab_row(const const_aview1d<T, TIndexer>& v)
 	{
 		marray a = create_marray<T>(1, v.nelems());
-		view(a) << v;
+		view1d<T>(a) << v;
 		return a;
 	}
 
@@ -50,7 +64,7 @@ namespace matlab
 	marray to_matlab_column(const const_aview1d<T, TIndexer>& v)
 	{
 		marray a = create_marray<T>(v.nelems(), 1);
-		view(a) << v;
+		view1d<T>(a) << v;
 		return a;
 	}
 
@@ -79,7 +93,7 @@ namespace matlab
 		typedef typename TFunc::result_type R;
 		size_t n = v.size();
 		marray a = create_marray<R>(1, n);
-		aview1d<R> av = view(a);
+		aview1d<R> av = view1d<R>(a);
 
 		for (size_t i = 0; i < n; ++i)
 		{
@@ -94,7 +108,7 @@ namespace matlab
 		typedef typename TFunc::result_type R;
 		size_t n = v.size();
 		marray a = create_marray<R>(n, 1);
-		aview1d<R> av = view(a);
+		aview1d<R> av = view1d<R>(a);
 
 		for (size_t i = 0; i < n; ++i)
 		{
@@ -129,7 +143,7 @@ namespace matlab
 		return to_matlab_row(vec, f);
 	}
 
-	template<typename TIter>
+	template<typename TIter, typename TFunc>
 	marray to_matlab_column(TIter first, TIter last, TFunc f)
 	{
 		typedef typename std::iterator_traits<TIter>::value_type T;
@@ -144,7 +158,7 @@ namespace matlab
 	marray to_matlab_matrix(const const_aview2d<T, column_major_t, TIndexer0, TIndexer1>& v)
 	{
 		marray a = create_marray<T>(v.nrows(), v.ncolumns());
-		view(a) << v;
+		view2d<T>(a) << v;
 		return a;
 	}
 

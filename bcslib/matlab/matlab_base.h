@@ -96,6 +96,32 @@ namespace matlab
 	typedef array2d<char, column_major_t>     char_matrix;
 
 
+	// exception class
+
+	class mexception
+	{
+	public:
+		mexception(const char *id, const char *msg) : m_identifier(id), m_message(msg)
+		{
+		}
+
+		const char *identifier() const
+		{
+			return m_identifier.c_str();
+		}
+
+		const char *message() const
+		{
+			return m_message.c_str();
+		}
+
+	private:
+		std::string m_identifier;
+		std::string m_message;
+	};
+
+
+
 	// type specific stuff
 
 	template<typename T> struct mtype_traits;
