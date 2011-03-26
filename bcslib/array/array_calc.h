@@ -36,8 +36,7 @@ namespace bcs
 		}
 		else
 		{
-			array1d<T> xc = make_copy(x);
-			vecfunc(n, xc.pbase(), y.pbase());
+			vecfunc(n, x.begin(), y.pbase());
 		}
 		return y;
 	}
@@ -53,8 +52,7 @@ namespace bcs
 		}
 		else
 		{
-			array2d<T, TOrd> xc = make_copy(x);
-			vecfunc(xc.nelems(), xc.pbase(), y.pbase());
+			vecfunc(x.nelems(), x.begin(), y.pbase());
 		}
 		return y;
 	}
@@ -79,21 +77,18 @@ namespace bcs
 			}
 			else
 			{
-				array1d<T> x2c = make_copy(x2);
-				vecfunc(n, x1.pbase(), x2c.pbase(), y.pbase());
+				vecfunc(n, x1.pbase(), x2.begin(), y.pbase());
 			}
 		}
 		else
 		{
-			array1d<T> x1c = make_copy(x1);
 			if (is_dense_view(x2))
 			{
-				vecfunc(n, x1c.pbase(), x2.pbase(), y.pbase());
+				vecfunc(n, x1.begin(), x2.pbase(), y.pbase());
 			}
 			else
 			{
-				array1d<T> x2c = make_copy(x2);
-				vecfunc(n, x1c.pbase(), x2c.pbase(), y.pbase());
+				vecfunc(n, x1.begin(), x2.begin(), y.pbase());
 			}
 		}
 
@@ -123,21 +118,18 @@ namespace bcs
 			}
 			else
 			{
-				array2d<T, TOrd> x2c = make_copy(x2);
-				vecfunc(n, x1.pbase(), x2c.pbase(), y.pbase());
+				vecfunc(n, x1.pbase(), x2.begin(), y.pbase());
 			}
 		}
 		else
 		{
-			array2d<T, TOrd> x1c = make_copy(x1);
 			if (is_dense_view(x2))
 			{
-				vecfunc(n, x1c.pbase(), x2.pbase(), y.pbase());
+				vecfunc(n, x1.begin(), x2.pbase(), y.pbase());
 			}
 			else
 			{
-				array2d<T, TOrd> x2c = make_copy(x2);
-				vecfunc(n, x1c.pbase(), x2c.pbase(), y.pbase());
+				vecfunc(n, x1.begin(), x2.begin(), y.pbase());
 			}
 		}
 
@@ -157,8 +149,7 @@ namespace bcs
 		}
 		else
 		{
-			array1d<T> x1c = make_copy(x1);
-			vecfunc(n, x1c.pbase(), x2, y.pbase());
+			vecfunc(n, x1.begin(), x2, y.pbase());
 		}
 
 		return y;
@@ -177,8 +168,7 @@ namespace bcs
 		}
 		else
 		{
-			array1d<T> x2c = make_copy(x2);
-			vecfunc(n, x1, x2c.pbase(), y.pbase());
+			vecfunc(n, x1, x2.begin(), y.pbase());
 		}
 
 		return y;
@@ -197,8 +187,7 @@ namespace bcs
 		}
 		else
 		{
-			array2d<T, TOrd> x1c = make_copy(x1);
-			vecfunc(n, x1c.pbase(), x2, y.pbase());
+			vecfunc(n, x1.begin(), x2, y.pbase());
 		}
 		return y;
 	}
@@ -216,8 +205,7 @@ namespace bcs
 		}
 		else
 		{
-			array2d<T, TOrd> x2c = make_copy(x2);
-			vecfunc(n, x1, x2c.pbase(), y.pbase());
+			vecfunc(n, x1, x2.begin(), y.pbase());
 		}
 		return y;
 	}
@@ -233,26 +221,22 @@ namespace bcs
 		}
 		else
 		{
-			array1d<T> xc = make_copy(x);
-			vecfunc(n, xc.pbase());
-			x << xc;
+			vecfunc(n, x.begin());
 		}
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename TVecFunc>
-	inline void array_calc_inplace(aview2d<T, TOrd, TIndexer0, TIndexer1>& x, TVecFunc vecfunc)
+	inline void array_calc_inplace(aview2d<T, TOrd, TIndexer0, TIndexer1>& y, TVecFunc vecfunc)
 	{
-		size_t n = x.nelems();
+		size_t n = y.nelems();
 
-		if (is_dense_view(x))
+		if (is_dense_view(y))
 		{
-			vecfunc(n, x.pbase());
+			vecfunc(n, y.pbase());
 		}
 		else
 		{
-			array2d<T, TOrd> xc = make_copy(x);
-			vecfunc(n, xc.pbase());
-			x << xc;
+			vecfunc(n, y.begin());
 		}
 	}
 
@@ -275,23 +259,19 @@ namespace bcs
 			}
 			else
 			{
-				array1d<T> xc = make_copy(x);
-				vecfunc(n, y.pbase(), xc.pbase());
+				vecfunc(n, y.pbase(), x.begin());
 			}
 		}
 		else
 		{
-			array1d<T> yc = make_copy(y);
 			if (is_dense_view(x))
 			{
-				vecfunc(n, yc.pbase(), x.pbase());
+				vecfunc(n, y.begin(), x.pbase());
 			}
 			else
 			{
-				array1d<T> xc = make_copy(x);
-				vecfunc(n, yc.pbase(), xc.pbase());
+				vecfunc(n, y.begin(), x.begin());
 			}
-			y << yc;
 		}
 	}
 
@@ -316,23 +296,19 @@ namespace bcs
 			}
 			else
 			{
-				array2d<T, TOrd> xc = make_copy(x);
-				vecfunc(n, y.pbase(), xc.pbase());
+				vecfunc(n, y.pbase(), x.begin());
 			}
 		}
 		else
 		{
-			array2d<T, TOrd> yc = make_copy(y);
 			if (is_dense_view(x))
 			{
-				vecfunc(n, yc.pbase(), x.pbase());
+				vecfunc(n, y.begin(), x.pbase());
 			}
 			else
 			{
-				array2d<T, TOrd> xc = make_copy(x);
-				vecfunc(n, yc.pbase(), xc.pbase());
+				vecfunc(n, y.begin(), x.begin());
 			}
-			y << yc;
 		}
 	}
 
@@ -348,9 +324,7 @@ namespace bcs
 		}
 		else
 		{
-			array1d<T> yc = make_copy(y);
-			vecfunc(n, yc.pbase(), x);
-			y << yc;
+			vecfunc(n, y.begin(), x);
 		}
 	}
 
@@ -365,9 +339,7 @@ namespace bcs
 		}
 		else
 		{
-			array2d<T, TOrd> yc = make_copy(y);
-			vecfunc(n, yc.pbase(), x);
-			y << yc;
+			vecfunc(n, y.begin(), x);
 		}
 	}
 
@@ -390,19 +362,58 @@ namespace bcs
 			vec_add(n, x1, x2, y);
 		}
 
+		template<typename TIterX1, typename TIterX2>
+		void operator() (size_t n, TIterX1 x1, TIterX2 x2, T* y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x1, ++x2)
+			{
+				*(y++) = *x1 + *x2;
+			}
+		}
+
+
 		void operator() (size_t n, const T *x1, const T& x2, T *y)
 		{
 			vec_add(n, x1, x2, y);
 		}
+
+		template<typename TIterX1>
+		void operator() (size_t n, TIterX1 x1, const T& x2, T *y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x1)
+			{
+				*(y++) = *x1 + x2;
+			}
+		}
+
 
 		void operator() (size_t n, T *y, const T* x)
 		{
 			vec_add_inplace(n, y, x);
 		}
 
+		template<typename TIterY, typename TIterX>
+		void operator() (size_t n, TIterY y, TIterX x)
+		{
+			for (size_t i = 0; i < n; ++i, ++y, ++x)
+			{
+				*y += *x;
+			}
+		}
+
+
 		void operator() (size_t n, T *y, const T& x)
 		{
 			vec_add_inplace(n, y, x);
+		}
+
+		template<typename TIterY>
+		void operator() (size_t n, TIterY y, const T& x)
+		{
+			for (size_t i = 0; i < n; ++i, ++y)
+			{
+				*y += x;
+			}
 		}
 	};
 
@@ -486,9 +497,28 @@ namespace bcs
 			vec_sub(n, x1, x2, y);
 		}
 
+		template<typename TIterX1, typename TIterX2>
+		void operator() (size_t n, TIterX1 x1, TIterX2 x2, T* y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x1, ++x2)
+			{
+				*(y++) = *x1 - *x2;
+			}
+		}
+
+
 		void operator() (size_t n, const T *x1, const T& x2, T *y)
 		{
 			vec_sub(n, x1, x2, y);
+		}
+
+		template<typename TIterX1>
+		void operator() (size_t n, TIterX1 x1, const T& x2, T *y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x1)
+			{
+				*(y++) = *x1 - x2;
+			}
 		}
 
 		void operator() (size_t n, const T& x1, const T *x2, T *y)
@@ -496,16 +526,46 @@ namespace bcs
 			vec_sub(n, x1, x2, y);
 		}
 
+		template<typename TIterX2>
+		void operator() (size_t n, const T& x1, TIterX2 x2, T *y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x2)
+			{
+				*(y++) = x1 - *x2;
+			}
+		}
+
+
 		void operator() (size_t n, T *y, const T* x)
 		{
 			vec_sub_inplace(n, y, x);
 		}
 
+		template<typename TIterY, typename TIterX>
+		void operator() (size_t n, TIterY y, TIterX x)
+		{
+			for (size_t i = 0; i < n; ++i, ++y, ++x)
+			{
+				*y -= *x;
+			}
+		}
+
+
 		void operator() (size_t n, T *y, const T& x)
 		{
 			vec_sub_inplace(n, y, x);
 		}
+
+		template<typename TIterY>
+		void operator() (size_t n, TIterY y, const T& x)
+		{
+			for (size_t i = 0; i < n; ++i, ++y)
+			{
+				*y -= x;
+			}
+		}
 	};
+
 
 	template<typename T>
 	struct vec_rev_sub_fun
@@ -513,6 +573,15 @@ namespace bcs
 		void operator() (size_t n, T *y, const T& x)
 		{
 			vec_sub_inplace(n, x, y);
+		}
+
+		template<typename TIterY>
+		void operator() (size_t n, TIterY y, const T& x)
+		{
+			for (size_t i = 0; i < n; ++i, ++y)
+			{
+				*y = x - *y;
+			}
 		}
 	};
 
@@ -609,19 +678,58 @@ namespace bcs
 			vec_mul(n, x1, x2, y);
 		}
 
+		template<typename TIterX1, typename TIterX2>
+		void operator() (size_t n, TIterX1 x1, TIterX2 x2, T* y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x1, ++x2)
+			{
+				*(y++) = *x1 * *x2;
+			}
+		}
+
+
 		void operator() (size_t n, const T *x1, const T& x2, T *y)
 		{
 			vec_mul(n, x1, x2, y);
 		}
+
+		template<typename TIterX1>
+		void operator() (size_t n, TIterX1 x1, const T& x2, T *y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x1)
+			{
+				*(y++) = *x1 * x2;
+			}
+		}
+
 
 		void operator() (size_t n, T *y, const T* x)
 		{
 			vec_mul_inplace(n, y, x);
 		}
 
+		template<typename TIterY, typename TIterX>
+		void operator() (size_t n, TIterY y, TIterX x)
+		{
+			for (size_t i = 0; i < n; ++i, ++y, ++x)
+			{
+				*y *= *x;
+			}
+		}
+
+
 		void operator() (size_t n, T *y, const T& x)
 		{
 			vec_mul_inplace(n, y, x);
+		}
+
+		template<typename TIterY>
+		void operator() (size_t n, TIterY y, const T& x)
+		{
+			for (size_t i = 0; i < n; ++i, ++y)
+			{
+				*y *= x;
+			}
 		}
 	};
 
@@ -705,9 +813,28 @@ namespace bcs
 			vec_div(n, x1, x2, y);
 		}
 
+		template<typename TIterX1, typename TIterX2>
+		void operator() (size_t n, TIterX1 x1, TIterX2 x2, T* y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x1, ++x2)
+			{
+				*(y++) = *x1 / *x2;
+			}
+		}
+
+
 		void operator() (size_t n, const T *x1, const T& x2, T *y)
 		{
 			vec_div(n, x1, x2, y);
+		}
+
+		template<typename TIterX1>
+		void operator() (size_t n, TIterX1 x1, const T& x2, T *y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x1)
+			{
+				*(y++) = *x1 / x2;
+			}
 		}
 
 		void operator() (size_t n, const T& x1, const T *x2, T *y)
@@ -715,16 +842,46 @@ namespace bcs
 			vec_div(n, x1, x2, y);
 		}
 
+		template<typename TIterX2>
+		void operator() (size_t n, const T& x1, TIterX2 x2, T *y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x2)
+			{
+				*(y++) = x1 / *x2;
+			}
+		}
+
+
 		void operator() (size_t n, T *y, const T* x)
 		{
 			vec_div_inplace(n, y, x);
 		}
 
+		template<typename TIterY, typename TIterX>
+		void operator() (size_t n, TIterY y, TIterX x)
+		{
+			for (size_t i = 0; i < n; ++i, ++y, ++x)
+			{
+				*y /= *x;
+			}
+		}
+
+
 		void operator() (size_t n, T *y, const T& x)
 		{
 			vec_div_inplace(n, y, x);
 		}
+
+		template<typename TIterY>
+		void operator() (size_t n, TIterY y, const T& x)
+		{
+			for (size_t i = 0; i < n; ++i, ++y)
+			{
+				*y /= x;
+			}
+		}
 	};
+
 
 	template<typename T>
 	struct vec_rev_div_fun
@@ -732,6 +889,15 @@ namespace bcs
 		void operator() (size_t n, T *y, const T& x)
 		{
 			vec_div_inplace(n, x, y);
+		}
+
+		template<typename TIterY>
+		void operator() (size_t n, TIterY y, const T& x)
+		{
+			for (size_t i = 0; i < n; ++i, ++y)
+			{
+				*y = x / *y;
+			}
 		}
 	};
 
@@ -828,9 +994,27 @@ namespace bcs
 			vec_negate(n, x, y);
 		}
 
-		void operator() (size_t n, T *x)
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
 		{
-			vec_negate(n, x);
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = - *x;
+			}
+		}
+
+		void operator() (size_t n, T *y)
+		{
+			vec_negate(n, y);
+		}
+
+		template<typename TIterY>
+		void operator() (size_t n, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++y)
+			{
+				*y = -*y;
+			}
 		}
 	};
 
@@ -860,12 +1044,12 @@ namespace bcs
 	}
 
 
-
 	/******************************************************
 	 *
 	 *  Elementary functions
 	 *
 	 ******************************************************/
+
 
 	// abs
 
@@ -875,6 +1059,15 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y)
 		{
 			vec_abs(n, x, y);
+		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::abs(*x);
+			}
 		}
 	};
 
@@ -900,6 +1093,15 @@ namespace bcs
 		{
 			vec_sqr(n, x, y);
 		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = sqr(*x);
+			}
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -923,6 +1125,15 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y)
 		{
 			vec_sqrt(n, x, y);
+		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::sqrt(*x);
+			}
 		}
 	};
 
@@ -949,9 +1160,27 @@ namespace bcs
 			vec_pow(n, x, e, y);
 		}
 
+		template<typename TIterX, typename TIterE, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterE e, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++e, ++y)
+			{
+				*y = std::pow(*x, *e);
+			}
+		}
+
 		void operator() (size_t n, const T *x, const T &e, T *y)
 		{
 			vec_pow(n, x, e, y);
+		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, const T& e, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::pow(*x, e);
+			}
 		}
 	};
 
@@ -964,6 +1193,15 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y)
 		{
 			vec_pow_n(n, x, e, y);
+		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::pow(*x, e);
+			}
 		}
 	};
 
@@ -1016,6 +1254,15 @@ namespace bcs
 		{
 			vec_exp(n, x, y);
 		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::exp(*x);
+			}
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -1039,6 +1286,15 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y)
 		{
 			vec_log(n, x, y);
+		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::log(*x);
+			}
 		}
 	};
 
@@ -1064,6 +1320,15 @@ namespace bcs
 		{
 			vec_log10(n, x, y);
 		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::log10(*x);
+			}
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -1087,6 +1352,15 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y)
 		{
 			vec_ceil(n, x, y);
+		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::ceil(*x);
+			}
 		}
 	};
 
@@ -1112,6 +1386,15 @@ namespace bcs
 		{
 			vec_floor(n, x, y);
 		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::floor(*x);
+			}
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -1135,6 +1418,15 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y)
 		{
 			vec_sin(n, x, y);
+		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::sin(*x);
+			}
 		}
 	};
 
@@ -1160,6 +1452,15 @@ namespace bcs
 		{
 			vec_cos(n, x, y);
 		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::cos(*x);
+			}
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -1183,6 +1484,15 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y)
 		{
 			vec_tan(n, x, y);
+		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::tan(*x);
+			}
 		}
 	};
 
@@ -1208,6 +1518,15 @@ namespace bcs
 		{
 			vec_asin(n, x, y);
 		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::asin(*x);
+			}
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -1231,6 +1550,15 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y)
 		{
 			vec_acos(n, x, y);
+		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::acos(*x);
+			}
 		}
 	};
 
@@ -1256,6 +1584,15 @@ namespace bcs
 		{
 			vec_atan(n, x, y);
 		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::atan(*x);
+			}
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -1279,6 +1616,15 @@ namespace bcs
 		void operator() (size_t n, const T *x1, const T *x2, T *y)
 		{
 			vec_atan2(n, x1, x2, y);
+		}
+
+		template<typename TIterX1, typename TIterX2, typename TIterY>
+		void operator() (size_t n, TIterX1 x1, TIterX2 x2, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x1, ++x2, ++y)
+			{
+				*y = std::atan2(*x1, *x2);
+			}
 		}
 	};
 
@@ -1306,6 +1652,15 @@ namespace bcs
 		{
 			vec_sinh(n, x, y);
 		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::sinh(*x);
+			}
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -1330,6 +1685,15 @@ namespace bcs
 		{
 			vec_cosh(n, x, y);
 		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::cosh(*x);
+			}
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -1353,6 +1717,15 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y)
 		{
 			vec_tanh(n, x, y);
+		}
+
+		template<typename TIterX, typename TIterY>
+		void operator() (size_t n, TIterX x, TIterY y)
+		{
+			for (size_t i = 0; i < n; ++i, ++x, ++y)
+			{
+				*y = std::tanh(*x);
+			}
 		}
 	};
 
