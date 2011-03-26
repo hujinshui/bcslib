@@ -40,6 +40,7 @@ namespace bcs
 	 *
 	 * - void move_forward(int n);
 	 * - void move_backward(int n);
+	 * - ptrdiff_t  *this - rhs;
 	 *
 	 * - operator <
 	 * - operator >
@@ -216,6 +217,11 @@ namespace bcs
 			Impl impl(this->m_impl);
 			impl.move_backward(n);
 			return impl;
+		}
+
+		difference_type operator - (const self_type& rhs) const
+		{
+			return this->m_impl - rhs.m_impl;
 		}
 
 		self_type& operator += (difference_type n)

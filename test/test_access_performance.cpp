@@ -12,7 +12,21 @@
 #include <bcslib/array/array1d.h>
 #include <bcslib/array/array2d.h>
 
+#include <algorithm>
+
+
 using namespace bcs;
+
+
+void test_copy_syntax()
+{
+	double src[100];
+
+	const_aview1d<double, step_ind> view(src, step_ind(10, 2));
+
+	std::copy(view.begin(), view.end(), src);
+}
+
 
 double time_copy_memory(int nrepeats, const size_t nelems, const double *src, double *buf)
 {

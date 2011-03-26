@@ -54,6 +54,11 @@ namespace bcs
 		bool operator < (const self_type& rhs) const { return m_i < rhs.m_i; }
 		bool operator > (const self_type& rhs) const { return m_i > rhs.m_i; }
 
+		ptrdiff_t operator - (const self_type &rhs) const
+		{
+			return m_i - rhs.m_i;
+		}
+
 	private:
 		index_t offset(index_t i) const { return m_pindexer->operator[](m_i); }
 
@@ -90,6 +95,11 @@ namespace bcs
 		bool operator == (const self_type& rhs) const { return m_p == rhs.m_p; }
 		bool operator < (const self_type& rhs) const { return m_p < rhs.m_p; }
 		bool operator > (const self_type& rhs) const { return m_p > rhs.m_p; }
+
+		ptrdiff_t operator - (const self_type &rhs) const
+		{
+			return (m_p - rhs.m_p) / m_step;
+		}
 
 	private:
 		pointer m_p;
