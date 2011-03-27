@@ -73,6 +73,26 @@ namespace matlab
 			return mxIsEmpty(m_pa);
 		}
 
+		bool is_scalar() const
+		{
+			return nelems() == 1;
+		}
+
+		bool is_pair() const
+		{
+			return nelems() == 2;
+		}
+
+		bool is_vector() const
+		{
+			return ndims() == 2 && (nrows() == 1 || ncolumns() == 1);
+		}
+
+		bool is_matrix() const
+		{
+			return ndims() <= 2;
+		}
+
 		// type info
 
 		mxClassID class_id() const
@@ -254,6 +274,8 @@ namespace matlab
 	class marray : public const_marray
 	{
 	public:
+		marray() : const_marray(0) { }
+
 		marray(mxArray *pa) : const_marray(pa)
 		{
 		}
