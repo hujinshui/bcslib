@@ -24,7 +24,9 @@ namespace bcs
 	 * -------
 	 *
 	 * - result_type (typedef)
-	 * - result_type operator() (size_t n, const T *x) const
+	 * - result_type operator() (n, x) const
+	 *
+	 *   Here, x can be a const pointer or const iterator
 	 *
 	 */
 
@@ -38,8 +40,7 @@ namespace bcs
 		}
 		else
 		{
-			array1d<T> xc = make_copy(x);
-			return evaluator(xc.nelems(), xc.pbase());
+			return evaluator(x.nelems(), x.begin());
 		}
 	}
 
@@ -52,8 +53,7 @@ namespace bcs
 		}
 		else
 		{
-			array2d<T, TOrd> xc = make_copy(x);
-			return evaluator(xc.nelems(), xc.pbase());
+			return evaluator(x.nelems(), x.begin());
 		}
 	}
 
@@ -126,6 +126,12 @@ namespace bcs
 		{
 			return vec_sum(n, x);
 		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			return accumulate_n<sum_accumulator<T>, TIter>(n, x);
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -180,8 +186,6 @@ namespace bcs
 	}
 
 
-
-
 	// prod
 
 	template<typename T>
@@ -192,6 +196,12 @@ namespace bcs
 		result_type operator() (size_t n, const T *x) const
 		{
 			return vec_prod(n, x);
+		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			return accumulate_n<prod_accumulator<T>, TIter>(n, x);
 		}
 	};
 
@@ -231,6 +241,12 @@ namespace bcs
 		{
 			return vec_max(n, x);
 		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			return accumulate_n<max_accumulator<T>, TIter>(n, x);
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -268,6 +284,12 @@ namespace bcs
 		result_type operator() (size_t n, const T *x) const
 		{
 			return vec_min(n, x);
+		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			return accumulate_n<min_accumulator<T>, TIter>(n, x);
 		}
 	};
 
@@ -307,6 +329,12 @@ namespace bcs
 		{
 			return vec_minmax(n, x);
 		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			return accumulate_n<minmax_accumulator<T>, TIter>(n, x);
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -345,6 +373,32 @@ namespace bcs
 		result_type operator() (size_t n, const T *x) const
 		{
 			return vec_index_max(n, x);
+		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			if (n > 0)
+			{
+				index_t p = 0;
+				T v(*x);
+				++ x;
+
+				for (size_t i = 1; i < n; ++i, ++x)
+				{
+					if (*x > v)
+					{
+						p = (index_t)i;
+						v = *x;
+					}
+				}
+
+				return std::make_pair(p, v);
+			}
+			else
+			{
+				throw empty_accumulation("Cannot take minimum over an empty collection.");
+			}
 		}
 	};
 
@@ -386,6 +440,32 @@ namespace bcs
 		{
 			return vec_index_min(n, x);
 		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			if (n > 0)
+			{
+				index_t p = 0;
+				T v(*x);
+				++ x;
+
+				for (size_t i = 1; i < n; ++i, ++x)
+				{
+					if (*x < v)
+					{
+						p = (index_t)i;
+						v = *x;
+					}
+				}
+
+				return std::make_pair(p, v);
+			}
+			else
+			{
+				throw empty_accumulation("Cannot take minimum over an empty collection.");
+			}
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -426,6 +506,17 @@ namespace bcs
 		{
 			return vec_L1norm(n, x);
 		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			T s(0);
+			for (size_t i = 0; i < n; ++i, ++x)
+			{
+				s += std::abs(*x);
+			}
+			return s;
+		}
 	};
 
 	template<typename T, class TIndexer>
@@ -463,6 +554,17 @@ namespace bcs
 		result_type operator() (size_t n, const T *x) const
 		{
 			return vec_sqr_sum(n, x);
+		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			T s(0);
+			for (size_t i = 0; i < n; ++i, ++x)
+			{
+				s += sqr(*x);
+			}
+			return s;
 		}
 	};
 
@@ -502,6 +604,17 @@ namespace bcs
 		result_type operator() (size_t n, const T *x) const
 		{
 			return vec_L2norm(n, x);
+		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			T s(0);
+			for (size_t i = 0; i < n; ++i, ++x)
+			{
+				s += sqr(*x);
+			}
+			return std::sqrt(s);
 		}
 	};
 
@@ -544,6 +657,17 @@ namespace bcs
 		{
 			return vec_pow_sum(n, x, power);
 		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			T s(0);
+			for (size_t i = 0; i < n; ++i, ++x)
+			{
+				s += std::pow(*x, power);
+			}
+			return s;
+		}
 	};
 
 	template<typename T, class TIndexer, typename TPower>
@@ -585,6 +709,17 @@ namespace bcs
 		{
 			return vec_Lpnorm(n, x, power);
 		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			T s(0);
+			for (size_t i = 0; i < n; ++i, ++x)
+			{
+				s += std::pow(*x, power);
+			}
+			return (T)std::pow(s, 1.0 / power);
+		}
 	};
 
 	template<typename T, class TIndexer, typename TPower>
@@ -622,6 +757,18 @@ namespace bcs
 		result_type operator() (size_t n, const T *x) const
 		{
 			return vec_Linfnorm(n, x);
+		}
+
+		template<typename TIter>
+		result_type operator() (size_t n, TIter x) const
+		{
+			T s(0);
+			for (size_t i = 0; i < n; ++i, ++x)
+			{
+				T a = std::abs(*x);
+				if (a > s) s = a;
+			}
+			return s;
 		}
 	};
 

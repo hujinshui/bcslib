@@ -585,6 +585,57 @@ namespace bcs
 	}
 
 
+	// accumulate_n
+
+	template<class Accumulator, typename InputIter>
+	typename Accumulator::value_type accumulate_n(size_t n, InputIter it)
+	{
+		if (n > 0)
+		{
+			Accumulator accum(*it);
+			++it;
+
+			for (int i = 1; i < n; ++i)
+			{
+				accum.take_in(*it);
+				++it;
+			}
+
+			return accum.get_value();
+		}
+		else
+		{
+			return Accumulator::empty_value();
+		}
+	}
+
+
+	template<class Accumulator, typename InputIter, typename TInit>
+	typename Accumulator::value_type accumulate_n(size_t n, InputIter it, const TInit& init)
+	{
+		if (n > 0)
+		{
+			Accumulator accum(init);
+
+			for (int i = 0; i < n; ++i)
+			{
+				accum.take_in(*it);
+				++it;
+			}
+
+			return accum.get_value();
+		}
+		else
+		{
+			return Accumulator::empty_value();
+		}
+	}
+
+
+
+
+
+
 }
 
 #endif

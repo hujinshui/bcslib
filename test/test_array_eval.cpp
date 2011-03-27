@@ -93,7 +93,6 @@ BCS_TEST_CASE( test_array_mean )
 }
 
 
-
 BCS_TEST_CASE( test_array_prod )
 {
 	double src[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -121,8 +120,6 @@ BCS_TEST_CASE( test_array_prod )
 	BCS_CHECK( array_view_approx(row_prod(Xc), Xc_re, 2) );
 	BCS_CHECK( array_view_approx(column_prod(Xc), Xc_ce, 3) );
 }
-
-
 
 
 BCS_TEST_CASE( test_array_max_min )
@@ -234,7 +231,6 @@ BCS_TEST_CASE( test_array_max_min )
 	BCS_CHECK( array_view_equal(Xc_cmin_iv.first, Xc_cmin_i, 3) );
 	BCS_CHECK( array_view_equal(Xc_cmin_iv.second, Xc_cmin, 3) );
 }
-
 
 
 BCS_TEST_CASE( test_array_L1norm )
@@ -384,8 +380,6 @@ BCS_TEST_CASE( test_array_Linfnorm )
 }
 
 
-
-
 test_suite *test_array_eval_suite()
 {
 	test_suite *msuite = new test_suite( "test_array_eval" );
@@ -394,6 +388,7 @@ test_suite *test_array_eval_suite()
 	msuite->add( new test_array_mean() );
 	msuite->add( new test_array_prod() );
 	msuite->add( new test_array_max_min() );
+
 	msuite->add( new test_array_L1norm() );
 	msuite->add( new test_array_sqrsum_L2norm() );
 	msuite->add( new test_array_powsum_Lpnorm() );
