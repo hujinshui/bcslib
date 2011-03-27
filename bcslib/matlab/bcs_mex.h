@@ -70,7 +70,7 @@ namespace matlab
 
 
 	template<typename T>
-	marray to_matlab_row(std::vector<T>& v)
+	marray to_matlab_row(const std::vector<T>& v)
 	{
 		size_t n = v.size();
 		marray a = create_marray<T>(1, n);
@@ -79,7 +79,7 @@ namespace matlab
 	}
 
 	template<typename T>
-	marray to_matlab_column(std::vector<T>& v)
+	marray to_matlab_column(const std::vector<T>& v)
 	{
 		size_t n = v.size();
 		marray a = create_marray<T>(n, 1);
@@ -88,7 +88,7 @@ namespace matlab
 	}
 
 	template<typename T, typename TFunc>
-	marray to_matlab_row(std::vector<T>& v, TFunc f)
+	marray to_matlab_row(const std::vector<T>& v, TFunc f)
 	{
 		typedef typename TFunc::result_type R;
 		size_t n = v.size();
@@ -103,7 +103,7 @@ namespace matlab
 	}
 
 	template<typename T, typename TFunc>
-	marray to_matlab_column(std::vector<T>& v, TFunc f)
+	marray to_matlab_column(const std::vector<T>& v, TFunc f)
 	{
 		typedef typename TFunc::result_type R;
 		size_t n = v.size();
