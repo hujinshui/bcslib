@@ -167,4 +167,18 @@ namespace matlab
 
 }
 
+
+#define BCSMEX_MAINDEF \
+		void bcsmex_main(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]); \
+		void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) \
+		{ \
+			try { \
+				bcsmex_main(nlhs, plhs, nrhs, prhs); \
+			} \
+			catch(bcs::matlab::mexception& mexc) { \
+				mexErrMsgIdAndTxt(mexc.identifier(), mexc.message()); \
+			} \
+		}
+
+
 #endif 
