@@ -13,10 +13,14 @@
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/basic_funcs.h>
 
+#include <algorithm>
+
 namespace bcs
 {
 
 	// specific stats functions
+
+	// sum & product
 
 	template<typename T>
 	inline T vec_sum(size_t n, const T *x)
@@ -41,6 +45,8 @@ namespace bcs
 	{
 		return prod_n(x, n, x0);
 	}
+
+	// min & max & related
 
 	template<typename T>
 	inline T vec_min(size_t n, const T *x)
@@ -111,6 +117,45 @@ namespace bcs
 		}
 	}
 
+	// median
+
+	template<typename T>
+	inline T median_inplace(size_t n, T *x)
+	{
+		if (n > 0)
+		{
+			if (n == 1)
+			{
+				return *x;
+			}
+			else if (n == 2)
+			{
+				T x0 = x[0];
+				T x1 = x[1];
+				return x0 + (x1 - x0) / 2;
+			}
+			else if (n % 2 == 0) // even
+			{
+		        T *pm = x + (n/2);
+		        std::nth_element(x, pm, x+n);
+
+		        T v1 = *pm;
+		        T v0 = *(std::max_element(x, pm));
+
+		        return v0 + (v1 - v0) / 2;
+			}
+			else  // odd
+			{
+				T *pm = x + (n/2);
+				std::nth_element(x, pm, x+n);
+				return *pm;
+			}
+		}
+		else
+		{
+			throw empty_accumulation("Cannot take median over an empty collection.");
+		}
+	}
 
 }
 

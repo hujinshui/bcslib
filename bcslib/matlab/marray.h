@@ -442,9 +442,13 @@ namespace matlab
 		return mxCreateString(str.c_str());
 	}
 
-	inline marray create_mscalar(double x)
+
+	template<typename T>
+	inline marray create_mscalar(T x)
 	{
-		return mxCreateDoubleScalar(x);
+		marray mA = create_marray<T>(1, 1);
+		*(mA.data<T>()) = x;
+		return mA;
 	}
 
 	inline marray create_mstruct(size_t nfields, const char **fieldnames)
