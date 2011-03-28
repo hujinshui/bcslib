@@ -21,64 +21,44 @@ namespace bcs
 	template<typename T>
 	inline T vec_sum(size_t n, const T *x)
 	{
-		return accumulate_n<sum_accumulator<T>, const T*>(n, x);
+		return sum_n(x, n, T(0));
 	}
 
 	template<typename T>
 	inline T vec_sum(size_t n, const T *x, const T& x0)
 	{
-		return accumulate_n<sum_accumulator<T>, const T*, T>(n, x, x0);
+		return sum_n(x, n, x0);
 	}
 
 	template<typename T>
 	inline T vec_prod(size_t n, const T *x)
 	{
-		return accumulate_n<prod_accumulator<T>, const T*>(n, x);
+		return prod_n(x, n, T(1));
 	}
 
 	template<typename T>
 	inline T vec_prod(size_t n, const T *x, const T& x0)
 	{
-		return accumulate_n<prod_accumulator<T>, const T*, T>(n, x, x0);
+		return prod_n(x, n, x0);
 	}
 
 	template<typename T>
 	inline T vec_min(size_t n, const T *x)
 	{
-		return accumulate_n<min_accumulator<T>, const T*>(n, x);
-	}
-
-	template<typename T>
-	inline T vec_min(size_t n, const T *x, const T& x0)
-	{
-		return accumulate_n<min_accumulator<T>, const T*, T>(n, x, x0);
+		return min_n(x, n);
 	}
 
 	template<typename T>
 	inline T vec_max(size_t n, const T *x)
 	{
-		return accumulate_n<max_accumulator<T>, const T*>(n, x);
-	}
-
-	template<typename T>
-	inline T vec_max(size_t n, const T *x, const T& x0)
-	{
-		return accumulate_n<max_accumulator<T>, const T*, T>(n, x, x0);
+		return max_n(x, n);
 	}
 
 	template<typename T>
 	inline std::pair<T, T> vec_minmax(size_t n, const T *x)
 	{
-		return accumulate_n<minmax_accumulator<T>, const T*>(n, x);
+		return minmax_n(x, n);
 	}
-
-	template<typename T>
-	inline std::pair<T, T> vec_minmax(size_t n, const T *x, const T& min0, const T& max0)
-	{
-		return accumulate_n<minmax_accumulator<T>, const T*, std::pair<T, T> >(
-				n, x, std::make_pair(min0, max0));
-	}
-
 
 	template<typename T>
 	inline std::pair<index_t, T> vec_index_min(size_t n, const T *x)

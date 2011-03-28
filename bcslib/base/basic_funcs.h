@@ -13,6 +13,7 @@
 #include <bcslib/base/basic_defs.h>
 
 #include <utility>
+#include <iterator>
 #include <functional>
 #include <cstdlib>
 #include <cmath>
@@ -258,177 +259,6 @@ namespace bcs
 	};
 
 
-	// accumulators
-
-	class empty_accumulation : public base_exception
-	{
-	public:
-		empty_accumulation(const char *msg)
-		: base_exception(msg)
-		{
-		}
-	};
-
-
-	template<typename T>
-	struct sum_accumulator
-	{
-		typedef T value_type;
-
-		value_type value;
-
-		sum_accumulator(const T& v0) : value(v0)
-		{
-		}
-
-		void take_in(const T& v)
-		{
-			value += v;
-		}
-
-		value_type get_value() const
-		{
-			return value;
-		}
-
-		static T empty_value()
-		{
-			return T(0);
-		}
-	};
-
-
-	template<typename T>
-	struct prod_accumulator
-	{
-		typedef T value_type;
-
-		value_type value;
-
-		prod_accumulator(const T& v0) : value(v0)
-		{
-		}
-
-		void take_in(const T& v)
-		{
-			value *= v;
-		}
-
-		value_type get_value() const
-		{
-			return value;
-		}
-
-		static T empty_value()
-		{
-			return T(1);
-		}
-	};
-
-
-	template<typename T>
-	struct min_accumulator
-	{
-		typedef T value_type;
-
-		value_type value;
-
-		min_accumulator(const T& v0) : value(v0)
-		{
-		}
-
-		void take_in(const T& v)
-		{
-			if (v < value) value = v;
-		}
-
-		value_type get_value() const
-		{
-			return value;
-		}
-
-		static T empty_value()
-		{
-			throw empty_accumulation("Cannot take minimum over empty collection.");
-		}
-	};
-
-
-	template<typename T>
-	struct max_accumulator
-	{
-		typedef T value_type;
-
-		value_type value;
-
-		max_accumulator(const T& v0) : value(v0)
-		{
-		}
-
-		void take_in(const T& v)
-		{
-			if (v > value) value = v;
-		}
-
-		value_type get_value() const
-		{
-			return value;
-		}
-
-		static T empty_value()
-		{
-			throw empty_accumulation("Cannot take maximum over empty collection.");
-		}
-	};
-
-
-	template<typename T>
-	struct minmax_accumulator
-	{
-		typedef std::pair<T, T> value_type;
-
-		T min_value;
-		T max_value;
-
-		minmax_accumulator(const T& v) : min_value(v), max_value(v)
-		{
-
-		}
-
-		minmax_accumulator(const T& vmin0, const T& vmax0) : min_value(vmin0), max_value(vmax0)
-		{
-		}
-
-		minmax_accumulator(const std::pair<T, T>& minmax0) : min_value(minmax0.first), max_value(minmax0.second)
-		{
-		}
-
-		void take_in(const T& v)
-		{
-			if (v < min_value)
-			{
-				min_value = v;
-			}
-			else if (v > max_value)
-			{
-				max_value = v;
-			}
-		}
-
-		value_type get_value() const
-		{
-			return std::make_pair(min_value, max_value);
-		}
-
-		static value_type empty_value()
-		{
-			throw empty_accumulation("Cannot take minimum and maximum over empty collection.");
-		}
-	};
-
-
-
-
 	// min
 
 	template<typename T>
@@ -585,56 +415,161 @@ namespace bcs
 	}
 
 
-	// accumulate_n
+	// accumulation
 
-	template<class Accumulator, typename InputIter>
-	typename Accumulator::value_type accumulate_n(size_t n, InputIter it)
+	template<typename T>
+	struct sum_accumulator
 	{
+		typedef T result_type;
+		void operator() (result_type& r, const T& v)
+		{
+			r += v;
+		}
+	};
+
+	template<typename T>
+	struct prod_accumulator
+	{
+		typedef T result_type;
+		void operator() (result_type& r, const T& v) const
+		{
+			r *= v;
+		}
+	};
+
+	template<typename T>
+	struct max_accumulator
+	{
+		typedef T result_type;
+		void operator() (result_type& r, const T& v) const
+		{
+			if (v > r) r = v;
+		}
+	};
+
+	template<typename T>
+	struct min_accumulator
+	{
+		typedef T result_type;
+		void operator() (result_type& r, const T& v) const
+		{
+			if (v < r) r = v;
+		}
+	};
+
+	template<typename T>
+	struct minmax_accumulator
+	{
+		typedef std::pair<T, T> result_type;
+		void operator() (result_type& r, const T& v) const
+		{
+			if (v < r.first)
+			{
+				r.first = v;
+			}
+			else if (v > r.second)
+			{
+				r.second = v;
+			}
+		}
+	};
+
+
+
+	class empty_accumulation : public base_exception
+	{
+	public:
+		empty_accumulation(const char *msg)
+		: base_exception(msg)
+		{
+		}
+	};
+
+
+	template<class Accumulator, typename TIter>
+	void accumulate_n(Accumulator accum, TIter it, size_t n, typename Accumulator::result_type& r)
+	{
+		for (size_t i = 0; i < n; ++i, ++it)
+		{
+			accum(r, *it);
+		}
+	}
+
+
+
+	template<typename T, typename TIter>
+	inline T sum_n(TIter it, size_t n, T v)
+	{
+		accumulate_n(sum_accumulator<T>(), it, n, v);
+		return v;
+	}
+
+	template<typename T, typename TIter>
+	inline T prod_n(TIter it, size_t n, T v)
+	{
+		accumulate_n(prod_accumulator<T>(), it, n, v);
+		return v;
+	}
+
+	template<typename TIter>
+	typename std::iterator_traits<TIter>::value_type min_n(TIter it, size_t n)
+	{
+		typedef typename std::iterator_traits<TIter>::value_type T;
+
 		if (n > 0)
 		{
-			Accumulator accum(*it);
+			T r(*it);
+			++ it;
+
+			accumulate_n(min_accumulator<T>(), it, n-1, r);
+			return r;
+		}
+		else
+		{
+			throw empty_accumulation("Cannot take minimum over an empty collection.");
+		}
+	}
+
+	template<typename TIter>
+	typename std::iterator_traits<TIter>::value_type max_n(TIter it, size_t n)
+	{
+		typedef typename std::iterator_traits<TIter>::value_type T;
+
+		if (n > 0)
+		{
+			T r(*it);
+			++ it;
+
+			accumulate_n(max_accumulator<T>(), it, n-1, r);
+			return r;
+		}
+		else
+		{
+			throw empty_accumulation("Cannot take maximum over an empty collection.");
+		}
+	}
+
+	template<typename TIter>
+	std::pair<
+		typename std::iterator_traits<TIter>::value_type,
+		typename std::iterator_traits<TIter>::value_type>
+	minmax_n(TIter it, size_t n)
+	{
+		typedef typename std::iterator_traits<TIter>::value_type T;
+
+		if (n > 0)
+		{
+			std::pair<T, T> r(*it, *it);
 			++it;
 
-			for (int i = 1; i < n; ++i)
-			{
-				accum.take_in(*it);
-				++it;
-			}
-
-			return accum.get_value();
+			accumulate_n(minmax_accumulator<T>(), it, n-1, r);
+			return r;
 		}
 		else
 		{
-			return Accumulator::empty_value();
+			throw empty_accumulation("Cannot take minimum and maximum over an empty collection.");
 		}
 	}
-
-
-	template<class Accumulator, typename InputIter, typename TInit>
-	typename Accumulator::value_type accumulate_n(size_t n, InputIter it, const TInit& init)
-	{
-		if (n > 0)
-		{
-			Accumulator accum(init);
-
-			for (int i = 0; i < n; ++i)
-			{
-				accum.take_in(*it);
-				++it;
-			}
-
-			return accum.get_value();
-		}
-		else
-		{
-			return Accumulator::empty_value();
-		}
-	}
-
-
-
-
-
 
 }
 

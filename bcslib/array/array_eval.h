@@ -130,7 +130,7 @@ namespace bcs
 		template<typename TIter>
 		result_type operator() (size_t n, TIter x) const
 		{
-			return accumulate_n<sum_accumulator<T>, TIter>(n, x);
+			return sum_n(x, n, T(0));
 		}
 	};
 
@@ -201,7 +201,7 @@ namespace bcs
 		template<typename TIter>
 		result_type operator() (size_t n, TIter x) const
 		{
-			return accumulate_n<prod_accumulator<T>, TIter>(n, x);
+			return prod_n(x, n, T(1));
 		}
 	};
 
@@ -245,7 +245,7 @@ namespace bcs
 		template<typename TIter>
 		result_type operator() (size_t n, TIter x) const
 		{
-			return accumulate_n<max_accumulator<T>, TIter>(n, x);
+			return max_n(x, n);
 		}
 	};
 
@@ -289,7 +289,7 @@ namespace bcs
 		template<typename TIter>
 		result_type operator() (size_t n, TIter x) const
 		{
-			return accumulate_n<min_accumulator<T>, TIter>(n, x);
+			return min_n(x, n);
 		}
 	};
 
@@ -333,7 +333,7 @@ namespace bcs
 		template<typename TIter>
 		result_type operator() (size_t n, TIter x) const
 		{
-			return accumulate_n<minmax_accumulator<T>, TIter>(n, x);
+			return minmax_n(x, n);
 		}
 	};
 
