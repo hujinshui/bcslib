@@ -8,6 +8,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <ctime>
 
 #include <bcslib/array/array1d.h>
 #include <bcslib/array/array2d.h>
