@@ -13,6 +13,8 @@
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/basic_funcs.h>
 
+#include <iostream>
+
 namespace bcs
 {
 	template<typename T>
@@ -103,7 +105,7 @@ namespace bcs
 			T s(0);
 			for (size_t i = 0; i < n; ++i)
 			{
-				s += std::pow(x[i], p);
+				s += std::pow(std::abs(x[i]), p);
 			}
 			return s;
 		}

@@ -716,7 +716,7 @@ namespace bcs
 			T s(0);
 			for (size_t i = 0; i < n; ++i, ++x)
 			{
-				s += std::pow(*x, power);
+				s += std::pow(std::abs(*x), power);
 			}
 			return (T)std::pow(s, 1.0 / power);
 		}
