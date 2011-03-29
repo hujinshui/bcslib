@@ -66,6 +66,7 @@ namespace bcs
 
 	struct clone_t { };
 	struct own_t { };
+	struct ref_t { };
 
 
 	template<typename T1, typename T2>
