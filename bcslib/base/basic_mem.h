@@ -120,6 +120,58 @@ namespace bcs
 
 	}; // end class block
 
+
+    // different ways of input memory
+
+    template<typename T>
+    class const_memory_proxy
+    {
+    public:
+    	typedef T value_type;
+
+    public:
+    	const_memory_proxy(clone_t, size_t n, const value_type *src)
+    	: m_pblock(new block<T>(n))
+    	, m_base(m_pblock->pbase())
+    	, m_n(n)
+    	{
+    		copy_elements(src, m_base, n);
+    	}
+
+    	const_memory_proxy(ref_t, size_t n, const value_type *src)
+    	: m_base(src), m_n(n)
+    	{
+    	}
+
+    	const_memory_proxy(block<T>* pblk)
+    	: m_pblock(pblk)
+    	, m_base(pblk->pbase())
+    	, m_n(pblk->nelems())
+    	{
+    	}
+
+    	size_t nelems() const
+    	{
+    		return m_n;
+    	}
+
+    	const value_type *pbase() const
+    	{
+    		return m_base;
+    	}
+
+    	const value_type *pend() const
+    	{
+    		return m_base + m_n;
+    	}
+
+    public:
+    	tr1::shared_ptr<block<T> > m_pblock;
+    	const value_type* m_base;
+    	size_t m_n;
+
+    }; // end class const_memory_proxy
+
 }
 
 
