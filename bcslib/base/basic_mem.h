@@ -130,12 +130,18 @@ namespace bcs
     	typedef T value_type;
 
     public:
+
+    	const_memory_proxy()
+    	: m_base(0), m_n(0)
+    	{
+    	}
+
     	const_memory_proxy(clone_t, size_t n, const value_type *src)
     	: m_pblock(new block<T>(n))
     	, m_base(m_pblock->pbase())
     	, m_n(n)
     	{
-    		copy_elements(src, m_base, n);
+    		copy_elements(src, const_cast<T*>(m_base), n);
     	}
 
     	const_memory_proxy(ref_t, size_t n, const value_type *src)
@@ -148,6 +154,13 @@ namespace bcs
     	, m_base(pblk->pbase())
     	, m_n(pblk->nelems())
     	{
+    	}
+
+    	void reset(block<T>* pblk)
+    	{
+    		m_pblock.reset(pblk);
+    		m_base = pblk->pbase();
+    		m_n = pblk->nelems();
     	}
 
     	size_t nelems() const
@@ -163,6 +176,11 @@ namespace bcs
     	const value_type *pend() const
     	{
     		return m_base + m_n;
+    	}
+
+    	const value_type& operator[] (ptrdiff_t i) const
+    	{
+    		return m_base[i];
     	}
 
     public:

@@ -16,7 +16,7 @@ namespace bcs
 {
 
 	template<typename TDir>
-	class gr_edgelist_ref
+	class gr_edgelist
 	{
 	public:
 		typedef vertex_t vertex_type;
@@ -29,10 +29,28 @@ namespace bcs
 
 	public:
 
-		gr_edgelist_ref(gr_size_t nv, gr_size_t ne, const vertex_type *srcs, const vertex_type *tars)
-		: m_nvertices(nv), m_nedges(ne), m_sources(srcs), m_targets(tars)
+		gr_edgelist(gr_size_t nv, gr_size_t ne,
+				ref_t, const vertex_type *srcs, const vertex_type *tars)
+		: m_nvertices(nv), m_nedges(ne)
+		, m_sources(ref_t(), ne, srcs), m_targets(ref_t(), ne, tars)
 		{
 		}
+
+		gr_edgelist(gr_size_t nv, gr_size_t ne,
+				clone_t, const vertex_type *srcs, const vertex_type *tars)
+		: m_nvertices(nv), m_nedges(ne)
+		, m_sources(clone_t(), ne, srcs), m_targets(clone_t(), ne, tars)
+		{
+		}
+
+		gr_edgelist(gr_size_t nv, gr_size_t ne,
+				block<vertex_type>* srcs, block<vertex_type>* tars)
+		: m_nvertices(nv), m_nedges(ne)
+		, m_sources(srcs), m_targets(tars)
+		{
+		}
+
+	public:
 
 		// basic info
 
@@ -85,18 +103,18 @@ namespace bcs
 		}
 
 
-	private:
+	protected:
 		gr_size_t m_nvertices;
 		gr_size_t m_nedges;
 
-		const vertex_type *m_sources;
-		const vertex_type *m_targets;
+		const_memory_proxy<vertex_type> m_sources;
+		const_memory_proxy<vertex_type> m_targets;
 
 	}; // end class gr_edgelist
 
 
 	template<typename TWeight, typename TDir>
-	class gr_wedgelist_ref : public gr_edgelist_ref<TDir>
+	class gr_wedgelist : public gr_edgelist<TDir>
 	{
 	public:
 		typedef vertex_t vertex_type;
@@ -110,11 +128,26 @@ namespace bcs
 
 	public:
 
-		gr_wedgelist_ref(gr_size_t nv, gr_size_t ne,
-				const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
-		: m_nvertices(nv), m_nedges(ne), m_sources(srcs), m_targets(tars), m_weights(ws)
+		gr_wedgelist(gr_size_t nv, gr_size_t ne,
+				ref_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
+		: gr_edgelist<TDir>(nv, ne, ref_t(), srcs, tars)
+		, m_weights(ref_t(), ne, ws)
 		{
 		}
+
+		gr_wedgelist(gr_size_t nv, gr_size_t ne,
+				clone_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
+		: gr_edgelist<TDir>(nv, ne, ref_t(), srcs, tars)
+		, m_weights(clone_t(), ne, ws)
+		{
+		}
+
+		gr_wedgelist(gr_size_t nv, gr_size_t ne,
+				block<vertex_type>* srcs, block<vertex_type>* tars, block<weight_type>* ws)
+		: gr_edgelist<TDir>(nv, ne, srcs, tars), m_weights(ws)
+		{
+		}
+
 
 		weight_type weight_of(const edge_type& e) const
 		{
@@ -123,19 +156,17 @@ namespace bcs
 
 		wedge_i<weight_type> get_wedge_i(const edge_type& e) const
 		{
-			return make_edge_i(m_sources[e.index], m_targets[e.index], m_weights[e.index]);
+			return make_edge_i(
+					this->m_sources[e.index],
+					this->m_targets[e.index],
+					this->m_weights[e.index]);
 		}
 
 
-	private:
-		gr_size_t m_nvertices;
-		gr_size_t m_nedges;
+	protected:
+		const_memory_proxy<weight_type> m_weights;
 
-		const vertex_type *m_sources;
-		const vertex_type *m_targets;
-		const weight_type *m_weights;
-
-	}; // end class gr_edgelist
+	}; // end class gr_wedgelist
 
 
 }

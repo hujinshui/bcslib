@@ -10,6 +10,7 @@
 #define BCSLIB_GRAPH_BASE_H
 
 #include <bcslib/base/basic_defs.h>
+#include <bcslib/base/basic_mem.h>
 #include <bcslib/base/iterators.h>
 
 namespace bcs
@@ -240,7 +241,7 @@ namespace bcs
 		}
 
 	private:
-		vertex_t m_e;
+		edge_t m_e;
 	};
 
 
