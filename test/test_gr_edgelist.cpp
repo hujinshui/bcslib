@@ -136,7 +136,7 @@ BCS_TEST_CASE( test_gr_wedgelist )
 		BCS_CHECK_EQUAL(g1c.target_of(edge_t(i)), tar_vs[i]);
 		BCS_CHECK_EQUAL(g1c.weight_of(edge_t(i)), ws[i]);
 		BCS_CHECK_EQUAL(g1c.get_edge_i(edge_t(i)), edge_i(src_vs[i], tar_vs[i]));
-		BCS_CHECK_EQUAL(g1r.get_wedge_i(edge_t(i)), make_edge_i(src_vs[i], tar_vs[i], ws[i]));
+		BCS_CHECK_EQUAL(g1c.get_wedge_i(edge_t(i)), make_edge_i(src_vs[i], tar_vs[i], ws[i]));
 	}
 
 	BCS_CHECK( collection_equal(g1c.v_begin(), g1c.v_end(), all_vs, nv) );

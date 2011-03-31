@@ -318,6 +318,24 @@ namespace bcs
 		return std::make_pair(g.e_begin(), g.e_end());
 	}
 
+	template<typename TDir>
+	inline gr_size_t out_degree(const vertex_t& v, const gr_adjlist<TDir>& g)
+	{
+		return g.out_degree(v);
+	}
+
+	template<typename TDir>
+	inline std::pair<const edge_t*, const edge_t*> out_edges(const vertex_t& v, const gr_adjlist<TDir>& g)
+	{
+		return std::make_pair(g.out_edge_begin(v), g.out_edge_end(v));
+	}
+
+
+	template<typename TDir>
+	inline std::pair<const vertex_t*, const vertex_t*> adjacency_vertices(const vertex_t& v, const gr_adjlist<TDir>& g)
+	{
+		return std::make_pair(g.out_neighbor_begin(v), g.out_neighbor_end(v));
+	}
 
 	template<typename TDir>
 	inline vertex_index_map get(boost::vertex_index_t, const gr_adjlist<TDir>& g)
@@ -336,6 +354,10 @@ namespace bcs
 	{
 		return g.weights();
 	}
+
+
+
+
 
 }  // end namespace bcs
 
@@ -420,6 +442,8 @@ namespace boost
 
 		typedef typename graph_type::vertex_iterator vertex_iterator;
 		typedef typename graph_type::edge_iterator edge_iterator;
+
+
 	};
 
 	template<typename TWeight, typename TDir>

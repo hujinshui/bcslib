@@ -9,6 +9,9 @@
 #ifndef BCSLIB_GR_ADJLIST_H
 #define BCSLIB_GR_ADJLIST_H
 
+#include <bcslib/graph/graph_base.h>
+
+
 namespace bcs
 {
 	template<typename TDir>
@@ -19,10 +22,16 @@ namespace bcs
 			return ne;
 		}
 
-		static void do_clone_edgelist(size_t ne, const vertex_t *srcs_in, const vertex_t *tars_in, vertex_t *srcs, vertex_t *tars)
+		static void do_clone_edgelist(gr_size_t ne, const vertex_t *srcs_in, const vertex_t *tars_in, vertex_t *srcs, vertex_t *tars)
 		{
 			copy_elements(srcs_in, srcs, ne);
-			copy_elements(tars_in, srcs, ne);
+			copy_elements(tars_in, tars, ne);
+		}
+
+		template<typename TWeight>
+		static void do_clone_edgeweights(gr_size_t ne, const TWeight *ws_in, TWeight *ws)
+		{
+			copy_elements(ws_in, ws, ne);
 		}
 	};
 
@@ -34,13 +43,20 @@ namespace bcs
 			return 2 * ne;
 		}
 
-		static void do_clone_edgelist(size_t ne, const vertex_t *srcs_in, const vertex_t *tars_in, vertex_t *srcs, vertex_t *tars)
+		static void do_clone_edgelist(gr_size_t ne, const vertex_t *srcs_in, const vertex_t *tars_in, vertex_t *srcs, vertex_t *tars)
 		{
 			copy_elements(srcs_in, srcs, ne);
-			copy_elements(tars_in, srcs, ne);
+			copy_elements(tars_in, srcs + ne, ne);
 
 			copy_elements(tars_in, tars, ne);
-			copy_elements(srcs_in, tars, ne);
+			copy_elements(srcs_in, tars + ne, ne);
+		}
+
+		template<typename TWeight>
+		static void do_clone_edgeweights(gr_size_t ne, const TWeight *ws_in, TWeight *ws)
+		{
+			copy_elements(ws_in, ws, ne);
+			copy_elements(ws_in, ws + ne, ne);
 		}
 	};
 
@@ -69,8 +85,8 @@ namespace bcs
 				const gr_size_t *degs, const gr_index_t *osets, const vertex_t *nbs, const edge_t *adj_es)
 		: m_nvertices(nv), m_nedges(ne), m_el(gr_adjlist_aux<TDir>::edge_list_size(ne))
 		, m_sources(ref_t(), m_el, srcs), m_targets(ref_t(), m_el, tars)
-		, m_degrees(ref_t(), nv, degs), m_offsets(ref_t(), nv, osets)
-		, m_neighbors(ref_t(), m_el, nbs), m_adj_edges(ref_t(), m_el, adj_es)
+		, m_out_degrees(ref_t(), nv, degs), m_out_offsets(ref_t(), nv, osets)
+		, m_out_neighbors(ref_t(), m_el, nbs), m_out_edges(ref_t(), m_el, adj_es)
 		{
 		}
 
@@ -129,6 +145,11 @@ namespace bcs
 			return edge_i(m_sources[e.index], m_targets[e.index]);
 		}
 
+		gr_size_t out_degree(const vertex_type& v) const
+		{
+			return m_out_degrees[v.index];
+		}
+
 
 		// iteration
 
@@ -152,36 +173,36 @@ namespace bcs
 			return make_simple_edge_iterator((gr_index_t)m_nedges);
 		}
 
-		neighbor_iterator neighbor_begin(const vertex_t& v) const
+		neighbor_iterator out_neighbor_begin(const vertex_t& v) const
 		{
-			return m_neighbors.pbase() + adj_offset_begin(v);
+			return m_out_neighbors.pbase() + out_offset_begin(v);
 		}
 
-		neighbor_iterator neighbor_end(const vertex_t& v) const
+		neighbor_iterator out_neighbor_end(const vertex_t& v) const
 		{
-			return m_neighbors.pbase() + adj_offset_end(v);
+			return m_out_neighbors.pbase() + out_offset_end(v);
 		}
 
-		adj_edge_iterator adjedge_begin(const vertex_t& v) const
+		adj_edge_iterator out_edge_begin(const vertex_t& v) const
 		{
-			return m_adj_edges.pbase() + adj_offset_begin(v);
+			return m_out_edges.pbase() + out_offset_begin(v);
 		}
 
-		adj_edge_iterator adjedge_end(const vertex_t& v) const
+		adj_edge_iterator out_edge_end(const vertex_t& v) const
 		{
-			return m_adj_edges.pbase() + adj_offset_end(v);
+			return m_out_edges.pbase() + out_offset_end(v);
 		}
 
 
 	protected:
-		gr_index_t adj_offset_begin(const vertex_t& v) const
+		gr_index_t out_offset_begin(const vertex_t& v) const
 		{
-			return m_offsets[v.index];
+			return m_out_offsets[v.index];
 		}
 
-		gr_index_t adj_offset_end(const vertex_t& v) const
+		gr_index_t out_offset_end(const vertex_t& v) const
 		{
-			return m_offsets[v.index] + m_degrees[v.index];
+			return m_out_offsets[v.index] + m_out_degrees[v.index];
 		}
 
 
@@ -193,10 +214,10 @@ namespace bcs
 		const_memory_proxy<vertex_type> m_sources;
 		const_memory_proxy<vertex_type> m_targets;
 
-		const_memory_proxy<gr_size_t> m_degrees;
-		const_memory_proxy<gr_index_t> m_offsets;
-		const_memory_proxy<vertex_t> m_neighbors;
-		const_memory_proxy<edge_t> m_adj_edges;
+		const_memory_proxy<gr_size_t> m_out_degrees;
+		const_memory_proxy<gr_index_t> m_out_offsets;
+		const_memory_proxy<vertex_t> m_out_neighbors;
+		const_memory_proxy<edge_t> m_out_edges;
 
 
 	private:
@@ -257,10 +278,10 @@ namespace bcs
 				osets[v] -= (gr_index_t)degs[v];
 			}
 
-			m_degrees.reset(p_degs);
-			m_offsets.reset(p_osets);
-			m_neighbors.reset(p_nbs);
-			m_adj_edges.reset(p_aes);
+			m_out_degrees.reset(p_degs);
+			m_out_offsets.reset(p_osets);
+			m_out_neighbors.reset(p_nbs);
+			m_out_edges.reset(p_aes);
 		}
 
 	}; // end class gr_adjlist
@@ -287,22 +308,24 @@ namespace bcs
 				ref_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws,
 				const gr_size_t *degs, const gr_index_t *osets, const vertex_t *nbs, const edge_t *adj_es)
 		: gr_adjlist<TDir>(nv, ne, ref_t(), srcs, tars, degs, osets, nbs, adj_es)
-		, m_weights(ref_t(), ne, ws)
+		, m_weights(ref_t(), this->m_el, ws)
 		{
 		}
 
 		gr_wadjlist(gr_size_t nv, gr_size_t ne,
 				ref_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
 		: gr_adjlist<TDir>(nv, ne, ref_t(), srcs, tars)
-		, m_weights(ref_t(), ne, ws)
+		, m_weights(ref_t(), this->m_el, ws)
 		{
 		}
 
 		gr_wadjlist(gr_size_t nv, gr_size_t ne,
 				clone_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
 		: gr_adjlist<TDir>(nv, ne, ref_t(), srcs, tars)
-		, m_weights(clone_t(), ne, ws)
+		, m_weights(new block<weight_type>(this->m_el))
 		{
+			gr_adjlist_aux<TDir>::do_clone_edgeweights(ne, ws,
+					const_cast<weight_type*>(m_weights.pbase()));
 		}
 
 		gr_wadjlist(gr_size_t nv, gr_size_t ne,
