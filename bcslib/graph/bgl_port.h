@@ -380,6 +380,12 @@ namespace boost
 		typedef boost::directed_tag directed_category;
 	};
 
+	template<>
+	struct bcs_bgl_dir_translator<bcs::gr_undirected>
+	{
+		typedef boost::undirected_tag directed_category;
+	};
+
 
 	// for gr_edgelist
 
