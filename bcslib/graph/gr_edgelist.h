@@ -137,7 +137,7 @@ namespace bcs
 
 		gr_wedgelist(gr_size_t nv, gr_size_t ne,
 				clone_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
-		: gr_edgelist<TDir>(nv, ne, ref_t(), srcs, tars)
+		: gr_edgelist<TDir>(nv, ne, clone_t(), srcs, tars)
 		, m_weights(clone_t(), ne, ws)
 		{
 		}

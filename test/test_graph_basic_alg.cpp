@@ -14,7 +14,12 @@
 
 #include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/depth_first_search.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <boost/graph/kruskal_min_spanning_tree.hpp>
+#include <boost/graph/prim_minimum_spanning_tree.hpp>
+
 #include <vector>
+#include <iterator>
 #include <iostream>
 
 using namespace bcs;
@@ -128,7 +133,89 @@ BCS_TEST_CASE( test_dfs )
 }
 
 
+BCS_TEST_CASE( test_dijkstra )
+{
+	const gr_size_t nv = 5;
+	const gr_size_t ne = 8;
 
+	gr_index_t src_inds[ne] = {0, 0, 0, 1, 1, 3, 3, 2};
+	gr_index_t tar_inds[ne] = {1, 2, 3, 2, 4, 2, 4, 4};
+	double ws[ne] = {1.0, 5.0, 0.5, 1.2, 1.8, 0.6, 6.0, 0.2};
+
+	const vertex_t *src_vs = (const vertex_t*)(src_inds);
+	const vertex_t *tar_vs = (const vertex_t*)(tar_inds);
+
+	gr_wadjlist<double, gr_directed> g(nv, ne, ref_t(), src_vs, tar_vs, ws);
+
+	using boost::distance_map;
+	using boost::predecessor_map;
+
+	double dists[nv];
+	set_zeros_to_elements(dists, nv);
+
+	vertex_t preds[nv];
+
+	vertex_ref_map<double> dist_map(dists);
+	vertex_ref_map<vertex_t> pred_map(preds);
+
+	boost::dijkstra_shortest_paths(g, vertex_t(0), distance_map(dist_map).predecessor_map(pred_map));
+
+	gr_index_t preds_gt[nv] = {0, 0, 3, 0, 2};
+	double dists_gt[nv] = {0.0, 1.0, 1.1, 0.5, 1.3};
+
+	BCS_CHECK( collection_equal(preds, preds + nv, (const vertex_t*)preds_gt, nv) );
+	BCS_CHECK( collection_equal(dists, dists + nv, dists_gt, nv) );
+
+}
+
+
+BCS_TEST_CASE( test_kruskal )
+{
+	const gr_size_t nv = 7;
+	const gr_size_t ne = 11;
+
+	gr_index_t src_inds[ne] = {0, 1, 0, 3, 1, 2, 3, 3, 4, 4, 5};
+	gr_index_t tar_inds[ne] = {1, 2, 3, 1, 4, 4, 4, 5, 5, 6, 6};
+	double ws[ne] = {7, 8, 5, 9, 7, 5, 15, 6, 8, 9, 11};
+
+	const vertex_t *src_vs = (const vertex_t*)(src_inds);
+	const vertex_t *tar_vs = (const vertex_t*)(tar_inds);
+
+	gr_wadjlist<double, gr_undirected> g(nv, ne, clone_t(), src_vs, tar_vs, ws);
+
+	std::vector<edge_t> eds;
+
+	boost::kruskal_minimum_spanning_tree(g, std::back_inserter(eds));
+
+	gr_index_t gtruth[6] = {2, 5, 7, 0, 4, 9};
+
+	BCS_CHECK( collection_equal(eds.begin(), eds.end(), (const edge_t*)gtruth, 6) );
+
+}
+
+
+BCS_TEST_CASE( test_prim )
+{
+	const gr_size_t nv = 7;
+	const gr_size_t ne = 11;
+
+	gr_index_t src_inds[ne] = {0, 1, 0, 3, 1, 2, 3, 3, 4, 4, 5};
+	gr_index_t tar_inds[ne] = {1, 2, 3, 1, 4, 4, 4, 5, 5, 6, 6};
+	double ws[ne] = {7, 8, 5, 9, 7, 5, 15, 6, 8, 9, 11};
+
+	const vertex_t *src_vs = (const vertex_t*)(src_inds);
+	const vertex_t *tar_vs = (const vertex_t*)(tar_inds);
+
+	gr_wadjlist<double, gr_undirected> g(nv, ne, clone_t(), src_vs, tar_vs, ws);
+
+	vertex_t preds[nv];
+
+	boost::prim_minimum_spanning_tree(g, vertex_ref_map<vertex_t>(preds));
+
+	gr_index_t gtruth[nv] = {0, 0, 4, 0, 1, 3, 4};
+
+	BCS_CHECK( collection_equal(preds, preds + nv, (const vertex_t*)gtruth, nv) );
+}
 
 
 
@@ -138,6 +225,9 @@ test_suite *test_gr_basic_alg_suite()
 
 	suite->add( new test_bfs() );
 	suite->add( new test_dfs() );
+	suite->add( new test_dijkstra() );
+	suite->add( new test_kruskal() );
+	suite->add( new test_prim() );
 
 	return suite;
 }

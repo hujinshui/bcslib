@@ -11,7 +11,6 @@
 
 #include <bcslib/graph/graph_base.h>
 
-
 namespace bcs
 {
 	template<typename TDir>
@@ -321,7 +320,7 @@ namespace bcs
 
 		gr_wadjlist(gr_size_t nv, gr_size_t ne,
 				clone_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
-		: gr_adjlist<TDir>(nv, ne, ref_t(), srcs, tars)
+		: gr_adjlist<TDir>(nv, ne, clone_t(), srcs, tars)
 		, m_weights(new block<weight_type>(this->m_el))
 		{
 			gr_adjlist_aux<TDir>::do_clone_edgeweights(ne, ws,

@@ -139,7 +139,7 @@ namespace matlab
 
 
 	template<typename TWeight, typename TDir>
-	inline gr_wadjlist<TWeight, TDir> to_wadjlist(const_mgraph g)
+	inline gr_wadjlist<TWeight, TDir> to_gr_wadjlist(const_mgraph g)
 	{
 		return gr_wadjlist<TWeight, TDir>(g.nv(), g.ne(),
 				ref_t(), g.es(), g.et(), g.ew<TWeight>(), g.o_ds(), g.o_os(), g.o_ns(), g.o_es());
