@@ -15,6 +15,7 @@ using namespace bcs::test;
 
 extern test_suite *test_gr_edgelist_suite();
 extern test_suite *test_gr_adjlist_suite();
+extern test_suite *test_gr_basic_alg_suite();
 
 test_suite* master_suite()
 {
@@ -22,6 +23,7 @@ test_suite* master_suite()
 
 	msuite->add( test_gr_edgelist_suite() );
 	msuite->add( test_gr_adjlist_suite() );
+	msuite->add( test_gr_basic_alg_suite() );
 
 	return msuite;
 }

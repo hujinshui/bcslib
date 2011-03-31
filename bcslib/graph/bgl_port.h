@@ -239,6 +239,55 @@ namespace bcs
 	 *
 	 ***********************************************/
 
+	// general
+
+	template<class TGraph>
+	inline vertex_t source(const edge_t& e, const TGraph& g)
+	{
+		return g.source_of(e);
+	}
+
+	template<class TGraph>
+	inline vertex_t target(const edge_t& e, const TGraph& g)
+	{
+		return g.target_of(e);
+	}
+
+	template<class TGraph>
+	inline gr_size_t out_degree(const vertex_t& u, const TGraph& g)
+	{
+		return g.out_degree(u);
+	}
+
+	template<class TGraph>
+	inline gr_size_t in_degree(const vertex_t& v, const TGraph& g)
+	{
+		return g.in_degree(v);
+	}
+
+	template<class TGraph>
+	inline gr_size_t degree(const vertex_t& v, const TGraph& g)
+	{
+		return g.degree(v);
+	}
+
+	template<typename TGraph>
+	inline std::pair<typename TGraph::adj_edge_iterator, typename TGraph::adj_edge_iterator>
+	out_edges(const vertex_t& v, const TGraph& g)
+	{
+		return std::make_pair(g.out_edge_begin(v), g.out_edge_end(v));
+	}
+
+
+	template<typename TGraph>
+	inline std::pair<typename TGraph::neighbor_iterator, typename TGraph::neighbor_iterator>
+	adjacency_vertices(const vertex_t& v, const TGraph& g)
+	{
+		return std::make_pair(g.out_neighbor_begin(v), g.out_neighbor_end(v));
+	}
+
+
+
 	// for gr_edgelist (and thus gr_wedgelist)
 
 	template<typename TDir>
@@ -316,25 +365,6 @@ namespace bcs
 	inline std::pair<simple_edge_iterator, simple_edge_iterator> edges(const gr_adjlist<TDir>& g)
 	{
 		return std::make_pair(g.e_begin(), g.e_end());
-	}
-
-	template<typename TDir>
-	inline gr_size_t out_degree(const vertex_t& v, const gr_adjlist<TDir>& g)
-	{
-		return g.out_degree(v);
-	}
-
-	template<typename TDir>
-	inline std::pair<const edge_t*, const edge_t*> out_edges(const vertex_t& v, const gr_adjlist<TDir>& g)
-	{
-		return std::make_pair(g.out_edge_begin(v), g.out_edge_end(v));
-	}
-
-
-	template<typename TDir>
-	inline std::pair<const vertex_t*, const vertex_t*> adjacency_vertices(const vertex_t& v, const gr_adjlist<TDir>& g)
-	{
-		return std::make_pair(g.out_neighbor_begin(v), g.out_neighbor_end(v));
 	}
 
 	template<typename TDir>
