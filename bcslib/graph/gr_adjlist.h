@@ -216,8 +216,8 @@ namespace bcs
 
 		const_memory_proxy<gr_size_t> m_out_degrees;
 		const_memory_proxy<gr_index_t> m_out_offsets;
-		const_memory_proxy<vertex_t> m_out_neighbors;
-		const_memory_proxy<edge_t> m_out_edges;
+		const_memory_proxy<vertex_type> m_out_neighbors;
+		const_memory_proxy<edge_type> m_out_edges;
 
 
 	private:

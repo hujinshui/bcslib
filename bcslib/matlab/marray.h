@@ -105,6 +105,11 @@ namespace matlab
 			return mxGetClassName(m_pa);
 		}
 
+		bool is_class(const char* classname) const
+		{
+			return mxIsClass(m_pa, classname);
+		}
+
 		bool is_double() const
 		{
 			return mxIsDouble(m_pa);
@@ -262,6 +267,13 @@ namespace matlab
 		const_marray get_cell(int i) const
 		{
 			return mxGetCell(m_pa, i);
+		}
+
+		// object related
+
+		const_marray get_property(int i, const char *propertyname) const
+		{
+			return mxGetProperty(m_pa, i, propertyname);
 		}
 
 

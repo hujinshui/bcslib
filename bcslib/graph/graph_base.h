@@ -22,8 +22,8 @@ namespace bcs
 	 *
 	 */
 
-	typedef size_t gr_size_t;
-	typedef ptrdiff_t gr_index_t;
+	typedef uint32_t gr_size_t;
+	typedef int32_t gr_index_t;
 
 	struct gr_directed { };
 	struct gr_undirected { };
