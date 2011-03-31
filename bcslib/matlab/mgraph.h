@@ -89,7 +89,7 @@ namespace matlab
 			return m_a.get_property(0, "o_ds").data<gr_size_t>();
 		}
 
-		const gr_size_t* o_os() const
+		const gr_index_t* o_os() const
 		{
 			return m_a.get_property(0, "o_os").data<gr_index_t>();
 		}
@@ -131,7 +131,7 @@ namespace matlab
 
 
 	template<typename TDir>
-	inline gr_edgelist<TDir> to_gr_adjlist(const_mgraph g)
+	inline gr_adjlist<TDir> to_gr_adjlist(const_mgraph g)
 	{
 		return gr_adjlist<TDir>(g.nv(), g.ne(),
 				ref_t(), g.es(), g.et(), g.o_ds(), g.o_os(), g.o_ns(), g.o_es());
@@ -139,7 +139,7 @@ namespace matlab
 
 
 	template<typename TWeight, typename TDir>
-	inline gr_wedgelist<TWeight, TDir> to_wadjlist(const_mgraph g)
+	inline gr_wadjlist<TWeight, TDir> to_wadjlist(const_mgraph g)
 	{
 		return gr_wadjlist<TWeight, TDir>(g.nv(), g.ne(),
 				ref_t(), g.es(), g.et(), g.ew<TWeight>(), g.o_ds(), g.o_os(), g.o_ns(), g.o_es());
