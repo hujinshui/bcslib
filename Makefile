@@ -35,7 +35,7 @@ bin/test_array_comp: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VE
 bin/test_access_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) test/test_access_performance.cpp
 	$(CC) $(CFLAGS) -O2 test/test_access_performance.cpp -o bin/test_access_performance
 
-GRAPH_BASIC_TESTS = test/test_graph_basics.cpp
+GRAPH_BASIC_TESTS = test/test_graph_basics.cpp test/test_gr_edgelist.cpp
 bin/test_graph_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(GRAPH_BASIC_HEADERS) $(GRAPH_BASIC_TESTS)
 	$(CC) $(CFLAGS) $(GRAPH_BASIC_TESTS) -o bin/test_graph_basics	
 	

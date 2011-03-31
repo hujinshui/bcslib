@@ -163,6 +163,12 @@ namespace bcs
 		}
 
 
+		const weight_type *weights() const
+		{
+			return m_weights.pbase();
+		}
+
+
 	protected:
 		const_memory_proxy<weight_type> m_weights;
 

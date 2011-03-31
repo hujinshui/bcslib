@@ -27,7 +27,7 @@ namespace bcs
 
 	struct gr_directed { };
 	struct gr_undirected { };
-	struct gr_bidirected { };
+
 
 	struct vertex_t
 	{

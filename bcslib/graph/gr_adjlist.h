@@ -11,6 +11,42 @@
 
 namespace bcs
 {
+	template<typename TDir>
+	struct gr_adjlist_aux
+	{
+		static gr_size_t edge_list_size(gr_size_t ne)
+		{
+			return ne;
+		}
+
+		static void do_clone_edgelist(size_t ne, const vertex_t *srcs_in, const vertex_t *tars_in, vertex_t *srcs, vertex_t *tars)
+		{
+			copy_elements(srcs_in, srcs, ne);
+			copy_elements(tars_in, srcs, ne);
+		}
+	};
+
+	template<>
+	struct gr_adjlist_aux<gr_undirected>
+	{
+		static gr_size_t edge_list_size(gr_size_t ne)
+		{
+			return 2 * ne;
+		}
+
+		static void do_clone_edgelist(size_t ne, const vertex_t *srcs_in, const vertex_t *tars_in, vertex_t *srcs, vertex_t *tars)
+		{
+			copy_elements(srcs_in, srcs, ne);
+			copy_elements(tars_in, srcs, ne);
+
+			copy_elements(tars_in, tars, ne);
+			copy_elements(srcs_in, tars, ne);
+		}
+	};
+
+
+
+
 
 	template<typename TDir>
 	class gr_adjlist
@@ -31,26 +67,29 @@ namespace bcs
 		gr_adjlist(gr_size_t nv, gr_size_t ne,
 				ref_t, const vertex_type *srcs, const vertex_type *tars,
 				const gr_size_t *degs, const gr_index_t *osets, const vertex_t *nbs, const edge_t *adj_es)
-		: m_nvertices(nv), m_nedges(ne)
-		, m_sources(ref_t(), ne, srcs), m_targets(ref_t(), ne, tars)
+		: m_nvertices(nv), m_nedges(ne), m_el(gr_adjlist_aux<TDir>::edge_list_size(ne))
+		, m_sources(ref_t(), m_el, srcs), m_targets(ref_t(), m_el, tars)
 		, m_degrees(ref_t(), nv, degs), m_offsets(ref_t(), nv, osets)
-		, m_neighbors(ref_t(), ne, nbs), m_adj_edges(ref_t(), ne, adj_es)
+		, m_neighbors(ref_t(), m_el, nbs), m_adj_edges(ref_t(), m_el, adj_es)
 		{
 		}
 
 		gr_adjlist(gr_size_t nv, gr_size_t ne,
 				ref_t, const vertex_type *srcs, const vertex_type *tars)
-		: m_nvertices(nv), m_nedges(ne)
-		, m_sources(ref_t(), ne, srcs), m_targets(ref_t(), ne, tars)
+		: m_nvertices(nv), m_nedges(ne), m_el(gr_adjlist_aux<TDir>::edge_list_size(ne))
+		, m_sources(ref_t(), m_el, srcs), m_targets(ref_t(), m_el, tars)
 		{
 			_init_neighbor_structure();
 		}
 
 		gr_adjlist(gr_size_t nv, gr_size_t ne,
 				clone_t, const vertex_type *srcs, const vertex_type *tars)
-		: m_nvertices(nv), m_nedges(ne)
-		, m_sources(clone_t(), ne, srcs), m_targets(clone_t(), ne, tars)
+		: m_nvertices(nv), m_nedges(ne), m_el(gr_adjlist_aux<TDir>::edge_list_size(ne))
+		, m_sources(new block<vertex_type>(m_el)), m_targets(new block<vertex_type>(m_el))
 		{
+			gr_adjlist_aux<TDir>::do_clone_edgelist(ne, srcs, tars,
+					const_cast<vertex_t*>(m_sources.pbase()), const_cast<vertex_t*>(m_targets.pbase()) );
+
 			_init_neighbor_structure();
 		}
 
@@ -89,8 +128,6 @@ namespace bcs
 		{
 			return edge_i(m_sources[e.index], m_targets[e.index]);
 		}
-
-
 
 
 		// iteration
@@ -151,6 +188,7 @@ namespace bcs
 	protected:
 		gr_size_t m_nvertices;
 		gr_size_t m_nedges;
+		gr_size_t m_el;     // the length of entire edge list (e.g. for undirected graph, it is 2 * ne)
 
 		const_memory_proxy<vertex_type> m_sources;
 		const_memory_proxy<vertex_type> m_targets;
@@ -164,7 +202,65 @@ namespace bcs
 	private:
 		void _init_neighbor_structure()
 		{
+			gr_size_t n = m_nvertices;
+			gr_size_t m = m_el;
 
+			block<gr_size_t> *p_degs = new block<gr_size_t>(n);
+			block<gr_index_t> *p_osets = new block<gr_index_t>(n);
+			block<vertex_t> *p_nbs = new block<vertex_t>(m);
+			block<edge_t> *p_aes = new block<edge_t>(m);
+
+			const vertex_t *srcs = m_sources.pbase();
+			const vertex_t *tars = m_targets.pbase();
+
+			gr_size_t *degs = p_degs->pbase();
+			gr_index_t *osets = p_osets->pbase();
+			vertex_t *nbs = p_nbs->pbase();
+			edge_t *aes = p_aes->pbase();
+
+			// 1st pass: count degrees
+
+			set_zeros_to_elements(degs, n);
+			for (gr_size_t e = 0; e < m; ++e)
+			{
+				++ degs[srcs[e].index];
+			}
+
+			// 2nd pass: set offsets
+
+			gr_index_t o = 0;
+			for (gr_size_t v = 0; v < n; ++v)
+			{
+				osets[v] = o;
+				o += degs[v];
+			}
+
+			// 3rd pass: fill in adjacency info
+
+			for (gr_size_t e = 0; e < m; ++e)
+			{
+				const vertex_t& sv = srcs[e];
+				const vertex_t& tv = tars[e];
+
+				gr_index_t& o = osets[sv.index];
+
+				nbs[o] = tv;
+				aes[o] = (gr_index_t)e;
+
+				++o;
+			}
+
+			// 4th pass: reset the offsets
+
+			for (gr_size_t v = 0; v < n; ++v)
+			{
+				osets[v] -= (gr_index_t)degs[v];
+			}
+
+			m_degrees.reset(p_degs);
+			m_offsets.reset(p_osets);
+			m_neighbors.reset(p_nbs);
+			m_adj_edges.reset(p_aes);
 		}
 
 	}; // end class gr_adjlist
@@ -231,6 +327,10 @@ namespace bcs
 					this->m_weights[e.index]);
 		}
 
+		const weight_type *weights() const
+		{
+			return m_weights.pbase();
+		}
 
 	protected:
 		const_memory_proxy<weight_type> m_weights;
