@@ -93,8 +93,8 @@ namespace bcs
 		void move_backward(index_t n) { m_p -= n * m_step; }
 
 		bool operator == (const self_type& rhs) const { return m_p == rhs.m_p; }
-		bool operator < (const self_type& rhs) const { return m_p < rhs.m_p; }
-		bool operator > (const self_type& rhs) const { return m_p > rhs.m_p; }
+		bool operator < (const self_type& rhs) const { return (bool)((m_step < 0) ^ (m_p < rhs.m_p)); }
+		bool operator > (const self_type& rhs) const { return (bool)((m_step < 0) ^ (m_p > rhs.m_p)); }
 
 		ptrdiff_t operator - (const self_type &rhs) const
 		{
