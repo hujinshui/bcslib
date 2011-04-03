@@ -307,21 +307,21 @@ namespace bcs
 				ref_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws,
 				const gr_size_t *degs, const gr_index_t *osets, const vertex_t *nbs, const edge_t *adj_es)
 		: gr_adjlist<TDir>(nv, ne, ref_t(), srcs, tars, degs, osets, nbs, adj_es)
-		, m_weights(ref_t(), this->m_el, ws)
+		, m_weights(ref_t(), gr_adjlist_aux<TDir>::edge_list_size(ne), ws)
 		{
 		}
 
 		gr_wadjlist(gr_size_t nv, gr_size_t ne,
 				ref_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
 		: gr_adjlist<TDir>(nv, ne, ref_t(), srcs, tars)
-		, m_weights(ref_t(), this->m_el, ws)
+		, m_weights(ref_t(), gr_adjlist_aux<TDir>::edge_list_size(ne), ws)
 		{
 		}
 
 		gr_wadjlist(gr_size_t nv, gr_size_t ne,
 				clone_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
 		: gr_adjlist<TDir>(nv, ne, clone_t(), srcs, tars)
-		, m_weights(new block<weight_type>(this->m_el))
+		, m_weights(new block<weight_type>(gr_adjlist_aux<TDir>::edge_list_size(ne)))
 		{
 			gr_adjlist_aux<TDir>::do_clone_edgeweights(ne, ws,
 					const_cast<weight_type*>(m_weights.pbase()));

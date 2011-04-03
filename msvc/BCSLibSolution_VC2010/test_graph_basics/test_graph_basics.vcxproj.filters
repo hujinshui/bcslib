@@ -15,16 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\test_array_basics.cpp">
+    <ClCompile Include="..\..\..\test\test_gr_adjlist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\test_array1d.cpp">
+    <ClCompile Include="..\..\..\test\test_gr_edgelist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\test_index_selection.cpp">
+    <ClCompile Include="..\..\..\test\test_graph_basic_alg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\test\test_array2d.cpp">
+    <ClCompile Include="..\..\..\test\test_graph_basics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

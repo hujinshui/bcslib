@@ -81,6 +81,8 @@ namespace bcs
 		{
 			r1 = in.first;
 			r2 = in.second;
+
+			return *this;
 		}
 	};
 

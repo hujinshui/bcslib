@@ -23,10 +23,10 @@ template class bcs::gr_adjlist<bcs::gr_undirected>;
 template class bcs::gr_wadjlist<double, bcs::gr_directed>;
 template class bcs::gr_wadjlist<double, bcs::gr_undirected>;
 
-template class boost::graph_traits<bcs::gr_adjlist<bcs::gr_directed> >;
-template class boost::graph_traits<bcs::gr_adjlist<bcs::gr_undirected> >;
-template class boost::graph_traits<bcs::gr_wadjlist<double, bcs::gr_directed> >;
-template class boost::graph_traits<bcs::gr_wadjlist<double, bcs::gr_undirected> >;
+template struct boost::graph_traits<bcs::gr_adjlist<bcs::gr_directed> >;
+template struct boost::graph_traits<bcs::gr_adjlist<bcs::gr_undirected> >;
+template struct boost::graph_traits<bcs::gr_wadjlist<double, bcs::gr_directed> >;
+template struct boost::graph_traits<bcs::gr_wadjlist<double, bcs::gr_undirected> >;
 
 
 
@@ -57,14 +57,17 @@ bool verify_adjacency(const gr_adjlist<gr_directed>& g, const vertex_t& v)
 		return false;
 	}
 
-	if ( !collection_equal(g.out_neighbor_begin(v), g.out_neighbor_end(v), &(nbs[0]), out_deg) )
+	if (out_deg > 0)
 	{
-		return false;
-	}
+		if ( !collection_equal(g.out_neighbor_begin(v), g.out_neighbor_end(v), &(nbs[0]), out_deg) )
+		{
+			return false;
+		}
 
-	if ( !collection_equal(g.out_edge_begin(v), g.out_edge_end(v), &(aes[0]), out_deg) )
-	{
-		return false;
+		if ( !collection_equal(g.out_edge_begin(v), g.out_edge_end(v), &(aes[0]), out_deg) )
+		{
+			return false;
+		}
 	}
 
 	return true;
