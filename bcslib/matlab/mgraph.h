@@ -78,10 +78,11 @@ namespace matlab
 			return m_a.get_property(0, "ew").class_id();
 		}
 
-		template<typename TWeight>
-		const TWeight* ew() const
+		template<typename T>
+		const T* ew() const
 		{
-			return m_a.get_property(0, "ew").data<TWeight>();
+			const_marray p = m_a.get_property(0, "ew");
+			return p.data<T>();
 		}
 
 		const gr_size_t* o_ds() const
