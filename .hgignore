@@ -1,0 +1,9 @@
+syntax: glob
+
+.project
+.cproject
+Debug/*
+temp/*
+bin/*
+
+
