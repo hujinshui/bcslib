@@ -14,7 +14,7 @@
 #define BCSLIB_GCC 0x02
 
 
-#if (defined(WIN32) || defined(WIN64)) && defined(_MSC_VER)
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
         #if _MSC_VER < 1500
                 #error Microsoft Visual C++ of version lower than MSVC 2008 is not supported.
         #endif

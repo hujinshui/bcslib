@@ -699,7 +699,7 @@ BCS_TEST_CASE( test_array_pow )
 	for (int i = 0; i < 3; ++i) res_s[i] = std::pow(src[i*2], 3);
 
 	BCS_CHECK( array_view_approx( pow_n(x,  3), res, 6 ) );
-	BCS_CHECK( array_view_approx( pow_n(xs, 3.2), res_s, 3 ) );
+	BCS_CHECK( array_view_approx( pow_n(xs, 3), res_s, 3 ) );
 	BCS_CHECK( array_view_approx( pow_n(Xr, 3), res, 2, 3) );
 	BCS_CHECK( array_view_approx( pow_n(Xc, 3), res, 2, 3) );
 

@@ -21,10 +21,10 @@ template class bcs::gr_edgelist<bcs::gr_undirected>;
 template class bcs::gr_wedgelist<double, bcs::gr_directed>;
 template class bcs::gr_wedgelist<double, bcs::gr_undirected>;
 
-template class boost::graph_traits<bcs::gr_edgelist<bcs::gr_directed> >;
-template class boost::graph_traits<bcs::gr_edgelist<bcs::gr_undirected> >;
-template class boost::graph_traits<bcs::gr_wedgelist<double, bcs::gr_directed> >;
-template class boost::graph_traits<bcs::gr_wedgelist<double, bcs::gr_undirected> >;
+template struct boost::graph_traits<bcs::gr_edgelist<bcs::gr_directed> >;
+template struct boost::graph_traits<bcs::gr_edgelist<bcs::gr_undirected> >;
+template struct boost::graph_traits<bcs::gr_wedgelist<double, bcs::gr_directed> >;
+template struct boost::graph_traits<bcs::gr_wedgelist<double, bcs::gr_undirected> >;
 
 
 // auxiliary checking function
