@@ -168,6 +168,13 @@ namespace bcs
 	}; // end class imview
 
 
+	template<typename TPixel1, typename TPixel2>
+	inline bool is_same_size(const const_imview<TPixel1>& lhs, const const_imview<TPixel2>& rhs)
+	{
+		return lhs.width() == rhs.width() && lhs.height() == rhs.height();
+	}
+
+
 }
 
 #endif 
