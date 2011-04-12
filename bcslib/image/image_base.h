@@ -82,6 +82,13 @@ namespace bcs
 	template<typename TPixel> struct pixel_traits;
 
 	template<>
+	struct pixel_traits<bool>
+	{
+		typedef bool value_type;
+		static const size_t num_channels = 1;
+	};
+
+	template<>
 	struct pixel_traits<uint8_t>
 	{
 		typedef uint8_t value_type;
