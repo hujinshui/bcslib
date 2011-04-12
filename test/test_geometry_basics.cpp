@@ -6,26 +6,22 @@
  * @author Dahua Lin
  */
 
+#include <bcslib/test/execution_mon.h>
 
-#include <bcslib/geometry/geometry_base.h>
-#include <bcslib/geometry/triangle_mesh.h>
-#include <bcslib/geometry/poly_scan.h>
+using namespace bcs::test;
 
-// For syntax check
+extern test_suite* test_geometry_prim_suite();
+extern test_suite* test_poly_scan_suite();
 
-template struct bcs::point2d<double>;
-template struct bcs::point3d<double>;
-
-template struct bcs::lineseg2d<double>;
-template struct bcs::lineseg3d<double>;
-template struct bcs::line2d<double>;
-
-template struct bcs::rectangle<double>;
-template struct bcs::triangle<double>;
-
-template struct bcs::triangle_scanner<double>;
-
-
-int main(int argc, char *argv[])
+test_suite* master_suite()
 {
+	test_suite* msuite = new test_suite( "image_basics" );
+
+	msuite->add( test_geometry_prim_suite() );
+	// msuite->add( test_poly_scan_suite() );
+
+	return msuite;
 }
+
+
+BCS_TEST_MAIN_FUNCTION
