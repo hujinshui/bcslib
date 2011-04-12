@@ -41,13 +41,55 @@ BCS_TEST_CASE( test_triangle_scan )
 	BCS_CHECK_EQUAL( t1s.top(), 0.0 );
 	BCS_CHECK_EQUAL( t1s.bottom(), 3.0 );
 
-	print_scan_results(t1s);
-
 	BCS_CHECK( test_rowscan(t1s, 0, 1, 1) );
 	BCS_CHECK( test_rowscan(t1s, 1, 1, 1) );
 	BCS_CHECK( test_rowscan(t1s, 2, 0, 2) );
 	BCS_CHECK( test_rowscan(t1s, 3, 3, 3) );
+
+	triangle<double> t2 = make_tri(pt(0.0, 3.0), pt(2.0, 0.0), pt(3.0, 2.0));
+	triangle_scanner<double> t2s(t2);
+
+	BCS_CHECK_EQUAL( t2s.top(), 0.0 );
+	BCS_CHECK_EQUAL( t2s.bottom(), 3.0 );
+
+	BCS_CHECK( test_rowscan(t2s, 0, 2, 2) );
+	BCS_CHECK( test_rowscan(t2s, 1, 2, 2) );
+	BCS_CHECK( test_rowscan(t2s, 2, 1, 3) );
+	BCS_CHECK( test_rowscan(t2s, 3, 0, 0) );
+
+	triangle<double> t3 = make_tri(pt(0.8, 2.0), pt(1.5, 0.0), pt(1.5, 2.0) );
+	triangle_scanner<double> t3s(t3);
+
+	BCS_CHECK_EQUAL( t3s.top(), 0.0 );
+	BCS_CHECK_EQUAL( t3s.bottom(), 2.0 );
+
+	BCS_CHECK( test_rowscan(t3s, 0, 2, 1) );
+	BCS_CHECK( test_rowscan(t3s, 1, 2, 1) );
+	BCS_CHECK( test_rowscan(t3s, 2, 1, 1) );
+
+	triangle<double> t4 = make_tri(pt(0.0, 0.0), pt(2.0, 2.1), pt(3.0, 0.0));
+	triangle_scanner<double> t4s(t4);
+
+	BCS_CHECK_EQUAL( t4s.top(), 0.0 );
+	BCS_CHECK_EQUAL( t4s.bottom(), 2.1 );
+
+	BCS_CHECK( test_rowscan(t4s, 0, 0, 3) );
+	BCS_CHECK( test_rowscan(t4s, 1, 1, 2) );
+	BCS_CHECK( test_rowscan(t4s, 2, 2, 2) );
+
+	triangle<double> t5 = make_tri(pt(0.0, 3.0), pt(1.0, 0.0), pt(3.0, 3.0));
+	triangle_scanner<double> t5s(t5);
+
+	BCS_CHECK_EQUAL( t5s.top(), 0.0 );
+	BCS_CHECK_EQUAL( t5s.bottom(), 3.0 );
+
+	BCS_CHECK( test_rowscan(t5s, 0, 1, 1) );
+	BCS_CHECK( test_rowscan(t5s, 1, 1, 1) );
+	BCS_CHECK( test_rowscan(t5s, 2, 1, 2) );
+	BCS_CHECK( test_rowscan(t5s, 3, 0, 3) );
 }
+
+
 
 test_suite *test_poly_scan_suite()
 {
