@@ -108,11 +108,6 @@ namespace bcs
 			m_line01 = line2d<T>::from_segment(m_pt0, m_pt1);
 			m_line02 = line2d<T>::from_segment(m_pt0, m_pt2);
 			m_line12 = line2d<T>::from_segment(m_pt1, m_pt2);
-
-			std::printf("pt0: (%g, %g)\n", m_pt0.x, m_pt0.y);
-			std::printf("pt1: (%g, %g)\n", m_pt1.x, m_pt1.y);
-			std::printf("pt2: (%g, %g)\n", m_pt2.x, m_pt2.y);
-			std::printf("line 0 - 1: a = %g, b = %g, c = %g\n", m_line01.a, m_line01.b, m_line01.c);
 		}
 
 
@@ -130,7 +125,7 @@ namespace bcs
 		rowscan_segment get_rowscan_segment(geo_index_t y) const
 		{
 			T x0 = 0;
-			T x1 = 0;
+			T x1 = -1;
 
 			if (y >= m_pt0.y)
 			{
@@ -146,20 +141,10 @@ namespace bcs
 				}
 				else if (y <= m_pt2.y)
 				{
-					if (m_pt1.y < m_pt2.y)
-					{
-						x0 = m_line02.horiz_intersect((T)y);
-						x1 = m_line12.horiz_intersect((T)y);
-					}
-					else
-					{
-						x0 = m_pt1.x;
-						x1 = m_pt2.x;
-					}
+					x0 = ( y == m_pt2.y ? m_pt2.x : m_line02.horiz_intersect((T)y) );
+					x1 = ( y == m_pt1.y ? m_pt1.x : m_line12.horiz_intersect((T)y) );
 				}
 			}
-
-			std::printf("inside y = %d: x0 = %g, x1 = %g\n", y, x0, x1);
 
 			if (x1 < x0)
 			{

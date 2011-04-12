@@ -18,7 +18,7 @@ test_suite* master_suite()
 	test_suite* msuite = new test_suite( "image_basics" );
 
 	msuite->add( test_geometry_prim_suite() );
-	// msuite->add( test_poly_scan_suite() );
+	msuite->add( test_poly_scan_suite() );
 
 	return msuite;
 }
