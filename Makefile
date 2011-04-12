@@ -17,10 +17,14 @@ ARRAY_COMP_HEADERS = bcslib/array/array_calc.h bcslib/array/array_eval.h
 
 GRAPH_BASIC_HEADERS = bcslib/graph/graph_base.h bcslib/graph/gr_edgelist.h bcslib/graph/gr_adjlist.h bcslib/graph/bgl_port.h
 
-all: test_array test_graph
+GEOMETRY_BASIC_HEADERS = bcslib/geometry/geometry_base.h bcslib/geometry/poly_scan.h bcslib/geometry/triangle_mesh.h
+
+
+all: test_array test_graph test_geometry
 
 test_array : bin/test_array_basics bin/test_array_comp bin/test_access_performance
 test_graph : bin/test_graph_basics
+test_geometry : bin/test_geometry_basics
 
 ARRAY_BASIC_TESTS = test/test_array_basics.cpp test/test_index_selection.cpp test/test_array1d.cpp test/test_array2d.cpp
 bin/test_array_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 
@@ -38,4 +42,9 @@ bin/test_access_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) test/test_ac
 GRAPH_BASIC_TESTS = test/test_graph_basics.cpp test/test_gr_edgelist.cpp test/test_gr_adjlist.cpp test/test_graph_basic_alg.cpp
 bin/test_graph_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(GRAPH_BASIC_HEADERS) $(GRAPH_BASIC_TESTS)
 	$(CC) $(CFLAGS) $(GRAPH_BASIC_TESTS) -o bin/test_graph_basics	
+	
+GEOMETRY_BASIC_TESTS = test/test_geometry_basics.cpp
+bin/test_geometry_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(GEOMETRY_BASIC_HEADERS) $(GEOMETRY_BASIC_TESTS)
+	$(CC) $(CFLAGS) $(GEOMETRY_BASIC_TESTS) -o bin/test_geometry_basics
+
 	
