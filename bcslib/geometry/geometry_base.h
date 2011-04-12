@@ -54,7 +54,7 @@ namespace bcs
 	template<typename T>
 	inline bool operator == (const point3d<T>& lhs, const point3d<T>& rhs)
 	{
-		return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z = rhs.z;
+		return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
 	}
 
 	template<typename T>
@@ -87,7 +87,7 @@ namespace bcs
 	inline double distance(const point2d<double>& pt1, const point2d<double>& pt2)
 	{
 		double dx = pt1.x - pt2.x;
-		double dy = pt1.x - pt2.x;
+		double dy = pt1.y - pt2.y;
 		return std::sqrt(dx * dx + dy * dy);
 	}
 
@@ -95,7 +95,7 @@ namespace bcs
 	inline float distance(const point2d<float>& pt1, const point2d<float>& pt2)
 	{
 		float dx = pt1.x - pt2.x;
-		float dy = pt1.x - pt2.x;
+		float dy = pt1.y - pt2.y;
 		return std::sqrt(dx * dx + dy * dy);
 	}
 
@@ -103,7 +103,7 @@ namespace bcs
 	inline double distance(const point3d<double>& pt1, const point3d<double>& pt2)
 	{
 		double dx = pt1.x - pt2.x;
-		double dy = pt1.x - pt2.x;
+		double dy = pt1.y - pt2.y;
 		double dz = pt1.z - pt2.z;
 		return std::sqrt(dx * dx + dy * dy + dz * dz);
 	}
@@ -112,7 +112,7 @@ namespace bcs
 	inline float distance(const point3d<float>& pt1, const point3d<float>& pt2)
 	{
 		float dx = pt1.x - pt2.x;
-		float dy = pt1.x - pt2.x;
+		float dy = pt1.y - pt2.y;
 		float dz = pt1.z - pt2.z;
 		return std::sqrt(dx * dx + dy * dy + dz * dz);
 	}
@@ -168,7 +168,7 @@ namespace bcs
 	}
 
 	template<typename T>
-	inline lineseg2d<T> make_lineseg2d(const point2d<T>& pt1, const point2d<T>& pt2)
+	inline lineseg2d<T> lineseg(const point2d<T>& pt1, const point2d<T>& pt2)
 	{
 		lineseg2d<T> line;
 		line.pt1 = pt1;
@@ -177,7 +177,7 @@ namespace bcs
 	}
 
 	template<typename T>
-	inline lineseg3d<T> make_lineseg3d(const point3d<T>& pt1, const point3d<T>& pt2)
+	inline lineseg3d<T> lineseg(const point3d<T>& pt1, const point3d<T>& pt2)
 	{
 		lineseg3d<T> line;
 		line.pt1 = pt1;
@@ -252,12 +252,27 @@ namespace bcs
 			return -(a * x + c) / b;
 		}
 
+		T evaluate(const point2d<T>& pt) const
+		{
+			return a * pt.x + b * pt.y + c;
+		}
+
+		bool operator == (const line2d<T>& rhs) const
+		{
+			return a == rhs.a && b == rhs.b && c == rhs.c;
+		}
+
+		bool operator != (const line2d<T>& rhs) const
+		{
+			return !(operator == (rhs));
+		}
+
 		static line2d<T> from_segment(const point_type& pt1, const point_type& pt2)
 		{
 			line2d<T> l;
-			l.a = pt2.x - pt1.x;
-			l.b = pt1.y - pt2.y;
-			l.c = pt1.x * pt2.y - pt2.x * pt1.y;
+			l.a = pt2.y - pt1.y;
+			l.b = pt1.x - pt2.x;
+			l.c = pt2.x * pt1.y - pt1.x * pt2.y;
 			return l;
 		}
 
@@ -267,6 +282,16 @@ namespace bcs
 		}
 	};
 
+
+	template<typename T>
+	inline line2d<T> line(T a, T b, T c)
+	{
+		line2d<T> l;
+		l.a = a;
+		l.b = b;
+		l.c = c;
+		return l;
+	}
 
 
 	// rectangles
@@ -336,11 +361,21 @@ namespace bcs
 		{
 			return width() == 0 || height() == 0;
 		}
+
+		bool operator == (const rectangle<T>& rhs) const
+		{
+			return x == rhs.x && y == rhs.y && w == rhs.w && h == rhs.h;
+		}
+
+		bool operator != (const rectangle<T>& rhs) const
+		{
+			return !(operator == (rhs));
+		}
 	};
 
 
 	template<typename T>
-	inline rectangle<T> make_rect(T x, T y, T w, T h)
+	inline rectangle<T> rect(T x, T y, T w, T h)
 	{
 		rectangle<T> rc;
 		rc.x = x;
@@ -351,7 +386,7 @@ namespace bcs
 	}
 
 	template<typename T>
-	inline rectangle<T> make_rect(const point2d<T>& pt1, const point2d<T>& pt2)
+	inline rectangle<T> rect(const point2d<T>& pt1, const point2d<T>& pt2)
 	{
 		T x, y, w, h;
 
@@ -377,7 +412,7 @@ namespace bcs
 			h = pt1.y - pt2.y;
 		}
 
-		return make_rect(x, y, w, h);
+		return rect(x, y, w, h);
 	}
 
 
@@ -409,6 +444,16 @@ namespace bcs
 			T dy2 = pt3.y - pt1.y;
 
 			return dx1 * dy2 - dx2 * dy1 == 0;
+		}
+
+		bool operator == (const triangle<T>& rhs) const
+		{
+			return pt1 == rhs.pt1 && pt2 == rhs.pt2 && pt3 == rhs.pt3;
+		}
+
+		bool operator != (const triangle<T>& rhs) const
+		{
+			return !(operator == (rhs));
 		}
 	};
 

@@ -12,6 +12,8 @@
 #include <bcslib/geometry/geometry_base.h>
 #include <cmath>
 
+#include <cstdio>
+
 namespace bcs
 {
 
@@ -25,7 +27,26 @@ namespace bcs
 		{
 			return x1 < x0;
 		}
+
+		bool operator == (const rowscan_segment& rhs) const
+		{
+			return y == rhs.y && x0 == rhs.x0 && x1 == rhs.x1;
+		}
+
+		bool operator != (const rowscan_segment& rhs) const
+		{
+			return !(operator == (rhs));
+		}
 	};
+
+	inline rowscan_segment make_rowscan_segment(geo_index_t y, geo_index_t x0, geo_index_t x1)
+	{
+		rowscan_segment s;
+		s.y = y;
+		s.x0 = x0;
+		s.x1 = x1;
+		return s;
+	}
 
 
 	template<typename T>
@@ -87,6 +108,11 @@ namespace bcs
 			m_line01 = line2d<T>::from_segment(m_pt0, m_pt1);
 			m_line02 = line2d<T>::from_segment(m_pt0, m_pt2);
 			m_line12 = line2d<T>::from_segment(m_pt1, m_pt2);
+
+			std::printf("pt0: (%g, %g)\n", m_pt0.x, m_pt0.y);
+			std::printf("pt1: (%g, %g)\n", m_pt1.x, m_pt1.y);
+			std::printf("pt2: (%g, %g)\n", m_pt2.x, m_pt2.y);
+			std::printf("line 0 - 1: a = %g, b = %g, c = %g\n", m_line01.a, m_line01.b, m_line01.c);
 		}
 
 
@@ -132,6 +158,8 @@ namespace bcs
 					}
 				}
 			}
+
+			std::printf("inside y = %d: x0 = %g, x1 = %g\n", y, x0, x1);
 
 			if (x1 < x0)
 			{

@@ -46,7 +46,7 @@ GRAPH_BASIC_TESTS = test/test_graph_basics.cpp test/test_gr_edgelist.cpp test/te
 bin/test_graph_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(GRAPH_BASIC_HEADERS) $(GRAPH_BASIC_TESTS)
 	$(CC) $(CFLAGS) $(GRAPH_BASIC_TESTS) -o bin/test_graph_basics	
 	
-GEOMETRY_BASIC_TESTS = test/test_geometry_basics.cpp
+GEOMETRY_BASIC_TESTS = test/test_geometry_basics.cpp test/test_geometry_primitives.cpp test/test_poly_scan.cpp
 bin/test_geometry_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(GEOMETRY_BASIC_HEADERS) $(GEOMETRY_BASIC_TESTS)
 	$(CC) $(CFLAGS) $(GEOMETRY_BASIC_TESTS) -o bin/test_geometry_basics
 
