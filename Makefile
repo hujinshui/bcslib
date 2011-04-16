@@ -54,3 +54,7 @@ bin/test_geometry_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(GEOMETRY_BASIC_HEADE
 IMAGE_BASIC_TESTS = test/test_image_basics.cpp test/test_image_views.cpp
 bin/test_image_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(IMAGE_BASIC_HEADERS) $(IMAGE_BASIC_TESTS)
 	$(CC) $(CFLAGS) $(IMAGE_BASIC_TESTS) -o bin/test_image_basics
+
+
+clean:
+	rm bin/*
