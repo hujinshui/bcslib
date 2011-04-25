@@ -22,16 +22,24 @@ namespace bcs
 	class triangle_mesh
 	{
 	public:
-		typedef tr1::array<geo_index_t, 3> entry_type;
+		struct entry_type
+		{
+			int32_t v[3];
+
+			int32_t operator[] (int i) const
+			{
+				return v[i];
+			}
+		};
 
 	public:
-		triangle_mesh(size_t nv, size_t nf, entry_type *entries, ref_t)
+		triangle_mesh(size_t nv, size_t nf, const entry_type *entries, ref_t)
 		: m_nvertices(nv), m_nfaces(nf)
 		, m_entries(ref_t(), nf, entries)
 		{
 		}
 
-		triangle_mesh(size_t nv, size_t nf, entry_type *entries, clone_t)
+		triangle_mesh(size_t nv, size_t nf, const entry_type *entries, clone_t)
 		: m_nvertices(nv), m_nfaces(nf)
 		, m_entries(clone_t(), nf, entries)
 		{

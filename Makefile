@@ -21,13 +21,16 @@ GEOMETRY_BASIC_HEADERS = bcslib/geometry/geometry_base.h bcslib/geometry/poly_sc
 
 IMAGE_BASIC_HEADERS = bcslib/image/image_base.h bcslib/image/image.h
 
+PROB_BASIC_HEADERS = bcslib/prob/pdistribution.h bcslib/prob/sampling.h bcslib/prob/discrete_distr.h 
 
-all: test_array test_graph test_geometry test_image
+
+all: test_array test_graph test_geometry test_image test_prob
 
 test_array : bin/test_array_basics bin/test_array_comp bin/test_access_performance
 test_graph : bin/test_graph_basics
 test_geometry : bin/test_geometry_basics
 test_image: bin/test_image_basics
+test_prob: bin/test_psampling
 
 ARRAY_BASIC_TESTS = test/test_array_basics.cpp test/test_index_selection.cpp test/test_array1d.cpp test/test_array2d.cpp
 bin/test_array_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 
@@ -54,3 +57,9 @@ bin/test_geometry_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(GEOMETRY_BASIC_HEADE
 IMAGE_BASIC_TESTS = test/test_image_basics.cpp test/test_image_views.cpp
 bin/test_image_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(IMAGE_BASIC_HEADERS) $(IMAGE_BASIC_TESTS)
 	$(CC) $(CFLAGS) $(IMAGE_BASIC_TESTS) -o bin/test_image_basics
+	
+PROB_BASIC_TESTS = test/test_psampling.cpp
+bin/test_psampling: $(BASE_HEADERS) $(TEST_HEADERS) $(PROB_BASIC_HEADERS) $(PROB_BASIC_TESTS)
+	$(CC) $(CFLAGS) $(PROB_BASIC_TESTS) -o bin/test_psampling
+	
+		
