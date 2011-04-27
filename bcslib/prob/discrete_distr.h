@@ -64,6 +64,23 @@ namespace bcs
 			_init_internal((size_t)K, p);
 		}
 
+		value_type K() const
+		{
+			return m_K;
+		}
+
+		double average_search_length() const
+		{
+			return m_avg_searchlen;
+		}
+
+		methods method() const
+		{
+			return m_method;
+		}
+
+	public:
+
 		template<class RStream>
 		T operator() (RStream& rs)
 		{
@@ -80,15 +97,14 @@ namespace bcs
 		void operator() (RStream& rs, size_t len, T *buf)
 		{
 			bool use_sort = (m_method == DSAMP_SORT_METHOD) ||
-					(m_method == DSAMP_AUTO && m_K > 3 * m_avg_searchlen);
+					(m_method == DSAMP_AUTO && double(m_K) > 3 * m_avg_searchlen);
 
 			block<double> ublk(len);
 			rs.randf64_vec(len, ublk.pbase());
 
 			if (use_sort)
 			{
-				block<indexed_entry<double> > wsblk;
-				get_multi_by_sort(len, ublk.pbase(), buf, wsblk.pbase());
+				get_multi_by_sort(len, ublk.pbase(), buf);
 			}
 			else
 			{
@@ -96,17 +112,12 @@ namespace bcs
 			}
 		}
 
-		value_type K() const
-		{
-			return m_K;
-		}
-
 	public:
 		T get_one(double u)
 		{
 			int k = 0;
 			while (u > m_F[k] && k < m_K) ++k;
-			return m_I[(int)k];
+			return k < m_K ? m_I[(int)k] : m_K;
 		}
 
 		void get_multi(size_t len, const double* u, T *dst)
@@ -117,75 +128,10 @@ namespace bcs
 			}
 		}
 
-		void get_multi_by_sort(size_t len, const double *u, T *dst, indexed_entry<double>* ws)
-		{
-			// sort u with indices
-
-			copy_elements_attach_indices(u, ws, len);
-			std::sort(ws, ws + len);
-
-			// do assignment
-
-			size_t i = 0;
-			T k = T(0);
-			double F_k = m_F[0];
-			double I_k = m_I[0];
-
-			while (i < len && k < m_K)
-			{
-				if (ws[i].value <= F_k)
-				{
-					dst[ws[i].index] = I_k;
-					++ i;
-				}
-				else
-				{
-					++ k;
-					F_k = m_F[(int)k];
-					I_k = m_I[(int)k];
-				}
-			}
-
-			// remaining one
-
-			while (i < len)
-			{
-				dst[ws[i].index] = m_K;
-			}
-		}
+		void get_multi_by_sort(size_t len, const double *u, T *dst, indexed_entry<double>* ws = 0);
 
 	private:
-		void _init_internal(size_t K, const double *p)
-		{
-			// sort p in descending order with indices
-
-			block<indexed_entry<double> > bb(K);
-			copy_elements_attach_indices(p, bb.pbase(), K);
-			std::sort(bb.pbase(), bb.pend(), std::greater<indexed_entry<double> >());
-
-			// generate m_I, m_F, and calculate avg_searchlen
-
-			block<T> *pbI = new block<T>(K);
-			block<double> *pbF = new block<double>(K);
-
-			T *I = pbI->pbase();
-			double *F = pbF->pbase();
-
-			double lastF = 0;
-			m_avg_searchlen = 0;
-			for (size_t k = 0; k < K; ++k)
-			{
-				I[k] = bb[k].index;
-				double p = bb[k].value;
-				F[k] = (lastF += p);
-				m_avg_searchlen += (k+1) * p;
-			}
-			m_avg_searchlen += (1 - lastF) * K;
-
-			m_I.reset(pbI);
-			m_F.reset(pbF);
-		}
-
+		void _init_internal(size_t K, const double *p);
 
 	private:
 		value_type m_K;
@@ -198,11 +144,97 @@ namespace bcs
 	}; // end class discrete_sampler
 
 
+	template<typename T>
+	void discrete_sampler<T>::get_multi_by_sort(size_t len, const double *u, T *dst, indexed_entry<double>* ws)
+	{
+		// prepare work space
+		block<indexed_entry<double> > *p_wsblk = 0;
+		if (ws == 0)
+		{
+			p_wsblk = new block<indexed_entry<double> >(len);
+			ws = p_wsblk->pbase();
+		}
+
+		// sort u with indices
+
+		copy_elements_attach_indices(u, ws, len);
+		std::sort(ws, ws + len);
+
+		// do assignment
+
+		size_t i = 0;
+		T k = T(0);
+		double F_k = m_F[0];
+		double I_k = m_I[0];
+
+		while (i < len && k < m_K)
+		{
+			if (ws[i].value <= F_k)
+			{
+				dst[ws[i].index] = I_k;
+				++ i;
+			}
+			else
+			{
+				++ k;
+				F_k = m_F[(int)k];
+				I_k = m_I[(int)k];
+			}
+		}
+
+		// remaining one
+
+		while (i < len)
+		{
+			dst[ws[i++].index] = m_K;
+		}
+
+		// finalize
+
+		if (p_wsblk != 0)
+		{
+			delete p_wsblk;
+		}
+	}
+
+	template<typename T>
+	void discrete_sampler<T>::_init_internal(size_t K, const double *p)
+	{
+		// sort p in descending order with indices
+
+		block<indexed_entry<double> > bb(K);
+		copy_elements_attach_indices(p, bb.pbase(), K);
+		std::sort(bb.pbase(), bb.pend(), std::greater<indexed_entry<double> >());
+
+		// generate m_I, m_F, and calculate avg_searchlen
+
+		block<T> *pbI = new block<T>(K);
+		block<double> *pbF = new block<double>(K);
+
+		T *I = pbI->pbase();
+		double *F = pbF->pbase();
+
+		double lastF = 0;
+		m_avg_searchlen = 0;
+		for (size_t k = 0; k < K; ++k)
+		{
+			I[k] = bb[k].index;
+			double p = bb[k].value;
+			F[k] = (lastF += p);
+			m_avg_searchlen += p * (k+1);
+		}
+		m_avg_searchlen += (1 - lastF) * K;
+
+		m_I.reset(pbI);
+		m_F.reset(pbF);
+	}
+
+
 
 	/**
 	 * The class to represent a generic discrete distribution
 	 *
-	 * over [0, m-1]
+	 * over [0, K-1]
 	 */
 	template<typename T>
 	class discrete_distr
@@ -250,6 +282,11 @@ namespace bcs
 		sampler_type get_sampler()
 		{
 			return sampler_type(m_K, m_p);
+		}
+
+		sampler_type get_sampler(typename sampler_type::methods method)
+		{
+			return sampler_type(m_K, m_p, method);
 		}
 
 

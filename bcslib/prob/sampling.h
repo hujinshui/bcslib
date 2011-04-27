@@ -27,6 +27,61 @@
 namespace bcs
 {
 
+	class real_stream_for_diagnosis
+	{
+	public:
+		real_stream_for_diagnosis(size_t n, const double *src)
+		: m_n(n), m_src(src), m_i(0)
+		{
+		}
+
+		void reset()
+		{
+			m_i = 0;
+		}
+
+		void seed(unsigned long s)
+		{
+			m_i = static_cast<size_t>(s % static_cast<unsigned long>(m_n));
+		}
+
+		double randf64()
+		{
+			double v = m_src[m_i];
+			m_i = (m_i + 1) % m_n;
+			return v;
+		}
+
+		float randf32()
+		{
+			return static_cast<float>(randf64());
+		}
+
+		void randf64_vec(size_t len, double *buf)
+		{
+			for (size_t i = 0; i < len; ++i)
+			{
+				buf[i] = randf64();
+			}
+		}
+
+		void randf32_vec(size_t len, float *buf)
+		{
+			for (size_t i = 0; i < len; ++i)
+			{
+				buf[i] = randf32();
+			}
+		}
+
+	private:
+		size_t m_n;
+		const double *m_src;
+		size_t m_i;
+
+	}; // end class real_stream_for_testing
+
+
+
 	typedef std::tr1::mt19937 default_tr1_rand_engine;
 
 	template<typename TEngine32=default_tr1_rand_engine>  // TEngine32 must generates 32-bit random bits
