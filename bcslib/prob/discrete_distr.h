@@ -180,7 +180,7 @@ namespace bcs
 				F[k] = (lastF += p);
 				m_avg_searchlen += (k+1) * p;
 			}
-			m_avg_searchlen += (1 - F) * K;
+			m_avg_searchlen += (1 - lastF) * K;
 
 			m_I.reset(pbI);
 			m_F.reset(pbF);
@@ -260,83 +260,18 @@ namespace bcs
 	}; // end class discrete_distr
 
 
-	template<typename T>
-	class discrete_distr_set : public pdistribution_set_t<discrete_distr<T> >
-	{
-	public:
-		typedef discrete_distr<T> distribution_type;
-		typedef typename distribution_type::value_type value_type;
-		typedef typename distribution_type::sample_type sample_type;
-
-	public:
-		discrete_distr_set(T m, size_t n, const double *p)
-		: m_m(m), m_n(n), m_p(p)
-		{
-		}
-
-		size_t dim() const
-		{
-			return 1;
-		}
-
-		size_t domain_size() const
-		{
-			return (size_t)m_m;
-		}
-
-		size_t ndistrs() const
-		{
-			return m_n;
-		}
-
-		value_type m() const
-		{
-			return m_m;
-		}
-
-		distribution_type distribution(size_t i) const
-		{
-			return distribution_type(m_m, m_p + m_m * i);
-		}
-
-	private:
-		value_type m_m;
-		size_t m_n;
-		const double *m_p;
-
-	}; // end class discrete_distr_set
-
-
 	/**
 	 * Make a uniform discrete distribution on a buffer and return
 	 */
 	template<typename T>
 	inline discrete_distr<T> make_uniform_discrete_distr(T m, double *p)
 	{
-		double pv = 1.0 / ds;
+		double pv = 1.0 / double(m);
 		for (T i = 0; i < m; ++i)
 		{
 			p[i] = pv;
 		}
 		return discrete_distr<T>(m, p);
-	}
-
-
-	/**
-	 * Make a set of uniform distributions on a buffer and return
-	 */
-	template<typename T>
-	discrete_distr_set<T> make_uniform_discrete_distr_set(T m, size_t n, double *p)
-	{
-		double pv = 1.0 / ds;
-
-		size_t N = (size_t)m * n;
-		for (size_t i = 0; i < N; ++i)
-		{
-			p[i] = pv;
-		}
-
-		return discrete_distr_set<T>(m, n, p);
 	}
 
 
@@ -351,7 +286,7 @@ namespace bcs
 	template<typename TValue>
 	void normalize_exp(size_t n, const TValue *ps, TValue *pd)
 	{
-		TValue mv = ps[i];
+		TValue mv = ps[0];
 		for (size_t i = 1; i < n; ++i)
 		{
 			if (ps[i] > mv) mv = ps[i];
@@ -372,21 +307,12 @@ namespace bcs
 
 
 	template<typename T>
-	inline discrete_distr<T> make_discrete_distr_nrmexp(T m, const double *x, double *p)
+	inline discrete_distr<T> make_discrete_distr_by_nrmexp(T m, const double *x, double *p)
 	{
 		normalize_exp((size_t)m, x, p);
 		return discrete_distr<T>(m, p);
 	}
 
-	template<typename T>
-	discrete_distr<T> make_discrete_distr_set_nrmexp(size_t m, size_t n, const double *x, double *p)
-	{
-		for (size_t i = 0; i < n; ++i)
-		{
-			normalize_exp((size_t)m, x + i * m, p + i * m);
-		}
-		return discrete_distr_set<T>(m, n, p);
-	}
 
 }
 

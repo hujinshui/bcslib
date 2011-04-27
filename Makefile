@@ -57,11 +57,13 @@ bin/test_geometry_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(GEOMETRY_BASIC_HEADE
 IMAGE_BASIC_TESTS = test/test_image_basics.cpp test/test_image_views.cpp
 bin/test_image_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(IMAGE_BASIC_HEADERS) $(IMAGE_BASIC_TESTS)
 	$(CC) $(CFLAGS) $(IMAGE_BASIC_TESTS) -o bin/test_image_basics
+	 
+bin/test_psampling: $(BASE_HEADERS) $(TEST_HEADERS) $(PROB_BASIC_HEADERS) test/test_psampling.cpp
+	$(CC) $(CFLAGS) -O2 test/test_psampling.cpp -o bin/test_psampling
 	
-PROB_BASIC_TESTS = test/test_psampling.cpp
-bin/test_psampling: $(BASE_HEADERS) $(TEST_HEADERS) $(PROB_BASIC_HEADERS) $(PROB_BASIC_TESTS)
-	$(CC) $(CFLAGS) -O2 $(PROB_BASIC_TESTS) -o bin/test_psampling
-	
+PROB_BASIC_TESTS = test/test_prob_basics.cpp test/test_discrete_distr.cpp
+bin/test_prob_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(PROB_BASIC_HEADERS) $(PROB_BASIC_TESTS)
+	$(CC) $(CFLAGS) $(PROB_BASIC_TESTS) -o bin/test_prob_basics
 
 
 clean:
