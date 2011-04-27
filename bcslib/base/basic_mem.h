@@ -42,6 +42,25 @@ namespace bcs
             for (size_t i = 0; i < n; ++i) dst[i] = v;
     }
 
+    template<typename T, typename TIndex>
+    inline void copy_elements_attach_indices(const T *src, indexed_entry<T, TIndex>* dst, size_t n)
+    {
+    	for (size_t i = 0; i < n; ++i)
+    	{
+    		dst[i].set(src[i], static_cast<TIndex>(i));
+    	}
+    }
+
+    template<typename T, typename TIndex>
+    inline void copy_elements_detach_indices(const indexed_entry<T, TIndex>* src, T *dst, size_t n)
+    {
+    	for (size_t i = 0; i < n; ++i)
+    	{
+    		dst[i] = src[i].value;
+    	}
+    }
+
+
 
     /**
      *  The class to refer to a block of read/write memory that

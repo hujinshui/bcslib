@@ -8,95 +8,114 @@
 
 #include <bcslib/prob/sampling.h>
 #include <cstdio>
+#include <ctime>
+#include <limits>
 
 using namespace bcs;
 
-template class uniform_rgen<double>;
-template class duniform_rgen<int32_t>;
-template class normal_rgen<double>;
-template class bernoulli_rgen<>;
-template class geometric_rgen<int32_t>;
-template class poisson_rgen<int32_t>;
-template class binomial_rgen<int32_t>;
-template class exponential_rgen<double>;
-template class gamma_rgen<double>;
 
-
-template<typename TGen>
-void print_gen(const char *title, size_t n, const char *fmt, TGen& gen)
+struct bstat
 {
-	std::printf("%s: ", title);
+	double mean;
+	double var;
+	double skewness;
+	double kurtosis;
+};
+
+
+bstat do_stat(size_t n, double *x)
+{
+	double s1 = 0;
+	double s2 = 0;
+	double s3 = 0;
+	double s4 = 0;
+
 	for (size_t i = 0; i < n; ++i)
 	{
-		std::printf(fmt, gen());
-		std::printf(" ");
+		double v = x[i];
+		s1 += v;
 	}
-	std::printf("\n");
-}
+	double mv = s1 / n;
 
-template<typename TGen>
-void print_gen_b(const char *title, size_t n, const char *fmt, TGen& gen)
-{
-	std::printf("%s: ", title);
 	for (size_t i = 0; i < n; ++i)
 	{
-		std::printf(fmt, (int)gen());
-		std::printf(" ");
-	}
-	std::printf("\n");
-}
+		double v1 = x[i] - mv;
+		double v2 = v1 * v1;
+		double v3 = v2 * v1;
+		double v4 = v2 * v2;
 
+		s2 += v2;
+		s3 += v3;
+		s4 += v4;
+	}
+
+	bstat bs;
+
+	bs.mean = mv;
+	bs.var = s2 / n;
+	bs.skewness = (s3 / n) / std::pow(s2, 1.5);
+	bs.kurtosis = (s4 / n) / sqr(bs.var) - 3;
+
+	return bs;
+}
 
 
 int main(int argc, char *argv[])
 {
-
-	default_tr1_rgen_engine reng;
-
-	duniform_rgen<int32_t> g1(reng, 5);
-	std::printf("g1: duniform<int>: min = %d, max = %d\n", g1.min(), g1.max());
-	print_gen("g1", 15, "%d", g1);
+	std::printf("Test the performance of random number generation:\n");
+	std::printf("--------------------------------------------------\n");
+	std::printf("[1] uniform \n");
+	std::printf("[2] normal \n");
+	std::printf("[3] exponential \n");
+	std::printf("-----------------\n");
+	std::printf("[0] exit\n");
 	std::printf("\n");
 
-	uniform_rgen<double> g2(reng, -2, 4);
-	std::printf("g2: uniform<double>: min = %g, max = %g\n", g2.min(), g2.max());
-	print_gen("g2", 20, "%.2f", g2);
-	std::printf("\n");
+	std::printf("Your choice: ");
+	int choice;
+	std::scanf("%d", &choice);
 
-	normal_rgen<double> g3(reng, 0, 10);
-	std::printf("g3: normal<double>: mean = %g, sigma = %g\n", g3.mean(), g3.sigma());
-	print_gen("g3", 20, "%.2f", g3);
-	std::printf("\n");
 
-	bernoulli_rgen<> g4(reng, 0.8);
-	std::printf("g4: bernoulli<bool>: p = %g\n", g4.p());
-	print_gen_b("g4", 20, "%d", g4);
-	std::printf("\n");
+	randstream<> rstream;
+	rstream.seed( std::time(0) );
 
-	geometric_rgen<int32_t> g5(reng, 0.2);
-	std::printf("g5: geometric<int>: p = %g, mean = %g\n", g5.p(), g5.mean());
-	print_gen("g5", 20, "%d", g5);
-	std::printf("\n");
+	const size_t len = 10000000;
+	static double reals[len];
 
-	poisson_rgen<int32_t> g6(reng, 5.0);
-	std::printf("g6: poisson<rgen>: mean = %g\n", g6.mean());
-	print_gen("g6", 20, "%d", g6);
-	std::printf("\n");
+	std::clock_t start, elapsed;
+	if (choice == 1)
+	{
+		start = std::clock();
+		real_rng<double>::get_uniform(rstream, len, reals);
+		elapsed = std::clock() - start;
+	}
+	else if (choice == 2)
+	{
+		start = std::clock();
+		real_rng<double>::get_normal(rstream, len, reals);
+		elapsed = std::clock() - start;
+	}
+	else if (choice == 3)
+	{
+		start = std::clock();
+		real_rng<double>::get_exponential(rstream, len, reals);
+		elapsed = std::clock() - start;
+	}
+	else
+	{
+		return 0;  // exit
+	}
 
-	binomial_rgen<int32_t> g7(reng, 10, 0.3);
-	std::printf("g7: binomial<int>: n = %d, p = %g\n", g7.n(), g7.p());
-	print_gen("g7", 20, "%d", g7);
-	std::printf("\n");
 
-	exponential_rgen<double> g8(reng, 0.2);
-	std::printf("g8: exponential<double>: mean = %g\n", g8.mean());
-	print_gen("g8", 15, "%.2f", g8);
-	std::printf("\n");
+	double elapsed_secs = (double)elapsed / CLOCKS_PER_SEC;
+	std::printf("elapsed = %.4f sec\n", elapsed_secs);
+	std::printf("rate = %.2f Msamples / sec\n", (len / (1e6 * elapsed_secs)));
 
-	gamma_rgen<double> g9(reng);
-	std::printf("g9: gamma<double>: alpha = %g\n", g9.alpha());
-	print_gen("g9", 10, "%.2f", g9);
-	std::printf("\n");
+	bstat bs = do_stat(len, reals);
+	std::printf("mean = %.4f\n", bs.mean);
+	std::printf("var  = %.4f\n", bs.var);
+	std::printf("skew = %.4f\n", bs.skewness);
+	std::printf("kurt = %.4f\n", bs.kurtosis);
 
 	return 0;
 }
