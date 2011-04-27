@@ -15,6 +15,7 @@
 #include <bcslib/base/basic_funcs.h>
 
 #include <limits>
+#include <cmath>
 
 #if ((BCSLIB_COMPILER == BCSLIB_GCC) && (__GNUC_MINOR__ <= 2))
 #include <boost/tr1/random.hpp>  	// g++ 4.2 has several bugs in <random>
@@ -26,448 +27,307 @@
 namespace bcs
 {
 
-	typedef std::tr1::mt19937 default_tr1_rgen_engine;
+	typedef std::tr1::mt19937 default_tr1_rand_engine;
 
-
-	template<typename T, class TEngine=default_tr1_rgen_engine>
-	class uniform_rgen
+	template<typename TEngine32=default_tr1_rand_engine>  // TEngine32 must generates 32-bit random bits
+	class randstream
 	{
 	public:
-		typedef TEngine engine_type;
-		typedef std::tr1::uniform_real<T> distribution_type;
-		typedef T result_type;
+		typedef typename TEngine32::result_type engine_result_type;
 
-		explicit uniform_rgen(engine_type& eng)
-		: m_gen(eng, distribution_type())
+	public:
+		explicit randstream(const TEngine32& eng = TEngine32())
+		: m_eng(eng)
 		{
 		}
 
-		uniform_rgen(engine_type& eng, result_type ub)
-		: m_gen(eng, distribution_type(0, ub))
+		void seed(unsigned long s)
+		{
+			m_eng.seed(s);
+		}
+
+		uint32_t randu32()
+		{
+			return m_eng();
+		}
+
+		void randu32_vec(size_t len, uint32_t *buf)
+		{
+			for (size_t i = 0; i < len; ++i)
+			{
+				buf[i] = randu32();
+			}
+		}
+
+		int32_t randi32()
+		{
+			return (int32_t)randu32();
+		}
+
+		void randi32_vec(size_t len, int32_t *buf)
+		{
+			uint32_t *ubuf = reinterpret_cast<uint32_t*>(buf);
+			for (size_t i = 0; i < len; ++i)
+			{
+				ubuf[i] = randu32();
+			}
+		}
+
+		float randf32()
+		{
+			return float(m_eng()) / std::numeric_limits<uint32_t>::max();
+		}
+
+		void randf32_vec(size_t len, float *buf)
+		{
+			for (size_t i = 0; i < len; ++i)
+			{
+				buf[i] = randf32();
+			}
+		}
+
+		double randf64()
+		{
+			return double(m_eng()) / std::numeric_limits<uint32_t>::max();
+		}
+
+		void randf64_vec(size_t len, double *buf)
+		{
+			for (size_t i = 0; i < len; ++i)
+			{
+				buf[i] = randf64();
+			}
+		}
+
+
+	private:
+		TEngine32 m_eng;
+
+	}; // end class randstream
+
+
+	/******************************************************
+	 *
+	 * Convenient functors
+	 *
+	 *****************************************************/
+
+	/**
+	 * a functor for generating random uint32_t value up to n
+	 *
+	 * useful for working with functions like std::random_shuffle
+	 */
+	template<class RStream>
+	class randu32_functor
+	{
+	public:
+		explicit randu32_functor(RStream& rstream) : m_rstream(rstream)
 		{
 		}
 
-		uniform_rgen(engine_type& eng, result_type lb, result_type ub)
-		: m_gen(eng, distribution_type(lb, ub))
+		uint32_t operator() (uint32_t n)
 		{
-		}
-
-		result_type min() const
-		{
-			return m_gen.distribution().min();
-		}
-
-		result_type max() const
-		{
-			return m_gen.distribution().max();
-		}
-
-		result_type mean() const
-		{
-			return (min() + max()) / 2;
-		}
-
-		result_type span() const
-		{
-			return max() - min();
-		}
-
-		result_type variance() const
-		{
-			result_type s = span();
-			return  (s / 12) * s;
-		}
-
-		result_type operator()()
-		{
-			return m_gen();
+			return m_rstream.randu32() % n;
 		}
 
 	private:
-		std::tr1::variate_generator<engine_type&, distribution_type> m_gen;
+		RStream& m_rstream;
+	};
 
-	}; // end class uniform_rgen
 
-
-	template<typename T, class TEngine=default_tr1_rgen_engine>
-	class duniform_rgen
+	template<class RStream>
+	inline randu32_functor<RStream> randu32_fun(RStream& rstream)
 	{
-	public:
-		typedef TEngine engine_type;
-		typedef std::tr1::uniform_int<T> distribution_type;
-		typedef T result_type;
-
-		explicit duniform_rgen(engine_type& eng)
-		: m_gen(eng, distribution_type())
-		{
-		}
-
-		duniform_rgen(engine_type& eng, result_type ub)
-		: m_gen(eng, distribution_type(0, ub))
-		{
-		}
-
-		duniform_rgen(engine_type& eng, result_type lb, result_type ub)
-		: m_gen(eng, distribution_type(lb, ub))
-		{
-		}
-
-		result_type min() const
-		{
-			return m_gen.distribution().min();
-		}
-
-		result_type max() const
-		{
-			return m_gen.distribution().max();
-		}
-
-		double mean() const
-		{
-			return (min() + max()) * 0.5;
-		}
-
-		result_type span() const
-		{
-			return max() - min();
-		}
-
-		result_type num() const
-		{
-			return span() + 1;
-		}
-
-		double variance() const
-		{
-			double n = num();
-			return  (n*n - 1) / 12;
-		}
-
-		result_type operator()()
-		{
-			return m_gen();
-		}
-
-	private:
-		std::tr1::variate_generator<engine_type&, distribution_type> m_gen;
-
-	}; // end class duniform_rgen
-
-
-
-
-	template<typename T, class TEngine=default_tr1_rgen_engine>
-	class normal_rgen
-	{
-	public:
-		typedef TEngine engine_type;
-		typedef std::tr1::normal_distribution<T> distribution_type;
-		typedef T result_type;
-
-		explicit normal_rgen(engine_type& eng)
-		: m_gen(eng, distribution_type())
-		{
-		}
-
-		normal_rgen(engine_type& eng, result_type sig)
-		: m_gen(eng, distribution_type(0, sig))
-		{
-		}
-
-		normal_rgen(engine_type& eng, result_type mu, result_type sig)
-		: m_gen(eng, distribution_type(mu, sig))
-		{
-		}
-
-		result_type mean() const
-		{
-			return m_gen.distribution().mean();
-		}
-
-		result_type sigma() const
-		{
-			return m_gen.distribution().sigma();
-		}
-
-		result_type variance() const
-		{
-			return sqr(m_gen.distribution().sigma());
-		}
-
-		result_type operator()()
-		{
-			return m_gen();
-		}
-
-	private:
-		std::tr1::variate_generator<engine_type&, distribution_type> m_gen;
-
-	}; // end class normal_rgen
-
-
-	template<class TEngine=default_tr1_rgen_engine>
-	class bernoulli_rgen
-	{
-	public:
-		typedef TEngine engine_type;
-		typedef std::tr1::bernoulli_distribution distribution_type;
-		typedef bool result_type;
-
-		explicit bernoulli_rgen(engine_type& eng)
-		: m_gen(eng, distribution_type())
-		{
-		}
-
-		bernoulli_rgen(engine_type& eng, double p)
-		: m_gen(eng, distribution_type(p))
-		{
-		}
-
-		double p() const
-		{
-			return m_gen.distribution().p();
-		}
-
-		double mean() const
-		{
-			return p();
-		}
-
-		double variance() const
-		{
-			return p() * (1 - p());
-		}
-
-		result_type operator()()
-		{
-			return m_gen();
-		}
-
-	private:
-		std::tr1::variate_generator<engine_type&, distribution_type> m_gen;
-
-	}; // end class bernoulli_rgen
+		return randu32_functor<RStream>(rstream);
+	}
 
 
 	/**
-	 * The random number generator for geometric distribution
-	 *
-	 * Note: we use the definition by pmf(k) = (1-p)^{k-1} p
+	 * a functor for generating random double real values
 	 */
-	template<typename T, class TEngine=default_tr1_rgen_engine>
-	class geometric_rgen
+	template<class RStream>
+	class rand_real_functor
 	{
 	public:
-		typedef TEngine engine_type;
-		typedef std::tr1::geometric_distribution<T, double> distribution_type;
-		typedef T result_type;
-
-		explicit geometric_rgen(engine_type& eng)
-		: m_gen(eng, distribution_type())
+		explicit rand_real_functor(RStream& rstream) : m_rstream(rstream)
 		{
 		}
 
-		geometric_rgen(engine_type& eng, double p)
-		: m_gen(eng, distribution_type(1-p))
+		double operator()()
 		{
-		}
-
-		double p() const
-		{
-			return 1 - m_gen.distribution().p();
-		}
-
-		double mean() const
-		{
-			return 1.0 / p();
-		}
-
-		double variance() const
-		{
-			return (1 - p()) / sqr(p());
-		}
-
-		result_type operator()()
-		{
-			return m_gen();
+			return m_rstream.randf64();
 		}
 
 	private:
-		std::tr1::variate_generator<engine_type&, distribution_type> m_gen;
+		RStream& m_rstream;
+	};
 
-	}; // end class geometric_rgen
+
+	template<class RStream>
+	inline rand_real_functor<RStream> rand_real_fun(RStream& rstream)
+	{
+		return rand_real_functor<RStream>(rstream);
+	}
 
 
-	template<typename T, class TEngine=default_tr1_rgen_engine>
-	class poisson_rgen
+	/******************************************************
+	 *
+	 * distribution-specific RNGs
+	 *
+	 *****************************************************/
+
+	namespace _detail
+	{
+
+		template<class RStream, typename TReal> struct rand_real_helper;
+
+		template<class RStream>
+		struct rand_real_helper<RStream, float>
+		{
+			static float gen(RStream& rstream)
+			{
+				return rstream.randf32();
+			}
+
+			static void gen_vec(RStream& rstream, size_t len, float *buf)
+			{
+				rstream.randf32_vec(len, buf);
+			}
+		};
+
+
+		template<class RStream>
+		struct rand_real_helper<RStream, double>
+		{
+			static double gen(RStream& rstream)
+			{
+				return rstream.randf64();
+			}
+
+			static void gen_vec(RStream& rstream, size_t len, double *buf)
+			{
+				rstream.randf64_vec(len, buf);
+			}
+		};
+
+	}
+
+
+	template<class RStream>
+	inline bool get_bernoulli(RStream& rs, double p)
+	{
+		return rs.randf64() < p;
+	}
+
+
+	template<typename TInt, class RStream=randstream<> >
+	class int_rng
 	{
 	public:
-		typedef TEngine engine_type;
-		typedef std::tr1::poisson_distribution<T, double> distribution_type;
-		typedef T result_type;
+		typedef TInt value_type;
+		typedef RStream rstream_type;
 
-		explicit poisson_rgen(engine_type& eng)
-		: m_gen(eng, distribution_type())
+	public:
+		static value_type get_uniform(rstream_type& rs, value_type n)  // ~ [0, n-1]
 		{
+			return static_cast<value_type>(rs.randu32() % static_cast<uint32_t>(n));
 		}
 
-		poisson_rgen(engine_type& eng, double mu)
-		: m_gen(eng, distribution_type(mu))
+		static void get_uniform(rstream_type& rs, value_type n, size_t len, value_type *buf)
 		{
+			for (size_t i = 0; i < len; ++i)
+			{
+				buf[i] = get_uniform(rs, n);
+			}
 		}
 
-		double mean() const
+	}; // end class int_rng
+
+
+	template<typename TReal, class RStream=randstream<> >
+	class real_rng
+	{
+	public:
+		typedef TReal value_type;
+		typedef RStream rstream_type;
+
+	private:
+		typedef _detail::rand_real_helper<rstream_type, value_type> _helper;
+		static const value_type two_pi = value_type(2 * 3.14159265358979323846);
+
+	public:
+		static value_type get_uniform(rstream_type& rs) // ~ U[0, 1)
 		{
-			return m_gen.distribution().mean();
+			return _helper::gen(rs);
 		}
 
-		double variance() const
+		static void get_uniform(rstream_type& rs, size_t len, value_type *buf)
 		{
-			return mean();
+			_helper::gen_vec(rs, len, buf);
 		}
 
-		result_type operator()()
+		static value_type get_normal(rstream_type& rs) // ~ N(0, 1)
 		{
-			return m_gen();
+			value_type u = _helper::gen(rs);
+			value_type v = _helper::gen(rs);
+			value_type x;
+			normal_transform(u, v, x);
+			return x;
+		}
+
+		static void get_normal(rstream_type& rs, size_t len, value_type *buf)
+		{
+			_helper::gen_vec(rs, len, buf);
+			size_t m = len >> 1;
+			for (size_t k = 0; k < m; ++k)
+			{
+				normal_transform(buf[0], buf[1], buf[0], buf[1]);
+				buf += 2;
+			}
+
+			if (len & size_t(1))
+			{
+				normal_transform(*buf, _helper::gen(rs), *buf);
+			}
+		}
+
+		static value_type get_exponential(rstream_type& rs)  // ~ Exp(1)
+		{
+			value_type u = _helper::gen(rs);
+			return -std::log(u);
+		}
+
+		static void get_exponential(rstream_type& rs, size_t len, value_type *buf)
+		{
+			_helper::gen_vec(rs, len, buf);
+			for (size_t i = 0; i < len; ++i)
+			{
+				exp_transform(buf[i]);
+			}
 		}
 
 	private:
-		std::tr1::variate_generator<engine_type&, distribution_type> m_gen;
-
-	}; // end class poisson_rgen
-
-
-	template<typename T, class TEngine=default_tr1_rgen_engine>
-	class binomial_rgen
-	{
-	public:
-		typedef TEngine engine_type;
-		typedef std::tr1::binomial_distribution<T, double> distribution_type;
-		typedef T result_type;
-
-		binomial_rgen(engine_type& eng, result_type n, double p = 0.5)
-		: m_gen(eng, distribution_type(n, p))
+		static void normal_transform(value_type u, value_type v, value_type& x0)
 		{
+			x0 = std::sqrt((-2) * std::log(u)) * std::cos( two_pi * v );
 		}
 
-		double p() const
+		static void normal_transform(value_type u, value_type v, value_type& x0, value_type& x1)
 		{
-			return m_gen.distribution().p();
+			value_type r = std::sqrt((-2) * std::log(u));
+			value_type t = two_pi * v;
+			x0 = r * std::cos(t);
+			x1 = r * std::sin(t);
 		}
 
-		result_type n() const
+		static void exp_transform(value_type& u)
 		{
-			return m_gen.distribution().t();
+			u = -std::log(u);
 		}
 
-		double mean() const
-		{
-			return n() * p();
-		}
-
-		double variance() const
-		{
-			return n() * p() * (1 - p());
-		}
-
-		result_type operator()()
-		{
-			return m_gen();
-		}
-
-	private:
-		std::tr1::variate_generator<engine_type&, distribution_type> m_gen;
-
-	}; // end class binomial_rgen
+	}; // end class real_rng
 
 
-	template<typename T, class TEngine=default_tr1_rgen_engine>
-	class exponential_rgen
-	{
-	public:
-		typedef TEngine engine_type;
-		typedef std::tr1::exponential_distribution<T> distribution_type;
-		typedef T result_type;
-
-		explicit exponential_rgen(engine_type& eng)
-		: m_gen(eng, distribution_type())
-		{
-		}
-
-		exponential_rgen(engine_type& eng, result_type lambda)
-		: m_gen(eng, distribution_type(lambda))
-		{
-		}
-
-		result_type lambda() const
-		{
-			return m_gen.distribution().lambda();
-		}
-
-		result_type mean() const
-		{
-			return T(1) / lambda();
-		}
-
-		result_type variance() const
-		{
-			return sqr(mean());
-		}
-
-		result_type operator()()
-		{
-			return m_gen();
-		}
-
-	private:
-		std::tr1::variate_generator<engine_type&, distribution_type> m_gen;
-
-	}; // end class exponential_rgen
-
-
-
-	template<typename T, class TEngine=default_tr1_rgen_engine>
-	class gamma_rgen
-	{
-	public:
-		typedef TEngine engine_type;
-		typedef std::tr1::gamma_distribution<T> distribution_type;
-		typedef T result_type;
-
-		explicit gamma_rgen(engine_type& eng)
-		: m_gen(eng, distribution_type())
-		{
-		}
-
-		gamma_rgen(engine_type& eng, result_type alpha)
-		: m_gen(eng, distribution_type(alpha))
-		{
-		}
-
-		result_type alpha() const
-		{
-			return m_gen.distribution().alpha();
-		}
-
-		result_type mean() const
-		{
-			return alpha();
-		}
-
-		result_type variance() const
-		{
-			return alpha();
-		}
-
-		result_type operator()()
-		{
-			return m_gen();
-		}
-
-	private:
-		std::tr1::variate_generator<engine_type&, distribution_type> m_gen;
-
-	}; // end class gamma_rgen
 
 }
 

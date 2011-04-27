@@ -64,6 +64,65 @@ namespace bcs
 
 	typedef uint8_t byte;
 
+
+	// value associated with index (particularly useful for sorting or re-arrangement)
+
+	template<typename T, typename TIndex=uint32_t>
+	struct indexed_entry
+	{
+		typedef T value_type;
+		typedef TIndex index_type;
+
+		value_type value;
+		index_type index;
+
+		void set(const value_type& v, const index_type& i)
+		{
+			value = v;
+			index = i;
+		}
+	};
+
+
+	template<typename T, typename TIndex>
+	inline bool operator == (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
+	{
+		return lhs.value == rhs.value;
+	}
+
+	template<typename T, typename TIndex>
+	inline bool operator != (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
+	{
+		return lhs.value != rhs.value;
+	}
+
+	template<typename T, typename TIndex>
+	inline bool operator < (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
+	{
+		return lhs.value < rhs.value;
+	}
+
+	template<typename T, typename TIndex>
+	inline bool operator <= (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
+	{
+		return lhs.value <= rhs.value;
+	}
+
+	template<typename T, typename TIndex>
+	inline bool operator > (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
+	{
+		return lhs.value > rhs.value;
+	}
+
+	template<typename T, typename TIndex>
+	inline bool operator >= (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
+	{
+		return lhs.value >= rhs.value;
+	}
+
+
+	// copy tags
+
 	struct clone_t { };
 	struct own_t { };
 	struct ref_t { };
