@@ -7,6 +7,8 @@
  */
 
 #include <bcslib/prob/sampling.h>
+#include <bcslib/prob/discrete_distr.h>
+
 #include <cstdio>
 #include <ctime>
 #include <limits>
@@ -64,10 +66,12 @@ int main(int argc, char *argv[])
 {
 	std::printf("Test the performance of random number generation:\n");
 	std::printf("--------------------------------------------------\n");
-	std::printf("[1] uniform \n");
-	std::printf("[2] normal \n");
-	std::printf("[3] exponential \n");
-	std::printf("-----------------\n");
+	std::printf("[1] standard uniform \n");
+	std::printf("[2] standard normal \n");
+	std::printf("[3] standard exponential \n");
+	std::printf("[11] discrete (K = 100) direct\n");
+	std::printf("[12] discrete (K = 100) sort \n");
+	std::printf("----------------------------------\n");
 	std::printf("[0] exit\n");
 	std::printf("\n");
 
@@ -81,6 +85,7 @@ int main(int argc, char *argv[])
 
 	const size_t len = 10000000;
 	static double reals[len];
+	static int32_t ints[len];
 
 	std::clock_t start, elapsed;
 	if (choice == 1)
@@ -101,6 +106,43 @@ int main(int argc, char *argv[])
 		real_rng<double>::get_exponential(rstream, len, reals);
 		elapsed = std::clock() - start;
 	}
+	else if (choice / 10 == 1)
+	{
+		int32_t K = 100;
+		block<double> p((size_t)K);
+		double sp = 0;
+		for (int k = 0; k < K; ++k)
+		{
+			sp += (p[k] = rstream.randf64());
+		}
+		for (int k = 0; k < K; ++k)
+		{
+			p[k] /= sp;
+		}
+
+		if (choice == 11)
+		{
+			discrete_sampler<int32_t> sp(K, p.pbase(), discrete_sampler<int32_t>::DSAMP_DIRECT_METHOD);
+			std::printf("avg.slen = %.2f\n", sp.average_search_length());
+
+			start = std::clock();
+			sp(rstream, len, ints);
+			elapsed = std::clock() - start;
+		}
+		else if (choice == 12)
+		{
+			discrete_sampler<int32_t> sp(K, p.pbase(), discrete_sampler<int32_t>::DSAMP_SORT_METHOD);
+			std::printf("avg.slen = %.2f\n", sp.average_search_length());
+
+			start = std::clock();
+			sp(rstream, len, ints);
+			elapsed = std::clock() - start;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 	else
 	{
 		return 0;  // exit
@@ -111,11 +153,7 @@ int main(int argc, char *argv[])
 	std::printf("elapsed = %.4f sec\n", elapsed_secs);
 	std::printf("rate = %.2f Msamples / sec\n", (len / (1e6 * elapsed_secs)));
 
-	bstat bs = do_stat(len, reals);
-	std::printf("mean = %.4f\n", bs.mean);
-	std::printf("var  = %.4f\n", bs.var);
-	std::printf("skew = %.4f\n", bs.skewness);
-	std::printf("kurt = %.4f\n", bs.kurtosis);
+	std::printf("\n");
 
 	return 0;
 }
