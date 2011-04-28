@@ -30,7 +30,7 @@ test_array : bin/test_array_basics bin/test_array_comp bin/test_access_performan
 test_graph : bin/test_graph_basics
 test_geometry : bin/test_geometry_basics
 test_image: bin/test_image_basics
-test_prob: bin/test_prob_basics 
+test_prob: bin/test_prob_basics bin/test_psampling
 
 ARRAY_BASIC_TESTS = test/test_array_basics.cpp test/test_index_selection.cpp test/test_array1d.cpp test/test_array2d.cpp
 bin/test_array_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 

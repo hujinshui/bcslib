@@ -97,7 +97,7 @@ namespace bcs
 		void operator() (RStream& rs, size_t len, T *buf)
 		{
 			bool use_sort = (m_method == DSAMP_SORT_METHOD) ||
-					(m_method == DSAMP_AUTO && double(m_K) > 3 * m_avg_searchlen);
+					(m_method == DSAMP_AUTO && m_avg_searchlen > 5 * std::log(double(len)) + 3 );
 
 			block<double> ublk(len);
 			rs.randf64_vec(len, ublk.pbase());
