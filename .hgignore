@@ -5,5 +5,15 @@ syntax: glob
 Debug/*
 temp/*
 bin/*
-
+*.exe
+*.obj
+*.sdf
+*.suo
+*.pdb
+*.log
+*.tlog
+*.user
+*.ipch
+*.intermediate.manifest
+*.lastbuildstate
 
