@@ -31,6 +31,15 @@
     <Filter Include="Header Files\graph">
       <UniqueIdentifier>{490f471e-d708-4e4e-b5f9-385f0ef50a16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\geometry">
+      <UniqueIdentifier>{29781647-068f-4c5f-b9b2-50bc423fb4a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\image">
+      <UniqueIdentifier>{5ec77dbc-213b-4679-a882-6d2945eb868f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\prob">
+      <UniqueIdentifier>{cc992c72-953d-448c-87c7-14eee6caefe1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -119,6 +128,30 @@
     </ClInclude>
     <ClInclude Include="..\..\..\bcslib\graph\graph_base.h">
       <Filter>Header Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\geometry\geometry_base.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\geometry\poly_scan.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\geometry\triangle_mesh.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\image\image.h">
+      <Filter>Header Files\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\image\image_base.h">
+      <Filter>Header Files\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\prob\discrete_distr.h">
+      <Filter>Header Files\prob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\prob\pdistribution.h">
+      <Filter>Header Files\prob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\prob\sampling.h">
+      <Filter>Header Files\prob</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

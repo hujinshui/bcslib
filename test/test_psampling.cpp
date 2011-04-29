@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
 
 	randstream<> rstream;
-	rstream.seed( std::time(0) );
+	rstream.seed( (unsigned int)(std::time(0)) );
 
 	const size_t len = 10000000;
 	static double reals[len];
