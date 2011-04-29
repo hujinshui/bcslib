@@ -22,7 +22,7 @@ namespace bcs
 
 	template<typename T, class TIndexer=id_ind> class const_aview1d;
 	template<typename T, class TIndexer=id_ind> class aview1d;
-	template<typename T, class Alloc=std::allocator<T> > class array1d;
+	template<typename T, class Alloc=aligned_allocator<T> > class array1d;
 
 	// iterators
 

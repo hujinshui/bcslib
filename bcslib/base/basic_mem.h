@@ -11,8 +11,18 @@
 
 #include <bcslib/base/config.h>
 #include <bcslib/base/basic_defs.h>
+
+
+#include <stdlib.h>
+#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
+#include <malloc.h>
+#endif
+
 #include <cstring>
 #include <memory>
+#include <new>
+#include <limits>
+
 
 namespace bcs
 {
@@ -61,25 +71,109 @@ namespace bcs
     }
 
 
+    const size_t default_memory_alignment = 16;
+
+    template<typename T, size_t Alignment=default_memory_alignment>
+    class aligned_allocator
+    {
+    public:
+    	typedef T value_type;
+    	typedef T* pointer;
+    	typedef T& reference;
+    	typedef const T* const_pointer;
+    	typedef const T& const_reference;
+    	typedef size_t size_type;
+    	typedef ptrdiff_t difference_type;
+
+    	static const size_t alignment = Alignment;
+
+    public:
+    	aligned_allocator() { }
+
+    	aligned_allocator(const aligned_allocator& ) { }
+
+    	template<typename U>
+    	aligned_allocator(const aligned_allocator<U>& ) { }
+
+    	pointer address( reference x ) const
+    	{
+    		return &x;
+    	}
+
+    	const_pointer address( const_reference x ) const
+    	{
+    		return &x;
+    	}
+
+    	size_type max_size() const
+    	{
+    		return std::numeric_limits<size_type>::max() / sizeof(value_type);
+    	}
+
+    	pointer allocate(size_type n, const void* hint=0)
+    	{
+#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
+
+    		pointer p = (pointer)::_aligned_malloc(sizeof(value_type) * n, alignment);
+    		if (p == 0)
+    		{
+    			throw std::bad_alloc();
+    		}
+    		return p;
+
+#elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
+
+    		pointer p = 0;
+    		if (::posix_memalign((void**)(&p), alignment, sizeof(value_type) * n) != 0)
+    		{
+    			throw std::bad_alloc();
+    		}
+    		return p;
+#endif
+    	}
+
+    	void deallocate(pointer p, size_type)
+    	{
+#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
+    		::_aligned_free(p);
+#elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
+    		::free(p);
+#endif
+    	}
+
+    	void construct (pointer p, const_reference val)
+    	{
+    		new ((void*)p) value_type(val);
+    	}
+
+    	void destroy (pointer p)
+    	{
+    		p->~value_type();
+    	}
+
+    }; // end class aligned_allocator
+
+
+
 
     /**
      *  The class to refer to a block of read/write memory that
      *  it takes care of its management by itself
      */
-    template<typename T, typename TAlloc = std::allocator<T> >
+    template<typename T, typename TAlloc=aligned_allocator<T> >
 	class block
 	{
 	public:
 		typedef T value_type;
-		typedef size_t size_type;
-		typedef ptrdiff_t difference_type;
-
-		typedef T* pointer;
-		typedef T& reference;
-		typedef const T* const_pointer;
-		typedef const T& const_reference;
-
 		typedef TAlloc allocator_type;
+
+		typedef typename allocator_type::size_type size_type;
+		typedef typename allocator_type::difference_type difference_type;
+
+		typedef typename allocator_type::pointer pointer;
+		typedef typename allocator_type::reference reference;
+		typedef typename allocator_type::const_pointer const_pointer;
+		typedef typename allocator_type::const_reference const_reference;
 
 	public:
 		block(size_type n) :
