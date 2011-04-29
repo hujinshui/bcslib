@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\base">
+      <UniqueIdentifier>{433e6f23-3e28-46e4-b752-0af32c382537}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\array">
+      <UniqueIdentifier>{2c33dfad-67b3-4da2-8177-235fcfd59847}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\test">
+      <UniqueIdentifier>{904b2539-d237-4b91-a8a0-6784be29e60b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\matlab">
+      <UniqueIdentifier>{0960dfed-c83a-4ecb-bd4d-e0b31a099ee7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\veccomp">
+      <UniqueIdentifier>{1c1e29f9-e832-4888-8ad1-ff05da051cae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\graph">
+      <UniqueIdentifier>{490f471e-d708-4e4e-b5f9-385f0ef50a16}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\bcslib\array\array1d.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\index_selection.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\array_base.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\array_index.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\base\basic_defs.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\base\basic_funcs.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\base\basic_mem.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\base\config.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\base\enumerate.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\base\iterators.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\base\shared_vector.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\test\execution_mon.h">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\test\test_assertion.h">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\test\test_units.h">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\array_calc.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\array_eval.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\array2d.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\matlab\bcs_mex.h">
+      <Filter>Header Files\matlab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\matlab\marray.h">
+      <Filter>Header Files\matlab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\matlab\matlab_base.h">
+      <Filter>Header Files\matlab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\matlab\mgraph.h">
+      <Filter>Header Files\matlab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\veccomp\veccalc.h">
+      <Filter>Header Files\veccomp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\veccomp\vecnorm.h">
+      <Filter>Header Files\veccomp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\veccomp\vecstat.h">
+      <Filter>Header Files\veccomp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\graph\bgl_port.h">
+      <Filter>Header Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\graph\gr_adjlist.h">
+      <Filter>Header Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\graph\gr_edgelist.h">
+      <Filter>Header Files\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\graph\graph_base.h">
+      <Filter>Header Files\graph</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
