@@ -26,6 +26,8 @@ namespace bcs
 	struct row_major_t { };
 	struct column_major_t { };
 
+	const size_t default_array_memory_alignment = 32;
+
 	struct index_pair
 	{
 		index_t i0;
