@@ -17,7 +17,7 @@ namespace bcs
 
 	template<typename T, typename TOrd, class TIndexer0=id_ind, class TIndexer1=id_ind> class const_aview2d;
 	template<typename T, typename TOrd, class TIndexer0=id_ind, class TIndexer1=id_ind> class aview2d;
-	template<typename T, typename TOrd, class Alloc=std::allocator<T> > class array2d;
+	template<typename T, typename TOrd, class Alloc=aligned_allocator<T> > class array2d;
 
 
 	// order-specific offset calculation

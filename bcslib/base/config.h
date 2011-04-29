@@ -13,6 +13,9 @@
 #define BCSLIB_MSVC 0x01
 #define BCSLIB_GCC 0x02
 
+#define BCS_WINDOWS_INTERFACE 0x11
+#define BCS_POSIX_INTERFACE 0x12
+
 
 #if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
         #if _MSC_VER < 1500
@@ -43,10 +46,14 @@
                 #define BCS_STDINT_INCLUDED 1
         #endif
 
+		#define BCS_PLATFORM_INTERFACE BCS_WINDOWS_INTERFACE
+
 #elif BCSLIB_COMPILER == BCSLIB_GCC
 
         #include <stdint.h>
         #define BCS_STDINT_INCLUDED 1
+
+		#define BCS_PLATFORM_INTERFACE BCS_POSIX_INTERFACE
 
 #endif
 
