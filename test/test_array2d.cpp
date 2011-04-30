@@ -17,14 +17,14 @@ using namespace bcs::test;
 
 // Explicit instantiation for syntax checking
 
-template class array2d<double, row_major_t>;
-template class array2d<double, column_major_t>;
+template class bcs::array2d<double, row_major_t>;
+template class bcs::array2d<double, column_major_t>;
 
-template class aview2d<double, row_major_t, step_ind, step_ind>;
-template class aview2d<double, column_major_t, step_ind, step_ind>;
+template class bcs::aview2d<double, row_major_t, step_ind, step_ind>;
+template class bcs::aview2d<double, column_major_t, step_ind, step_ind>;
 
-template class aview2d<double, row_major_t, indices, indices>;
-template class aview2d<double, column_major_t, indices, indices>;
+template class bcs::aview2d<double, row_major_t, indices, indices>;
+template class bcs::aview2d<double, column_major_t, indices, indices>;
 
 
 

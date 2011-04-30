@@ -176,14 +176,17 @@ namespace bcs
 		typedef typename allocator_type::const_reference const_reference;
 
 	public:
-		block(size_type n) :
-			m_base(_alloc.allocate(n)), m_n(n)
+		block(size_type n)
+		: m_base(n > 0 ? _alloc.allocate(n) : pointer(0)), m_n(n)
 		{
 		}
 
 		~block()
 		{
-			_alloc.deallocate(this->pbase(), this->nelems());
+			if (m_base != 0)
+			{
+				_alloc.deallocate(this->pbase(), this->nelems());
+			}
 		}
 
 		size_type nelems() const

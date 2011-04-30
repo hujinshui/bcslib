@@ -2,7 +2,7 @@
 
 # compiler configuration
 
-CC = g++
+CC = g++4.5
 CFLAGS = -I. -Wall
 
 BASE_HEADERS = bcslib/base/config.h bcslib/base/basic_defs.h bcslib/base/basic_funcs.h bcslib/base/basic_mem.h bcslib/base/enumerate.h 
