@@ -17,10 +17,10 @@ using namespace bcs::test;
 
 // Explicit instantiation for syntax checking
 
-template class array1d<double>;
-template class aview1d<double, step_ind>;
-template class aview1d<double, rep_ind>;
-template class aview1d<double, indices>;
+template class bcs::array1d<double>;
+template class bcs::aview1d<double, step_ind>;
+template class bcs::aview1d<double, rep_ind>;
+template class bcs::aview1d<double, indices>;
 
 
 template<typename T, class TIndexer>
@@ -100,6 +100,7 @@ BCS_TEST_CASE( test_dense_array1d )
 	export_to(a2, a2_buf.pbase());
 
 	BCS_CHECK( collection_equal(a2_buf.pbase(), a2_buf.pend(), src2, n2) );
+
 }
 
 
