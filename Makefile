@@ -2,8 +2,9 @@
 
 # compiler configuration
 
-CC = g++4.5
-CFLAGS = -I. -Wall
+CC = g++-4.5
+WARNING_FLAGS = -Wall -Wextra -Wconversion -Wdouble-promotion -Wformat -Wno-unused-parameter
+CFLAGS = -std=c++0x -pedantic $(WARNING_FLAGS) -I.
 
 BASE_HEADERS = bcslib/base/config.h bcslib/base/basic_defs.h bcslib/base/basic_funcs.h bcslib/base/basic_mem.h bcslib/base/enumerate.h 
 
