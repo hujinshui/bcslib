@@ -77,7 +77,11 @@ int main(int argc, char *argv[])
 
 	std::printf("Your choice: ");
 	int choice;
-	std::scanf("%d", &choice);
+	if (std::scanf("%d", &choice) == EOF)
+	{
+		std::printf("Failed to read the choice!\n");
+		return 1;
+	}
 
 
 	randstream<> rstream;
