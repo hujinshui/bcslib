@@ -37,7 +37,7 @@ bstat do_stat(size_t n, double *x)
 		double v = x[i];
 		s1 += v;
 	}
-	double mv = s1 / n;
+	double mv = s1 / double(n);
 
 	for (size_t i = 0; i < n; ++i)
 	{
@@ -54,9 +54,9 @@ bstat do_stat(size_t n, double *x)
 	bstat bs;
 
 	bs.mean = mv;
-	bs.var = s2 / n;
-	bs.skewness = (s3 / n) / std::pow(s2, 1.5);
-	bs.kurtosis = (s4 / n) / sqr(bs.var) - 3;
+	bs.var = s2 / double(n);
+	bs.skewness = (s3 / double(n)) / std::pow(s2, 1.5);
+	bs.kurtosis = (s4 / double(n)) / sqr(bs.var) - 3;
 
 	return bs;
 }
