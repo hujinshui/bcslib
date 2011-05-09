@@ -165,7 +165,7 @@ namespace bcs
 		size_t i = 0;
 		T k = T(0);
 		double F_k = m_F[0];
-		T I_k = m_I[0];
+		double I_k = m_I[0];
 
 		while (i < len && k < m_K)
 		{
