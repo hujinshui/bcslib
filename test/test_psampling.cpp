@@ -8,12 +8,13 @@
 
 #include <bcslib/prob/sampling.h>
 #include <bcslib/prob/discrete_distr.h>
+#include <bcslib/test/performance_timer.h>
 
 #include <cstdio>
-#include <ctime>
 #include <limits>
 
 using namespace bcs;
+using namespace bcs::test;
 
 
 struct bstat
@@ -91,24 +92,24 @@ int main(int argc, char *argv[])
 	static double reals[len];
 	static int32_t ints[len];
 
-	std::clock_t start, elapsed;
+	double elapsed;
 	if (choice == 1)
 	{
-		start = std::clock();
+		performance_timer timer(true);
 		real_rng<double>::get_uniform(rstream, len, reals);
-		elapsed = std::clock() - start;
+		elapsed = timer.elapsed_seconds();
 	}
 	else if (choice == 2)
 	{
-		start = std::clock();
+		performance_timer timer(true);
 		real_rng<double>::get_normal(rstream, len, reals);
-		elapsed = std::clock() - start;
+		elapsed = timer.elapsed_seconds();
 	}
 	else if (choice == 3)
 	{
-		start = std::clock();
+		performance_timer timer(true);
 		real_rng<double>::get_exponential(rstream, len, reals);
-		elapsed = std::clock() - start;
+		elapsed = timer.elapsed_seconds();
 	}
 	else if (choice / 10 == 1)
 	{
@@ -129,18 +130,18 @@ int main(int argc, char *argv[])
 			discrete_sampler<int32_t> sp(K, p.pbase(), discrete_sampler<int32_t>::DSAMP_DIRECT_METHOD);
 			std::printf("avg.slen = %.2f\n", sp.average_search_length());
 
-			start = std::clock();
+			performance_timer timer(true);;
 			sp(rstream, len, ints);
-			elapsed = std::clock() - start;
+			elapsed = timer.elapsed_seconds();
 		}
 		else if (choice == 12)
 		{
 			discrete_sampler<int32_t> sp(K, p.pbase(), discrete_sampler<int32_t>::DSAMP_SORT_METHOD);
 			std::printf("avg.slen = %.2f\n", sp.average_search_length());
 
-			start = std::clock();
+			performance_timer timer(true);;
 			sp(rstream, len, ints);
-			elapsed = std::clock() - start;
+			elapsed = timer.elapsed_seconds();
 		}
 		else
 		{
@@ -153,9 +154,8 @@ int main(int argc, char *argv[])
 	}
 
 
-	double elapsed_secs = (double)elapsed / CLOCKS_PER_SEC;
-	std::printf("elapsed = %.4f sec\n", elapsed_secs);
-	std::printf("rate = %.2f Msamples / sec\n", (len / (1e6 * elapsed_secs)));
+	std::printf("elapsed = %.4f sec\n", elapsed);
+	std::printf("rate = %.2f Msamples / sec\n", (len / (1e6 * elapsed)));
 
 	std::printf("\n");
 
