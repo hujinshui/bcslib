@@ -2,7 +2,14 @@
 
 # compiler configuration
 
-CC = g++
+ifndef CC
+CC=gcc
+endif
+
+ifndef CXX
+CXX=g++
+endif
+
 WARNING_FLAGS = -Wall -Wextra -Wconversion -Wformat -Wno-unused-parameter
 CFLAGS = -std=c++0x -pedantic $(WARNING_FLAGS) -I.
 
@@ -35,36 +42,36 @@ test_prob: bin/test_prob_basics bin/test_psampling
 
 ARRAY_BASIC_TESTS = test/test_array_basics.cpp test/test_index_selection.cpp test/test_array1d.cpp test/test_array2d.cpp
 bin/test_array_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 
-	$(CC) $(CFLAGS) $(ARRAY_BASIC_TESTS) -o bin/test_array_basics
+	$(CXX) $(CFLAGS) $(ARRAY_BASIC_TESTS) -o bin/test_array_basics
 	
 	
 ARRAY_COMP_TESTS = test/test_array_comp.cpp test/test_array_calc.cpp test/test_array_eval.cpp
 bin/test_array_comp: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
-	$(CC) $(CFLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp
+	$(CXX) $(CFLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp
 	
 
 bin/test_access_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) test/test_access_performance.cpp
-	$(CC) $(CFLAGS) -O2 test/test_access_performance.cpp -o bin/test_access_performance
+	$(CXX) $(CFLAGS) -O2 test/test_access_performance.cpp -o bin/test_access_performance
 
 GRAPH_BASIC_TESTS = test/test_graph_basics.cpp test/test_gr_edgelist.cpp test/test_gr_adjlist.cpp test/test_graph_basic_alg.cpp
 bin/test_graph_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(GRAPH_BASIC_HEADERS) $(GRAPH_BASIC_TESTS)
-	$(CC) $(CFLAGS) $(GRAPH_BASIC_TESTS) -o bin/test_graph_basics	
+	$(CXX) $(CFLAGS) $(GRAPH_BASIC_TESTS) -o bin/test_graph_basics	
 	
 GEOMETRY_BASIC_TESTS = test/test_geometry_basics.cpp test/test_geometry_primitives.cpp test/test_poly_scan.cpp
 bin/test_geometry_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(GEOMETRY_BASIC_HEADERS) $(GEOMETRY_BASIC_TESTS)
-	$(CC) $(CFLAGS) $(GEOMETRY_BASIC_TESTS) -o bin/test_geometry_basics
+	$(CXX) $(CFLAGS) $(GEOMETRY_BASIC_TESTS) -o bin/test_geometry_basics
 
 	
 IMAGE_BASIC_TESTS = test/test_image_basics.cpp test/test_image_views.cpp
 bin/test_image_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(IMAGE_BASIC_HEADERS) $(IMAGE_BASIC_TESTS)
-	$(CC) $(CFLAGS) $(IMAGE_BASIC_TESTS) -o bin/test_image_basics
+	$(CXX) $(CFLAGS) $(IMAGE_BASIC_TESTS) -o bin/test_image_basics
 	 
 bin/test_psampling: $(BASE_HEADERS) $(TEST_HEADERS) $(PROB_BASIC_HEADERS) test/test_psampling.cpp
-	$(CC) $(CFLAGS) -O2 test/test_psampling.cpp -o bin/test_psampling
+	$(CXX) $(CFLAGS) -O2 test/test_psampling.cpp -o bin/test_psampling
 	
 PROB_BASIC_TESTS = test/test_prob_basics.cpp test/test_discrete_distr.cpp
 bin/test_prob_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(PROB_BASIC_HEADERS) $(PROB_BASIC_TESTS)
-	$(CC) $(CFLAGS) $(PROB_BASIC_TESTS) -o bin/test_prob_basics
+	$(CXX) $(CFLAGS) $(PROB_BASIC_TESTS) -o bin/test_prob_basics
 
 
 clean:
