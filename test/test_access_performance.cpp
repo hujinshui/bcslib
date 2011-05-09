@@ -8,15 +8,16 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 
 #include <bcslib/array/array1d.h>
 #include <bcslib/array/array2d.h>
+#include <bcslib/test/performance_timer.h>
 
 #include <algorithm>
 
 
 using namespace bcs;
+using namespace bcs::test;
 
 
 void test_copy_syntax()
@@ -33,14 +34,13 @@ double time_copy_memory(int nrepeats, const size_t nelems, const double *src, do
 {
 	copy_elements(src, buf, nelems);
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		bcs::copy_elements(src, buf, nelems);
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 }
 
 
@@ -48,7 +48,7 @@ double time_raw_for_loop(int nrepeats, const size_t nelems, const double *src, d
 {
 	copy_elements(src, buf, nelems);
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		for (size_t j = 0; j < nelems; ++j)
@@ -56,9 +56,8 @@ double time_raw_for_loop(int nrepeats, const size_t nelems, const double *src, d
 			buf[j] = src[j];
 		}
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 }
 
 
@@ -68,14 +67,13 @@ double time_dense1d_export(int nrepeats, const size_t nelems, const double *src,
 
 	export_to(view, buf);
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		export_to(view, buf);
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 
 }
 
@@ -84,7 +82,7 @@ double time_dense1d_access(int nrepeats, const size_t nelems, const double *src,
 {
 	const_aview1d<double> view(src, nelems);
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		for (size_t j = 0; j < nelems; ++j)
@@ -92,9 +90,8 @@ double time_dense1d_access(int nrepeats, const size_t nelems, const double *src,
 			buf[j] = view(j);
 		}
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 }
 
 
@@ -104,14 +101,13 @@ double time_step1d_export(int nrepeats, const size_t nelems, const double *src, 
 
 	export_to(view, buf);
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		export_to(view, buf);
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 }
 
 
@@ -119,7 +115,7 @@ double time_step1d_access(int nrepeats, const size_t nelems, const double *src, 
 {
 	const_aview1d<double, step_ind> view(src, step_ind(nelems, 2));
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		for (size_t j = 0; j < nelems; ++j)
@@ -127,9 +123,8 @@ double time_step1d_access(int nrepeats, const size_t nelems, const double *src, 
 			buf[j] = view(j);
 		}
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 }
 
 
@@ -139,14 +134,13 @@ double time_dense2d_rm_export(int nrepeats, const size_t m, const size_t n, cons
 
 	export_to(view, buf);
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		export_to(view, buf);
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 }
 
 
@@ -156,14 +150,12 @@ double time_dense2d_cm_export(int nrepeats, const size_t m, const size_t n, cons
 
 	export_to(view, buf);
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		export_to(view, buf);
 	}
-	clock_t elapsed = clock() - start;
-
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 
 }
 
@@ -172,8 +164,7 @@ double time_dense2d_rm_access(int nrepeats, const size_t m, const size_t n, cons
 {
 	const_aview2d<double, row_major_t> view(src, m, n, id_ind(m), id_ind(n));
 
-	clock_t start = clock();
-
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		double *p = buf;
@@ -185,9 +176,8 @@ double time_dense2d_rm_access(int nrepeats, const size_t m, const size_t n, cons
 			}
 		}
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 }
 
 
@@ -195,8 +185,7 @@ double time_dense2d_cm_access(int nrepeats, const size_t m, const size_t n, cons
 {
 	const_aview2d<double, column_major_t> view(src, m, n, id_ind(m), id_ind(n));
 
-	clock_t start = clock();
-
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		double *p = buf;
@@ -208,9 +197,8 @@ double time_dense2d_cm_access(int nrepeats, const size_t m, const size_t n, cons
 			}
 		}
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 }
 
 
@@ -220,14 +208,13 @@ double time_step2d_rm_export(int nrepeats, const size_t m, const size_t n, const
 
 	export_to(view, buf);
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		export_to(view, buf);
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 }
 
 
@@ -237,14 +224,13 @@ double time_step2d_cm_export(int nrepeats, const size_t m, const size_t n, const
 
 	export_to(view, buf);
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		export_to(view, buf);
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 
 }
 
@@ -253,7 +239,7 @@ double time_step2d_rm_access(int nrepeats, const size_t m, const size_t n, const
 {
 	const_aview2d<double, row_major_t, step_ind, step_ind> view(src, 2*m, 2*n, step_ind(m, 2), step_ind(n,2));
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		double *p = buf;
@@ -265,9 +251,8 @@ double time_step2d_rm_access(int nrepeats, const size_t m, const size_t n, const
 			}
 		}
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 }
 
 
@@ -275,7 +260,7 @@ double time_step2d_cm_access(int nrepeats, const size_t m, const size_t n, const
 {
 	const_aview2d<double, column_major_t, step_ind, step_ind> view(src, 2*m, 2*n, step_ind(m,2), step_ind(n,2));
 
-	clock_t start = clock();
+	performance_timer timer(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
 		double *p = buf;
@@ -287,12 +272,10 @@ double time_step2d_cm_access(int nrepeats, const size_t m, const size_t n, const
 			}
 		}
 	}
-	clock_t elapsed = clock() - start;
 
-	return (double)elapsed / CLOCKS_PER_SEC;
+	return timer.elapsed_seconds();
 
 }
-
 
 
 
