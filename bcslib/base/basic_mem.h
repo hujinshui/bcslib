@@ -176,6 +176,95 @@ namespace bcs
     }; // end class aligned_allocator
 
 
+    class tbuffer
+    {
+    public:
+    	typedef aligned_allocator<byte> allocator_type;
+    	static const size_t default_alignment = 64;
+
+    public:
+    	explicit tbuffer(size_t init_capa)
+    	: m_allocator(default_alignment)
+    	, m_base(init_capa > 0 ? m_allocator.allocate(init_capa) : 0), m_capacity(init_capa)
+    	{
+    	}
+
+    	~tbuffer()
+    	{
+    		if (m_base != 0)
+    		{
+    			m_allocator.deallocate(m_base, m_capacity);
+    		}
+    	}
+
+		size_t capacity() const
+		{
+			return m_capacity;
+		}
+
+		size_t alignment() const
+		{
+			return m_allocator.alignment();
+		}
+
+		size_t max_size() const
+		{
+			return std::numeric_limits<size_t>::max() >> 1;
+		}
+
+		void reserve(size_t num_bytes)
+		{
+			if (num_bytes >= m_capacity)
+			{
+				if (num_bytes > max_size())
+				{
+					throw std::bad_alloc();
+				}
+
+				size_t c = m_capacity;
+				do
+				{
+					c <<= 1;
+				}
+				while(c < num_bytes);
+
+				if (m_base != 0)
+				{
+					m_allocator.deallocate(m_base, m_capacity);
+				}
+				m_base = m_allocator.allocate(c);
+				m_capacity = c;
+			}
+		}
+
+		void* request(size_t num_bytes)
+		{
+			reserve(num_bytes);
+			return m_base;
+		}
+
+		void release()
+		{
+			if (m_base != 0)
+			{
+				m_allocator.deallocate(m_base, m_capacity);
+				m_base = null_p<byte>();
+				m_capacity = 0;
+			}
+		}
+
+    private:
+		tbuffer(const tbuffer& );
+		tbuffer& operator = (const tbuffer& );
+
+		allocator_type m_allocator;
+		byte *m_base;
+		size_t m_capacity;
+
+
+    }; // end class tbuffer
+
+
 
 
     /**
