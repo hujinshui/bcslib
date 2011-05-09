@@ -20,11 +20,7 @@
 #if ((BCSLIB_COMPILER == BCSLIB_GCC) && (__GNUC_MINOR__ <= 2))
 #include <boost/tr1/random.hpp>  	// g++ 4.2 has several bugs in <random>
 #else
-#if (BCSLIB_COMPILER == BCSLIB_MSVC)
-#include <random>
-#else
 #include <tr1/random>
-#endif
 #endif
 
 
@@ -312,6 +308,7 @@ namespace bcs
 
 	private:
 		typedef _detail::rand_real_helper<rstream_type, value_type> _helper;
+		static const value_type two_pi = value_type(2 * 3.14159265358979323846);
 
 	public:
 		static value_type get_uniform(rstream_type& rs) // ~ U[0, 1)
@@ -367,15 +364,11 @@ namespace bcs
 	private:
 		static void normal_transform(value_type u, value_type v, value_type& x0)
 		{
-			const value_type two_pi = value_type(2 * 3.14159265358979323846);
-
 			x0 = std::sqrt((-2) * std::log(u)) * std::cos( two_pi * v );
 		}
 
 		static void normal_transform(value_type u, value_type v, value_type& x0, value_type& x1)
 		{
-			const value_type two_pi = value_type(2 * 3.14159265358979323846);
-
 			value_type r = std::sqrt((-2) * std::log(u));
 			value_type t = two_pi * v;
 			x0 = r * std::cos(t);
