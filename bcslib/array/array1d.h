@@ -22,7 +22,7 @@ namespace bcs
 
 	template<typename T, class TIndexer=id_ind> class const_aview1d;
 	template<typename T, class TIndexer=id_ind> class aview1d;
-	template<typename T, class Alloc=aligned_allocator<T, default_array_memory_alignment> > class array1d;
+	template<typename T, class Alloc=aligned_allocator<T> > class array1d;
 
 	// iterators
 
@@ -552,13 +552,13 @@ namespace bcs
 
 	public:
 		explicit array1d(size_type n)
-		: view_type(0, n), m_pblock(new block_type(n))
+		: view_type(0, n), m_pblock(create_blk(n))
 		{
 			this->m_base = m_pblock->pbase();
 		}
 
 		array1d(size_type n, const T& x)
-		: view_type(0, n), m_pblock(new block_type(n))
+		: view_type(0, n), m_pblock(create_blk(n))
 		{
 			this->m_base = m_pblock->pbase();
 
@@ -567,7 +567,7 @@ namespace bcs
 
 		template<typename InputIter>
 		array1d(size_type n, InputIter src)
-		: view_type(0, n), m_pblock(new block_type(n))
+		: view_type(0, n), m_pblock(create_blk(n))
 		{
 			this->m_base = m_pblock->pbase();
 			import_from(*this, src);
@@ -575,6 +575,12 @@ namespace bcs
 
 	private:
 		shared_ptr<block_type> m_pblock;
+
+	private:
+		static block_type* create_blk(size_type n)
+		{
+			return array_block_creater<T, Alloc>::create(n);
+		}
 
 	}; // end class array1d
 

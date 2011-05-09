@@ -28,6 +28,27 @@ namespace bcs
 
 	const size_t default_array_memory_alignment = 32;
 
+	template<typename T, class Alloc>
+	struct array_block_creater
+	{
+		static block<T, Alloc>* create(size_t n)
+		{
+			return new block<T, Alloc>(n);
+		}
+	};
+
+	template<typename T>
+	struct array_block_creater<T, aligned_allocator<T> >
+	{
+		static block<T, aligned_allocator<T> >* create(size_t n)
+		{
+			return new block<T, aligned_allocator<T> >(n, aligned_allocator<T>(default_array_memory_alignment));
+		}
+	};
+
+
+
+
 	struct index_pair
 	{
 		index_t i0;
