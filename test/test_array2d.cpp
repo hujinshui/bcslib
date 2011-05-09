@@ -240,7 +240,7 @@ BCS_TEST_CASE( test_gen_array2d )
 
 	index_t inds[] = {0, 2, 3};
 
-	aview2d<double, row_major_t, indices, id_ind> a4_rm(src, 5, 6, indices(inds, 3), id_ind(4));
+	aview2d<double, row_major_t, indices, id_ind> a4_rm(src, 5, 6, indices(ref_arr(inds, 3)), id_ind(4));
 	double r4_rm[] = {1, 2, 3, 4, 13, 14, 15, 16, 19, 20, 21, 22};
 
 	BCS_CHECK( !is_dense_view(a4_rm) );
@@ -248,7 +248,7 @@ BCS_TEST_CASE( test_gen_array2d )
 	BCS_CHECK( array_view_equal(a4_rm, r4_rm, 3, 4) );
 	BCS_CHECK( array_iteration_test(a4_rm) );
 
-	aview2d<double, column_major_t, indices, id_ind> a4_cm(src, 5, 6, indices(inds, 3), id_ind(4));
+	aview2d<double, column_major_t, indices, id_ind> a4_cm(src, 5, 6, indices(ref_arr(inds, 3)), id_ind(4));
 	double r4_cm[] = {1, 3, 4, 6, 8, 9, 11, 13, 14, 16, 18, 19};
 
 	BCS_CHECK( !is_dense_view(a4_cm) );
@@ -258,7 +258,7 @@ BCS_TEST_CASE( test_gen_array2d )
 
 	// (indices, step_ind(2))
 
-	aview2d<double, row_major_t, indices, step_ind> a5_rm(src, 5, 6, indices(inds, 3), step_ind(3, 2));
+	aview2d<double, row_major_t, indices, step_ind> a5_rm(src, 5, 6, indices(ref_arr(inds, 3)), step_ind(3, 2));
 	double r5_rm[] = {1, 3, 5, 13, 15, 17, 19, 21, 23};
 
 	BCS_CHECK( !is_dense_view(a5_rm) );
@@ -266,7 +266,7 @@ BCS_TEST_CASE( test_gen_array2d )
 	BCS_CHECK( array_view_equal(a5_rm, r5_rm, 3, 3) );
 	BCS_CHECK( array_iteration_test(a5_rm) );
 
-	aview2d<double, column_major_t, indices, step_ind> a5_cm(src, 5, 6, indices(inds, 3), step_ind(3, 2));
+	aview2d<double, column_major_t, indices, step_ind> a5_cm(src, 5, 6, indices(ref_arr(inds, 3)), step_ind(3, 2));
 	double r5_cm[] = {1, 3, 4, 11, 13, 14, 21, 23, 24};
 
 	BCS_CHECK( !is_dense_view(a5_cm) );
@@ -276,7 +276,7 @@ BCS_TEST_CASE( test_gen_array2d )
 
 	// (indices, indices)
 
-	aview2d<double, row_major_t, indices, indices> a6_rm(src, 5, 6, indices(inds, 2), indices(inds, 3));
+	aview2d<double, row_major_t, indices, indices> a6_rm(src, 5, 6, indices(ref_arr(inds, 2)), indices(ref_arr(inds, 3)));
 	double r6_rm[] = {1, 3, 4, 13, 15, 16};
 
 	BCS_CHECK( !is_dense_view(a6_rm) );
@@ -284,7 +284,7 @@ BCS_TEST_CASE( test_gen_array2d )
 	BCS_CHECK( array_view_equal(a6_rm, r6_rm, 2, 3) );
 	BCS_CHECK( array_iteration_test(a6_rm) );
 
-	aview2d<double, column_major_t, indices, indices> a6_cm(src, 5, 6, indices(inds, 2), indices(inds, 3));
+	aview2d<double, column_major_t, indices, indices> a6_cm(src, 5, 6, indices(ref_arr(inds, 2)), indices(ref_arr(inds, 3)));
 	double r6_cm[] = {1, 3, 11, 13, 16, 18};
 
 	BCS_CHECK( !is_dense_view(a6_cm) );
@@ -294,7 +294,7 @@ BCS_TEST_CASE( test_gen_array2d )
 
 	// (rep_ind, indices)
 
-	aview2d<double, row_major_t, rep_ind, indices> a7_rm(src, 5, 6, rep_ind(2), indices(inds, 3));
+	aview2d<double, row_major_t, rep_ind, indices> a7_rm(src, 5, 6, rep_ind(2), indices(ref_arr(inds, 3)));
 	double r7_rm[] = {1, 3, 4, 1, 3, 4};
 
 	BCS_CHECK( !is_dense_view(a7_rm) );
@@ -302,7 +302,7 @@ BCS_TEST_CASE( test_gen_array2d )
 	BCS_CHECK( array_view_equal(a7_rm, r7_rm, 2, 3) );
 	BCS_CHECK( array_iteration_test(a7_rm) );
 
-	aview2d<double, column_major_t, rep_ind, indices> a7_cm(src, 5, 6, rep_ind(2), indices(inds, 3));
+	aview2d<double, column_major_t, rep_ind, indices> a7_cm(src, 5, 6, rep_ind(2), indices(ref_arr(inds, 3)));
 	double r7_cm[] = {1, 1, 11, 11, 16, 16};
 
 	BCS_CHECK( !is_dense_view(a7_cm) );
@@ -403,7 +403,7 @@ BCS_TEST_CASE( test_array2d_slices )
 	index_t rinds[] = {0, 2, 4};
 	index_t cinds[] = {0, 2, 3, 5};
 
-	aview2d<double, row_major_t, step_ind, indices> a4_rm(src, 5, 6, step_ind(3, 2), indices(cinds, 4));
+	aview2d<double, row_major_t, step_ind, indices> a4_rm(src, 5, 6, step_ind(3, 2), indices(ref_arr(cinds, 4)));
 
 	double a4_rm_r1[] = {1, 3, 4, 6};
 	double a4_rm_r2[] = {13, 15, 16, 18};
@@ -415,7 +415,7 @@ BCS_TEST_CASE( test_array2d_slices )
 	BCS_CHECK_EQUAL( a4_rm.column(0), const_aview1d<double>(a4_rm_c1, 3) );
 	BCS_CHECK_EQUAL( a4_rm.column(1), const_aview1d<double>(a4_rm_c2, 3) );
 
-	aview2d<double, column_major_t, step_ind, indices> a4_cm(src, 5, 6, step_ind(3, 2), indices(cinds, 4));
+	aview2d<double, column_major_t, step_ind, indices> a4_cm(src, 5, 6, step_ind(3, 2), indices(ref_arr(cinds, 4)));
 
 	double a4_cm_r1[] = {1, 11, 16, 26};
 	double a4_cm_r2[] = {3, 13, 18, 28};
@@ -427,10 +427,9 @@ BCS_TEST_CASE( test_array2d_slices )
 	BCS_CHECK_EQUAL( a4_cm.column(0), const_aview1d<double>(a4_cm_c1, 3) );
 	BCS_CHECK_EQUAL( a4_cm.column(1), const_aview1d<double>(a4_cm_c2, 3) );
 
-
 	// (indices, indices)
 
-	aview2d<double, row_major_t, indices, indices> a5_rm(src, 5, 6, indices(rinds, 3), indices(cinds, 4));
+	aview2d<double, row_major_t, indices, indices> a5_rm(src, 5, 6, indices(ref_arr(rinds, 3)), indices(ref_arr(cinds, 4)));
 
 	double a5_rm_r1[] = {1, 3, 4, 6};
 	double a5_rm_r2[] = {13, 15, 16, 18};
@@ -442,7 +441,7 @@ BCS_TEST_CASE( test_array2d_slices )
 	BCS_CHECK_EQUAL( a5_rm.column(0), const_aview1d<double>(a5_rm_c1, 3) );
 	BCS_CHECK_EQUAL( a5_rm.column(1), const_aview1d<double>(a5_rm_c2, 3) );
 
-	aview2d<double, column_major_t, indices, indices> a5_cm(src, 5, 6, indices(rinds, 3), indices(cinds, 4));
+	aview2d<double, column_major_t, indices, indices> a5_cm(src, 5, 6, indices(ref_arr(rinds, 3)), indices(ref_arr(cinds, 4)));
 
 	double a5_cm_r1[] = {1, 11, 16, 26};
 	double a5_cm_r2[] = {3, 13, 18, 28};
@@ -453,7 +452,6 @@ BCS_TEST_CASE( test_array2d_slices )
 	double a5_cm_c2[] = {11, 13, 15};
 	BCS_CHECK_EQUAL( a5_cm.column(0), const_aview1d<double>(a5_cm_c1, 3) );
 	BCS_CHECK_EQUAL( a5_cm.column(1), const_aview1d<double>(a5_cm_c2, 3) );
-
 }
 
 
@@ -557,8 +555,8 @@ BCS_TEST_CASE( test_array2d_subviews )
 
 	index_t a0_cinds_s6[] = {0, 2, 3, 4};
 
-	BCS_CHECK_EQUAL( a0_rm.V(rgn(0, aend(), 2), indices(a0_cinds_s6, 4)),  dense_aview2d(a0_rm_s6, 3, 4, row_major_t()) );
-	BCS_CHECK_EQUAL( a0_cm.V(rgn(0, aend(), 2), indices(a0_cinds_s6, 4)),  dense_aview2d(a0_cm_s6, 3, 4, column_major_t()) );
+	BCS_CHECK_EQUAL( a0_rm.V(rgn(0, aend(), 2), indices(ref_arr(a0_cinds_s6, 4))),  dense_aview2d(a0_rm_s6, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(rgn(0, aend(), 2), indices(ref_arr(a0_cinds_s6, 4))),  dense_aview2d(a0_cm_s6, 3, 4, column_major_t()) );
 
 	// dense => (rep_range, indices)
 
@@ -567,8 +565,8 @@ BCS_TEST_CASE( test_array2d_subviews )
 	double a0_rm_s7[] = {7, 9, 10, 11, 7, 9, 10, 11, 7, 9, 10, 11};
 	double a0_cm_s7[] = {2, 2, 2, 14, 14, 14, 20, 20, 20, 26, 26, 26};
 
-	BCS_CHECK_EQUAL( a0_rm.V(rep(1, 3), indices(a0_cinds_s7, 4)),  dense_aview2d(a0_rm_s7, 3, 4, row_major_t()) );
-	BCS_CHECK_EQUAL( a0_cm.V(rep(1, 3), indices(a0_cinds_s7, 4)),  dense_aview2d(a0_cm_s7, 3, 4, column_major_t()) );
+	BCS_CHECK_EQUAL( a0_rm.V(rep(1, 3), indices(ref_arr(a0_cinds_s7, 4))),  dense_aview2d(a0_rm_s7, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(rep(1, 3), indices(ref_arr(a0_cinds_s7, 4))),  dense_aview2d(a0_cm_s7, 3, 4, column_major_t()) );
 
 	// dense => (indices, indices)
 
@@ -578,8 +576,8 @@ BCS_TEST_CASE( test_array2d_subviews )
 	double a0_rm_s8[] = {7, 9, 10, 12, 19, 21, 22, 24, 25, 27, 28, 30};
 	double a0_cm_s8[] = {2, 4, 5, 14, 16, 17, 20, 22, 23, 32, 34, 35};
 
-	BCS_CHECK_EQUAL( a0_rm.V(indices(a0_rinds_s8, 3), indices(a0_cinds_s8, 4)),  dense_aview2d(a0_rm_s8, 3, 4, row_major_t()) );
-	BCS_CHECK_EQUAL( a0_cm.V(indices(a0_rinds_s8, 3), indices(a0_cinds_s8, 4)),  dense_aview2d(a0_cm_s8, 3, 4, column_major_t()) );
+	BCS_CHECK_EQUAL( a0_rm.V(indices(ref_arr(a0_rinds_s8, 3)), indices(ref_arr(a0_cinds_s8, 4))),  dense_aview2d(a0_rm_s8, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a0_cm.V(indices(ref_arr(a0_rinds_s8, 3)), indices(ref_arr(a0_cinds_s8, 4))),  dense_aview2d(a0_cm_s8, 3, 4, column_major_t()) );
 
 
 	// step base
@@ -670,8 +668,8 @@ BCS_TEST_CASE( test_array2d_subviews )
 	double a1_rm_s4[] = {57, 51, 59, 53, 9, 3, 11, 5, 81, 75, 83, 77};
 	double a1_cm_s4[] = {101, 97, 103, 29, 25, 31, 125, 121, 127, 53, 49, 55};
 
-	BCS_CHECK_EQUAL( a1_rm.V(indices(a1_s4_rinds, 3), indices(a1_s4_cinds, 4)), dense_aview2d(a1_rm_s4, 3, 4, row_major_t()) );
-	BCS_CHECK_EQUAL( a1_cm.V(indices(a1_s4_rinds, 3), indices(a1_s4_cinds, 4)), dense_aview2d(a1_cm_s4, 3, 4, column_major_t()) );
+	BCS_CHECK_EQUAL( a1_rm.V(indices(ref_arr(a1_s4_rinds, 3)), indices(ref_arr(a1_s4_cinds, 4))), dense_aview2d(a1_rm_s4, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a1_cm.V(indices(ref_arr(a1_s4_rinds, 3)), indices(ref_arr(a1_s4_cinds, 4))), dense_aview2d(a1_cm_s4, 3, 4, column_major_t()) );
 
 
 	// rep x -step base
@@ -758,8 +756,8 @@ BCS_TEST_CASE( test_array2d_subviews )
 	double a2_rm_s3[] = {48, 44, 42, 38, 48, 44, 42, 38, 48, 44, 42, 38};
 	double a2_cm_s3[] = {136, 136, 136, 88, 88, 88, 64, 64, 64, 16, 16, 16};
 
-	BCS_CHECK_EQUAL( a2_rm.V(rgn(0, 3), indices(a2_s3_cinds, 4)), dense_aview2d(a2_rm_s3, 3, 4, row_major_t()) );
-	BCS_CHECK_EQUAL( a2_cm.V(rgn(0, 3), indices(a2_s3_cinds, 4)), dense_aview2d(a2_cm_s3, 3, 4, column_major_t()) );
+	BCS_CHECK_EQUAL( a2_rm.V(rgn(0, 3), indices(ref_arr(a2_s3_cinds, 4))), dense_aview2d(a2_rm_s3, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a2_cm.V(rgn(0, 3), indices(ref_arr(a2_s3_cinds, 4))), dense_aview2d(a2_cm_s3, 3, 4, column_major_t()) );
 
 
 	// rep x -step => (indices, indices)
@@ -770,16 +768,16 @@ BCS_TEST_CASE( test_array2d_subviews )
 	double a2_rm_s4[] = {48, 44, 42, 38, 48, 44, 42, 38, 48, 44, 42, 38};
 	double a2_cm_s4[] = {136, 136, 136, 88, 88, 88, 64, 64, 64, 16, 16, 16};
 
-	BCS_CHECK_EQUAL( a2_rm.V(indices(a2_s4_rinds, 3), indices(a2_s4_cinds, 4)), dense_aview2d(a2_rm_s4, 3, 4, row_major_t()) );
-	BCS_CHECK_EQUAL( a2_cm.V(indices(a2_s4_rinds, 3), indices(a2_s4_cinds, 4)), dense_aview2d(a2_cm_s4, 3, 4, column_major_t()) );
+	BCS_CHECK_EQUAL( a2_rm.V(indices(ref_arr(a2_s4_rinds, 3)), indices(ref_arr(a2_s4_cinds, 4))), dense_aview2d(a2_rm_s4, 3, 4, row_major_t()) );
+	BCS_CHECK_EQUAL( a2_cm.V(indices(ref_arr(a2_s4_rinds, 3)), indices(ref_arr(a2_s4_cinds, 4))), dense_aview2d(a2_cm_s4, 3, 4, column_major_t()) );
 
 
 	// indices x step base
 
 	index_t a3_rinds[5] = {1, 3, 4, 7, 9};
 
-	aview2d<double, row_major_t, indices, step_ind> a3_rm = Arm.V(indices(a3_rinds, 5), rgn(1, aend(), 2));
-	aview2d<double, column_major_t, indices, step_ind> a3_cm = Acm.V(indices(a3_rinds, 5), rgn(1, aend(), 2));
+	aview2d<double, row_major_t, indices, step_ind> a3_rm = Arm.V(indices(ref_arr(a3_rinds, 5)), rgn(1, aend(), 2));
+	aview2d<double, column_major_t, indices, step_ind> a3_cm = Acm.V(indices(ref_arr(a3_rinds, 5)), rgn(1, aend(), 2));
 
 	// indices x step => (whole, whole)
 
@@ -853,8 +851,8 @@ BCS_TEST_CASE( test_array2d_subviews )
 	double a3_rm_s2[9] = {16, 20, 22, 52, 56, 58, 88, 92, 94};
 	double a3_cm_s2[9] = {38, 41, 44, 86, 89, 92, 110, 113, 116};
 
-	BCS_CHECK_EQUAL( a3_rm.V(indices(a3_s2_rinds, 3), indices(a3_s2_cinds, 3)), dense_aview2d(a3_rm_s2, 3, 3, row_major_t()) );
-	BCS_CHECK_EQUAL( a3_cm.V(indices(a3_s2_rinds, 3), indices(a3_s2_cinds, 3)), dense_aview2d(a3_cm_s2, 3, 3, column_major_t()) );
+	BCS_CHECK_EQUAL( a3_rm.V(indices(ref_arr(a3_s2_rinds, 3)), indices(ref_arr(a3_s2_cinds, 3))), dense_aview2d(a3_rm_s2, 3, 3, row_major_t()) );
+	BCS_CHECK_EQUAL( a3_cm.V(indices(ref_arr(a3_s2_rinds, 3)), indices(ref_arr(a3_s2_cinds, 3))), dense_aview2d(a3_cm_s2, 3, 3, column_major_t()) );
 
 	// indices x step => (step_range, rep)
 

@@ -29,24 +29,10 @@ namespace bcs
 
 	public:
 
-		gr_edgelist(gr_size_t nv, gr_size_t ne,
-				ref_t, const vertex_type *srcs, const vertex_type *tars)
+		template<typename ASrc, typename ATar>
+		gr_edgelist(gr_size_t nv, gr_size_t ne, ASrc srcs, ATar tars)
 		: m_nvertices(nv), m_nedges(ne)
-		, m_sources(ref_t(), ne, srcs), m_targets(ref_t(), ne, tars)
-		{
-		}
-
-		gr_edgelist(gr_size_t nv, gr_size_t ne,
-				clone_t, const vertex_type *srcs, const vertex_type *tars)
-		: m_nvertices(nv), m_nedges(ne)
-		, m_sources(clone_t(), ne, srcs), m_targets(clone_t(), ne, tars)
-		{
-		}
-
-		gr_edgelist(gr_size_t nv, gr_size_t ne,
-				block<vertex_type>* srcs, block<vertex_type>* tars)
-		: m_nvertices(nv), m_nedges(ne)
-		, m_sources(srcs), m_targets(tars)
+		, m_sources(srcs, ne), m_targets(tars, ne)
 		{
 		}
 
@@ -128,26 +114,12 @@ namespace bcs
 
 	public:
 
-		gr_wedgelist(gr_size_t nv, gr_size_t ne,
-				ref_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
-		: gr_edgelist<TDir>(nv, ne, ref_t(), srcs, tars)
-		, m_weights(ref_t(), ne, ws)
+		template<typename ASrc, typename ATar, typename AWeight>
+		gr_wedgelist(gr_size_t nv, gr_size_t ne, ASrc srcs, ATar tars, AWeight ws)
+		: gr_edgelist<TDir>(nv, ne, srcs, tars)
+		, m_weights(ws, ne)
 		{
 		}
-
-		gr_wedgelist(gr_size_t nv, gr_size_t ne,
-				clone_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
-		: gr_edgelist<TDir>(nv, ne, clone_t(), srcs, tars)
-		, m_weights(clone_t(), ne, ws)
-		{
-		}
-
-		gr_wedgelist(gr_size_t nv, gr_size_t ne,
-				block<vertex_type>* srcs, block<vertex_type>* tars, block<weight_type>* ws)
-		: gr_edgelist<TDir>(nv, ne, srcs, tars), m_weights(ws)
-		{
-		}
-
 
 		weight_type weight_of(const edge_type& e) const
 		{

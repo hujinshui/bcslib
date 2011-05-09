@@ -79,26 +79,8 @@ namespace bcs
 
 	public:
 
-		gr_adjlist(gr_size_t nv, gr_size_t ne,
-				ref_t, const vertex_type *srcs, const vertex_type *tars,
-				const gr_size_t *degs, const gr_index_t *osets, const vertex_t *nbs, const edge_t *adj_es)
-		: m_nvertices(nv), m_nedges(ne), m_el(gr_adjlist_aux<TDir>::edge_list_size(ne))
-		, m_sources(ref_t(), m_el, srcs), m_targets(ref_t(), m_el, tars)
-		, m_out_degrees(ref_t(), nv, degs), m_out_offsets(ref_t(), nv, osets)
-		, m_out_neighbors(ref_t(), m_el, nbs), m_out_edges(ref_t(), m_el, adj_es)
-		{
-		}
 
-		gr_adjlist(gr_size_t nv, gr_size_t ne,
-				ref_t, const vertex_type *srcs, const vertex_type *tars)
-		: m_nvertices(nv), m_nedges(ne), m_el(gr_adjlist_aux<TDir>::edge_list_size(ne))
-		, m_sources(ref_t(), m_el, srcs), m_targets(ref_t(), m_el, tars)
-		{
-			_init_neighbor_structure();
-		}
-
-		gr_adjlist(gr_size_t nv, gr_size_t ne,
-				clone_t, const vertex_type *srcs, const vertex_type *tars)
+		gr_adjlist(gr_size_t nv, gr_size_t ne, const vertex_type *srcs, const vertex_type *tars)
 		: m_nvertices(nv), m_nedges(ne), m_el(gr_adjlist_aux<TDir>::edge_list_size(ne))
 		, m_sources(new block<vertex_type>(m_el)), m_targets(new block<vertex_type>(m_el))
 		{
@@ -108,12 +90,15 @@ namespace bcs
 			_init_neighbor_structure();
 		}
 
+
 		gr_adjlist(gr_size_t nv, gr_size_t ne,
-				block<vertex_type>* srcs, block<vertex_type>* tars)
-		: m_nvertices(nv), m_nedges(ne)
-		, m_sources(srcs), m_targets(tars)
+				const vertex_type *srcs, const vertex_type *tars,
+				const gr_size_t *degs, const gr_index_t *osets, const vertex_t *nbs, const edge_t *adj_es)
+		: m_nvertices(nv), m_nedges(ne), m_el(gr_adjlist_aux<TDir>::edge_list_size(ne))
+		, m_sources(ref_arr(srcs, m_el)), m_targets(ref_arr(tars, m_el))
+		, m_out_degrees(ref_arr(degs, nv)), m_out_offsets(ref_arr(osets, nv))
+		, m_out_neighbors(ref_arr(nbs, m_el)), m_out_edges(ref_arr(adj_es, m_el))
 		{
-			_init_neighbor_structure();
 		}
 
 	public:
@@ -277,10 +262,10 @@ namespace bcs
 				osets[v] -= (gr_index_t)degs[v];
 			}
 
-			m_out_degrees.reset(p_degs);
-			m_out_offsets.reset(p_osets);
-			m_out_neighbors.reset(p_nbs);
-			m_out_edges.reset(p_aes);
+			m_out_degrees.set_block(p_degs);
+			m_out_offsets.set_block(p_osets);
+			m_out_neighbors.set_block(p_nbs);
+			m_out_edges.set_block(p_aes);
 		}
 
 	}; // end class gr_adjlist
@@ -303,24 +288,8 @@ namespace bcs
 
 	public:
 
-		gr_wadjlist(gr_size_t nv, gr_size_t ne,
-				ref_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws,
-				const gr_size_t *degs, const gr_index_t *osets, const vertex_t *nbs, const edge_t *adj_es)
-		: gr_adjlist<TDir>(nv, ne, ref_t(), srcs, tars, degs, osets, nbs, adj_es)
-		, m_weights(ref_t(), gr_adjlist_aux<TDir>::edge_list_size(ne), ws)
-		{
-		}
-
-		gr_wadjlist(gr_size_t nv, gr_size_t ne,
-				ref_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
-		: gr_adjlist<TDir>(nv, ne, ref_t(), srcs, tars)
-		, m_weights(ref_t(), gr_adjlist_aux<TDir>::edge_list_size(ne), ws)
-		{
-		}
-
-		gr_wadjlist(gr_size_t nv, gr_size_t ne,
-				clone_t, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
-		: gr_adjlist<TDir>(nv, ne, clone_t(), srcs, tars)
+		gr_wadjlist(gr_size_t nv, gr_size_t ne, const vertex_type *srcs, const vertex_type *tars, const weight_type *ws)
+		: gr_adjlist<TDir>(nv, ne, srcs, tars)
 		, m_weights(new block<weight_type>(gr_adjlist_aux<TDir>::edge_list_size(ne)))
 		{
 			gr_adjlist_aux<TDir>::do_clone_edgeweights(ne, ws,
@@ -328,9 +297,10 @@ namespace bcs
 		}
 
 		gr_wadjlist(gr_size_t nv, gr_size_t ne,
-				block<vertex_type>* srcs, block<vertex_type>* tars, block<weight_type>* ws)
-		: gr_adjlist<TDir>(nv, ne, srcs, tars)
-		, m_weights(ws)
+				const vertex_type *srcs, const vertex_type *tars, const weight_type *ws,
+				const gr_size_t *degs, const gr_index_t *osets, const vertex_t *nbs, const edge_t *adj_es)
+		: gr_adjlist<TDir>(nv, ne, srcs, tars, degs, osets, nbs, adj_es)
+		, m_weights(ref_arr(ws, gr_adjlist_aux<TDir>::edge_list_size(ne)))
 		{
 		}
 

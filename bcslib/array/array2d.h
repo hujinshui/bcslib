@@ -996,30 +996,39 @@ namespace bcs
 
 	public:
 		explicit array2d(size_type m, size_type n)
-		: view_type(0, m, n, m, n), m_pblock(new block_type(m * n))
+		: view_type(0, m, n, m, n), m_block(m * n)
 		{
-			this->m_base = m_pblock->pbase();
+			this->m_base = m_block.pbase();
 		}
 
 		array2d(size_type m, size_type n, const T& x)
-		: view_type(0, m, n, m, n), m_pblock(new block_type(m * n))
+		: view_type(0, m, n, m, n), m_block(m * n)
 		{
-			this->m_base = m_pblock->pbase();
+			this->m_base = m_block.pbase();
 
 			fill(*this, x);
 		}
 
 		template<typename InputIter>
 		array2d(size_type m, size_type n, InputIter src)
-		: view_type(0, m, n, m, n), m_pblock(new block_type(m * n))
+		: view_type(0, m, n, m, n), m_block(m * n)
 		{
-			this->m_base = m_pblock->pbase();
+			this->m_base = m_block.pbase();
 
 			import_from(*this, src);
 		}
 
+		array2d(const array2d& r)
+		: view_type(0, r.nrows(), r.ncolumns(), r.nrows(), r.ncolumns()), m_block(r.nelems(), r.pbase())
+		{
+			this->m_base = m_block.pbase();
+		}
+
 	private:
-		tr1::shared_ptr<block_type> m_pblock;
+		array2d& operator = (const array2d& r);
+
+	private:
+		block_type m_block;
 
 	}; // end class array2d
 

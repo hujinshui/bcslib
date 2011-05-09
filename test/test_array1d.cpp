@@ -169,7 +169,7 @@ BCS_TEST_CASE( test_indices_array1d )
 	double src1[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 	index_t inds1[4] = {1, 3, 6, 7};
-	aview1d<double, indices> a1(src1, indices(inds1, 4));
+	aview1d<double, indices> a1(src1, indices(ref_arr(inds1, 4)));
 	double r1[] = {2, 4, 7, 8};
 
 	BCS_CHECK( array_integrity_test(a1) );
@@ -177,7 +177,7 @@ BCS_TEST_CASE( test_indices_array1d )
 	BCS_CHECK( array_iteration_test(a1) );
 
 	index_t inds2[6] = {5, 1, 4, 2, 2, 3};
-	aview1d<double, indices> a2(src1, indices(inds2, 6));
+	aview1d<double, indices> a2(src1, indices(ref_arr(inds2, 6)));
 	double r2[] = {6, 2, 5, 3, 3, 4};
 
 	BCS_CHECK( array_integrity_test(a2) );
@@ -185,7 +185,7 @@ BCS_TEST_CASE( test_indices_array1d )
 	BCS_CHECK( array_iteration_test(a2) );
 
 	index_t inds0[5] = {0, 2, 3, 5, 7};
-	aview1d<double, indices> a0(src0, indices(inds0, 5));
+	aview1d<double, indices> a0(src0, indices(ref_arr(inds0, 5)));
 
 	import_from(a0, src1);
 	double g1[10] = {1, 0, 2, 3, 0, 4, 0, 5, 0, 0};
@@ -309,23 +309,23 @@ BCS_TEST_CASE( test_indices_subview )
 
 	aview1d<double, id_ind> a1(src, 8);
 	double r1i[4] = {1, 3, 6, 7};
-	BCS_CHECK_EQUAL( a1.V(indices(inds, 4)), aview1d<double>(r1i, 4));
+	BCS_CHECK_EQUAL( a1.V(indices(ref_arr(inds, 4))), aview1d<double>(r1i, 4));
 
 	aview1d<double, step_ind> a2(src, step_ind(8, 2));
 	double r2i[4] = {2, 6, 12, 14};
-	BCS_CHECK_EQUAL( a2.V(indices(inds, 4)), aview1d<double>(r2i, 4));
+	BCS_CHECK_EQUAL( a2.V(indices(ref_arr(inds, 4))), aview1d<double>(r2i, 4));
 
 	aview1d<double, step_ind> a3(src + 8, step_ind(8, -1));
 	double r3i[4] = {7, 5, 2, 1};
-	BCS_CHECK_EQUAL( a3.V(indices(inds, 4)), aview1d<double>(r3i, 4));
+	BCS_CHECK_EQUAL( a3.V(indices(ref_arr(inds, 4))), aview1d<double>(r3i, 4));
 
 	aview1d<double, rep_ind> a4(src + 2, rep_ind(8));
 	double r4i[4] = {2, 2, 2, 2};
-	BCS_CHECK_EQUAL( a4.V(indices(inds, 4)), aview1d<double>(r4i, 4));
+	BCS_CHECK_EQUAL( a4.V(indices(ref_arr(inds, 4))), aview1d<double>(r4i, 4));
 
 
 	index_t inds_i[8] = {1, 3, 6, 7, 9, 13, 15, 16};
-	aview1d<double, indices> ai(src, indices(inds_i, 8));
+	aview1d<double, indices> ai(src, indices(ref_arr(inds_i, 8)));
 
 	double ria[8] = {1, 3, 6, 7, 9, 13, 15, 16};
 	BCS_CHECK_EQUAL( ai.V(whole()), aview1d<double>(ria, 8) );
@@ -349,7 +349,7 @@ BCS_TEST_CASE( test_indices_subview )
 	BCS_CHECK_EQUAL( ai.V(rep(2, 5)),  aview1d<double>(rir, 5) );
 
 	double rig[4] = {3, 7, 15, 16};
-	BCS_CHECK_EQUAL( ai.V(indices(inds, 4)), aview1d<double>(rig, 4));
+	BCS_CHECK_EQUAL( ai.V(indices(ref_arr(inds, 4))), aview1d<double>(rig, 4));
 
 }
 

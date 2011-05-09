@@ -50,7 +50,7 @@ BCS_TEST_CASE( test_gr_edgelist )
 
 	// for construction with ref
 
-	gr_edgelist<gr_directed> g1r(nv, ne, ref_t(), src_vs, tar_vs);
+	gr_edgelist<gr_directed> g1r(nv, ne, ref_arr(src_vs, ne), ref_arr(tar_vs, ne));
 
 	BCS_CHECK_EQUAL( g1r.nvertices(), nv );
 	BCS_CHECK_EQUAL( g1r.nedges(), ne );
@@ -68,7 +68,7 @@ BCS_TEST_CASE( test_gr_edgelist )
 
 	// for construction with clone
 
-	gr_edgelist<gr_directed> g1c(nv, ne, clone_t(), src_vs, tar_vs);
+	gr_edgelist<gr_directed> g1c(nv, ne, copy_arr(src_vs, ne), copy_arr(tar_vs, ne));
 
 	BCS_CHECK_EQUAL( g1c.nvertices(), nv );
 	BCS_CHECK_EQUAL( g1c.nedges(), ne );
@@ -107,7 +107,7 @@ BCS_TEST_CASE( test_gr_wedgelist )
 
 	// for construction with ref
 
-	gr_wedgelist<double, gr_directed> g1r(nv, ne, ref_t(), src_vs, tar_vs, ws);
+	gr_wedgelist<double, gr_directed> g1r(nv, ne, ref_arr(src_vs, ne), ref_arr(tar_vs, ne), ref_arr(ws, ne));
 
 	BCS_CHECK_EQUAL( g1r.nvertices(), nv );
 	BCS_CHECK_EQUAL( g1r.nedges(), ne );
@@ -127,7 +127,7 @@ BCS_TEST_CASE( test_gr_wedgelist )
 
 	// for construction with clone
 
-	gr_wedgelist<double, gr_directed> g1c(nv, ne, clone_t(), src_vs, tar_vs, ws);
+	gr_wedgelist<double, gr_directed> g1c(nv, ne, copy_arr(src_vs, ne), copy_arr(tar_vs, ne), copy_arr(ws, ne));
 
 	BCS_CHECK_EQUAL( g1c.nvertices(), nv );
 	BCS_CHECK_EQUAL( g1c.nedges(), ne );

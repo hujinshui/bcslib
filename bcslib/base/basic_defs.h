@@ -121,13 +121,6 @@ namespace bcs
 	}
 
 
-	// copy tags
-
-	struct clone_t { };
-	struct own_t { };
-	struct ref_t { };
-
-
 	template<typename T1, typename T2>
 	struct ref_bind
 	{
@@ -179,18 +172,11 @@ namespace bcs
 		}
 	};
 
+	// import tr1 names
 
-
-	namespace tr1
-	{
-
-		// import tr1 names
-
-		using std::tr1::shared_ptr;
-		using std::tr1::array;
-		using std::tr1::tuple;
-
-	}
+	// using std::tr1::shared_ptr;
+	using std::tr1::array;
+	using std::tr1::tuple;
 
 }
 

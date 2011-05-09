@@ -225,8 +225,8 @@ namespace bcs
 		}
 		m_avg_searchlen += (1 - lastF) * K;
 
-		m_I.reset(pbI);
-		m_F.reset(pbF);
+		m_I.set_block(pbI);
+		m_F.set_block(pbF);
 	}
 
 

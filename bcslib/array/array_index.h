@@ -176,7 +176,7 @@ namespace bcs
 				dst[i] = idx0[i] * step;
 			}
 
-			return indices(pb, own_t());
+			return indices(pb);
 		}
 	};
 
@@ -318,7 +318,7 @@ namespace bcs
 				dst[i] = selector[i] * s;
 			}
 
-			return indices(pb, own_t());
+			return indices(pb);
 		}
 	};
 
@@ -380,7 +380,7 @@ namespace bcs
 					dst[i] = base_indexer[etor.get()];
 				}
 
-				return indices(pb, own_t());
+				return indices(pb);
 			}
 		};
 
