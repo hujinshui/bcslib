@@ -13,7 +13,7 @@
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/basic_funcs.h>
 
-#include <iostream>
+#include <stdexcept>
 
 namespace bcs
 {
@@ -136,7 +136,7 @@ namespace bcs
 	{
 		if (p < 1)
 		{
-			throw invalid_argument("The p-value of a norm should be no less than 1.");
+			throw std::invalid_argument("The p-value of a norm should be no less than 1.");
 		}
 
 		if (p == 2)

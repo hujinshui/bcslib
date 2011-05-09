@@ -84,7 +84,7 @@ BCS_TEST_CASE( test_dense_array1d )
 	BCS_CHECK( array_integrity_test(a0) );
 	BCS_CHECK( array_iteration_test(a0) );
 
-	array1d<double> a1(n1, src1[0]);
+	array1d<double> a1(n1, src1);
 
 	BCS_CHECK( array_integrity_test(a1) );
 	BCS_CHECK( array_view_equal(a1, src1, n1) );
