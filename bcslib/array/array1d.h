@@ -552,30 +552,39 @@ namespace bcs
 
 	public:
 		explicit array1d(size_type n)
-		: view_type(0, n), m_pblock(new block_type(n))
+		: view_type(0, n), m_block(n)
 		{
-			this->m_base = m_pblock->pbase();
+			this->m_base = m_block.pbase();
 		}
 
 		array1d(size_type n, const T& x)
-		: view_type(0, n), m_pblock(new block_type(n))
+		: view_type(0, n), m_block(n)
 		{
-			this->m_base = m_pblock->pbase();
+			this->m_base = m_block.pbase();
 
 			fill(*this, x);
 		}
 
 		template<typename InputIter>
 		array1d(size_type n, InputIter src)
-		: view_type(0, n), m_pblock(new block_type(n))
+		: view_type(0, n), m_block(n)
 		{
-			this->m_base = m_pblock->pbase();
+			this->m_base = m_block.pbase();
 
 			import_from(*this, src);
 		}
 
+		array1d(const array1d& r)
+		: view_type(0, r.nelems()), m_block(r.nelems(), r.pbase())
+		{
+			this->m_base = m_block.pbase();
+		}
+
 	private:
-		tr1::shared_ptr<block_type> m_pblock;
+		array1d& operator = (const array1d& r);
+
+	private:
+		block_type m_block;
 
 	}; // end class array1d
 

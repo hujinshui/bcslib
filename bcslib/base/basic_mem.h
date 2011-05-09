@@ -22,7 +22,8 @@
 #include <memory>
 #include <new>
 #include <limits>
-
+#include <type_traits>
+#include <stdexcept>
 
 namespace bcs
 {
@@ -181,6 +182,15 @@ namespace bcs
 		{
 		}
 
+		block(size_type n, const value_type *src)
+		: m_base(n > 0 ? _alloc.allocate(n) : pointer(0)), m_n(n)
+		{
+			if (n > 0)
+			{
+				copy_elements(src, m_base, n);
+			}
+		}
+
 		~block()
 		{
 			if (m_base != 0)
@@ -240,67 +250,229 @@ namespace bcs
     // different ways of input memory
 
     template<typename T>
+    class const_ref_arr_t
+    {
+    public:
+    	typedef const T* const_pointer;
+    	typedef const T& const_reference;
+    	typedef size_t size_type;
+    	typedef ptrdiff_t difference_type;
+
+    	const_ref_arr_t(const_pointer base, size_type n)
+    	: m_base(base), m_n(n)
+    	{
+    	}
+
+		size_type nelems() const
+		{
+			return m_n;
+		}
+
+		const_pointer pbase() const
+		{
+			return m_base;
+		}
+
+		const_pointer pend() const
+		{
+			return m_base + m_n;
+		}
+
+    private:
+    	const T *m_base;
+    	size_t m_n;
+    };
+
+
+    template<typename T>
+    class const_copy_arr_t
+    {
+    public:
+    	typedef const T* const_pointer;
+    	typedef const T& const_reference;
+    	typedef size_t size_type;
+    	typedef ptrdiff_t difference_type;
+
+    	const_copy_arr_t(const_pointer base, size_type n)
+    	: m_base(base), m_n(n)
+    	{
+    	}
+
+		size_type nelems() const
+		{
+			return m_n;
+		}
+
+		const_pointer pbase() const
+		{
+			return m_base;
+		}
+
+		const_pointer pend() const
+		{
+			return m_base + m_n;
+		}
+
+    private:
+    	const T *m_base;
+    	size_t m_n;
+    };
+
+
+    template<typename T>
+    inline const_ref_arr_t<T> ref_arr(const T *p, size_t n)
+    {
+    	return const_ref_arr_t<T>(p, n);
+    }
+
+    template<typename T>
+    inline const_copy_arr_t<T> copy_arr(const T *p, size_t n)
+    {
+    	return const_copy_arr_t<T>(p, n);
+    }
+
+
+    template<typename T>
     class const_memory_proxy
     {
     public:
     	typedef T value_type;
+    	typedef block<T> block_type;
+
+    	typedef const T* const_pointer;
+    	typedef const T& const_reference;
+    	typedef size_t size_type;
+    	typedef ptrdiff_t difference_type;
 
     public:
 
+    	// constructors
+
     	const_memory_proxy()
-    	: m_base(0), m_n(0)
+    	: m_pblock(0), m_base(0), m_n(0)
     	{
     	}
 
-    	const_memory_proxy(clone_t, size_t n, const value_type *src)
-    	: m_pblock(new block<T>(n))
+    	const_memory_proxy(const const_memory_proxy& r)
+    	: m_pblock(0), m_base(0), m_n(0)
+    	{
+    		if (r.m_pblock != 0)
+    		{
+    			m_pblock = new block_type(r.m_n, r.m_base);
+    			m_base = m_pblock->pbase();
+    			m_n = m_pblock->nelems();
+    		}
+    		else
+    		{
+    			m_pblock = 0;
+    			m_base = r.m_base;
+    			m_n = r.m_n;
+    		}
+    	}
+
+
+    	~const_memory_proxy()
+    	{
+    		if (m_pblock != 0)
+    		{
+    			delete m_pblock;
+    		}
+    	}
+
+    	const_memory_proxy(const const_ref_arr_t<T>& src)
+    	: m_pblock(0), m_base(src.pbase()), m_n(src.nelems())
+    	{
+    	}
+
+    	const_memory_proxy(const const_ref_arr_t<T>& src, size_t expect_n)
+    	: m_check_size(src.nelems(), expect_n)
+    	, m_pblock(0), m_base(src.pbase()), m_n(src.nelems())
+    	{
+    	}
+
+    	const_memory_proxy(const const_copy_arr_t<T>& src)
+    	: m_pblock(new block_type(src.nelems(), src.pbase()))
     	, m_base(m_pblock->pbase())
-    	, m_n(n)
-    	{
-    		copy_elements(src, const_cast<T*>(m_base), n);
-    	}
-
-    	const_memory_proxy(ref_t, size_t n, const value_type *src)
-    	: m_base(src), m_n(n)
+    	, m_n(m_pblock->nelems())
     	{
     	}
 
-    	const_memory_proxy(block<T>* pblk)
+    	const_memory_proxy(const const_copy_arr_t<T>& src, size_t expect_n)
+    	: m_check_size(src.nelems(), expect_n)
+    	, m_pblock(new block_type(src.nelems(), src.pbase()))
+    	, m_base(m_pblock->pbase())
+    	, m_n(m_pblock->nelems())
+    	{
+    	}
+
+    	const_memory_proxy(block_type* pblk)
     	: m_pblock(pblk)
     	, m_base(pblk->pbase())
     	, m_n(pblk->nelems())
     	{
     	}
 
-    	void reset(block<T>* pblk)
+    	const_memory_proxy(block_type* pblk, size_t expect_n)
+    	: m_check_size(pblk->nelems(), expect_n)
+    	, m_pblock(pblk)
+    	, m_base(pblk->pbase())
+    	, m_n(pblk->nelems())
     	{
-    		m_pblock.reset(pblk);
+    	}
+
+    	void set_block(block_type *pblk)
+    	{
+    		if (m_base != 0 || m_pblock != 0)
+    		{
+    			throw std::invalid_argument("Cannot set block to non-empty proxy.");
+    		}
+
+    		m_pblock = pblk;
     		m_base = pblk->pbase();
     		m_n = pblk->nelems();
     	}
 
-    	size_t nelems() const
+
+    	// basic info
+
+    	size_type nelems() const
     	{
     		return m_n;
     	}
 
-    	const value_type *pbase() const
+    	const_pointer pbase() const
     	{
     		return m_base;
     	}
 
-    	const value_type *pend() const
+    	const_pointer pend() const
     	{
     		return m_base + m_n;
     	}
 
-    	const value_type& operator[] (ptrdiff_t i) const
+    	const_reference operator[] (difference_type i) const
     	{
     		return m_base[i];
     	}
 
-    public:
-    	tr1::shared_ptr<block<T> > m_pblock;
+    private:
+    	const_memory_proxy& operator = (const const_memory_proxy& );
+
+    	struct _size_checker
+    	{
+    		_size_checker() { }
+
+    		_size_checker(size_t a, size_t b)
+    		{
+    			if (a != b)
+    				throw std::invalid_argument(
+    					"The size of the input array does not match expected.");
+    		}
+    	};
+
+    private:
+    	_size_checker m_check_size;
+    	block_type* m_pblock;
     	const value_type* m_base;
     	size_t m_n;
 

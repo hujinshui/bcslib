@@ -385,43 +385,25 @@ namespace bcs
 	public:
 		static const bool is_open_end = false;
 
-		indices(const index_t *p, size_t n)
-		: m_pblock(), m_pinds(p), m_n(n)
+		indices(const indices& s) : m_inds(s.m_inds)
 		{
 		}
 
-		indices(const std::vector<index_t>& refvec)
-		: m_pblock(), m_pinds(&(refvec[0])), m_n((size_t)refvec.size())
+		template<typename Arr>
+		explicit indices(Arr a) : m_inds(a)
 		{
 		}
 
-		indices(const index_t *src, size_t n, clone_t)
-		: m_pblock(new block<index_t>(n)), m_pinds(m_pblock->pbase()), m_n(n)
-		{
-			copy_elements(src, const_cast<index_t*>(m_pinds), n);
-		}
+		size_t size() const { return m_inds.nelems(); }
 
-		indices(const std::vector<index_t>& src, clone_t)
-		: m_pblock(new block<index_t>(src.size())), m_pinds(m_pblock->pbase()), m_n(src.size())
-		{
-			copy_elements(&(src[0]), const_cast<index_t*>(m_pinds), src.size());
-		}
-
-		indices(block<index_t>* p_newblk, own_t)
-		: m_pblock(p_newblk), m_pinds(p_newblk->pbase()), m_n(p_newblk->nelems())
-		{
-		}
-
-
-		size_t size() const { return m_n; }
-
-		bool is_empty() const { return m_n == 0; }
+		bool is_empty() const { return m_inds.nelems() == 0; }
 
 		bool is_contained_in(size_t n) const
 		{
-			for (index_t i = 0; i < (index_t)m_n; ++i)
+			index_t ne = (index_t)m_inds.nelems();
+			for (index_t i = 0; i < ne; ++i)
 			{
-				index_t v = m_pinds[i];
+				index_t v = m_inds[i];
 				if (v < 0 || v >= (index_t)n) return false;
 			}
 			return true;
@@ -429,12 +411,12 @@ namespace bcs
 
 		index_t operator[] (index_t i) const
 		{
-			return m_pinds[i];
+			return m_inds[i];
 		}
 
 		index_t step_at(index_t i) const
 		{
-			return m_pinds[i+1] - m_pinds[i];
+			return m_inds[i+1] - m_inds[i];
 		}
 
 	public:
@@ -470,10 +452,7 @@ namespace bcs
 
 
 	private:
-		tr1::shared_ptr<block<index_t> > m_pblock;
-		const index_t *m_pinds;
-		size_t m_n;
-
+		const_memory_proxy<index_t> m_inds;
 
 	}; // end class indices
 

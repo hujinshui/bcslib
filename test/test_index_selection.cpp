@@ -169,7 +169,7 @@ BCS_TEST_CASE( test_indices )
 {
 	index_t rg_s[5] = {3, 4, 6, 1, 2};
 
-	indices rg(rg_s, 5);
+	indices rg(ref_arr(rg_s, 5));
 
 	BCS_CHECK( !is_open_end_selector(rg) );
 

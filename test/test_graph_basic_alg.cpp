@@ -61,15 +61,15 @@ BCS_TEST_CASE( test_bfs )
 	const int nv = 5;
 	const int ne = 7;
 
-	gr_index_t src_inds[ne * 2] = {0, 0, 1, 1, 2, 3, 4,   1, 2, 2, 3, 3, 4, 0};
-	gr_index_t tar_inds[ne * 2] = {1, 2, 2, 3, 3, 4, 0,   0, 0, 1, 1, 2, 3, 4};
+	gr_index_t src_inds[ne * 2] = {0, 0, 1, 1, 2, 3, 4};
+	gr_index_t tar_inds[ne * 2] = {1, 2, 2, 3, 3, 4, 0};
 
 	const vertex_t *src_vs = (const vertex_t*)src_inds;
 	const vertex_t *tar_vs = (const vertex_t*)tar_inds;
 
 	// directed
 
-	gr_adjlist<gr_directed> gd(nv, ne, ref_t(), src_vs, tar_vs);
+	gr_adjlist<gr_directed> gd(nv, ne, src_vs, tar_vs);
 
 	std::vector<vertex_t> vorder_d;
 	my_bfs_visitor vis_d(vorder_d);
@@ -81,7 +81,7 @@ BCS_TEST_CASE( test_bfs )
 
 	// undirected
 
-	gr_adjlist<gr_undirected> gu(nv, ne, ref_t(), src_vs, tar_vs);
+	gr_adjlist<gr_undirected> gu(nv, ne, src_vs, tar_vs);
 
 	std::vector<vertex_t> vorder_u;
 	my_bfs_visitor vis_u(vorder_u);
@@ -99,15 +99,15 @@ BCS_TEST_CASE( test_dfs )
 	const int nv = 5;
 	const int ne = 6;
 
-	gr_index_t src_inds[ne * 2] = {0, 0, 1, 2, 3, 4,   1, 2, 3, 3, 4, 0};
-	gr_index_t tar_inds[ne * 2] = {1, 2, 3, 3, 4, 0,   0, 0, 1, 2, 3, 4};
+	gr_index_t src_inds[ne * 2] = {0, 0, 1, 2, 3, 4};
+	gr_index_t tar_inds[ne * 2] = {1, 2, 3, 3, 4, 0};
 
 	const vertex_t *src_vs = (const vertex_t*)src_inds;
 	const vertex_t *tar_vs = (const vertex_t*)tar_inds;
 
 	// directed
 
-	gr_adjlist<gr_directed> gd(nv, ne, ref_t(), src_vs, tar_vs);
+	gr_adjlist<gr_directed> gd(nv, ne, src_vs, tar_vs);
 
 	std::vector<vertex_t> vorder_d;
 	my_dfs_visitor vis_d(vorder_d);
@@ -120,7 +120,7 @@ BCS_TEST_CASE( test_dfs )
 
 	// undirected
 
-	gr_adjlist<gr_undirected> gu(nv, ne, ref_t(), src_vs, tar_vs);
+	gr_adjlist<gr_undirected> gu(nv, ne, src_vs, tar_vs);
 
 	std::vector<vertex_t> vorder_u;
 	my_dfs_visitor vis_u(vorder_u);
@@ -145,7 +145,7 @@ BCS_TEST_CASE( test_dijkstra )
 	const vertex_t *src_vs = (const vertex_t*)(src_inds);
 	const vertex_t *tar_vs = (const vertex_t*)(tar_inds);
 
-	gr_wadjlist<double, gr_directed> g(nv, ne, ref_t(), src_vs, tar_vs, ws);
+	gr_wadjlist<double, gr_directed> g(nv, ne, src_vs, tar_vs, ws);
 
 	using boost::distance_map;
 	using boost::predecessor_map;
@@ -181,7 +181,7 @@ BCS_TEST_CASE( test_kruskal )
 	const vertex_t *src_vs = (const vertex_t*)(src_inds);
 	const vertex_t *tar_vs = (const vertex_t*)(tar_inds);
 
-	gr_wadjlist<double, gr_undirected> g(nv, ne, clone_t(), src_vs, tar_vs, ws);
+	gr_wadjlist<double, gr_undirected> g(nv, ne, src_vs, tar_vs, ws);
 
 	std::vector<edge_t> eds;
 
@@ -206,7 +206,7 @@ BCS_TEST_CASE( test_prim )
 	const vertex_t *src_vs = (const vertex_t*)(src_inds);
 	const vertex_t *tar_vs = (const vertex_t*)(tar_inds);
 
-	gr_wadjlist<double, gr_undirected> g(nv, ne, clone_t(), src_vs, tar_vs, ws);
+	gr_wadjlist<double, gr_undirected> g(nv, ne, src_vs, tar_vs, ws);
 
 	vertex_t preds[nv];
 
