@@ -11,19 +11,19 @@
 
 #include <bcslib/base/config.h>
 #include <bcslib/base/basic_defs.h>
+#include <bcslib/base/import_tr1.h>
 
+#include <cstring>  // for low-level memory manipulation functions
+#include <new>   // for std::bad_alloc
+#include <stdexcept>  // for std::invalid_argument
+#include <limits>  // for computing max() in allocator types
 
+// for platform-dependent aligned allocation
 #include <stdlib.h>
 #if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
 #include <malloc.h>
 #endif
 
-#include <cstring>
-#include <memory>
-#include <new>
-#include <limits>
-#include <type_traits>
-#include <stdexcept>
 
 namespace bcs
 {
@@ -349,44 +349,18 @@ namespace bcs
     	// constructors
 
     	const_memory_proxy()
-    	: m_pblock(0), m_base(0), m_n(0)
+    	: m_pblock(), m_base(0), m_n(0)
     	{
-    	}
-
-    	const_memory_proxy(const const_memory_proxy& r)
-    	: m_pblock(0), m_base(0), m_n(0)
-    	{
-    		if (r.m_pblock != 0)
-    		{
-    			m_pblock = new block_type(r.m_n, r.m_base);
-    			m_base = m_pblock->pbase();
-    			m_n = m_pblock->nelems();
-    		}
-    		else
-    		{
-    			m_pblock = 0;
-    			m_base = r.m_base;
-    			m_n = r.m_n;
-    		}
-    	}
-
-
-    	~const_memory_proxy()
-    	{
-    		if (m_pblock != 0)
-    		{
-    			delete m_pblock;
-    		}
     	}
 
     	const_memory_proxy(const const_ref_arr_t<T>& src)
-    	: m_pblock(0), m_base(src.pbase()), m_n(src.nelems())
+    	: m_pblock(), m_base(src.pbase()), m_n(src.nelems())
     	{
     	}
 
     	const_memory_proxy(const const_ref_arr_t<T>& src, size_t expect_n)
     	: m_check_size(src.nelems(), expect_n)
-    	, m_pblock(0), m_base(src.pbase()), m_n(src.nelems())
+    	, m_pblock(), m_base(src.pbase()), m_n(src.nelems())
     	{
     	}
 
@@ -422,12 +396,7 @@ namespace bcs
 
     	void set_block(block_type *pblk)
     	{
-    		if (m_base != 0 || m_pblock != 0)
-    		{
-    			throw std::invalid_argument("Cannot set block to non-empty proxy.");
-    		}
-
-    		m_pblock = pblk;
+    		m_pblock.reset(pblk);
     		m_base = pblk->pbase();
     		m_n = pblk->nelems();
     	}
@@ -472,7 +441,7 @@ namespace bcs
 
     private:
     	_size_checker m_check_size;
-    	block_type* m_pblock;
+    	shared_ptr<block_type> m_pblock;
     	const value_type* m_base;
     	size_t m_n;
 

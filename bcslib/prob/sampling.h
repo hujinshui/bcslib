@@ -17,19 +17,19 @@
 #include <limits>
 #include <cmath>
 
-#if ((BCSLIB_COMPILER == BCSLIB_GCC) && (__GNUC_MINOR__ <= 2))
-#include <boost/tr1/random.hpp>  	// g++ 4.2 has several bugs in <random>
-#else
-#if (BCSLIB_COMPILER == BCSLIB_MSVC)
+#if (BCSLIB_TR1_INCLUDE_DIR == BCS_TR1_INCLUDE_STD_DIR)
 #include <random>
-#else
+#elif (BCSLIB_TR1_INCLUDE_DIR == BCS_TR1_INCLUDE_TR1_DIR)
 #include <tr1/random>
 #endif
-#endif
+
 
 
 namespace bcs
 {
+
+	typedef BCS_TR1_FROM_NAMESPACE::mt19937 default_tr1_rand_engine;
+
 
 	class real_stream_for_diagnosis
 	{
@@ -84,9 +84,6 @@ namespace bcs
 
 	}; // end class real_stream_for_testing
 
-
-
-	typedef std::tr1::mt19937 default_tr1_rand_engine;
 
 	template<typename TEngine32=default_tr1_rand_engine>  // TEngine32 must generates 32-bit random bits
 	class randstream
