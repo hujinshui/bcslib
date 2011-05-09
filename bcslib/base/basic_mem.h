@@ -74,7 +74,7 @@ namespace bcs
 
     const size_t default_memory_alignment = 16;
 
-    template<typename T, size_t Alignment=default_memory_alignment>
+    template<typename T>
     class aligned_allocator
     {
     public:
@@ -86,15 +86,33 @@ namespace bcs
     	typedef size_t size_type;
     	typedef ptrdiff_t difference_type;
 
-    	static const size_t alignment = Alignment;
-
     public:
-    	aligned_allocator() { }
+    	aligned_allocator()
+    	: m_alignment(default_memory_alignment)
+    	{
+    	}
 
-    	aligned_allocator(const aligned_allocator& ) { }
+    	explicit aligned_allocator(size_t align)
+    	: m_alignment(align)
+    	{
+    	}
+
+    	aligned_allocator(const aligned_allocator& r)
+    	: m_alignment(r.alignment())
+    	{
+    	}
 
     	template<typename U>
-    	aligned_allocator(const aligned_allocator<U>& ) { }
+    	aligned_allocator(const aligned_allocator<U>& r)
+    	: m_alignment(r.alignment())
+    	{
+    	}
+
+    	size_t alignment() const
+    	{
+    		return m_alignment;
+    	}
+
 
     	pointer address( reference x ) const
     	{
@@ -115,7 +133,7 @@ namespace bcs
     	{
 #if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
 
-    		pointer p = (pointer)::_aligned_malloc(sizeof(value_type) * n, alignment);
+    		pointer p = (pointer)::_aligned_malloc(sizeof(value_type) * n, m_alignment);
     		if (p == 0)
     		{
     			throw std::bad_alloc();
@@ -125,7 +143,7 @@ namespace bcs
 #elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
 
     		pointer p = 0;
-    		if (::posix_memalign((void**)(&p), alignment, sizeof(value_type) * n) != 0)
+    		if (::posix_memalign((void**)(&p), m_alignment, sizeof(value_type) * n) != 0)
     		{
     			throw std::bad_alloc();
     		}
@@ -152,6 +170,9 @@ namespace bcs
     		p->~value_type();
     	}
 
+    private:
+    	size_t m_alignment;
+
     }; // end class aligned_allocator
 
 
@@ -177,13 +198,22 @@ namespace bcs
 		typedef typename allocator_type::const_reference const_reference;
 
 	public:
-		block(size_type n)
-		: m_base(n > 0 ? _alloc.allocate(n) : pointer(0)), m_n(n)
+		explicit block(size_type n)
+		: m_allocator()
+		, m_base(n > 0 ? m_allocator.allocate(n) : pointer(0)), m_n(n)
 		{
 		}
 
+		block(size_type n, const allocator_type& alloc)
+		: m_allocator(alloc)
+		, m_base(n > 0 ? m_allocator.allocate(n) : pointer(0)), m_n(n)
+		{
+		}
+
+
 		block(size_type n, const value_type *src)
-		: m_base(n > 0 ? _alloc.allocate(n) : pointer(0)), m_n(n)
+		: m_allocator()
+		, m_base(n > 0 ? m_allocator.allocate(n) : pointer(0)), m_n(n)
 		{
 			if (n > 0)
 			{
@@ -191,11 +221,22 @@ namespace bcs
 			}
 		}
 
+		block(size_type n, const value_type *src, const allocator_type& alloc)
+		: m_allocator(alloc)
+		, m_base(n > 0 ? m_allocator.allocate(n) : pointer(0)), m_n(n)
+		{
+			if (n > 0)
+			{
+				copy_elements(src, m_base, n);
+			}
+		}
+
+
 		~block()
 		{
 			if (m_base != 0)
 			{
-				_alloc.deallocate(this->pbase(), this->nelems());
+				m_allocator.deallocate(this->pbase(), this->nelems());
 			}
 		}
 
@@ -239,10 +280,10 @@ namespace bcs
 		block<T>& operator =(const block<T>&);
 
 	private:
+		allocator_type m_allocator;
 		pointer m_base;
 		size_type m_n;
 
-		allocator_type _alloc;
 
 	}; // end class block
 
@@ -446,6 +487,7 @@ namespace bcs
     	size_t m_n;
 
     }; // end class const_memory_proxy
+
 
 }
 

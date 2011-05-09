@@ -17,7 +17,7 @@ namespace bcs
 
 	template<typename T, typename TOrd, class TIndexer0=id_ind, class TIndexer1=id_ind> class const_aview2d;
 	template<typename T, typename TOrd, class TIndexer0=id_ind, class TIndexer1=id_ind> class aview2d;
-	template<typename T, typename TOrd, class Alloc=aligned_allocator<T, default_array_memory_alignment> > class array2d;
+	template<typename T, typename TOrd, class Alloc=aligned_allocator<T> > class array2d;
 
 
 	// order-specific offset calculation
@@ -996,13 +996,13 @@ namespace bcs
 
 	public:
 		explicit array2d(size_type m, size_type n)
-		: view_type(0, m, n, m, n), m_pblock(new block_type(m * n))
+		: view_type(0, m, n, m, n), m_pblock(create_blk(m * n))
 		{
 			this->m_base = m_pblock->pbase();
 		}
 
 		array2d(size_type m, size_type n, const T& x)
-		: view_type(0, m, n, m, n), m_pblock(new block_type(m * n))
+		: view_type(0, m, n, m, n), m_pblock(create_blk(m * n))
 		{
 			this->m_base = m_pblock->pbase();
 
@@ -1011,7 +1011,7 @@ namespace bcs
 
 		template<typename InputIter>
 		array2d(size_type m, size_type n, InputIter src)
-		: view_type(0, m, n, m, n), m_pblock(new block_type(m * n))
+		: view_type(0, m, n, m, n), m_pblock(create_blk(m * n))
 		{
 			this->m_base = m_pblock->pbase();
 
@@ -1020,6 +1020,12 @@ namespace bcs
 
 	private:
 		shared_ptr<block_type> m_pblock;
+
+	private:
+		static block_type* create_blk(size_type n)
+		{
+			return array_block_creater<T, Alloc>::create(n);
+		}
 
 	}; // end class array2d
 
