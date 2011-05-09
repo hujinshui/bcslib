@@ -104,7 +104,8 @@ namespace bcs
 
 			if (use_sort)
 			{
-				get_multi_by_sort(len, ublk.pbase(), buf);
+				tbuffer wsbuf(len * sizeof(indexed_entry<double>));
+				get_multi_by_sort(len, ublk.pbase(), buf, wsbuf);
 			}
 			else
 			{
@@ -128,7 +129,7 @@ namespace bcs
 			}
 		}
 
-		void get_multi_by_sort(size_t len, const double *u, T *dst, indexed_entry<double>* ws = 0);
+		void get_multi_by_sort(size_t len, const double *u, T *dst, tbuffer& wsbuf);
 
 	private:
 		void _init_internal(size_t K, const double *p);
@@ -145,15 +146,11 @@ namespace bcs
 
 
 	template<typename T>
-	void discrete_sampler<T>::get_multi_by_sort(size_t len, const double *u, T *dst, indexed_entry<double>* ws)
+	void discrete_sampler<T>::get_multi_by_sort(size_t len, const double *u, T *dst, tbuffer& wsbuf)
 	{
 		// prepare work space
-		block<indexed_entry<double> > *p_wsblk = 0;
-		if (ws == 0)
-		{
-			p_wsblk = new block<indexed_entry<double> >(len);
-			ws = p_wsblk->pbase();
-		}
+
+		indexed_entry<double> *ws = (indexed_entry<double>*)(wsbuf.request(len * sizeof(indexed_entry<double>)));
 
 		// sort u with indices
 
@@ -187,13 +184,6 @@ namespace bcs
 		while (i < len)
 		{
 			dst[ws[i++].index] = m_K;
-		}
-
-		// finalize
-
-		if (p_wsblk != 0)
-		{
-			delete p_wsblk;
 		}
 	}
 
