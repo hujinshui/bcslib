@@ -554,6 +554,7 @@ namespace bcs
     		return m_base[i];
     	}
 
+
     private:
     	const_memory_proxy& operator = (const const_memory_proxy& );
 

@@ -14,8 +14,8 @@
 using namespace bcs;
 using namespace bcs::test;
 
-template class discrete_distr<int32_t>;
-template class discrete_sampler<int32_t>;
+template class bcs::discrete_distr<int32_t>;
+template class bcs::discrete_sampler<int32_t>;
 
 typedef discrete_distr<int32_t> ddistr;
 typedef discrete_sampler<int32_t> dsampler;

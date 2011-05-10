@@ -186,7 +186,7 @@ namespace bcs
 
 		gr_index_t out_offset_end(const vertex_t& v) const
 		{
-			return m_out_offsets[v.index] + m_out_degrees[v.index];
+			return m_out_offsets[v.index] + (gr_index_t)m_out_degrees[v.index];
 		}
 
 

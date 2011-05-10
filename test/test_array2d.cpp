@@ -59,16 +59,18 @@ void print_collection(FwdIter first, FwdIter last)
 template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 bool array_integrity_test(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1>& view)
 {
-	size_t m = view.dim0();
-	size_t n = view.dim1();
+	index_t m = view.dim0();
+	index_t n = view.dim1();
 
 	if (view.ndims() != 2) return false;
+	if (view.nrows() != (size_t)m) return false;
+	if (view.ncolumns() != (size_t)n) return false;
 	if (view.shape() != arr_shape(m, n)) return false;
-	if (view.nelems() != m * n) return false;
+	if (view.nelems() != (size_t)(m * n)) return false;
 
-	for (index_t i = 0; i < (index_t)m; ++i)
+	for (index_t i = 0; i < m; ++i)
 	{
-		for (index_t j = 0; j < (index_t)n; ++j)
+		for (index_t j = 0; j < n; ++j)
 		{
 			if (view.ptr(i, j) != &(view(i, j))) return false;
 		}
@@ -84,41 +86,41 @@ bool array_integrity_test(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1
 template<typename T, class TIndexer0, class TIndexer1>
 bool array_iteration_test(const bcs::const_aview2d<T, row_major_t, TIndexer0, TIndexer1>& view)
 {
-	size_t m = view.dim0();
-	size_t n = view.dim1();
+	index_t m = view.dim0();
+	index_t n = view.dim1();
 
-	bcs::block<T> buffer(m * n);
+	bcs::block<T> buffer((size_t)(m * n));
 	T *p = buffer.pbase();
 
-	for (index_t i = 0; i < (index_t)m; ++i)
+	for (index_t i = 0; i < m; ++i)
 	{
-		for (index_t j = 0; j < (index_t)n; ++j)
+		for (index_t j = 0; j < n; ++j)
 		{
 			*p++ = view(i, j);
 		}
 	}
 
-	return collection_equal(view.begin(), view.end(), buffer.pbase(), m * n);
+	return collection_equal(view.begin(), view.end(), buffer.pbase(), (size_t)(m * n));
 }
 
 template<typename T, class TIndexer0, class TIndexer1>
 bool array_iteration_test(const bcs::const_aview2d<T, column_major_t, TIndexer0, TIndexer1>& view)
 {
-	size_t m = view.dim0();
-	size_t n = view.dim1();
+	index_t m = view.dim0();
+	index_t n = view.dim1();
 
-	bcs::block<T> buffer(m * n);
+	bcs::block<T> buffer((size_t)(m * n));
 	T *p = buffer.pbase();
 
-	for (index_t j = 0; j < (index_t)n; ++j)
+	for (index_t j = 0; j < n; ++j)
 	{
-		for (index_t i = 0; i < (index_t)m; ++i)
+		for (index_t i = 0; i < m; ++i)
 		{
 			*p++ = view(i, j);
 		}
 	}
 
-	return collection_equal(view.begin(), view.end(), buffer.pbase(), m * n);
+	return collection_equal(view.begin(), view.end(), buffer.pbase(), (size_t)(m * n));
 }
 
 

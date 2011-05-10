@@ -41,12 +41,12 @@ void print_array(const bcs::const_aview1d<T, TIndexer>& view, const char *title 
 template<typename T, class TIndexer>
 bool array_integrity_test(const bcs::const_aview1d<T, TIndexer>& view)
 {
-	size_t n = view.nelems();
+	index_t n = view.dim0();
 
 	if (view.ndims() != 1) return false;
 	if (view.shape() != arr_shape(n)) return false;
 
-	for (index_t i = 0; i < (index_t)n; ++i)
+	for (index_t i = 0; i < n; ++i)
 	{
 		if (view.ptr(i) != &(view(i))) return false;
 		if (view.ptr(i) != &(view[i])) return false;
@@ -62,11 +62,11 @@ bool array_integrity_test(const bcs::const_aview1d<T, TIndexer>& view)
 template<typename T, class TIndexer>
 bool array_iteration_test(const bcs::const_aview1d<T, TIndexer>& view)
 {
-	size_t n = view.nelems();
-	bcs::block<T> buffer(n);
-	for (size_t i = 0; i < n; ++i) buffer[i] = view(i);
+	index_t n = view.dim0();
+	bcs::block<T> buffer(view.nelems());
+	for (index_t i = 0; i < n; ++i) buffer[i] = view(i);
 
-	return collection_equal(view.begin(), view.end(), buffer.pbase(), n);
+	return collection_equal(view.begin(), view.end(), buffer.pbase(), (size_t)n);
 }
 
 

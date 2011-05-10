@@ -23,7 +23,7 @@ namespace bcs
 		static const size_t num_channels = bcs::pixel_traits<TPixel>::num_channels;
 
 	public:
-		const_imview(const pixel_type *base, size_t w, size_t h, size_t stride)
+		const_imview(const pixel_type *base, size_t w, size_t h, img_index_t stride)
 		: m_base(const_cast<uint8_t*>((const uint8_t*)base))
 		, m_width(w), m_height(h), m_stride(stride)
 		{
@@ -31,7 +31,7 @@ namespace bcs
 
 		const_imview(const pixel_type *base, size_t w, size_t h)
 		: m_base(const_cast<uint8_t*>((const uint8_t*)base))
-		, m_width(w), m_height(h), m_stride(w * sizeof(pixel_type))
+		, m_width(w), m_height(h), m_stride((img_index_t)(w * sizeof(pixel_type)))
 		{
 		}
 
@@ -45,7 +45,7 @@ namespace bcs
 			return m_height;
 		}
 
-		size_t stride() const
+		img_index_t stride() const
 		{
 			return m_stride;
 		}
@@ -57,7 +57,7 @@ namespace bcs
 
 		bool with_dense_layout() const
 		{
-			return m_stride == m_width * sizeof(pixel_type);
+			return m_stride == (img_index_t)(m_width * sizeof(pixel_type));
 		}
 
 	public:
@@ -91,7 +91,7 @@ namespace bcs
 		uint8_t *m_base;
 		size_t m_width;
 		size_t m_height;
-		size_t m_stride;  // # of bytes per row
+		img_index_t m_stride;  // # of bytes per row
 
 	}; // end class const_imview
 
@@ -105,7 +105,7 @@ namespace bcs
 		static const size_t num_channels = bcs::pixel_traits<TPixel>::num_channels;
 
 	public:
-		imview(const pixel_type *base, size_t w, size_t h, size_t stride)
+		imview(const pixel_type *base, size_t w, size_t h, img_index_t stride)
 		: const_imview<TPixel>(base, w, h, stride)
 		{
 		}

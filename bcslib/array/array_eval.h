@@ -102,7 +102,7 @@ namespace bcs
 		array1d<T1> a1(pairs.nelems());
 		array1d<T2> a2(pairs.nelems());
 
-		index_t n = (index_t)pairs.nelems();
+		index_t n = pairs.dim0();
 		for (index_t i = 0; i < n; ++i)
 		{
 			const std::pair<T1, T2>& p = pairs(i);
@@ -796,7 +796,6 @@ namespace bcs
 		return array_columns_eval(x, vec_Linfnorm_evaluator<T>());
 	}
 
-
-};
+}
 
 #endif 

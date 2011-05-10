@@ -192,9 +192,9 @@ namespace bcs
 	{
 		// sort p in descending order with indices
 
-		block<indexed_entry<double> > bb(K);
+		block<indexed_entry<double, T> > bb(K);
 		copy_elements_attach_indices(p, bb.pbase(), K);
-		std::sort(bb.pbase(), bb.pend(), std::greater<indexed_entry<double> >());
+		std::sort(bb.pbase(), bb.pend(), std::greater<indexed_entry<double, T> >());
 
 		// generate m_I, m_F, and calculate avg_searchlen
 
@@ -206,7 +206,9 @@ namespace bcs
 
 		double lastF = 0;
 		m_avg_searchlen = 0;
-		for (size_t k = 0; k < K; ++k)
+
+		int Ki = (int)K;
+		for (int k = 0; k < Ki; ++k)
 		{
 			I[k] = bb[k].index;
 			double p = bb[k].value;

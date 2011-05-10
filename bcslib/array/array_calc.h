@@ -44,7 +44,7 @@ namespace bcs
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename TVecFunc>
 	inline array2d<T, TOrd> array_calc(const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& x, TVecFunc vecfunc)
 	{
-		array2d<T, TOrd> y(x.dim0(), x.dim1());
+		array2d<T, TOrd> y(x.nrows(), x.ncolumns());
 
 		if (is_dense_view(x))
 		{
@@ -107,7 +107,7 @@ namespace bcs
 			throw array_size_mismatch();
 		}
 
-		array2d<T, TOrd> y(x1.dim0(), x1.dim1());
+		array2d<T, TOrd> y(x1.nrows(), x1.ncolumns());
 		size_t n = x1.nelems();
 
 		if (is_dense_view(x1))
@@ -178,7 +178,7 @@ namespace bcs
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, typename TVecFunc>
 	inline array2d<T, TOrd> array_calc(const const_aview2d<T, TOrd, LIndexer0, LIndexer1>& x1, const T& x2, TVecFunc vecfunc)
 	{
-		array2d<T, TOrd> y(x1.dim0(), x1.dim1());
+		array2d<T, TOrd> y(x1.nrows(), x1.ncolumns());
 		size_t n = x1.nelems();
 
 		if (is_dense_view(x1))
@@ -196,7 +196,7 @@ namespace bcs
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1, typename TVecFunc>
 	inline array2d<T, TOrd> array_calc(const T& x1, const const_aview2d<T, TOrd, RIndexer0, RIndexer1>& x2, TVecFunc vecfunc)
 	{
-		array2d<T, TOrd> y(x2.dim0(), x2.dim1());
+		array2d<T, TOrd> y(x2.nrows(), x2.ncolumns());
 		size_t n = x2.nelems();
 
 		if (is_dense_view(x2))

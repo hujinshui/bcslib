@@ -140,9 +140,9 @@ namespace bcs
 
 		size_t size() const
 		{
-			return step > 0 ?
+			return (size_t)(step > 0 ?
 					((end > begin) ? ((end - begin - 1) / step + 1) : 0) :
-					((end < begin) ? ((end - begin + 1) / step + 1) : 0);
+					((end < begin) ? ((end - begin + 1) / step + 1) : 0));
 		}
 
 		bool is_empty() const

@@ -183,7 +183,7 @@ namespace bcs
 
 	public:
 		const_aview1d(const_pointer base, const indexer_type& indexer)
-		: m_base(const_cast<pointer>(base)), m_ne(indexer.size()), m_indexer(indexer)
+		: m_base(const_cast<pointer>(base)), m_d0((index_t)indexer.size()), m_indexer(indexer)
 		{
 		}
 
@@ -194,12 +194,17 @@ namespace bcs
 
 		size_type nelems() const
 		{
-			return m_ne;
+			return (size_type)m_d0;
+		}
+
+		index_t dim0() const
+		{
+			return m_d0;
 		}
 
 		shape_type shape() const
 		{
-			return arr_shape(m_ne);
+			return arr_shape(m_d0);
 		}
 
 		const indexer_type& get_indexer() const
@@ -238,7 +243,7 @@ namespace bcs
 
 		const_iterator end() const
 		{
-			return _iterators::get_const_iterator(m_base, m_indexer, m_ne);
+			return _iterators::get_const_iterator(m_base, m_indexer, m_d0);
 		}
 
 		// Sub-view
@@ -258,7 +263,7 @@ namespace bcs
 
 	protected:
 		pointer m_base;
-		size_type m_ne;
+		index_type m_d0;
 		indexer_type m_indexer;
 
 	}; // end class const_aview1d
@@ -340,12 +345,12 @@ namespace bcs
 
 		const_iterator end() const
 		{
-			return _iterators::get_const_iterator(this->m_base, this->m_indexer, this->m_ne);
+			return _iterators::get_const_iterator(this->m_base, this->m_indexer, this->m_d0);
 		}
 
 		iterator end()
 		{
-			return _iterators::get_iterator(this->m_base, this->m_indexer, this->m_ne);
+			return _iterators::get_iterator(this->m_base, this->m_indexer, this->m_d0);
 		}
 
 		// Sub-view
