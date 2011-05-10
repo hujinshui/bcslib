@@ -17,10 +17,16 @@
 #include <limits>
 #include <cmath>
 
+#if (__GNUC_MINOR__ >= 4)
 #if (BCSLIB_TR1_INCLUDE_DIR == BCS_TR1_INCLUDE_STD_DIR)
 #include <random>
 #elif (BCSLIB_TR1_INCLUDE_DIR == BCS_TR1_INCLUDE_TR1_DIR)
 #include <tr1/random>
+#endif
+#define BCS_TR1_RANDOM_FROM_NAMESPACE BCS_TR1_FROM_NAMESPACE
+#else
+#include <boost/random.hpp>
+#define BCS_TR1_RANDOM_FROM_NAMESPACE boost
 #endif
 
 
@@ -28,7 +34,8 @@
 namespace bcs
 {
 
-	typedef BCS_TR1_FROM_NAMESPACE::mt19937 default_tr1_rand_engine;
+
+	typedef BCS_TR1_RANDOM_FROM_NAMESPACE::mt19937 default_tr1_rand_engine;
 
 
 	class real_stream_for_diagnosis
@@ -99,7 +106,7 @@ namespace bcs
 
 		void seed(unsigned long s)
 		{
-			m_eng.seed(s);
+			m_eng.seed((uint32_t)(s));
 		}
 
 		uint32_t randu32()

@@ -90,7 +90,7 @@ namespace bcs
 
 			base_test_unit* get_unit(int i) const
 			{
-				return m_tunits[i];
+				return m_tunits[(size_t)i];
 			}
 
 		private:

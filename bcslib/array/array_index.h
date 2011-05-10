@@ -308,12 +308,12 @@ namespace bcs
 		{
 			offset = 0;
 
-			size_t n = selector.size();
-			block<index_t>* pb = new block<index_t>(n);
+			index_t n = (index_t)selector.size();
+			block<index_t>* pb = new block<index_t>((size_t)n);
 			index_t *dst = pb->pbase();
 
 			index_t s = base_indexer.step();
-			for (size_t i = 0; i < n; ++i)
+			for (index_t i = 0; i < n; ++i)
 			{
 				dst[i] = selector[i] * s;
 			}
@@ -369,7 +369,7 @@ namespace bcs
 				offset = 0;
 
 				index_t n = (index_t)selector.size();
-				block<index_t>* pb = new block<index_t>(n);
+				block<index_t>* pb = new block<index_t>((size_t)n);
 				index_t *dst = pb->pbase();
 
 				typename TSelector::enumerator etor = selector.get_enumerator();

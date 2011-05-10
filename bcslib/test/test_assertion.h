@@ -136,7 +136,7 @@ namespace bcs
 		template<typename T, class TIndexer0, class TIndexer1>
 		bool array_view_equal(const bcs::const_aview2d<T, row_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n)
 		{
-			if (!(view.dim0() == m && view.dim1() == n)) return false;
+			if (!(view.nrows() == m && view.ncolumns() == n)) return false;
 
 			for (index_t i = 0; i < (index_t)m; ++i)
 			{
@@ -152,7 +152,7 @@ namespace bcs
 		template<typename T, class TIndexer0, class TIndexer1>
 		bool array_view_equal(const bcs::const_aview2d<T, column_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n)
 		{
-			if (!(view.dim0() == m && view.dim1() == n)) return false;
+			if (!(view.nrows() == m && view.ncolumns() == n)) return false;
 
 			for (index_t j = 0; j < (index_t)n; ++j)
 			{
@@ -168,7 +168,7 @@ namespace bcs
 		template<typename T, class TIndexer0, class TIndexer1>
 		bool array_view_approx(const bcs::const_aview2d<T, row_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n, double eps = 1e-12)
 		{
-			if (!(view.dim0() == m && view.dim1() == n)) return false;
+			if (!(view.nrows() == m && view.ncolumns() == n)) return false;
 
 			for (index_t i = 0; i < (index_t)m; ++i)
 			{
@@ -184,7 +184,7 @@ namespace bcs
 		template<typename T, class TIndexer0, class TIndexer1>
 		bool array_view_approx(const bcs::const_aview2d<T, column_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n, double eps=1e-12)
 		{
-			if (!(view.dim0() == m && view.dim1() == n)) return false;
+			if (!(view.nrows() == m && view.ncolumns() == n)) return false;
 
 			for (index_t j = 0; j < (index_t)n; ++j)
 			{

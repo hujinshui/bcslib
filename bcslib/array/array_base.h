@@ -95,33 +95,33 @@ namespace bcs
 
 	// make array shape
 
-	inline array<size_t, 1> arr_shape(size_t n)
+	inline array<index_t, 1> arr_shape(index_t n)
 	{
-		array<size_t, 1> shape;
+		array<index_t, 1> shape;
 		shape[0] = n;
 		return shape;
 	}
 
-	inline array<size_t, 2> arr_shape(size_t d0, size_t d1)
+	inline array<index_t, 2> arr_shape(index_t d0, index_t d1)
 	{
-		array<size_t, 2> shape;
+		array<index_t, 2> shape;
 		shape[0] = d0;
 		shape[1] = d1;
 		return shape;
 	}
 
-	inline array<size_t, 3> arr_shape(size_t d0, size_t d1, size_t d2)
+	inline array<index_t, 3> arr_shape(index_t d0, index_t d1, index_t d2)
 	{
-		array<size_t, 3> shape;
+		array<index_t, 3> shape;
 		shape[0] = d0;
 		shape[1] = d1;
 		shape[2] = d2;
 		return shape;
 	}
 
-	inline array<size_t, 4> arr_shape(size_t d0, size_t d1, size_t d2, size_t d3)
+	inline array<index_t, 4> arr_shape(index_t d0, index_t d1, index_t d2, index_t d3)
 	{
-		array<size_t, 4> shape;
+		array<index_t, 4> shape;
 		shape[0] = d0;
 		shape[1] = d1;
 		shape[2] = d2;
@@ -154,7 +154,7 @@ namespace bcs
 
 #define BCS_ARRAY_BASIC_TYPEDEFS(nd, T) \
 	static const dim_num_t num_dims = nd; \
-	typedef array<size_t, nd> shape_type; \
+	typedef array<index_t, nd> shape_type; \
 	typedef T value_type; \
 	typedef T* pointer; \
 	typedef const T* const_pointer; \

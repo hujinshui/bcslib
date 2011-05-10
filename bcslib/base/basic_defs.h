@@ -104,7 +104,7 @@ namespace bcs
 		T1& r1;
 		T2& r2;
 
-		ref_bind(T1& r1_, T2& r2_) : r1(r1_), r2(r2_) { };
+		ref_bind(T1& r1_, T2& r2_) : r1(r1_), r2(r2_) { }
 
 		ref_bind& operator = (const std::pair<T1, T2>& in)
 		{
