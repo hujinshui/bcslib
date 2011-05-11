@@ -181,12 +181,12 @@ namespace bcs
 			return m_values;
 		}
 
-		index_type active_index(size_type i) const
+		const index_type& active_index(size_type i) const
 		{
 			return m_pattern.get(i);
 		}
 
-		value_type active_value(size_type i) const
+		const value_type& active_value(size_type i) const
 		{
 			return m_values[i];
 		}
