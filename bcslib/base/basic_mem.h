@@ -185,7 +185,9 @@ namespace bcs
     public:
     	explicit tbuffer(size_t init_capa)
     	: m_allocator(default_alignment)
-    	, m_base(init_capa > 0 ? m_allocator.allocate(init_capa) : 0), m_capacity(init_capa)
+    	, m_base(init_capa > 0 ? m_allocator.allocate(init_capa) : 0)
+    	, m_capacity(init_capa)
+    	, m_requested(0)
     	{
     	}
 
@@ -212,8 +214,18 @@ namespace bcs
 			return std::numeric_limits<size_t>::max() >> 1;
 		}
 
+		bool is_available() const
+		{
+			return m_requested == 0;
+		}
+
 		void reserve(size_t num_bytes)
 		{
+			if (!is_available())
+			{
+				throw std::runtime_error("Cannot modify an unavailable tbuffer object.");
+			}
+
 			if (num_bytes >= m_capacity)
 			{
 				if (num_bytes > max_size())
@@ -237,14 +249,28 @@ namespace bcs
 			}
 		}
 
-		void* request(size_t num_bytes)
+		void* request_buffer(size_t num_bytes)
 		{
 			reserve(num_bytes);
 			return m_base;
 		}
 
+		void return_buffer(void *p)
+		{
+			if (m_requested != p)
+			{
+				throw std::runtime_error("An invalid pointer is returned to tbuffer.");
+			}
+			m_requested = 0;
+		}
+
 		void release()
 		{
+			if (!is_available())
+			{
+				throw std::runtime_error("Cannot modify an unavailable tbuffer object.");
+			}
+
 			if (m_base != 0)
 			{
 				m_allocator.deallocate(m_base, m_capacity);
@@ -260,6 +286,8 @@ namespace bcs
 		allocator_type m_allocator;
 		byte *m_base;
 		size_t m_capacity;
+
+		byte *m_requested;
 
 
     }; // end class tbuffer

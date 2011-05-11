@@ -197,7 +197,7 @@ namespace bcs
 			return (size_type)m_d0;
 		}
 
-		index_t dim0() const
+		index_type dim0() const
 		{
 			return m_d0;
 		}
@@ -219,17 +219,17 @@ namespace bcs
 			return m_base;
 		}
 
-		const_pointer ptr(index_t i) const
+		const_pointer ptr(index_type i) const
 		{
 			return m_base + m_indexer[i];
 		}
 
-		const_reference operator[] (index_t i) const
+		const_reference operator[] (index_type i) const
 		{
 			return m_base[m_indexer[i]];
 		}
 
-		const_reference operator() (index_t i) const
+		const_reference operator() (index_type i) const
 		{
 			return m_base[m_indexer[i]];
 		}
@@ -301,32 +301,32 @@ namespace bcs
 			return this->m_base;
 		}
 
-		const_pointer ptr(index_t i) const
+		const_pointer ptr(index_type i) const
 		{
 			return this->m_base + this->m_indexer[i];
 		}
 
-		pointer ptr(index_t i)
+		pointer ptr(index_type i)
 		{
 			return this->m_base + this->m_indexer[i];
 		}
 
-		const_reference operator[] (index_t i) const
+		const_reference operator[] (index_type i) const
 		{
 			return this->m_base[this->m_indexer[i]];
 		}
 
-		reference operator[] (index_t i)
+		reference operator[] (index_type i)
 		{
 			return this->m_base[this->m_indexer[i]];
 		}
 
-		const_reference operator() (index_t i) const
+		const_reference operator() (index_type i) const
 		{
 			return this->m_base[this->m_indexer[i]];
 		}
 
-		reference operator() (index_t i)
+		reference operator() (index_type i)
 		{
 			return this->m_base[this->m_indexer[i]];
 		}

@@ -284,18 +284,18 @@ namespace bcs
 			return m_base;
 		}
 
-		index_t offset_at(index_t i, index_t j) const
+		index_t offset_at(index_type i, index_type j) const
 		{
 			return _detail::layout_aux2d<layout_order>::offset(
 					base_dim0(), base_dim1(), m_indexer0[i], m_indexer1[j]);
 		}
 
-		const_pointer ptr(index_t i, index_t j) const
+		const_pointer ptr(index_type i, index_type j) const
 		{
 			return m_base + offset_at(i, j);
 		}
 
-		const_reference operator() (index_t i, index_t j) const
+		const_reference operator() (index_type i, index_type j) const
 		{
 			return m_base[offset_at(i, j)];
 		}
@@ -317,7 +317,7 @@ namespace bcs
 
 		// Slice
 
-		const_aview1d<value_type, slices0_indexer_type> sliceI0(index_t i) const
+		const_aview1d<value_type, slices0_indexer_type> sliceI0(index_type i) const
 		{
 			typedef _detail::array2d_slices0<layout_order, indexer0_type, indexer1_type> _slices;
 
@@ -326,7 +326,7 @@ namespace bcs
 					_slices::get_indexer(m_base_d0, m_base_d1, m_indexer1));
 		}
 
-		const_aview1d<value_type, slices1_indexer_type> sliceI1(index_t j) const
+		const_aview1d<value_type, slices1_indexer_type> sliceI1(index_type j) const
 		{
 			typedef _detail::array2d_slices1<layout_order, indexer0_type, indexer1_type> _slices;
 
@@ -335,12 +335,12 @@ namespace bcs
 					_slices::get_indexer(m_base_d0, m_base_d1, m_indexer0));
 		}
 
-		const_aview1d<value_type, slices0_indexer_type> row(index_t i) const
+		const_aview1d<value_type, slices0_indexer_type> row(index_type i) const
 		{
 			return sliceI0(i);
 		}
 
-		const_aview1d<value_type, slices1_indexer_type> column(index_t j) const
+		const_aview1d<value_type, slices1_indexer_type> column(index_type j) const
 		{
 			return sliceI1(j);
 		}
@@ -350,14 +350,14 @@ namespace bcs
 
 		template<class TSelector>
 		const_aview1d<value_type, typename sub_indexer<slices0_indexer_type, TSelector>::type>
-		V(index_t i, const TSelector& sel) const
+		V(index_type i, const TSelector& sel) const
 		{
 			return sliceI0(i).V(sel);
 		}
 
 		template<class TSelector>
 		const_aview1d<value_type, typename sub_indexer<slices1_indexer_type, TSelector>::type>
-		V(const TSelector& sel, index_t j) const
+		V(const TSelector& sel, index_type j) const
 		{
 			return sliceI1(j).V(sel);
 		}
@@ -437,22 +437,22 @@ namespace bcs
 			return this->m_base;
 		}
 
-		const_pointer ptr(index_t i, index_t j) const
+		const_pointer ptr(index_type i, index_type j) const
 		{
 			return this->m_base + this->offset_at(i, j);
 		}
 
-		pointer ptr(index_t i, index_t j)
+		pointer ptr(index_type i, index_type j)
 		{
 			return this->m_base + this->offset_at(i, j);
 		}
 
-		const_reference operator() (index_t i, index_t j) const
+		const_reference operator() (index_type i, index_type j) const
 		{
 			return this->m_base[this->offset_at(i, j)];
 		}
 
-		reference operator() (index_t i, index_t j)
+		reference operator() (index_type i, index_type j)
 		{
 			return this->m_base[this->offset_at(i, j)];
 		}
@@ -486,7 +486,7 @@ namespace bcs
 
 		// Slice
 
-		const_aview1d<value_type, slices0_indexer_type> sliceI0(index_t i) const
+		const_aview1d<value_type, slices0_indexer_type> sliceI0(index_type i) const
 		{
 			typedef _detail::array2d_slices0<layout_order, indexer0_type, indexer1_type> _slices;
 
@@ -495,7 +495,7 @@ namespace bcs
 					_slices::get_indexer(this->m_base_d0, this->m_base_d1, this->m_indexer1));
 		}
 
-		aview1d<value_type, slices0_indexer_type> sliceI0(index_t i)
+		aview1d<value_type, slices0_indexer_type> sliceI0(index_type i)
 		{
 			typedef _detail::array2d_slices0<layout_order, indexer0_type, indexer1_type> _slices;
 
@@ -504,7 +504,7 @@ namespace bcs
 					_slices::get_indexer(this->m_base_d0, this->m_base_d1, this->m_indexer1));
 		}
 
-		const_aview1d<value_type, slices1_indexer_type> sliceI1(index_t j) const
+		const_aview1d<value_type, slices1_indexer_type> sliceI1(index_type j) const
 		{
 			typedef _detail::array2d_slices1<layout_order, indexer0_type, indexer1_type> _slices;
 
@@ -513,7 +513,7 @@ namespace bcs
 					_slices::get_indexer(this->m_base_d0, this->m_base_d1, this->m_indexer0));
 		}
 
-		aview1d<value_type, slices1_indexer_type> sliceI1(index_t j)
+		aview1d<value_type, slices1_indexer_type> sliceI1(index_type j)
 		{
 			typedef _detail::array2d_slices1<layout_order, indexer0_type, indexer1_type> _slices;
 
@@ -522,22 +522,22 @@ namespace bcs
 					_slices::get_indexer(this->m_base_d0, this->m_base_d1, this->m_indexer0));
 		}
 
-		const_aview1d<value_type, slices0_indexer_type> row(index_t i) const
+		const_aview1d<value_type, slices0_indexer_type> row(index_type i) const
 		{
 			return sliceI0(i);
 		}
 
-		aview1d<value_type, slices0_indexer_type> row(index_t i)
+		aview1d<value_type, slices0_indexer_type> row(index_type i)
 		{
 			return sliceI0(i);
 		}
 
-		const_aview1d<value_type, slices1_indexer_type> column(index_t j) const
+		const_aview1d<value_type, slices1_indexer_type> column(index_type j) const
 		{
 			return sliceI1(j);
 		}
 
-		aview1d<value_type, slices1_indexer_type> column(index_t j)
+		aview1d<value_type, slices1_indexer_type> column(index_type j)
 		{
 			return sliceI1(j);
 		}
@@ -546,28 +546,28 @@ namespace bcs
 
 		template<class TSelector>
 		const_aview1d<value_type, typename sub_indexer<slices0_indexer_type, TSelector>::type>
-		V(index_t i, const TSelector& sel) const
+		V(index_type i, const TSelector& sel) const
 		{
 			return sliceI0(i).V(sel);
 		}
 
 		template<class TSelector>
 		aview1d<value_type, typename sub_indexer<slices0_indexer_type, TSelector>::type>
-		V(index_t i, const TSelector& sel)
+		V(index_type i, const TSelector& sel)
 		{
 			return sliceI0(i).V(sel);
 		}
 
 		template<class TSelector>
 		const_aview1d<value_type, typename sub_indexer<slices1_indexer_type, TSelector>::type>
-		V(const TSelector& sel, index_t j) const
+		V(const TSelector& sel, index_type j) const
 		{
 			return sliceI1(j).V(sel);
 		}
 
 		template<class TSelector>
 		aview1d<value_type, typename sub_indexer<slices1_indexer_type, TSelector>::type>
-		V(const TSelector& sel, index_t j)
+		V(const TSelector& sel, index_type j)
 		{
 			return sliceI1(j).V(sel);
 		}

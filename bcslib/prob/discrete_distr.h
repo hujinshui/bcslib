@@ -150,7 +150,8 @@ namespace bcs
 	{
 		// prepare work space
 
-		indexed_entry<double> *ws = (indexed_entry<double>*)(wsbuf.request(len * sizeof(indexed_entry<double>)));
+		indexed_entry<double> *ws = (indexed_entry<double>*)(
+				wsbuf.request_buffer(len * sizeof(indexed_entry<double>)));
 
 		// sort u with indices
 
@@ -185,6 +186,10 @@ namespace bcs
 		{
 			dst[ws[i++].index] = m_K;
 		}
+
+		// finalize
+
+		wsbuf.return_buffer(ws);
 	}
 
 	template<typename T>
@@ -343,24 +348,22 @@ namespace bcs
 	}
 
 
+	// TODO: reimplement using ordered_spvec
+	template<typename T>
 	class variable_discrete_distr
 	{
 	public:
 		typedef discrete_distribution_t distribution_category;
 		typedef scalar_sample_t sample_category;
 
-		typedef size_t size_type;
-		typedef size_t value_type;
+		typedef uint32_t size_type;
+		typedef T value_type;
 
 	public:
 
 		~variable_discrete_distr()
 		{
-			if (m_sorted_inds != 0)
-				delete[] m_sorted_inds;
-
-			if (m_sorted_weights != 0)
-				delete[] m_sorted_weights;
+			release();
 		}
 
 		variable_discrete_distr(size_type K)
@@ -413,12 +416,20 @@ namespace bcs
 			return s / m_total_active_weight;
 		}
 
+		template<typename RStream>
+		value_type direct_sample(RStream& rstream)
+		{
+			size_type i = direct_sample_position_with_u(rstream.randf64());
+			return m_sorted_inds[i];
+		}
+
 	public:
 
-		void set_weight(value_type k, double w);
+		void assign_weights(const double *weights, tbuffer& buffer);
 
-	private:
-		size_type set_weight_at_position(size_type i, value_type k, double w);
+		void assign_weights(size_type len, const value_type *inds, const double *weights, tbuffer& buffer);
+
+		void set_weight(value_type k, double w);
 
 	private:
 		size_type m_K;
@@ -434,77 +445,6 @@ namespace bcs
 
 	}; // end class variable_discrete_distr
 
-
-	void variable_discrete_distr::set_weight(value_type k, double w)
-	{
-		for (size_type i = 0; i < m_len; ++i)
-		{
-			if (m_sorted_inds[i] == k)
-			{
-				double w0 = m_sorted_weights[i];
-				size_type ti = set_weight_at_position(i, k, w);
-
-				if (w == 0 && i < m_num_actives) -- m_num_actives;
-
-				if (m_weight_adjust_counter < s_maximum_weight_adjusts)
-				{
-					m_total_active_weight += (w - w0);
-				}
-				else
-				{
-					double tw = 0;
-					for (size_type i = 0; i < m_num_actives; ++i)
-					{
-						tw += m_sorted_weights[i];
-					}
-					m_total_active_weight = tw;
-				}
-
-				return;
-			}
-		}
-	}
-
-
-	variable_discrete_distr::size_type
-	variable_discrete_distr::set_weight_at_position(size_type i, value_type k, double w)
-	{
-		if (i < m_len - 1 && m_sorted_weights[i+1] > w)
-		{
-			size_type j = i+1;
-			while (j < m_len && m_sorted_weights[j] > w)
-			{
-				m_sorted_inds[j-1] = m_sorted_inds[j];
-				m_sorted_weights[j-1] = m_sorted_weights[j];
-				++j;
-			}
-
-			-- j;
-			m_sorted_inds[j] = k;
-			m_sorted_weights[j] = w;
-			return j;
-		}
-		else if (i > 0 && m_sorted_weights[i-1] < w)
-		{
-			size_type j = i-1;
-			while (j >= 0 && m_sorted_weights[j] < w)
-			{
-				m_sorted_inds[j+1] = m_sorted_inds[j];
-				m_sorted_weights[j+1] = m_sorted_weights[j];
-				--j;
-			}
-
-			++ j;
-			m_sorted_inds[j] = k;
-			m_sorted_weights[j] = w;
-			return j;
-		}
-		else
-		{
-			m_sorted_weights[i] = w;
-			return i;
-		}
-	}
 
 
 

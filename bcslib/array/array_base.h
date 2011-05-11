@@ -129,8 +129,6 @@ namespace bcs
 		return shape;
 	}
 
-
-
 	// Exception classes
 
 	class array_exception : public base_exception
