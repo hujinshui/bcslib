@@ -31,6 +31,8 @@ ARRAY_BASIC_HEADERS = bcslib/array/array_base.h bcslib/array/index_selection.h b
 
 ARRAY_COMP_HEADERS = bcslib/array/array_calc.h bcslib/array/array_eval.h
 
+ARRAY_SPARSE_HEADERS = bcslib/array/sparse_vector.h
+
 GRAPH_BASIC_HEADERS = bcslib/graph/graph_base.h bcslib/graph/gr_edgelist.h bcslib/graph/gr_adjlist.h bcslib/graph/bgl_port.h
 
 GEOMETRY_BASIC_HEADERS = bcslib/geometry/geometry_base.h bcslib/geometry/poly_scan.h bcslib/geometry/triangle_mesh.h
@@ -40,9 +42,9 @@ IMAGE_BASIC_HEADERS = bcslib/image/image_base.h bcslib/image/image.h
 PROB_BASIC_HEADERS = bcslib/prob/pdistribution.h bcslib/prob/sampling.h bcslib/prob/discrete_distr.h 
 
 
-all: test_array test_image test_geometry test_graph test_prob
+all: test_array
 
-test_array : bin/test_array_basics bin/test_array_comp bin/test_access_performance
+test_array : bin/test_array_basics bin/test_array_comp bin/test_array_sparse bin/test_access_performance 
 test_image: bin/test_image_basics
 test_geometry : bin/test_geometry_basics
 test_graph : bin/test_graph_basics
@@ -57,6 +59,10 @@ ARRAY_COMP_TESTS = test/test_array_comp.cpp test/test_array_calc.cpp test/test_a
 bin/test_array_comp: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
 	$(CXX) $(CFLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp
 	
+ARRAY_SPARSE_TESTS = test/test_array_sparse.cpp test/test_spvec.cpp
+bin/test_array_sparse: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_SPARSE_HEADERS) $(ARRAY_SPARSE_TESTS)
+	$(CXX) $(CFLAGS) $(ARRAY_SPARSE_TESTS) -o bin/test_array_sparse	
+
 
 bin/test_access_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) test/test_access_performance.cpp
 	$(CXX) $(CFLAGS) -O3 test/test_access_performance.cpp -o bin/test_access_performance
