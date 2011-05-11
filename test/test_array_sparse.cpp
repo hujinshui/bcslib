@@ -11,12 +11,14 @@
 using namespace bcs::test;
 
 extern test_suite* test_spvec_suite();
+extern test_suite *test_dynamic_spvec_suite();
 
 test_suite* master_suite()
 {
 	test_suite* msuite = new test_suite( "array_sparse" );
 
 	msuite->add( test_spvec_suite() );
+	msuite->add( test_dynamic_spvec_suite() );
 
 	return msuite;
 }

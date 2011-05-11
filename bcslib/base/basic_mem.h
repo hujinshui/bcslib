@@ -86,6 +86,12 @@ namespace bcs
     	typedef size_t size_type;
     	typedef ptrdiff_t difference_type;
 
+    	template<typename TOther>
+    	struct rebind
+    	{
+    		typedef aligned_allocator<TOther> other;
+    	};
+
     public:
     	aligned_allocator()
     	: m_alignment(default_memory_alignment)

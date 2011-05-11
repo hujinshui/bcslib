@@ -31,7 +31,7 @@ ARRAY_BASIC_HEADERS = bcslib/array/array_base.h bcslib/array/index_selection.h b
 
 ARRAY_COMP_HEADERS = bcslib/array/array_calc.h bcslib/array/array_eval.h
 
-ARRAY_SPARSE_HEADERS = bcslib/array/sparse_vector.h
+ARRAY_SPARSE_HEADERS = bcslib/array/sparse_vector.h bcslib/array/dynamic_sparse_vector.h
 
 GRAPH_BASIC_HEADERS = bcslib/graph/graph_base.h bcslib/graph/gr_edgelist.h bcslib/graph/gr_adjlist.h bcslib/graph/bgl_port.h
 
@@ -59,7 +59,7 @@ ARRAY_COMP_TESTS = test/test_array_comp.cpp test/test_array_calc.cpp test/test_a
 bin/test_array_comp: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
 	$(CXX) $(CFLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp
 	
-ARRAY_SPARSE_TESTS = test/test_array_sparse.cpp test/test_spvec.cpp
+ARRAY_SPARSE_TESTS = test/test_array_sparse.cpp test/test_spvec.cpp test/test_dynamic_spvec.cpp
 bin/test_array_sparse: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_SPARSE_HEADERS) $(ARRAY_SPARSE_TESTS)
 	$(CXX) $(CFLAGS) $(ARRAY_SPARSE_TESTS) -o bin/test_array_sparse	
 

@@ -167,7 +167,7 @@ BCS_TEST_CASE( test_spvecs )
 
 test_suite *test_spvec_suite()
 {
-	test_suite *suite = new test_suite( "test_array1d" );
+	test_suite *suite = new test_suite( "test_spvec" );
 
 	suite->add( new test_spvec_patterns() );
 	suite->add( new test_spvecs() );

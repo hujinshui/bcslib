@@ -12,6 +12,8 @@
 #include <bcslib/prob/pdistribution.h>
 #include <bcslib/prob/sampling.h>
 #include <cmath>
+
+#include <map>
 #include <algorithm>
 #include <functional>
 
@@ -348,7 +350,6 @@ namespace bcs
 	}
 
 
-	// TODO: reimplement using ordered_spvec
 	template<typename T>
 	class variable_discrete_distr
 	{
@@ -359,12 +360,11 @@ namespace bcs
 		typedef uint32_t size_type;
 		typedef T value_type;
 
-	public:
+		typedef std::multimap<double, value_type> internal_map_t;
+		typedef typename internal_map_t::iterator iterator;
+		typedef typename internal_map_t::const_iterator const_iterator;
 
-		~variable_discrete_distr()
-		{
-			release();
-		}
+	public:
 
 		variable_discrete_distr(size_type K)
 		{
@@ -381,24 +381,9 @@ namespace bcs
 			return m_K;
 		}
 
-		size_type maintained_length() const
-		{
-			return m_len;
-		}
-
 		size_type num_actives() const
 		{
 			return m_num_actives;
-		}
-
-		const value_type *active_indices() const
-		{
-			return m_sorted_inds;
-		}
-
-		const double* active_weights() const
-		{
-			return m_sorted_weights;
 		}
 
 		double total_active_weight() const
@@ -409,9 +394,11 @@ namespace bcs
 		double average_search_length() const
 		{
 			double s = 0;
-			for (size_type k = 0; k < m_num_actives; ++k)
+			size_type i = 1;
+			for (const_iterator it = m_internal_map.begin();
+					it != m_internal_map.end(); ++it, ++i)
 			{
-				s += double(k+1) * m_sorted_weights[k];
+				s += (it->first) * i;
 			}
 			return s / m_total_active_weight;
 		}
@@ -419,8 +406,8 @@ namespace bcs
 		template<typename RStream>
 		value_type direct_sample(RStream& rstream)
 		{
-			size_type i = direct_sample_position_with_u(rstream.randf64());
-			return m_sorted_inds[i];
+			const_iterator it = get_position_with_u(rstream.randf64());
+			return it->second;
 		}
 
 	public:
@@ -429,17 +416,44 @@ namespace bcs
 
 		void assign_weights(size_type len, const value_type *inds, const double *weights, tbuffer& buffer);
 
-		void set_weight(value_type k, double w);
+		void set_weight(value_type k, double w)
+		{
+		}
+
+
+	private:
+		const_iterator get_position_with_u(double u)
+		{
+			double v = u * m_total_active_weight;
+
+			const_iterator it = m_internal_map.begin();
+			double c = it->first;
+
+			if (v <= c)
+			{
+				return it;
+			}
+			else
+			{
+				const_iterator it_end = m_internal_map.end();
+				++ it;
+				while (c < v && it != it_end)
+				{
+					c += it->first;
+					++ it;
+				}
+				return --it;
+			}
+		}
+
 
 	private:
 		size_type m_K;
 		size_type m_num_actives;
+
+		internal_map_t m_internal_map;
+
 		double m_total_active_weight;
-
-		size_type m_len;
-		value_type *m_sorted_inds;
-		double *m_sorted_weights;
-
 		size_type m_weight_adjust_counter;
 		static const size_type s_maximum_weight_adjusts = 100;
 
