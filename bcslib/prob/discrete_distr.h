@@ -11,9 +11,10 @@
 
 #include <bcslib/prob/pdistribution.h>
 #include <bcslib/prob/sampling.h>
+#include <bcslib/array/dynamic_sparse_vector.h>
+
 #include <cmath>
 
-#include <map>
 #include <algorithm>
 #include <functional>
 
@@ -152,8 +153,9 @@ namespace bcs
 	{
 		// prepare work space
 
-		indexed_entry<double> *ws = (indexed_entry<double>*)(
+		byte *ws_bytes = (byte*)(
 				wsbuf.request_buffer(len * sizeof(indexed_entry<double>)));
+		indexed_entry<double>* ws = reinterpret_cast<indexed_entry<double>*>(ws_bytes);
 
 		// sort u with indices
 
@@ -191,7 +193,7 @@ namespace bcs
 
 		// finalize
 
-		wsbuf.return_buffer(ws);
+		wsbuf.return_buffer(ws_bytes);
 	}
 
 	template<typename T>
@@ -350,112 +352,198 @@ namespace bcs
 	}
 
 
-	template<typename T>
+
+
+
 	class variable_discrete_distr
 	{
 	public:
 		typedef discrete_distribution_t distribution_category;
 		typedef scalar_sample_t sample_category;
 
-		typedef uint32_t size_type;
-		typedef T value_type;
-
-		typedef std::multimap<double, value_type> internal_map_t;
-		typedef typename internal_map_t::iterator iterator;
-		typedef typename internal_map_t::const_iterator const_iterator;
+		typedef dynamic_ordered_spvec<double> internal_vector_t;
+		typedef internal_vector_t::size_type size_type;
+		typedef internal_vector_t::index_type value_type;
 
 	public:
 
-		variable_discrete_distr(size_type K)
+		variable_discrete_distr(size_type K, double w, tbuffer& buf, double thres = 0)
+		: m_vec(K), m_total_weight(0.0), m_adjust_counter(0)
 		{
+			byte *wspace = (byte*)buf.request_buffer( (sizeof(double) + sizeof(value_type)) * (size_t)K );
+
+			value_type *inds = (value_type*)wspace;
+			double *weights = (double*)(wspace + sizeof(value_type) * (size_t)K);
+
+			for (size_type k = 0; k < K; ++k)
+			{
+				inds[k] = (value_type)k;
+				weights[k] = w;
+			}
+
+			_init(K, inds, weights);
+
+			buf.return_buffer(wspace);
 		}
 
+		variable_discrete_distr(size_type K, const double *weights, tbuffer& buf, double thres = 0)
+		: m_vec(K), m_total_weight(0.0), m_adjust_counter(0)
+		{
+			byte *wspace = (byte*)buf.request_buffer(sizeof(value_type) * (size_t)K);
+
+			value_type *inds = (value_type*)wspace;
+
+			for (size_type k = 0; k < K; ++k)
+			{
+				inds[k] = (value_type)k;
+			}
+
+			_init(K, inds, weights);
+
+			buf.return_buffer(wspace);
+		}
+
+		variable_discrete_distr(size_type K, size_type len,
+				const value_type *inds, const double *weights, double thres = 0)
+		: m_vec(K), m_total_weight(0.0), m_adjust_counter(0)
+		{
+			_init(len, inds, weights);
+		}
 
 		size_t dim() const
 		{
 			return 1;
 		}
 
-		size_type K() const
+		value_type K() const
 		{
-			return m_K;
+			return m_vec.dim0();
 		}
 
-		size_type num_actives() const
+		size_type nactives() const
 		{
-			return m_num_actives;
+			return m_vec.nactives();
 		}
 
-		double total_active_weight() const
+		value_type active_value(size_type i) const
 		{
-			return m_total_active_weight;
+			return m_vec.active_index(i);
+		}
+
+		double active_weight(size_type i) const
+		{
+			return m_vec.active_value(i);
+		}
+
+		double total_weight() const
+		{
+			return m_total_weight;
+		}
+
+		double weight(const value_type& k) const
+		{
+			size_type i = m_vec.position_of_index(k);
+			if (i < nactives())
+			{
+				return m_vec.active_value(i);
+			}
+			else
+			{
+				return 0.0;
+			}
+		}
+
+		double p(const value_type& k) const
+		{
+			size_type i = m_vec.position_of_index(k);
+			if (i < nactives())
+			{
+				return m_vec.active_value(i) / total_weight();
+			}
+			else
+			{
+				return 0.0;
+			}
 		}
 
 		double average_search_length() const
 		{
 			double s = 0;
-			size_type i = 1;
-			for (const_iterator it = m_internal_map.begin();
-					it != m_internal_map.end(); ++it, ++i)
+			size_type na = nactives();
+			for (size_type i = 0; i < na; ++i)
 			{
-				s += (it->first) * i;
+				s += m_vec.active_value(i) * double(i+1);
 			}
-			return s / m_total_active_weight;
+			return s / total_weight();
 		}
 
 		template<typename RStream>
 		value_type direct_sample(RStream& rstream)
 		{
-			const_iterator it = get_position_with_u(rstream.randf64());
-			return it->second;
+			double v = rstream.randf64() * total_weight();
+			size_type i = direct_sample_from_discrete_pmf<size_type>(
+					nactives(), m_vec.active_values(), v);
+
+			if (i >= nactives())
+			{
+				i = nactives() - 1;
+			}
+
+			return m_vec.active_index(i);
 		}
-
-	public:
-
-		void assign_weights(const double *weights, tbuffer& buffer);
-
-		void assign_weights(size_type len, const value_type *inds, const double *weights, tbuffer& buffer);
 
 		void set_weight(value_type k, double w)
 		{
-		}
-
-
-	private:
-		const_iterator get_position_with_u(double u)
-		{
-			double v = u * m_total_active_weight;
-
-			const_iterator it = m_internal_map.begin();
-			double c = it->first;
-
-			if (v <= c)
+			size_type i = m_vec.position_of_index(k);
+			if (i < m_vec.nactives())
 			{
-				return it;
+				double w0 = m_vec.active_value(i);
+				m_vec.update_value_at_position(i, w);
+				m_total_weight += (w - w0);
 			}
 			else
 			{
-				const_iterator it_end = m_internal_map.end();
-				++ it;
-				while (c < v && it != it_end)
-				{
-					c += it->first;
-					++ it;
-				}
-				return --it;
+				m_vec.add_new_pair(k, w);
+				m_total_weight += w;
+			}
+
+			++ m_adjust_counter;
+			if (m_adjust_counter == m_maximum_adjust_times)
+			{
+				recalc_total_weight();
 			}
 		}
 
 
 	private:
-		size_type m_K;
-		size_type m_num_actives;
 
-		internal_map_t m_internal_map;
+		void _init(size_type len, const value_type *inds, const double *weights)
+		{
+			m_vec.initialize(len, inds, weights);
+			recalc_total_weight();
+		}
 
-		double m_total_active_weight;
-		size_type m_weight_adjust_counter;
-		static const size_type s_maximum_weight_adjusts = 100;
+		void recalc_total_weight()
+		{
+			size_t na = m_vec.nactives();
+			double tw = 0;
+			for (size_t i = 0; i < na; ++i)
+			{
+				tw += m_vec.active_value(i);
+			}
+
+			m_total_weight = tw;
+			m_adjust_counter = 0;
+		}
+
+
+	private:
+		internal_vector_t m_vec;
+
+		double m_total_weight;
+		uint32_t m_adjust_counter;
+
+		static const uint32_t m_maximum_adjust_times = 100;
 
 	}; // end class variable_discrete_distr
 

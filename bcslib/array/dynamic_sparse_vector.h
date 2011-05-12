@@ -13,6 +13,7 @@
 #include <vector>
 #include <functional>
 #include <algorithm>
+#include <stdexcept>
 
 namespace bcs
 {
@@ -31,12 +32,22 @@ namespace bcs
 		typedef std::vector<value_type, aligned_allocator<value_type> > value_container;
 
 	public:
+		dynamic_ordered_spvec(size_type n, value_type thres=value_type())
+		: m_d0((index_type)n), m_na(0), m_thres(thres), m_comp()
+		{
+		}
+
+		dynamic_ordered_spvec(size_type n, comparer_type comp, value_type thres)
+		: m_d0((index_type)n), m_na(0), m_thres(thres), m_comp(comp)
+		{
+		}
+
 		template<typename IndIter, typename ValIter>
 		dynamic_ordered_spvec(size_type n, size_type len,
 				IndIter inds, ValIter vals, value_type thres=value_type())
 		: m_d0((index_type)n), m_na(0), m_thres(thres), m_comp()
 		{
-			_init_structure(len, inds, vals);
+			initialize(len, inds, vals);
 		}
 
 		template<typename IndIter, typename ValIter>
@@ -44,8 +55,11 @@ namespace bcs
 				IndIter inds, ValIter vals, comparer_type comp, value_type thres)
 		: m_d0((index_type)n), m_na(0), m_thres(thres), m_comp(comp)
 		{
-			_init_structure(len, inds, vals);
+			initialize(len, inds, vals);
 		}
+
+		template<typename IndIter, typename ValIter>
+		void initialize(size_type len, IndIter inds, ValIter vals);
 
 	public:
 		index_type dim0() const
@@ -70,12 +84,12 @@ namespace bcs
 
 		const index_type* active_indices() const
 		{
-			return &(m_inds[0]);
+			return m_na > 0 ? &(m_inds[0]) : null_p<const index_type>();
 		}
 
 		const value_type* active_values() const
 		{
-			return &(m_vals[0]);
+			return m_na > 0 ? &(m_vals[0]) : null_p<const value_type>();
 		}
 
 		index_type active_index(size_type i) const
@@ -180,10 +194,6 @@ namespace bcs
 			comparer_type comp;
 		};
 
-
-		template<typename IndIter, typename ValIter>
-		void _init_structure(size_type len, IndIter inds, ValIter vals);
-
 	private:
 		index_type m_d0;
 		size_type m_na;
@@ -197,6 +207,58 @@ namespace bcs
 
 
 	// Some implementation of dynamic_ordered_spvec
+
+
+	template<typename T, typename TComp>
+	template<typename IndIter, typename ValIter>
+	void dynamic_ordered_spvec<T, TComp>::initialize(size_type len, IndIter inds, ValIter vals)
+	{
+		if (m_na > 0)
+		{
+			throw std::runtime_error("Cannot do initialization when nactives() > 0");
+		}
+
+		// put valid ones as pairs
+
+		std::vector<pair_type> pairs;
+		pairs.reserve(len);
+
+		for (size_type i = 0; i < len; ++i)
+		{
+			index_type idx = *(inds++);
+			value_type val = *(vals++);
+
+			if (can_be_active_value(val))
+			{
+				pair_type pa;
+				pa.index = idx;
+				pa.value = val;
+
+				pairs.push_back(pa);
+			}
+		}
+
+		m_na = (size_type)(pairs.size());
+
+		// sort them
+
+		std::sort(pairs.begin(), pairs.end(), pair_comparer(m_comp));
+
+		// put sorted ones into internal storage
+
+		m_inds.reserve(m_na);
+		m_vals.reserve(m_na);
+
+		for (size_type i = 0; i < m_na; ++i)
+		{
+			const pair_type& pa = pairs[i];
+			m_inds.push_back(pa.index);
+			m_vals.push_back(pa.value);
+		}
+
+	}
+
+
 
 	template<typename T, typename TComp>
 	typename dynamic_ordered_spvec<T, TComp>::size_type
@@ -253,49 +315,7 @@ namespace bcs
 		return i;
 	}
 
-	template<typename T, typename TComp>
-	template<typename IndIter, typename ValIter>
-	void dynamic_ordered_spvec<T, TComp>::_init_structure(size_type len, IndIter inds, ValIter vals)
-	{
-		// put valid ones as pairs
 
-		std::vector<pair_type> pairs;
-		pairs.reserve(len);
-
-		for (size_type i = 0; i < len; ++i)
-		{
-			index_type idx = *(inds++);
-			value_type val = *(vals++);
-
-			if (can_be_active_value(val))
-			{
-				pair_type pa;
-				pa.index = idx;
-				pa.value = val;
-
-				pairs.push_back(pa);
-			}
-		}
-
-		m_na = (size_type)(pairs.size());
-
-		// sort them
-
-		std::sort(pairs.begin(), pairs.end(), pair_comparer(m_comp));
-
-		// put sorted ones into internal storage
-
-		m_inds.reserve(m_na);
-		m_vals.reserve(m_na);
-
-		for (size_type i = 0; i < m_na; ++i)
-		{
-			const pair_type& pa = pairs[i];
-			m_inds.push_back(pa.index);
-			m_vals.push_back(pa.value);
-		}
-
-	}
 
 
 }
