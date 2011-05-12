@@ -35,8 +35,6 @@ namespace bcs
 		dynamic_ordered_spvec(size_type n, size_type len,
 				IndIter inds, ValIter vals, value_type thres=value_type())
 		: m_d0((index_type)n), m_na(0), m_thres(thres), m_comp()
-		, m_sp_inds(new index_container())
-		, m_sp_vals(new value_container())
 		{
 			_init_structure(len, inds, vals);
 		}
@@ -45,8 +43,6 @@ namespace bcs
 		dynamic_ordered_spvec(size_type n, size_type len,
 				IndIter inds, ValIter vals, comparer_type comp, value_type thres)
 		: m_d0((index_type)n), m_na(0), m_thres(thres), m_comp(comp)
-		, m_sp_inds(new index_container())
-		, m_sp_vals(new value_container())
 		{
 			_init_structure(len, inds, vals);
 		}
@@ -74,22 +70,22 @@ namespace bcs
 
 		const index_type* active_indices() const
 		{
-			return m_pinds;
+			return &(m_inds[0]);
 		}
 
 		const value_type* active_values() const
 		{
-			return m_pvals;
+			return &(m_vals[0]);
 		}
 
 		index_type active_index(size_type i) const
 		{
-			return m_pinds[i];
+			return m_inds[i];
 		}
 
 		value_type active_value(size_type i) const
 		{
-			return m_pvals[i];
+			return m_vals[i];
 		}
 
 		pair_type active_pair(size_type i) const
@@ -142,7 +138,7 @@ namespace bcs
 			}
 			else
 			{
-				m_pvals[i] = v;
+				m_vals[i] = v;
 				return i;
 			}
 		}
@@ -151,10 +147,8 @@ namespace bcs
 		{
 			if (can_be_active_value(v))
 			{
-				m_sp_inds->push_back(k);
-				m_sp_vals->push_back(v);
-				set_base_pointers();
-
+				m_inds.push_back(k);
+				m_vals.push_back(v);
 				++ m_na;
 
 				return increase_value_at_position(m_na-1, v);
@@ -190,25 +184,14 @@ namespace bcs
 		template<typename IndIter, typename ValIter>
 		void _init_structure(size_type len, IndIter inds, ValIter vals);
 
-		void set_base_pointers()
-		{
-			index_container& cinds = *m_sp_inds;
-			value_container& cvals = *m_sp_vals;
-
-			m_pinds = &(cinds[0]);
-			m_pvals = &(cvals[0]);
-		}
-
 	private:
 		index_type m_d0;
 		size_type m_na;
 		value_type m_thres;
 		comparer_type m_comp;
 
-		shared_ptr<index_container> m_sp_inds;
-		shared_ptr<value_container> m_sp_vals;
-		index_type *m_pinds;
-		value_type *m_pvals;
+		index_container m_inds;
+		value_container m_vals;
 
 	}; // end class dynamic_ordered_spvec
 
@@ -219,17 +202,17 @@ namespace bcs
 	typename dynamic_ordered_spvec<T, TComp>::size_type
 	dynamic_ordered_spvec<T, TComp>::increase_value_at_position(size_type i, const value_type& v)
 	{
-		index_type k = m_pinds[i];
+		index_type k = m_inds[i];
 
-		while (i > 0 && m_comp(v, m_pvals[i-1]))
+		while (i > 0 && m_comp(v, m_vals[i-1]))
 		{
-			m_pinds[i] = m_pinds[i-1];
-			m_pvals[i] = m_pvals[i-1];
+			m_inds[i] = m_inds[i-1];
+			m_vals[i] = m_vals[i-1];
 			-- i;
 		}
 
-		m_pinds[i] = k;
-		m_pvals[i] = v;
+		m_inds[i] = k;
+		m_vals[i] = v;
 
 		return i;
 	}
@@ -239,31 +222,31 @@ namespace bcs
 	dynamic_ordered_spvec<T, TComp>::decrease_value_at_position(size_type i, const value_type& v)
 	{
 		size_type max_i = nactives() - 1;
-		index_type k = m_pinds[i];
+		index_type k = m_inds[i];
 
 		if (can_be_active_value(v))
 		{
-			while (i < max_i && m_comp(m_pvals[i+1], v))
+			while (i < max_i && m_comp(m_vals[i+1], v))
 			{
-				m_pinds[i] = m_pinds[i+1];
-				m_pvals[i] = m_pvals[i+1];
+				m_inds[i] = m_inds[i+1];
+				m_vals[i] = m_vals[i+1];
 				++ i;
 			}
 
-			m_pinds[i] = k;
-			m_pvals[i] = v;
+			m_inds[i] = k;
+			m_vals[i] = v;
 		}
 		else
 		{
 			while(i < max_i)
 			{
-				m_pinds[i] = m_pinds[i+1];
-				m_pvals[i] = m_pvals[i+1];
+				m_inds[i] = m_inds[i+1];
+				m_vals[i] = m_vals[i+1];
 				++ i;
 			}
 
-			m_sp_inds->pop_back();
-			m_sp_vals->pop_back();
+			m_inds.pop_back();
+			m_vals.pop_back();
 			-- m_na;
 		}
 
@@ -302,21 +285,16 @@ namespace bcs
 
 		// put sorted ones into internal storage
 
-		index_container& cinds = *m_sp_inds;
-		value_container& cvals = *m_sp_vals;
-
-		cinds.reserve(m_na);
-		cvals.reserve(m_na);
+		m_inds.reserve(m_na);
+		m_vals.reserve(m_na);
 
 		for (size_type i = 0; i < m_na; ++i)
 		{
 			const pair_type& pa = pairs[i];
-			cinds.push_back(pa.index);
-			cvals.push_back(pa.value);
+			m_inds.push_back(pa.index);
+			m_vals.push_back(pa.value);
 		}
 
-		// set base pointers
-		set_base_pointers();
 	}
 
 
