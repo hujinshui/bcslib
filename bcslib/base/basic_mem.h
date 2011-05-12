@@ -258,6 +258,7 @@ namespace bcs
 		void* request_buffer(size_t num_bytes)
 		{
 			reserve(num_bytes);
+			m_requested = m_base;
 			return m_base;
 		}
 

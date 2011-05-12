@@ -66,6 +66,9 @@ BCS_TEST_CASE( test_dynamic_ordered_spvec_construct )
 	index_t inds[m] = {3,  6,  0,  12, 8};
 	double vals[m] =  {5., 1., 7., 0., 6.};
 
+	dovec vempty(n);
+	BCS_CHECK( test_dovec(vempty, n, 0, 0., 0, 0));
+
 	dovec v0(n, m, inds, vals);
 	const size_t m0 = 4;
 	index_t sinds[m0] = {0,  8,  3,  6};

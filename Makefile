@@ -42,11 +42,11 @@ IMAGE_BASIC_HEADERS = bcslib/image/image_base.h bcslib/image/image.h
 PROB_BASIC_HEADERS = bcslib/prob/pdistribution.h bcslib/prob/sampling.h bcslib/prob/discrete_distr.h 
 
 
-all: test_array
+all: test_array test_geometry test_image test_graph test_prob
 
 test_array : bin/test_array_basics bin/test_array_comp bin/test_array_sparse bin/test_access_performance 
-test_image: bin/test_image_basics
 test_geometry : bin/test_geometry_basics
+test_image: bin/test_image_basics
 test_graph : bin/test_graph_basics
 test_prob: bin/test_prob_basics bin/test_psampling
 
