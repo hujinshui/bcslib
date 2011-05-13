@@ -126,8 +126,6 @@ namespace bcs
 		static const bool is_pdf_evaluable = TDistr::is_pdf_evaluable;
 	};
 
-
-
 }
 
 #endif 
