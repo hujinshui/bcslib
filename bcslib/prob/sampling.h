@@ -29,7 +29,7 @@
 #define BCS_TR1_RANDOM_FROM_NAMESPACE boost
 #endif
 
-
+#include <iterator>
 
 namespace bcs
 {
@@ -305,6 +305,15 @@ namespace bcs
 		}
 
 	}; // end class int_rng
+
+
+	template<typename RandomIter, class RStream>
+	inline typename std::iterator_traits<RandomIter>::reference
+	random_draw_from_array(RandomIter arr, size_t n, RStream& rs)
+	{
+		size_t i = int_rng<size_t, RStream>::get_uniform(rs, n);
+		return arr[static_cast<typename std::iterator_traits<RandomIter>::difference_type>(i)];
+	}
 
 
 	template<typename TReal, class RStream=randstream<> >
