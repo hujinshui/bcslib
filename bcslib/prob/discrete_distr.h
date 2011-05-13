@@ -368,7 +368,7 @@ namespace bcs
 	public:
 
 		variable_discrete_distr(size_type K, double w, tbuffer& buf, double thres = 0)
-		: m_vec(K), m_total_weight(0.0), m_adjust_counter(0)
+		: m_vec(K, thres), m_total_weight(0.0), m_adjust_counter(0)
 		{
 			byte *wspace = (byte*)buf.request_buffer( (sizeof(double) + sizeof(value_type)) * (size_t)K );
 
@@ -387,7 +387,7 @@ namespace bcs
 		}
 
 		variable_discrete_distr(size_type K, const double *weights, tbuffer& buf, double thres = 0)
-		: m_vec(K), m_total_weight(0.0), m_adjust_counter(0)
+		: m_vec(K, thres), m_total_weight(0.0), m_adjust_counter(0)
 		{
 			byte *wspace = (byte*)buf.request_buffer(sizeof(value_type) * (size_t)K);
 
@@ -405,7 +405,7 @@ namespace bcs
 
 		variable_discrete_distr(size_type K, size_type len,
 				const value_type *inds, const double *weights, double thres = 0)
-		: m_vec(K), m_total_weight(0.0), m_adjust_counter(0)
+		: m_vec(K, thres), m_total_weight(0.0), m_adjust_counter(0)
 		{
 			_init(len, inds, weights);
 		}
@@ -492,17 +492,22 @@ namespace bcs
 			return m_vec.active_index(i);
 		}
 
-		void set_weight(value_type k, double w)
+		bool set_weight(value_type k, double w)
 		{
 			size_type i = m_vec.position_of_index(k);
 			if (i < m_vec.nactives())
 			{
 				double w0 = m_vec.active_value(i);
+
+				if (w == w0) return false;
+
 				m_vec.update_value_at_position(i, w);
 				m_total_weight += (w - w0);
 			}
 			else
 			{
+				if (!m_vec.can_be_active_value(w)) return false;
+
 				m_vec.add_new_pair(k, w);
 				m_total_weight += w;
 			}
@@ -512,6 +517,8 @@ namespace bcs
 			{
 				recalc_total_weight();
 			}
+
+			return true;
 		}
 
 
