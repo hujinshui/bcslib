@@ -403,8 +403,9 @@ namespace bcs
 			buf.return_buffer(wspace);
 		}
 
+		template<typename IndexIter, typename WeightIter>
 		variable_discrete_distr(size_type K, size_type len,
-				const value_type *inds, const double *weights, double thres = 0)
+				IndexIter inds, WeightIter weights, double thres = 0)
 		: m_vec(K, thres), m_total_weight(0.0), m_adjust_counter(0)
 		{
 			_init(len, inds, weights);
@@ -524,7 +525,8 @@ namespace bcs
 
 	private:
 
-		void _init(size_type len, const value_type *inds, const double *weights)
+		template<typename IndexIter, typename WeightIter>
+		void _init(size_type len, IndexIter inds, WeightIter weights)
 		{
 			m_vec.initialize(len, inds, weights);
 			recalc_total_weight();
