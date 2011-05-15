@@ -118,24 +118,31 @@ namespace matlab
 	template<typename TDir>
 	inline gr_edgelist<TDir> to_gr_edgelist(const_mgraph g)
 	{
-		return gr_edgelist<TDir>(g.nv(), g.ne(),
-				ref_t(), g.es(), g.et());
+		gr_size_t nv = g.nv();
+		gr_size_t ne = g.ne();
+
+		return gr_edgelist<TDir>(nv, ne, ref_arr(g.es(), ne), ref_arr(g.et(), ne));
 	}
 
 
 	template<typename TWeight, typename TDir>
 	inline gr_wedgelist<TWeight, TDir> to_gr_wedgelist(const_mgraph g)
 	{
-		return gr_wedgelist<TWeight, TDir>(g.nv(), g.ne(),
-				ref_t(), g.es(), g.et(), g.ew<TWeight>());
+		gr_size_t nv = g.nv();
+		gr_size_t ne = g.ne();
+
+		return gr_wedgelist<TWeight, TDir>(nv, ne, ref_arr(g.es(), ne), ref_arr(g.et(), ne), ref_arr(g.ew<TWeight>(), ne));
 	}
 
 
 	template<typename TDir>
 	inline gr_adjlist<TDir> to_gr_adjlist(const_mgraph g)
 	{
-		return gr_adjlist<TDir>(g.nv(), g.ne(),
-				ref_t(), g.es(), g.et(), g.o_ds(), g.o_os(), g.o_ns(), g.o_es());
+		gr_size_t nv = g.nv();
+		gr_size_t ne = g.ne();
+
+		return gr_adjlist<TDir>(nv, ne,
+				g.es(), g.et(), g.o_ds(), g.o_os(), g.o_ns(), g.o_es());
 	}
 
 
@@ -143,7 +150,7 @@ namespace matlab
 	inline gr_wadjlist<TWeight, TDir> to_gr_wadjlist(const_mgraph g)
 	{
 		return gr_wadjlist<TWeight, TDir>(g.nv(), g.ne(),
-				ref_t(), g.es(), g.et(), g.ew<TWeight>(), g.o_ds(), g.o_os(), g.o_ns(), g.o_es());
+				g.es(), g.et(), g.ew<TWeight>(), g.o_ds(), g.o_os(), g.o_ns(), g.o_es());
 	}
 
 
