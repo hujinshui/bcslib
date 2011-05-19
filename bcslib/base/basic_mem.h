@@ -591,7 +591,6 @@ namespace bcs
 
 
     private:
-    	const_memory_proxy& operator = (const const_memory_proxy& );
 
     	struct _size_checker
     	{
