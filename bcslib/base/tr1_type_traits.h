@@ -17,7 +17,7 @@
 #include <tr1/type_traits>
 #endif
 
-namespace tr1
+namespace bcs
 {
 	using BCS_TR1_FROM_NAMESPACE::true_type;
 	using BCS_TR1_FROM_NAMESPACE::false_type;

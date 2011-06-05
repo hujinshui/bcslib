@@ -17,7 +17,7 @@
 #include <tr1/memory>
 #endif
 
-namespace tr1
+namespace bcs
 {
 	using BCS_TR1_FROM_NAMESPACE::swap;
 	using BCS_TR1_FROM_NAMESPACE::weak_ptr;

@@ -18,7 +18,12 @@ endif
 WARNING_FLAGS = -Wall -Wextra -Wconversion -Wformat -Wno-unused-parameter
 BOOST_WARNING_FLAGS = -Wall -Wextra -Wno-unused-variable -Wno-unused-parameter
 
-CFLAGS = -ansi -pedantic $(WARNING_FLAGS) -I. 
+ifeq ($(CXX), clang++)
+	CFLAGS = -std=c++0x -stdlib=libc++ -pedantic -U__STRICT_ANSI__ $(WARNING_FLAGS) -I. 
+else
+	CFLAGS = -std=c++0x -pedantic $(WARNING_FLAGS) -I. 
+endif
+
 BOOST_CFLAGS = -ansi $(BOOST_WARNING_FLAGS) -I$(BOOST_HOME) -I. 
 
 BASE_HEADERS = bcslib/base/config.h bcslib/base/basic_defs.h bcslib/base/basic_funcs.h bcslib/base/basic_mem.h bcslib/base/enumerate.h 
@@ -41,8 +46,12 @@ IMAGE_BASIC_HEADERS = bcslib/image/image_base.h bcslib/image/image.h
 
 PROB_BASIC_HEADERS = bcslib/prob/pdistribution.h bcslib/prob/sampling.h bcslib/prob/discrete_distr.h 
 
+all: test_c0x_support 
+others: test_array test_geometry test_image test_graph test_prob
 
-all: test_array test_geometry test_image test_graph test_prob
+test_c0x_support: bin/test_c0x_support.out
+bin/test_c0x_support.out: test/test_c0x_support.cpp
+	$(CXX) $(CFLAGS) -c test/test_c0x_support.cpp -o bin/test_c0x_support.out
 
 test_array : bin/test_array_basics bin/test_array_comp bin/test_array_sparse bin/test_access_performance 
 test_geometry : bin/test_geometry_basics

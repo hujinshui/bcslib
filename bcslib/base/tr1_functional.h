@@ -17,7 +17,7 @@
 #include <tr1/functional>
 #endif
 
-namespace tr1
+namespace bcs
 {
 	using BCS_TR1_FROM_NAMESPACE::reference_wrapper;
 	using BCS_TR1_FROM_NAMESPACE::ref;
