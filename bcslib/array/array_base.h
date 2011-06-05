@@ -14,6 +14,9 @@
 #include <bcslib/base/basic_funcs.h>
 #include <bcslib/base/basic_mem.h>
 
+#include <bcslib/base/tr1_smartptr.h>
+#include <bcslib/base/tr1_functional.h>
+
 #include <memory>
 
 namespace bcs

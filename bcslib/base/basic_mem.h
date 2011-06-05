@@ -11,7 +11,7 @@
 
 #include <bcslib/base/config.h>
 #include <bcslib/base/basic_defs.h>
-#include <bcslib/base/import_tr1.h>
+#include <bcslib/base/tr1_smartptr.h>
 
 #include <cstring>  // for low-level memory manipulation functions
 #include <new>   // for std::bad_alloc

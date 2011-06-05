@@ -19,15 +19,21 @@
 
 #if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
 	#if _MSC_VER < 1600
-	#error Microsoft Visual C++ of version lower than MSVC 2010 is not supported.
+		#error Microsoft Visual C++ of version lower than MSVC 2010 is not supported.
 	#endif
 	#define BCSLIB_COMPILER BCSLIB_MSVC
 
 	#define BCS_PLATFORM_INTERFACE BCS_WINDOWS_INTERFACE
 
 #elif (defined(__GNUC__))
-	#if ((__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 2))
-		#error GCC of version lower than 4.2.0 is not supported
+	#if (defined(__clang__))
+		#if ((__clang_major__ < 2) || (__clang_minor__ < 8))
+			#error CLANG of version lower than 2.8.0 is not supported
+		#endif
+	#else
+		#if ((__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 4))
+			#error GCC of version lower than 4.4.0 is not supported
+		#endif
 	#endif
 	#define BCSLIB_COMPILER BCSLIB_GCC
 
