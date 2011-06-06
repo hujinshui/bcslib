@@ -12,6 +12,7 @@
 
 #define BCSLIB_MSVC 0x01
 #define BCSLIB_GCC 0x02
+#define BCSLIB_CLANG 0x03
 
 #define BCS_WINDOWS_INTERFACE 0x11
 #define BCS_POSIX_INTERFACE 0x12
@@ -30,40 +31,18 @@
 		#if ((__clang_major__ < 2) || (__clang_minor__ < 8))
 			#error CLANG of version lower than 2.8.0 is not supported
 		#endif
+		#define BCSLIB_COMPILER BCSLIB_CLANG
 	#else
 		#if ((__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 4))
 			#error GCC of version lower than 4.4.0 is not supported
 		#endif
+		#define BCSLIB_COMPILER BCSLIB_GCC
 	#endif
-	#define BCSLIB_COMPILER BCSLIB_GCC
 
 	#define BCS_PLATFORM_INTERFACE BCS_POSIX_INTERFACE
 
 #else
-	#error BCSLib can only be used with Microsoft Visual C++ or GCC (G++)
-#endif
-
-
-#define BCS_TR1_INCLUDE_STD_DIR 0
-#define BCS_TR1_INCLUDE_TR1_DIR 1
-#define BCS_TR1_INCLUDE_BOOST_DIR 2
-
-
-#if (BCSLIB_COMPILER == BCSLIB_MSVC)
-
-	#define BCSLIB_TR1_INCLUDE_DIR BCS_TR1_INCLUDE_STD_DIR
-	#define BCS_TR1_FROM_NAMESPACE std::tr1
-
-#elif (BCSLIB_COMPILER == BCSLIB_GCC)
-
-	#ifdef __GXX_EXPERIMENTAL_CXX0X__
-		#define BCSLIB_TR1_INCLUDE_DIR BCS_TR1_INCLUDE_STD_DIR
-		#define BCS_TR1_FROM_NAMESPACE std
-	#else
-		#define BCSLIB_TR1_INCLUDE_DIR BCS_TR1_INCLUDE_TR1_DIR
-		#define BCS_TR1_FROM_NAMESPACE std::tr1
-	#endif
-
+	#error BCSLib can only be used with Microsoft Visual C++, GCC (G++), or clang (clang++).
 #endif
 
 

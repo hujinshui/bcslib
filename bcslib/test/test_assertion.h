@@ -10,13 +10,11 @@
 #define BCSLIB_TEST_ASSERTION_H
 
 #include <bcslib/base/basic_defs.h>
-#include <bcslib/base/basic_funcs.h>
-#include <bcslib/array/array1d.h>
-#include <bcslib/array/array2d.h>
+// #include <bcslib/array/array1d.h>
+// #include <bcslib/array/array2d.h>
 
 #include <cstdio>
 #include <string>
-#include <algorithm>
 
 namespace bcs
 {
@@ -85,27 +83,9 @@ namespace bcs
 		}
 
 
-		template<typename TEnum, typename TIter>
-		bool enumerate_equal(TEnum e, TIter it, size_t n)
-		{
-			size_t c = 0;
-
-			while (c < n && e.next())
-			{
-				if (e.get() != *it++) return false;
-				++ c;
-			}
-
-			if (c < n) return false;
-			if (e.next()) return false;
-
-			return true;
-		}
-
-
 		// array comparison
 
-
+/*
 		template<typename T, class TIndexer>
 		bool array_view_equal(const bcs::const_aview1d<T, TIndexer>& view, const T* src, size_t n)
 		{
@@ -196,7 +176,7 @@ namespace bcs
 
 			return true;
 		}
-
+*/
 
 	}
 }
