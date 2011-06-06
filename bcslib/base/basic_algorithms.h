@@ -136,6 +136,68 @@ namespace bcs
 
 	// sort
 
+	template<typename T, typename Comp>
+	inline void simple_sort(T& x, T& y, Comp comp)
+	{
+		using std::swap;
+		if (comp(y, x)) swap(x, y);
+	}
+
+	template<typename T>
+	inline void simple_sort(T& x, T& y)
+	{
+		simple_sort(x, y, std::less<T>());
+	}
+
+	template<typename T, typename Comp>
+	inline void simple_sort(T& x, T& y, T& z, Comp comp)
+	{
+		using std::swap;
+
+		if (comp(y, x)) swap(x, y);
+		if (comp(z, y))
+		{
+			swap(y, z);
+			if (comp(y, x)) swap(x, y);
+		}
+	}
+
+	template<typename T>
+	inline void simple_sort(T& x, T& y, T& z)
+	{
+		simple_sort(x, y, z, std::less<T>());
+	}
+
+	template<typename T, typename Comp>
+	inline void simple_sort(T& x, T& y, T& z, T& w, Comp comp)
+	{
+		using std::swap;
+		simple_sort(x, y, z, comp);
+
+		if (comp(w, z))
+		{
+			swap(z, w);
+
+			if (comp(z, y))
+			{
+				swap(y, z);
+				if (comp(y, x))
+				{
+					swap(x, y);
+				}
+			}
+		}
+	}
+
+
+	template<typename T>
+	inline void simple_sort(T& x, T& y, T& z, T& w)
+	{
+		simple_sort(x, y, z, w, std::less<T>());
+	}
+
+
+
 	template<class Tuple, size_t I, typename Comp=std::less<typename std::tuple_element<I, Tuple>::type> >
 	struct tuple_cc
 	{
@@ -178,25 +240,25 @@ namespace bcs
 
 
 	template<typename ForwardIterator>
-	ForwardIterator next(ForwardIterator it)
+	inline ForwardIterator next(ForwardIterator it)
 	{
 		return ++it;
 	}
 
 	template<typename ForwardIterator>
-	ForwardIterator next2(ForwardIterator it)
+	inline ForwardIterator next2(ForwardIterator it)
 	{
 		return ++(++it);
 	}
 
 	template<typename BidirectionalIterator>
-	BidirectionalIterator prev(BidirectionalIterator it)
+	inline BidirectionalIterator prev(BidirectionalIterator it)
 	{
 		return --it;
 	}
 
 	template<typename BidirectionalIterator>
-	BidirectionalIterator prev2(BidirectionalIterator it)
+	inline BidirectionalIterator prev2(BidirectionalIterator it)
 	{
 		return --(--it);
 	}
