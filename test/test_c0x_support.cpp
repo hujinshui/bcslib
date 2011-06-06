@@ -149,8 +149,8 @@ void test_type_transforms()
 			is_same<make_signed<unsigned int>::type, int>::value,
 			"is_same<make_signed<unsigned int>::type, int>::value");
 	static_assert(
-			is_same<make_unsigned<const int>::type, const unsigned int>::value,
-			"is_same<make_unsigned<const int>::type, const unsigned int>::value");
+			is_same<make_unsigned<int>::type, unsigned int>::value,
+			"is_same<make_unsigned<int>::type, unsigned int>::value");
 
 	static_assert(
 			is_same<enable_if<is_integral<int>::value>::type, void>::value,
