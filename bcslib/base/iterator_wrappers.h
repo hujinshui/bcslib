@@ -1,19 +1,21 @@
 /**
- * @file iterators.h
+ * @file iterator_wrappers.h
  *
- * The facilities to support the implementation of iterator classes
+ * Some useful wrapper classes for extending the functionality of iterators
  * 
  * @author Dahua Lin
  */
 
-#ifndef BCSLIB_ITERATORS_H
-#define BCSLIB_ITERATORS_H
+#ifndef BCSLIB_ITERATOR_WRAPPERS_H
+#define BCSLIB_ITERATOR_WRAPPERS_H
 
+#include <bcslib/base/basic_defs.h>
 #include <iterator>
 
 
 namespace bcs
 {
+	// Basic wrappers
 
 	/**
 	 * The Concept of forward_iterator_implementer
@@ -45,34 +47,14 @@ namespace bcs
 	 * - operator <
 	 * - operator >
 	 *
-	 * - T& at(int n) const;
+	 * - reference element_at(int n) const;
 	 *
 	 */
-
-
-	template<typename T, bool IsConst> struct pointer_and_reference;
-
-	template<typename T>
-	struct pointer_and_reference<T, true>
-	{
-		typedef const T* pointer;
-		typedef const T& reference;
-	};
-
-	template<typename T>
-	struct pointer_and_reference<T, false>
-	{
-		typedef T* pointer;
-		typedef T& reference;
-	};
-
 
 	template<class Impl>
 	class forward_iterator_wrapper
 	{
 	public:
-		typedef forward_iterator_wrapper<Impl> self_type;
-
 		typedef std::forward_iterator_tag iterator_category;
 		typedef typename Impl::value_type value_type;
 		typedef typename Impl::pointer pointer;
@@ -108,13 +90,13 @@ namespace bcs
 			return m_impl.ptr();
 		}
 
-		self_type& operator ++ ()
+		forward_iterator_wrapper& operator ++ ()
 		{
 			m_impl.move_next();
 			return *this;
 		}
 
-		self_type operator ++ (int)
+		forward_iterator_wrapper operator ++ (int)
 		{
 			Impl cimpl = m_impl;
 			m_impl.move_next();
@@ -127,12 +109,11 @@ namespace bcs
 	}; // end class forward_iterator_wrapper
 
 
+
 	template<class Impl>
 	class bidirectional_iterator_wrapper : public forward_iterator_wrapper<Impl>
 	{
 	public:
-		typedef bidirectional_iterator_wrapper<Impl> self_type;
-
 		typedef std::bidirectional_iterator_tag iterator_category;
 		typedef typename Impl::value_type value_type;
 		typedef typename Impl::pointer pointer;
@@ -148,13 +129,13 @@ namespace bcs
 		{
 		}
 
-		self_type& operator -- ()
+		bidirectional_iterator_wrapper& operator -- ()
 		{
 			this->m_impl.move_prev();
 			return *this;
 		}
 
-		self_type operator -- (int)
+		bidirectional_iterator_wrapper operator -- (int)
 		{
 			Impl cimpl = this->m_impl;
 			this->m_impl.move_prev();
@@ -164,12 +145,11 @@ namespace bcs
 	}; // end class bidirectional_iterator_wrapper
 
 
+
 	template<class Impl>
 	class random_access_iterator_wrapper : public bidirectional_iterator_wrapper<Impl>
 	{
 	public:
-		typedef random_access_iterator_wrapper<Impl> self_type;
-
 		typedef std::random_access_iterator_tag iterator_category;
 		typedef typename Impl::value_type value_type;
 		typedef typename Impl::pointer pointer;
@@ -205,14 +185,14 @@ namespace bcs
 			return !(this->m_impl < rhs.m_impl);
 		}
 
-		self_type operator + (difference_type n) const
+		random_access_iterator_wrapper operator + (difference_type n) const
 		{
 			Impl impl(this->m_impl);
 			impl.move_forward(n);
 			return impl;
 		}
 
-		self_type operator - (difference_type n) const
+		random_access_iterator_wrapper operator - (difference_type n) const
 		{
 			Impl impl(this->m_impl);
 			impl.move_backward(n);
@@ -224,13 +204,13 @@ namespace bcs
 			return this->m_impl - rhs.m_impl;
 		}
 
-		self_type& operator += (difference_type n)
+		random_access_iterator_wrapper& operator += (difference_type n)
 		{
 			this->m_impl.move_forward(n);
 			return *this;
 		}
 
-		self_type& operator -= (difference_type n)
+		random_access_iterator_wrapper& operator -= (difference_type n)
 		{
 			this->m_impl.move_backward(n);
 			return *this;
@@ -238,11 +218,18 @@ namespace bcs
 
 		reference operator[] (difference_type n) const
 		{
-			return this->m_impl.at(n);
+			return this->m_impl.element_at(n);
 		}
 
 	}; // end class random_access_iterator_wrapper
 
+	template<class Impl>
+	inline random_access_iterator_wrapper<Impl> operator + (
+			typename random_access_iterator_wrapper<Impl>::difference_type n,
+			const random_access_iterator_wrapper<Impl>& rhs)
+	{
+		return rhs + n;
+	}
 
 
 }
