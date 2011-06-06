@@ -31,7 +31,8 @@ BASE_HEADERS = bcslib/base/config.h \
 	bcslib/base/arg_check.h \
 	bcslib/base/basic_functors.h \
 	bcslib/base/math_functors.h \
-	bcslib/base/basic_algorithms.h
+	bcslib/base/basic_algorithms.h \
+	bcslib/base/iterator_wrappers.h
 
 TEST_HEADERS = bcslib/test/test_assertion.h \
 	bcslib/test/test_units.h \

@@ -618,21 +618,6 @@ BCS_TEST_CASE( test_cumulation )
 }
 
 
-BCS_TEST_CASE( test_iterator_use )
-{
-	int a[5] = {1, 2, 3, 4, 5};
-
-	const int *p = a + 2;
-
-	BCS_CHECK_EQUAL( next(p), a+3 );
-	BCS_CHECK_EQUAL( next2(p), a+4 );
-	BCS_CHECK_EQUAL( prev(p), a+1 );
-	BCS_CHECK_EQUAL( prev2(p), a );
-
-	BCS_CHECK_EQUAL( count_all(a, a+5), 5 );
-}
-
-
 test_suite *test_basic_algorithms_suite()
 {
 	test_suite *suite = new test_suite( "test_basic_algorithms" );
@@ -645,7 +630,6 @@ test_suite *test_basic_algorithms_suite()
 	suite->add( new test_simple_sort() );
 	suite->add( new test_tuple_sort() );
 	suite->add( new test_cumulation() );
-	suite->add( new test_iterator_use() );
 
 	return suite;
 }

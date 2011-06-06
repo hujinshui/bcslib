@@ -256,44 +256,6 @@ namespace bcs
 		}
 	}
 
-
-	// iterator-based algorithms
-
-
-	template<typename ForwardIterator>
-	inline ForwardIterator next(ForwardIterator it)
-	{
-		return ++it;
-	}
-
-	template<typename ForwardIterator>
-	inline ForwardIterator next2(ForwardIterator it)
-	{
-		return ++(++it);
-	}
-
-	template<typename BidirectionalIterator>
-	inline BidirectionalIterator prev(BidirectionalIterator it)
-	{
-		return --it;
-	}
-
-	template<typename BidirectionalIterator>
-	inline BidirectionalIterator prev2(BidirectionalIterator it)
-	{
-		return --(--it);
-	}
-
-
-	template<typename ForwardIterator>
-	typename std::iterator_traits<ForwardIterator>::difference_type
-	count_all(ForwardIterator first, ForwardIterator last)
-	{
-		typename std::iterator_traits<ForwardIterator>::difference_type c(0);
-		for (; first != last; ++first) ++c;
-		return c;
-	}
-
 }
 
 
