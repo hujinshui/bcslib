@@ -10,6 +10,7 @@
 #include <bcslib/test/test_units.h>
 #include <functional>
 
+#include <bcslib/base/basic_functors.h>
 #include <bcslib/base/basic_algorithms.h>
 
 using namespace bcs;
@@ -604,6 +605,18 @@ BCS_TEST_CASE( test_tuple_sort )
 
 }
 
+BCS_TEST_CASE( test_cumulation )
+{
+	int a[5] = {1, 2, 3, 4, 5};
+
+	int s = 10;
+	cumulate(s, a, a+5, inplace_plus<int>());
+	BCS_CHECK_EQUAL(s, 25);
+
+	cumulate_n(s, a, 3, inplace_plus<int>());
+	BCS_CHECK_EQUAL(s, 31);
+}
+
 
 BCS_TEST_CASE( test_iterator_use )
 {
@@ -631,6 +644,7 @@ test_suite *test_basic_algorithms_suite()
 
 	suite->add( new test_simple_sort() );
 	suite->add( new test_tuple_sort() );
+	suite->add( new test_cumulation() );
 	suite->add( new test_iterator_use() );
 
 	return suite;
