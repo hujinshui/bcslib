@@ -236,6 +236,27 @@ namespace bcs
 	}
 
 
+	// accumulation
+
+	template<class Cumulator, typename InputIterator, typename Comb>
+	void cumulate(Cumulator& cumulator, InputIterator first, InputIterator last, Comb comb)
+	{
+		for (; first != last; ++first)
+		{
+			comb(cumulator, *first);
+		}
+	}
+
+	template<class Cumulator, typename InputIterator, typename Comb>
+	void cumulate_n(Cumulator& cumulator, InputIterator first, size_t n, Comb comb)
+	{
+		for(size_t i = 0; i < n; ++i, ++first)
+		{
+			comb(cumulator, *first);
+		}
+	}
+
+
 	// iterator-based algorithms
 
 
