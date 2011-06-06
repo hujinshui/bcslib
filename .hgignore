@@ -2,8 +2,15 @@ syntax: glob
 
 .project
 .cproject
-Debug/*
 temp/*
 bin/*
 
-
+*.suo
+*.ipch
+*.sdf
+*.log
+*.tlog
+*.pdb
+*.vcxproj.user
+Debug/*.*
+Release/*.*
