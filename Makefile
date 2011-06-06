@@ -26,9 +26,15 @@ endif
 
 BOOST_CFLAGS = -ansi $(BOOST_WARNING_FLAGS) -I$(BOOST_HOME) -I. 
 
-BASE_HEADERS = bcslib/base/config.h bcslib/base/basic_defs.h bcslib/base/basic_funcs.h bcslib/base/basic_mem.h bcslib/base/enumerate.h 
+BASE_HEADERS = bcslib/base/config.h \
+	bcslib/base/basic_defs.h \
+	bcslib/base/basic_functors.h \
+	bcslib/base/math_functors.h \
+	bcslib/base/basic_algorithms.h
 
-TEST_HEADERS = bcslib/test/test_assertion.h bcslib/test/test_units.h bcslib/test/execution_mon.h
+TEST_HEADERS = bcslib/test/test_assertion.h \
+	bcslib/test/test_units.h \
+	bcslib/test/execution_mon.h
 
 VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h bcslib/veccomp/vecnorm.h bcslib/veccomp/vecstat.h
 
@@ -46,7 +52,7 @@ IMAGE_BASIC_HEADERS = bcslib/image/image_base.h bcslib/image/image.h
 
 PROB_BASIC_HEADERS = bcslib/prob/pdistribution.h bcslib/prob/sampling.h bcslib/prob/discrete_distr.h 
 
-all: test_c0x_support 
+all: test_c0x_support test_basics
 others: test_array test_geometry test_image test_graph test_prob
 
 test_c0x_support: bin/test_c0x_support.out
@@ -58,6 +64,20 @@ test_geometry : bin/test_geometry_basics
 test_image: bin/test_image_basics
 test_graph : bin/test_graph_basics
 test_prob: bin/test_prob_basics bin/test_psampling
+
+
+#------ Basic tests ----------
+
+test_basics: bin/test_basics
+
+BASICS_TESTS = test/test_basics.cpp \
+	test/test_basic_algorithms.cpp
+	
+bin/test_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(BASICS_TESTS)
+	$(CXX) $(CFLAGS) $(BASICS_TESTS) -o bin/test_basics 
+
+
+#------ Array tests -----------
 
 ARRAY_BASIC_TESTS = test/test_array_basics.cpp test/test_index_selection.cpp test/test_array1d.cpp test/test_array2d.cpp
 bin/test_array_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 

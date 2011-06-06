@@ -11,133 +11,77 @@
 #define BCSLIB_BASIC_DEFS_H
 
 #include <bcslib/base/config.h>
-#include <stddef.h>
-#include <stdint.h>
 
-#include <string>
+#include <cstddef>
+#include <cstdint>
 #include <utility>
 
+
+// This is for temporary use,
+// and will be replaced with nullptr when it is available in most compilers
+
+#if ( (BCSLIB_COMPILER == BCSLIB_MSVC) || (BCSLIB_COMPILER == BCSLIB_GCC && __GNUC_MINOR__ >= 6) )
+#define BCS_NULL nullptr
+#else
+#define BCS_NULL 0L
+#endif
+
+#define BCS_STATIC_ASSERT(cond) static_assert(cond, #cond)
+#define BCS_STATIC_ASSERT_V(cond) static_assert(cond::value, #cond)
 
 namespace bcs
 {
 
-	using ::uint8_t;
-	using ::int8_t;
-	using ::uint16_t;
-	using ::int16_t;
-	using ::uint32_t;
-	using ::int32_t;
-	using ::uint64_t;
-	using ::int64_t;
+	using std::int8_t;
+	using std::int16_t;
+	using std::int32_t;
+	using std::int64_t;
 
-	using ::ptrdiff_t;
-	using ::size_t;
+	using std::uint8_t;
+	using std::uint16_t;
+	using std::uint32_t;
+	using std::uint64_t;
 
-	typedef uint8_t byte;
+	using std::ptrdiff_t;
+	using std::size_t;
 
-	template<typename T>
-	inline T* null_p()
-	{
-		return (T*)(0);
-	}
+	using std::intptr_t;
+	using std::uintptr_t;
 
+	typedef int32_t index_t;
 
-	// value associated with index (particularly useful for sorting or re-arrangement)
-
-	template<typename T, typename TIndex=uint32_t>
-	struct indexed_entry
-	{
-		typedef T value_type;
-		typedef TIndex index_type;
-
-		value_type value;
-		index_type index;
-
-		void set(const value_type& v, const index_type& i)
-		{
-			value = v;
-			index = i;
-		}
-	};
-
-
-	template<typename T, typename TIndex>
-	inline bool operator == (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
-	{
-		return lhs.value == rhs.value;
-	}
-
-	template<typename T, typename TIndex>
-	inline bool operator != (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
-	{
-		return lhs.value != rhs.value;
-	}
-
-	template<typename T, typename TIndex>
-	inline bool operator < (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
-	{
-		return lhs.value < rhs.value;
-	}
-
-	template<typename T, typename TIndex>
-	inline bool operator <= (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
-	{
-		return lhs.value <= rhs.value;
-	}
-
-	template<typename T, typename TIndex>
-	inline bool operator > (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
-	{
-		return lhs.value > rhs.value;
-	}
-
-	template<typename T, typename TIndex>
-	inline bool operator >= (const indexed_entry<T, TIndex>& lhs, const indexed_entry<T, TIndex>& rhs)
-	{
-		return lhs.value >= rhs.value;
-	}
-
+	using std::pair;
+	using std::make_pair;
 
 	template<typename T1, typename T2>
-	struct ref_bind
+	inline pair<T1&, T2&> tie_pair(T1& t1, T2& t2)
 	{
-		T1& r1;
-		T2& r2;
-
-		ref_bind(T1& r1_, T2& r2_) : r1(r1_), r2(r2_) { }
-
-		ref_bind& operator = (const std::pair<T1, T2>& in)
-		{
-			r1 = in.first;
-			r2 = in.second;
-
-			return *this;
-		}
-	};
-
-	template<typename T1, typename T2>
-	inline ref_bind<T1, T2> rbind(T1& r1, T2& r2)
-	{
-		return ref_bind<T1, T2>(r1, r2);
+		return pair<T1&, T2&>(t1, t2);
 	}
 
 
-	class base_exception
+	/**
+	 * The base class to make sure its derived classes are non-copyable
+	 */
+	class noncopyable
 	{
-	public:
-		virtual ~base_exception() { }
-
-		base_exception(const char *msg) : m_message(msg)
-		{
-		}
-
-		const char *message() const
-		{
-			return m_message.c_str();
-		}
+	protected:
+		noncopyable() { }
+		~noncopyable() { }
 
 	private:
-		std::string m_message;
+		noncopyable(const noncopyable& );
+		noncopyable& operator= (const noncopyable& );
+	};
+
+
+	/**
+	 * A compile time size constant
+	 */
+	template<size_t N>
+	struct size_constant
+	{
+		static const size_t value = N;
 	};
 
 }
