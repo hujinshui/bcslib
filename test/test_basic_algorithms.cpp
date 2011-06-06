@@ -403,6 +403,144 @@ BCS_TEST_CASE( test_zip_and_extract )
 }
 
 
+BCS_TEST_CASE( test_simple_sort )
+{
+	int x = 0, y = 0, z = 0, w = 0;
+
+	// two
+	x = 1; y = 2;
+	simple_sort(x, y);
+	BCS_CHECK( x == 1 && y == 2 );
+
+	x = 2; y = 1;
+	simple_sort(x, y);
+	BCS_CHECK( x == 1 && y == 2 );
+
+	// three
+	x = 1; y = 2; z = 3;
+	simple_sort(x, y, z);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+
+	x = 1; y = 3; z = 2;
+	simple_sort(x, y, z);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+
+	x = 2; y = 1; z = 3;
+	simple_sort(x, y, z);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+
+	x = 2; y = 3; z = 1;
+	simple_sort(x, y, z);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+
+	x = 3; y = 1; z = 2;
+	simple_sort(x, y, z);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+
+	x = 3; y = 2; z = 1;
+	simple_sort(x, y, z);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+
+	// four
+
+	x = 1; y = 2; z = 3; w = 4;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 1; y = 2; z = 4; w = 3;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 1; y = 3; z = 2; w = 4;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 1; y = 3; z = 4; w = 2;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 1; y = 4; z = 2; w = 3;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 1; y = 4; z = 3; w = 2;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 2; y = 1; z = 3; w = 4;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 2; y = 1; z = 4; w = 3;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 2; y = 3; z = 1; w = 4;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 2; y = 3; z = 4; w = 1;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 2; y = 4; z = 1; w = 3;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 2; y = 4; z = 3; w = 1;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 3; y = 1; z = 2; w = 4;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 3; y = 1; z = 4; w = 2;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 3; y = 2; z = 1; w = 4;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 3; y = 2; z = 4; w = 1;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 3; y = 4; z = 1; w = 2;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 3; y = 4; z = 2; w = 1;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 4; y = 1; z = 2; w = 3;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 4; y = 1; z = 3; w = 2;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 4; y = 2; z = 1; w = 3;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 4; y = 2; z = 3; w = 1;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 4; y = 3; z = 1; w = 2;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+
+	x = 4; y = 3; z = 2; w = 1;
+	simple_sort(x, y, z, w);
+	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+}
+
+
 BCS_TEST_CASE( test_tuple_sort )
 {
 	const int N = 5;
@@ -490,6 +628,8 @@ test_suite *test_basic_algorithms_suite()
 	suite->add( new test_min_and_max_e3() );
 	suite->add( new test_min_and_max_e4() );
 	suite->add( new test_zip_and_extract() );
+
+	suite->add( new test_simple_sort() );
 	suite->add( new test_tuple_sort() );
 	suite->add( new test_iterator_use() );
 

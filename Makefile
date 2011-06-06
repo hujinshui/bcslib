@@ -28,6 +28,7 @@ BOOST_CFLAGS = -ansi $(BOOST_WARNING_FLAGS) -I$(BOOST_HOME) -I.
 
 BASE_HEADERS = bcslib/base/config.h \
 	bcslib/base/basic_defs.h \
+	bcslib/base/arg_check.h \
 	bcslib/base/basic_functors.h \
 	bcslib/base/math_functors.h \
 	bcslib/base/basic_algorithms.h
