@@ -6,6 +6,11 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
+
 #ifndef BCSLIB_BASIC_ALGORITHMS_H
 #define BCSLIB_BASIC_ALGORITHMS_H
 
@@ -13,8 +18,6 @@
 #include <bcslib/base/basic_defs.h>
 #include <type_traits>
 #include <algorithm>
-#include <iterator>
-
 
 namespace bcs
 {
@@ -23,7 +26,31 @@ namespace bcs
 
 	using std::min;
 	using std::max;
+
+#if (BCSLIB_COMPILER == BCSLIB_MSVC)
+	// MSVC uses a non-standard-conformant way:
+	// it returns pair<T, T> instead of pair<const T&, const T&>
+	// below is a workaround
+
+	// --- MSVC-WORKAROUND (BEGIN) ---
+	
+	template<typename T>
+	inline std::pair<const T&, const T&> minmax(const T& x, const T& y)
+	{
+		return y < x ? std::pair<const T&, const T&>(y, x) : std::pair<const T&, const T&>(x, y);
+	}
+
+	template<typename T, typename Pred>
+	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, Pred comp)
+	{
+		return comp(y, x) ? std::pair<const T&, const T&>(y, x) : std::pair<const T&, const T&>(x, y);
+	}
+	
+	// --- MSVC-WORKAROUND (END) ---
+
+#else
 	using std::minmax;
+#endif
 
 	template<typename T>
 	inline const T& min(const T& x, const T& y, const T& z)
@@ -76,30 +103,30 @@ namespace bcs
 	template<typename T>
 	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, const T& z)
 	{
-		auto mxy = minmax(x, y);
+		auto mxy = bcs::minmax(x, y);
 		return std::pair<const T&, const T&>(min(mxy.first, z), max(z, mxy.second));
 	}
 
 	template<typename T, typename Pred>
 	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, const T& z, Pred comp)
 	{
-		auto mxy = minmax(x, y, comp);
+		auto mxy = bcs::minmax(x, y, comp);
 		return std::pair<const T&, const T&>(min(mxy.first, z, comp), max(z, mxy.second, comp));
 	}
 
 	template<typename T>
 	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, const T& z, const T& w)
 	{
-		auto mxy = minmax(x, y);
-		auto mzw = minmax(z, w);
+		auto mxy = bcs::minmax(x, y);
+		auto mzw = bcs::minmax(z, w);
 		return std::pair<const T&, const T&>(min(mxy.first, mzw.first), max(mzw.second, mxy.second));
 	}
 
 	template<typename T, typename Pred>
 	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, const T& z, const T& w, Pred comp)
 	{
-		auto mxy = minmax(x, y, comp);
-		auto mzw = minmax(z, w, comp);
+		auto mxy = bcs::minmax(x, y, comp);
+		auto mzw = bcs::minmax(z, w, comp);
 		return std::pair<const T&, const T&>(min(mxy.first, mzw.first, comp), max(mzw.second, mxy.second, comp));
 	}
 

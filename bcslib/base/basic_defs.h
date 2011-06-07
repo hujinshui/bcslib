@@ -6,6 +6,9 @@
  * @author dhlin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
 
 #ifndef BCSLIB_BASIC_DEFS_H
 #define BCSLIB_BASIC_DEFS_H

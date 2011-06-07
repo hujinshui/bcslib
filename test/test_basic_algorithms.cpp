@@ -9,6 +9,7 @@
 
 #include <bcslib/test/test_units.h>
 #include <functional>
+#include <vector>
 
 #include <bcslib/base/basic_functors.h>
 #include <bcslib/base/basic_algorithms.h>
@@ -56,8 +57,6 @@ inline bool operator == (const val_idx<T>& lhs, const val_idx<T>& rhs)
 	return lhs.value == rhs.value && lhs.index == rhs.index;
 }
 
-
-
 BCS_TEST_CASE( test_min_and_max_e2 )
 {
 	val_idx<double> v1 = mk_vidx(1.0, 1);
@@ -84,13 +83,13 @@ BCS_TEST_CASE( test_min_and_max_e2 )
 	BCS_CHECK_EQUAL( max(v2, v1, comp), v1 );
 	BCS_CHECK_EQUAL( max(p1, p2, comp), p1 );
 
-	BCS_CHECK_EQUAL( minmax(v1, v2), mk_cpair(v1, v2) );
-	BCS_CHECK_EQUAL( minmax(v2, v1), mk_cpair(v1, v2) );
-	BCS_CHECK_EQUAL( minmax(p1, p2), mk_cpair(p1, p2) );
+	BCS_CHECK_EQUAL( bcs::minmax(v1, v2), mk_cpair(v1, v2) );
+	BCS_CHECK_EQUAL( bcs::minmax(v2, v1), mk_cpair(v1, v2) );
+	BCS_CHECK_EQUAL( bcs::minmax(p1, p2), mk_cpair(p1, p2) );
 
-	BCS_CHECK_EQUAL( minmax(v1, v2, comp), mk_cpair(v2, v1) );
-	BCS_CHECK_EQUAL( minmax(v2, v1, comp), mk_cpair(v2, v1) );
-	BCS_CHECK_EQUAL( minmax(p1, p2, comp), mk_cpair(p1, p2) );
+	BCS_CHECK_EQUAL( bcs::minmax(v1, v2, comp), mk_cpair(v2, v1) );
+	BCS_CHECK_EQUAL( bcs::minmax(v2, v1, comp), mk_cpair(v2, v1) );
+	BCS_CHECK_EQUAL( bcs::minmax(p1, p2, comp), mk_cpair(p1, p2) );
 }
 
 

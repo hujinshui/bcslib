@@ -6,6 +6,10 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
 #ifndef BCSLIB_ARG_CHECK_H_
 #define BCSLIB_ARG_CHECK_H_
 

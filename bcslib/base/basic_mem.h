@@ -6,9 +6,13 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
+
 #ifndef BCSLIB_BASIC_MEM_H
 #define BCSLIB_BASIC_MEM_H
-
 
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/arg_check.h>
