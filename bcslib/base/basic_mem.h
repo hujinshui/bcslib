@@ -51,6 +51,14 @@ namespace bcs
 			{
 				std::memcpy(dst, src, sizeof(T) * n);
 			}
+
+			static void copy_construct(const T& v, T *dst, size_t n)
+			{
+				for (size_t i = 0; i < n; ++i)
+				{
+					dst[i] = v;
+				}
+			}
 		};
 
 		template<typename T>
@@ -58,12 +66,26 @@ namespace bcs
 		{
 			static void copy(const T *src, T *dst, size_t n)
 			{
-				for (size_t i = 0; i < n; ++i) dst[i] = src[i];
+				for (size_t i = 0; i < n; ++i)
+				{
+					dst[i] = src[i];
+				}
 			}
 
 			static void copy_construct(const T *src, T *dst, size_t n)
 			{
-				for (size_t i = 0; i < n; ++i) new (dst + i) T(src[i]);
+				for (size_t i = 0; i < n; ++i)
+				{
+					new (dst + i) T(src[i]);
+				}
+			}
+
+			static void copy_construct(const T& v, T *dst, size_t n)
+			{
+				for (size_t i = 0; i < n; ++i)
+				{
+					new (dst + i) T(v);
+				}
 			}
 		};
 
@@ -116,11 +138,10 @@ namespace bcs
 	}
 
 
-
     template<typename T>
-    inline void copy_elements(const T *src, T *dst, size_t n)
+    inline void copy_construct_elements(const T& v, T *dst, size_t n)
     {
-    	_detail::__element_copy_helper<T, std::is_pod<T>::value>::copy(src, dst, n);
+    	_detail::__element_copy_helper<T, std::is_pod<T>::value>::copy_construct(v, dst, n);
     }
 
     template<typename T>
@@ -129,6 +150,11 @@ namespace bcs
     	_detail::__element_copy_helper<T, std::is_pod<T>::value>::copy_construct(src, dst, n);
     }
 
+    template<typename T>
+    inline void copy_elements(const T *src, T *dst, size_t n)
+    {
+    	_detail::__element_copy_helper<T, std::is_pod<T>::value>::copy(src, dst, n);
+    }
 
     template<typename T>
     inline bool elements_equal(const T *a, const T *b, size_t n)
@@ -137,7 +163,7 @@ namespace bcs
     }
 
     template<typename T>
-    inline bool elements_equal(const T *a, size_t n, const T& v)
+    inline bool elements_equal(const T& v, const T *a, size_t n)
     {
     	for (size_t i = 0; i < n; ++i)
     	{
@@ -450,6 +476,20 @@ namespace bcs
     		{
     		}
 
+    		block_impl(size_type n, const_reference v)
+    		: m_allocator()
+    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
+    		{
+    			if (n > 0) copy_construct_elements(v, m_base, n);
+    		}
+
+    		block_impl(size_type n, const_reference v, const allocator_type& allocator)
+    		: m_allocator(allocator)
+    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
+    		{
+    			if (n > 0) copy_construct_elements(v, m_base, n);
+    		}
+
     		block_impl(size_type n, const_pointer src)
     		: m_allocator()
     		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
@@ -487,7 +527,7 @@ namespace bcs
 
     		block_impl(const block_impl& r)
     		: m_allocator(r.m_allocator)
-    		, m_base(r.m_own ? safe_allocate(m_allocator, m_n) : r.m_base)
+    		, m_base(r.m_own ? safe_allocate(m_allocator, r.m_n) : r.m_base)
     		, m_n(r.m_n)
     		, m_own(r.m_own)
     		{
@@ -596,6 +636,16 @@ namespace bcs
 		{
 		}
 
+		const_block(const size_type& n, const_reference v)
+		: m_impl(n, v)
+		{
+		}
+
+		const_block(const size_type& n, const_reference v, const allocator_type& allocator)
+		: m_impl(n, v, allocator)
+		{
+		}
+
 		explicit const_block(const copy_blk_t<value_type>& src)
 		: m_impl(src.nelems(), src.pbase())
 		{
@@ -694,6 +744,26 @@ namespace bcs
 	public:
 		explicit block(const ref_blk_t<value_type>& src)
 		: m_impl(src.pbase(), src.nelems())
+		{
+		}
+
+		explicit block(const size_type& n)
+		: m_impl(n)
+		{
+		}
+
+		block(const size_type& n, const allocator_type& allocator)
+		: m_impl(n, allocator)
+		{
+		}
+
+		block(const size_type& n, const_reference v)
+		: m_impl(n, v)
+		{
+		}
+
+		block(const size_type& n, const_reference v, const allocator_type& allocator)
+		: m_impl(n, v, allocator)
 		{
 		}
 
@@ -851,8 +921,25 @@ namespace bcs
     	return copy_blk_t<T>(blk.pbase(), blk.nelems());
     }
 
-
 }
 
+
+namespace std
+{
+	// specialize std::swap for const_block and block
+
+	template<typename T, class Allocator>
+	inline void swap(bcs::const_block<T, Allocator>& lhs, bcs::const_block<T, Allocator>& rhs)
+	{
+		lhs.swap(rhs);
+	}
+
+	template<typename T, class Allocator>
+	inline void swap(bcs::block<T, Allocator>& lhs, bcs::block<T, Allocator>& rhs)
+	{
+		lhs.swap(rhs);
+	}
+
+}
 
 #endif 
