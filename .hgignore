@@ -13,5 +13,6 @@ bin/*
 *.tlog
 *.pdb
 *.vcxproj.user
+*.opensdf
 Debug/*.*
 Release/*.*
