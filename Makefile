@@ -32,7 +32,9 @@ BASE_HEADERS = bcslib/base/config.h \
 	bcslib/base/basic_functors.h \
 	bcslib/base/math_functors.h \
 	bcslib/base/basic_algorithms.h \
-	bcslib/base/iterator_wrappers.h
+	bcslib/base/iterator_wrappers.h \
+	bcslib/base/basic_mem.h \
+	bcslib/base/monitored_allocator.h
 
 TEST_HEADERS = bcslib/test/test_assertion.h \
 	bcslib/test/test_units.h \
@@ -73,7 +75,8 @@ test_prob: bin/test_prob_basics bin/test_psampling
 test_basics: bin/test_basics
 
 BASICS_TESTS = test/test_basics.cpp \
-	test/test_basic_algorithms.cpp
+	test/test_basic_algorithms.cpp \
+	test/test_basic_memory.cpp
 	
 bin/test_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(BASICS_TESTS)
 	$(CXX) $(CFLAGS) $(BASICS_TESTS) -o bin/test_basics 

@@ -24,7 +24,7 @@ namespace bcs
 	{
 		if (!cond)
 		{
-			return std::invalid_argument("Invalid argument");
+			throw std::invalid_argument("Invalid argument");
 		}
 	}
 
@@ -33,7 +33,7 @@ namespace bcs
 	{
 		if (!cond)
 		{
-			return std::invalid_argument(message);
+			throw std::invalid_argument(message);
 		}
 	}
 
@@ -78,8 +78,8 @@ namespace bcs
 		BCS_STATIC_ASSERT_V( std::is_integral<TIndex> );
 		BCS_STATIC_ASSERT_V( std::is_integral<TBound> );
 
-		return _index_check_helper<TIndex, is_signed<TIndex>::value>(
-				i, static_cast<TTndex>(ub));
+		return _detail::_index_check_helper<TIndex, std::is_signed<TIndex>::value>(
+				i, static_cast<TIndex>(ub));
 	}
 
 	template<typename TIndex, typename TBound>
@@ -88,18 +88,8 @@ namespace bcs
 		BCS_STATIC_ASSERT_V( std::is_integral<TIndex> );
 		BCS_STATIC_ASSERT_V( std::is_integral<TBound> );
 
-		return _index_check_helper<TIndex, is_signed<TIndex>::value>(
-				i, static_cast<TIndex>(lb), static_cast<TTndex>(ub));
-	}
-
-	template<typename TIndex, typename TBound>
-	inline bool is_index_in_range(const TIndex& i, const TBound& ub)
-	{
-		BCS_STATIC_ASSERT_V( std::is_integral<TIndex> );
-		BCS_STATIC_ASSERT_V( std::is_integral<TBound> );
-
-		return _index_check_helper<TIndex, is_signed<TIndex>::value>(
-				i, static_cast<TTndex>(ub));
+		return _detail::_index_check_helper<TIndex, std::is_signed<TIndex>::value>(
+				i, static_cast<TIndex>(lb), static_cast<TIndex>(ub));
 	}
 
 
