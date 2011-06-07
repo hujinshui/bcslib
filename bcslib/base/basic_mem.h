@@ -9,14 +9,15 @@
 #ifndef BCSLIB_BASIC_MEM_H
 #define BCSLIB_BASIC_MEM_H
 
-#include <bcslib/base/config.h>
-#include <bcslib/base/basic_defs.h>
-#include <bcslib/base/tr1_smartptr.h>
 
-#include <cstring>  // for low-level memory manipulation functions
-#include <new>   // for std::bad_alloc
-#include <stdexcept>  // for std::invalid_argument
-#include <limits>  // for computing max() in allocator types
+#include <bcslib/base/basic_defs.h>
+#include <bcslib/base/arg_check.h>
+
+#include <algorithm> 	// for swap
+#include <cstring>  	// for low-level memory manipulation functions
+#include <new>   		// for std::bad_alloc
+#include <limits>  		// for computing max() in allocator types
+#include <memory> 		// for std::allocator
 
 // for platform-dependent aligned allocation
 #include <stdlib.h>
@@ -28,56 +29,190 @@
 namespace bcs
 {
 
+	/********************************************
+	 *
+	 *	Basic memory manipulation
+	 *
+	 ********************************************/
+
+	namespace _detail
+	{
+		template<typename T, bool IsTriviallyCopyable> struct __element_copy_helper;
+
+		template<typename T>
+		struct __element_copy_helper<T, true>
+		{
+			static void copy(const T *src, T *dst, size_t n)
+			{
+				std::memcpy(dst, src, sizeof(T) * n);
+			}
+
+			static void copy_construct(const T *src, T *dst, size_t n)
+			{
+				std::memcpy(dst, src, sizeof(T) * n);
+			}
+		};
+
+		template<typename T>
+		struct __element_copy_helper<T, false>
+		{
+			static void copy(const T *src, T *dst, size_t n)
+			{
+				for (size_t i = 0; i < n; ++i) dst[i] = src[i];
+			}
+
+			static void copy_construct(const T *src, T *dst, size_t n)
+			{
+				for (size_t i = 0; i < n; ++i) new (dst + i) T(src[i]);
+			}
+		};
+
+
+		template<typename T, bool IsTriviallyDestructible> struct __element_destruct_helper;
+
+		template<typename T>
+		struct __element_destruct_helper<T, true>
+		{
+			static void destruct(T *, size_t) { }
+		};
+
+		template<typename T>
+		struct __element_destruct_helper<T, false>
+		{
+			static void destruct(T *dst, size_t n)
+			{
+				for (size_t i = 0; i < n; ++i)
+				{
+					(dst+i)->~T();
+				}
+			}
+		};
+
+
+		template<typename T, bool IsBitwiseComparable> struct __element_compare_helper;
+
+		template<typename T>
+		struct __element_compare_helper<T, true>
+		{
+			static bool all_equal(const T *a, const T *b, size_t n)
+			{
+				return std::memcmp(a, b, sizeof(T) * n) == 0;
+			}
+		};
+
+		template<typename T>
+		struct __element_compare_helper<T, false>
+		{
+			static bool all_equal(const T *a, const T *b, size_t n)
+			{
+				for (size_t i = 0; i < n; ++i)
+				{
+					if (a[i] != b[i]) return false;
+				}
+				return true;
+			}
+		};
+
+	}
+
+
+
     template<typename T>
     inline void copy_elements(const T *src, T *dst, size_t n)
     {
-            std::memcpy(dst, src, sizeof(T) * n);
+    	_detail::__element_copy_helper<T, std::is_pod<T>::value>::copy(src, dst, n);
+    }
+
+    template<typename T>
+    inline void copy_construct_elements(const T *src, T *dst, size_t n)
+    {
+    	_detail::__element_copy_helper<T, std::is_pod<T>::value>::copy_construct(src, dst, n);
     }
 
 
     template<typename T>
     inline bool elements_equal(const T *a, const T *b, size_t n)
     {
-            return std::memcmp(a, b, sizeof(T) * n) == 0;
+    	return _detail::__element_compare_helper<T, std::is_pod<T>::value>::all_equal(a, b, n);
+    }
+
+    template<typename T>
+    inline bool elements_equal(const T *a, size_t n, const T& v)
+    {
+    	for (size_t i = 0; i < n; ++i)
+    	{
+    		if (a[i] != v) return false;
+    	}
+    	return true;
     }
 
     template<typename T>
     inline void set_zeros_to_elements(T *dst, size_t n)
     {
-            std::memset(dst, 0, sizeof(T) * n);
+    	BCS_STATIC_ASSERT_V(std::is_pod<T>);
+    	std::memset(dst, 0, sizeof(T) * n);
     }
 
     template<typename T>
     inline void fill_elements(T *dst, size_t n, const T& v)
     {
-            for (size_t i = 0; i < n; ++i) dst[i] = v;
+    	for (size_t i = 0; i < n; ++i) dst[i] = v;
     }
 
-    template<typename T, typename TIndex>
-    inline void copy_elements_attach_indices(const T *src, indexed_entry<T, TIndex>* dst, size_t n)
+
+    template<typename T>
+    inline void destruct_elements(T *dst, size_t n)
     {
-    	for (size_t i = 0; i < n; ++i)
-    	{
-    		dst[i].set(src[i], static_cast<TIndex>(i));
-    	}
+    	_detail::__element_destruct_helper<T, std::is_pod<T>::value>::destruct(dst, n);
     }
 
-    template<typename T, typename TIndex>
-    inline void copy_elements_detach_indices(const indexed_entry<T, TIndex>* src, T *dst, size_t n)
+
+
+	/********************************************
+	 *
+	 *	aligned allocation
+	 *
+	 ********************************************/
+
+    template<typename T>
+    T* aligned_allocate(size_t nelements, size_t alignment)
     {
-    	for (size_t i = 0; i < n; ++i)
-    	{
-    		dst[i] = src[i].value;
-    	}
+#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
+    	T* p = static_cast<T*>(::_aligned_malloc(sizeof(T) * nelements, alignment));
+    	if (p == 0)
+		{
+			throw std::bad_alloc();
+		}
+		return p;
+
+#elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
+		char* p = 0;
+		if (::posix_memalign((void**)(&p), alignment, sizeof(T) * nelements) != 0)
+		{
+			throw std::bad_alloc();
+		}
+		return static_cast<T*>((void*)p);
+
+#endif
     }
 
+    template<typename T>
+    void aligned_deallocate(T *p)
+    {
+#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
+    	::_aligned_free(p);
+#elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
+    	::free(p);
+#endif
+    }
 
-    const size_t default_memory_alignment = 16;
 
     template<typename T>
     class aligned_allocator
     {
     public:
+    	static const size_t default_memory_alignment = 32;
+
     	typedef T value_type;
     	typedef T* pointer;
     	typedef T& reference;
@@ -137,38 +272,17 @@ namespace bcs
 
     	pointer allocate(size_type n, const void* hint=0)
     	{
-#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
-
-    		pointer p = (pointer)::_aligned_malloc(sizeof(value_type) * n, m_alignment);
-    		if (p == 0)
-    		{
-    			throw std::bad_alloc();
-    		}
-    		return p;
-
-#elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
-
-    		pointer p = 0;
-    		if (::posix_memalign((void**)(&p), m_alignment, sizeof(value_type) * n) != 0)
-    		{
-    			throw std::bad_alloc();
-    		}
-    		return p;
-#endif
+    		return aligned_allocate<value_type>(n, m_alignment);
     	}
 
     	void deallocate(pointer p, size_type)
     	{
-#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
-    		::_aligned_free(p);
-#elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
-    		::free(p);
-#endif
+    		aligned_deallocate(p);
     	}
 
     	void construct (pointer p, const_reference val)
     	{
-    		new ((void*)p) value_type(val);
+    		new (p) value_type(val);
     	}
 
     	void destroy (pointer p)
@@ -182,136 +296,291 @@ namespace bcs
     }; // end class aligned_allocator
 
 
-    class tbuffer
+    template<class Allocator>
+    inline typename Allocator::pointer safe_allocate(Allocator& allocator, size_t n)
+    {
+    	return n > 0 ? allocator.allocate(n) : static_cast<typename Allocator::pointer>(BCS_NULL);
+    }
+
+    template<class Allocator>
+    inline void safe_deallocate(Allocator& allocator, typename Allocator::pointer p, size_t n)
+    {
+    	if (p)
+    	{
+    		allocator.deallocate(p, n);
+    	}
+    }
+
+
+	/********************************************
+	 *
+	 *	const_block and block
+	 *
+	 ********************************************/
+
+    template<typename T, class Allocator> class const_block;
+    template<typename T, class Allocator> class block;
+
+
+    // different ways of input memory
+
+    template<typename T>
+    class cref_blk_t
     {
     public:
-    	typedef aligned_allocator<byte> allocator_type;
-    	static const size_t default_alignment = 64;
-
-    public:
-    	explicit tbuffer(size_t init_capa)
-    	: m_allocator(default_alignment)
-    	, m_base(init_capa > 0 ? m_allocator.allocate(init_capa) : 0)
-    	, m_capacity(init_capa)
-    	, m_requested(0)
+    	cref_blk_t(const T* base, size_t n)
+    	: m_base(base), m_n(n)
     	{
     	}
 
-    	~tbuffer()
-    	{
-    		if (m_base != 0)
-    		{
-    			m_allocator.deallocate(m_base, m_capacity);
-    		}
-    	}
-
-		size_t capacity() const
+		size_t nelems() const
 		{
-			return m_capacity;
+			return m_n;
 		}
 
-		size_t alignment() const
+		const T* pbase() const
 		{
-			return m_allocator.alignment();
-		}
-
-		size_t max_size() const
-		{
-			return std::numeric_limits<size_t>::max() >> 1;
-		}
-
-		bool is_available() const
-		{
-			return m_requested == 0;
-		}
-
-		void reserve(size_t num_bytes)
-		{
-			if (!is_available())
-			{
-				throw std::runtime_error("Cannot modify an unavailable tbuffer object.");
-			}
-
-			if (num_bytes >= m_capacity)
-			{
-				if (num_bytes > max_size())
-				{
-					throw std::bad_alloc();
-				}
-
-				size_t c = m_capacity;
-				do
-				{
-					c <<= 1;
-				}
-				while(c < num_bytes);
-
-				if (m_base != 0)
-				{
-					m_allocator.deallocate(m_base, m_capacity);
-				}
-				m_base = m_allocator.allocate(c);
-				m_capacity = c;
-			}
-		}
-
-		void* request_buffer(size_t num_bytes)
-		{
-			reserve(num_bytes);
-			m_requested = m_base;
 			return m_base;
 		}
 
-		void return_buffer(void *p)
+		const T* pend() const
 		{
-			if (m_requested != p)
-			{
-				throw std::runtime_error("An invalid pointer is returned to tbuffer.");
-			}
-			m_requested = 0;
-		}
-
-		void release()
-		{
-			if (!is_available())
-			{
-				throw std::runtime_error("Cannot modify an unavailable tbuffer object.");
-			}
-
-			if (m_base != 0)
-			{
-				m_allocator.deallocate(m_base, m_capacity);
-				m_base = null_p<byte>();
-				m_capacity = 0;
-			}
+			return m_base + m_n;
 		}
 
     private:
-		tbuffer(const tbuffer& );
-		tbuffer& operator = (const tbuffer& );
-
-		allocator_type m_allocator;
-		byte *m_base;
-		size_t m_capacity;
-
-		byte *m_requested;
+    	const T *m_base;
+    	size_t m_n;
+    };
 
 
-    }; // end class tbuffer
+    template<typename T>
+    class ref_blk_t
+    {
+    public:
+    	ref_blk_t(T* base, size_t n)
+    	: m_base(base), m_n(n)
+    	{
+    	}
+
+		size_t nelems() const
+		{
+			return m_n;
+		}
+
+		T* pbase() const
+		{
+			return m_base;
+		}
+
+		T* pend() const
+		{
+			return m_base + m_n;
+		}
+
+    private:
+    	T *m_base;
+    	size_t m_n;
+    };
 
 
+    template<typename T>
+    class copy_blk_t
+    {
+    public:
+    	copy_blk_t(const T* base, size_t n)
+    	: m_base(base), m_n(n)
+    	{
+    	}
+
+		size_t nelems() const
+		{
+			return m_n;
+		}
+
+		const T* pbase() const
+		{
+			return m_base;
+		}
+
+		const T* pend() const
+		{
+			return m_base + m_n;
+		}
+
+    private:
+    	const T *m_base;
+    	size_t m_n;
+    };
 
 
-    /**
-     *  The class to refer to a block of read/write memory that
-     *  it takes care of its management by itself
-     */
-    template<typename T, typename TAlloc=aligned_allocator<T> >
-	class block
+    namespace _detail
+    {
+    	template<typename T, typename Allocator>
+    	class block_impl
+    	{
+    	public:
+    		typedef T value_type;
+    		typedef Allocator allocator_type;
+
+    		typedef typename allocator_type::size_type size_type;
+    		typedef typename allocator_type::difference_type difference_type;
+
+    		typedef typename allocator_type::pointer pointer;
+    		typedef typename allocator_type::reference reference;
+    		typedef typename allocator_type::const_pointer const_pointer;
+    		typedef typename allocator_type::const_reference const_reference;
+
+    	public:
+    		block_impl(pointer p, size_type n)
+    		: m_allocator()
+    		, m_base(p), m_n(n), m_own(false)
+    		{
+    		}
+
+    		explicit block_impl(size_type n)
+    		: m_allocator()
+    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
+    		{
+    		}
+
+    		block_impl(size_type n, const allocator_type& allocator)
+    		: m_allocator(allocator)
+    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
+    		{
+    		}
+
+    		block_impl(size_type n, const_pointer src)
+    		: m_allocator()
+    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
+    		{
+    			if (n > 0) copy_construct_elements(src, m_base, n);
+    		}
+
+    		block_impl(size_type n, const_pointer src, const allocator_type& allocator)
+    		: m_allocator(allocator)
+    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
+    		{
+    			if (n > 0) copy_construct_elements(src, m_base, n);
+    		}
+
+    		~block_impl()
+    		{
+    			if (m_own)
+    			{
+    				destruct_elements(m_base, m_n);
+    				safe_deallocate(m_allocator, m_base, m_n);
+    			}
+    		}
+
+    		void release()
+    		{
+    			if (m_own)
+    			{
+    				safe_deallocate(m_allocator, m_base, m_n);
+    			}
+
+    			m_base = BCS_NULL;
+    			m_n = 0;
+    			m_own = false;
+    		}
+
+    		block_impl(const block_impl& r)
+    		: m_allocator(r.m_allocator)
+    		, m_base(r.m_own ? safe_allocate(m_allocator, m_n) : r.m_base)
+    		, m_n(r.m_n)
+    		, m_own(r.m_own)
+    		{
+    		}
+
+    		block_impl(block_impl&& r)
+    		: m_allocator(std::move(r.m_allocator))
+    		, m_base(r.m_base)
+    		, m_n(r.m_n)
+    		, m_own(r.m_own)
+    		{
+    			r.m_base = BCS_NULL;
+    			r.m_n = 0;
+    			r.m_own = false;
+    		}
+
+    		void swap(block_impl& r)
+    		{
+    			using std::swap;
+
+    			swap(m_allocator, r.m_allocator);
+    			swap(m_base, r.m_base);
+    			swap(m_n, r.m_n);
+    			swap(m_own, r.m_own);
+    		}
+
+    		void operator = (const block_impl& r)
+    		{
+    			if (this !=  &r)
+    			{
+    				block_impl tmp(r);
+    				swap(tmp);
+    			}
+    		}
+
+    		void operator = (block_impl&& r)
+    		{
+    			swap(r);
+    			r.release();
+    		}
+
+    	public:
+    		size_type nelems() const
+    		{
+    			return m_n;
+    		}
+
+    		const_pointer pbase() const
+    		{
+    			return m_base;
+    		}
+
+    		pointer pbase()
+    		{
+    			return m_base;
+    		}
+
+    		const_reference get(size_type i) const
+    		{
+    			return m_base[i];
+    		}
+
+    		reference get(size_type i)
+    		{
+    			return m_base[i];
+    		}
+
+    		const allocator_type& get_allocator() const
+    		{
+    			return m_allocator;
+    		}
+
+    		bool own_memory() const
+    		{
+    			return m_own;
+    		}
+
+    	private:
+    		allocator_type m_allocator;
+    		pointer m_base;
+    		size_type m_n;
+    		bool m_own;
+
+    	}; // end class block_impl
+    }
+
+
+    template<typename T, typename Allocator=std::allocator<T> >
+	class const_block
 	{
 	public:
 		typedef T value_type;
-		typedef TAlloc allocator_type;
+		typedef Allocator allocator_type;
 
 		typedef typename allocator_type::size_type size_type;
 		typedef typename allocator_type::difference_type difference_type;
@@ -322,295 +591,265 @@ namespace bcs
 		typedef typename allocator_type::const_reference const_reference;
 
 	public:
-		explicit block(size_type n)
-		: m_allocator()
-		, m_base(n > 0 ? m_allocator.allocate(n) : pointer(0)), m_n(n)
+		explicit const_block(const cref_blk_t<value_type>& src)
+		: m_impl(const_cast<pointer>(src.pbase()), src.nelems())
 		{
 		}
 
-		block(size_type n, const allocator_type& alloc)
-		: m_allocator(alloc)
-		, m_base(n > 0 ? m_allocator.allocate(n) : pointer(0)), m_n(n)
+		explicit const_block(const copy_blk_t<value_type>& src)
+		: m_impl(src.nelems(), src.pbase())
+		{
+		}
+
+		const_block(const copy_blk_t<value_type>& src, const allocator_type& allocator)
+		: m_impl(src.nelems(), src.pbase(), allocator)
 		{
 		}
 
 
-		block(size_type n, const value_type *src)
-		: m_allocator()
-		, m_base(n > 0 ? m_allocator.allocate(n) : pointer(0)), m_n(n)
+		const_block(const const_block& r)
+		: m_impl(r.m_impl)
 		{
-			if (n > 0)
-			{
-				copy_elements(src, m_base, n);
-			}
 		}
 
-		block(size_type n, const value_type *src, const allocator_type& alloc)
-		: m_allocator(alloc)
-		, m_base(n > 0 ? m_allocator.allocate(n) : pointer(0)), m_n(n)
+		const_block(const_block&& r)
+		: m_impl(std::move(r.m_impl))
 		{
-			if (n > 0)
-			{
-				copy_elements(src, m_base, n);
-			}
 		}
 
-
-		~block()
+		const_block& operator = (const const_block& r)
 		{
-			if (m_base != 0)
-			{
-				m_allocator.deallocate(this->pbase(), this->nelems());
-			}
+			m_impl = r.m_impl;
+			return *this;
 		}
 
+		const_block& operator = (const_block&& r)
+		{
+			m_impl = std::move(r.m_impl);
+			return *this;
+		}
+
+		void swap(const_block& r)
+		{
+			m_impl.swap(r.m_impl);
+		}
+
+		inline const_block(block<T, Allocator>&& r);
+		inline const_block& operator = (block<T, Allocator>&& r);
+
+	public:
 		size_type nelems() const
 		{
-			return m_n;
+			return m_impl.nelems();
+		}
+
+		bool own_memory() const
+		{
+			return m_impl.own_memory();
+		}
+
+		const allocator_type& get_allocator() const
+		{
+			return m_impl.get_allocator();
 		}
 
 		const_pointer pbase() const
 		{
-			return m_base;
+			return m_impl.pbase();
+		}
+
+		const_pointer pend() const
+		{
+			return m_impl.pbase() + m_impl.nelems();
+		}
+
+		const_reference operator[](size_type i) const
+		{
+			return m_impl.get(i);
+		}
+
+	private:
+		_detail::block_impl<T, Allocator> m_impl;
+
+	}; // end class const_block
+
+
+    template<typename T, typename Allocator=std::allocator<T> >
+	class block
+	{
+    	friend class const_block<T, Allocator>;
+
+	public:
+		typedef T value_type;
+		typedef Allocator allocator_type;
+
+		typedef typename allocator_type::size_type size_type;
+		typedef typename allocator_type::difference_type difference_type;
+
+		typedef typename allocator_type::pointer pointer;
+		typedef typename allocator_type::reference reference;
+		typedef typename allocator_type::const_pointer const_pointer;
+		typedef typename allocator_type::const_reference const_reference;
+
+	public:
+		explicit block(const ref_blk_t<value_type>& src)
+		: m_impl(src.pbase(), src.nelems())
+		{
+		}
+
+		explicit block(const copy_blk_t<value_type>& src)
+		: m_impl(src.nelems(), src.pbase())
+		{
+		}
+
+		block(const copy_blk_t<value_type>& src, const allocator_type& allocator)
+		: m_impl(src.nelems(), src.pbase(), allocator)
+		{
+		}
+
+		block(const block& r)
+		: m_impl(r.m_impl)
+		{
+		}
+
+		block(block&& r)
+		: m_impl(std::move(r.m_impl))
+		{
+		}
+
+		block& operator = (const block& r)
+		{
+			m_impl = r.m_impl;
+			return *this;
+		}
+
+		block& operator = (block&& r)
+		{
+			m_impl = std::move(r.m_impl);
+			return *this;
+		}
+
+		void swap(block& r)
+		{
+			m_impl.swap(r.m_impl);
+		}
+
+	public:
+		size_type nelems() const
+		{
+			return m_impl.nelems();
+		}
+
+		bool own_memory() const
+		{
+			return m_impl.own_memory();
+		}
+
+		const allocator_type& get_allocator() const
+		{
+			return m_impl.get_allocator();
+		}
+
+		const_pointer pbase() const
+		{
+			return m_impl.pbase();
 		}
 
 		pointer pbase()
 		{
-			return m_base;
+			return m_impl.pbase();
 		}
 
 		const_pointer pend() const
 		{
-			return m_base + m_n;
+			return m_impl.pbase() + m_impl.nelems();
 		}
 
 		pointer pend()
 		{
-			return m_base + m_n;
+			return m_impl.pbase() + m_impl.nelems();
 		}
 
-		const_reference operator[](difference_type i) const
+		const_reference operator[](size_type i) const
 		{
-			return m_base[i];
+			return m_impl.get(i);
 		}
 
-		reference operator[](difference_type i)
+		reference operator[](size_type i)
 		{
-			return m_base[i];
+			return m_impl.get(i);
 		}
 
 	private:
-		block(const block<T>&);
-		block<T>& operator =(const block<T>&);
-
-	private:
-		allocator_type m_allocator;
-		pointer m_base;
-		size_type m_n;
-
+		_detail::block_impl<T, Allocator> m_impl;
 
 	}; // end class block
 
 
-    // different ways of input memory
+    template<typename T, class Allocator>
+	inline const_block<T, Allocator>::const_block(block<T, Allocator>&& r)
+	: m_impl(std::move(r.m_impl))
+	{
+	}
+
+    template<typename T, class Allocator>
+	inline const_block<T, Allocator>& const_block<T, Allocator>::operator = (block<T, Allocator>&& r)
+    {
+    	m_impl = std::move(r.m_impl);
+    	return *this;
+	}
+
+
+	// convenient routines
 
     template<typename T>
-    class const_ref_arr_t
+    inline cref_blk_t<T> cref_blk(const T *p, size_t n)
     {
-    public:
-    	typedef const T* const_pointer;
-    	typedef const T& const_reference;
-    	typedef size_t size_type;
-    	typedef ptrdiff_t difference_type;
+    	return cref_blk_t<T>(p, n);
+    }
 
-    	const_ref_arr_t(const_pointer base, size_type n)
-    	: m_base(base), m_n(n)
-    	{
-    	}
-
-		size_type nelems() const
-		{
-			return m_n;
-		}
-
-		const_pointer pbase() const
-		{
-			return m_base;
-		}
-
-		const_pointer pend() const
-		{
-			return m_base + m_n;
-		}
-
-    private:
-    	const T *m_base;
-    	size_t m_n;
-    };
-
-
-    template<typename T>
-    class const_copy_arr_t
+    template<typename T, class Allocator>
+    inline cref_blk_t<T> cref_arr(const const_block<T, Allocator>& blk)
     {
-    public:
-    	typedef const T* const_pointer;
-    	typedef const T& const_reference;
-    	typedef size_t size_type;
-    	typedef ptrdiff_t difference_type;
+    	return cref_blk_t<T>(blk.pbase(), blk.nelems());
+    }
 
-    	const_copy_arr_t(const_pointer base, size_type n)
-    	: m_base(base), m_n(n)
-    	{
-    	}
-
-		size_type nelems() const
-		{
-			return m_n;
-		}
-
-		const_pointer pbase() const
-		{
-			return m_base;
-		}
-
-		const_pointer pend() const
-		{
-			return m_base + m_n;
-		}
-
-    private:
-    	const T *m_base;
-    	size_t m_n;
-    };
-
-
-    template<typename T>
-    inline const_ref_arr_t<T> ref_arr(const T *p, size_t n)
+    template<typename T, class Allocator>
+    inline cref_blk_t<T> cref_arr(const block<T, Allocator>& blk)
     {
-    	return const_ref_arr_t<T>(p, n);
+    	return cref_blk_t<T>(blk.pbase(), blk.nelems());
     }
 
     template<typename T>
-    inline const_copy_arr_t<T> copy_arr(const T *p, size_t n)
+    inline ref_blk_t<T> ref_blk(T *p, size_t n)
     {
-    	return const_copy_arr_t<T>(p, n);
+    	return ref_blk_t<T>(p, n);
+    }
+
+    template<typename T, class Allocator>
+    inline ref_blk_t<T> ref_arr(block<T, Allocator>& blk)
+    {
+    	return ref_blk_t<T>(blk.pbase(), blk.nelems());
     }
 
 
     template<typename T>
-    class const_memory_proxy
+    inline copy_blk_t<T> copy_blk(const T *p, size_t n)
     {
-    public:
-    	typedef T value_type;
-    	typedef block<T> block_type;
+    	return copy_blk_t<T>(p, n);
+    }
 
-    	typedef const T* const_pointer;
-    	typedef const T& const_reference;
-    	typedef size_t size_type;
-    	typedef ptrdiff_t difference_type;
+    template<typename T, class Allocator>
+    inline copy_blk_t<T> copy_arr(const const_block<T, Allocator>& blk)
+    {
+    	return copy_blk_t<T>(blk.pbase(), blk.nelems());
+    }
 
-    public:
-
-    	// constructors
-
-    	const_memory_proxy()
-    	: m_pblock(), m_base(0), m_n(0)
-    	{
-    	}
-
-    	const_memory_proxy(const const_ref_arr_t<T>& src)
-    	: m_pblock(), m_base(src.pbase()), m_n(src.nelems())
-    	{
-    	}
-
-    	const_memory_proxy(const const_ref_arr_t<T>& src, size_t expect_n)
-    	: m_check_size(src.nelems(), expect_n)
-    	, m_pblock(), m_base(src.pbase()), m_n(src.nelems())
-    	{
-    	}
-
-    	const_memory_proxy(const const_copy_arr_t<T>& src)
-    	: m_pblock(new block_type(src.nelems(), src.pbase()))
-    	, m_base(m_pblock->pbase())
-    	, m_n(m_pblock->nelems())
-    	{
-    	}
-
-    	const_memory_proxy(const const_copy_arr_t<T>& src, size_t expect_n)
-    	: m_check_size(src.nelems(), expect_n)
-    	, m_pblock(new block_type(src.nelems(), src.pbase()))
-    	, m_base(m_pblock->pbase())
-    	, m_n(m_pblock->nelems())
-    	{
-    	}
-
-    	const_memory_proxy(block_type* pblk)
-    	: m_pblock(pblk)
-    	, m_base(pblk->pbase())
-    	, m_n(pblk->nelems())
-    	{
-    	}
-
-    	const_memory_proxy(block_type* pblk, size_t expect_n)
-    	: m_check_size(pblk->nelems(), expect_n)
-    	, m_pblock(pblk)
-    	, m_base(pblk->pbase())
-    	, m_n(pblk->nelems())
-    	{
-    	}
-
-    	void set_block(block_type *pblk)
-    	{
-    		m_pblock.reset(pblk);
-    		m_base = pblk->pbase();
-    		m_n = pblk->nelems();
-    	}
-
-
-    	// basic info
-
-    	size_type nelems() const
-    	{
-    		return m_n;
-    	}
-
-    	const_pointer pbase() const
-    	{
-    		return m_base;
-    	}
-
-    	const_pointer pend() const
-    	{
-    		return m_base + m_n;
-    	}
-
-    	const_reference operator[] (difference_type i) const
-    	{
-    		return m_base[i];
-    	}
-
-
-    private:
-
-    	struct _size_checker
-    	{
-    		_size_checker() { }
-
-    		_size_checker(size_t a, size_t b)
-    		{
-    			if (a != b)
-    				throw std::invalid_argument(
-    					"The size of the input array does not match expected.");
-    		}
-    	};
-
-    private:
-    	_size_checker m_check_size;
-    	shared_ptr<block_type> m_pblock;
-    	const value_type* m_base;
-    	size_t m_n;
-
-    }; // end class const_memory_proxy
+    template<typename T, class Allocator>
+    inline copy_blk_t<T> copy_arr(const block<T, Allocator>& blk)
+    {
+    	return copy_blk_t<T>(blk.pbase(), blk.nelems());
+    }
 
 
 }
