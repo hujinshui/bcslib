@@ -77,14 +77,14 @@ namespace bcs
 	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, const T& z)
 	{
 		auto mxy = minmax(x, y);
-		return make_pair(min(mxy.first, z), max(z, mxy.second));
+		return std::pair<const T&, const T&>(min(mxy.first, z), max(z, mxy.second));
 	}
 
 	template<typename T, typename Pred>
 	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, const T& z, Pred comp)
 	{
 		auto mxy = minmax(x, y, comp);
-		return make_pair(min(mxy.first, z, comp), max(z, mxy.second, comp));
+		return std::pair<const T&, const T&>(min(mxy.first, z, comp), max(z, mxy.second, comp));
 	}
 
 	template<typename T>
@@ -92,7 +92,7 @@ namespace bcs
 	{
 		auto mxy = minmax(x, y);
 		auto mzw = minmax(z, w);
-		return make_pair(min(mxy.first, mzw.first), max(mzw.second, mxy.second));
+		return std::pair<const T&, const T&>(min(mxy.first, mzw.first), max(mzw.second, mxy.second));
 	}
 
 	template<typename T, typename Pred>
@@ -100,7 +100,7 @@ namespace bcs
 	{
 		auto mxy = minmax(x, y, comp);
 		auto mzw = minmax(z, w, comp);
-		return make_pair(min(mxy.first, mzw.first, comp), max(mzw.second, mxy.second, comp));
+		return std::pair<const T&, const T&>(min(mxy.first, mzw.first, comp), max(mzw.second, mxy.second, comp));
 	}
 
 

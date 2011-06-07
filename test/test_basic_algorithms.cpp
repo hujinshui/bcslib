@@ -16,7 +16,6 @@
 using namespace bcs;
 using namespace bcs::test;
 
-
 template<typename T>
 struct val_idx
 {
@@ -139,6 +138,7 @@ BCS_TEST_CASE( test_min_and_max_e3 )
 	BCS_CHECK_EQUAL( max(v3, v2, v1, comp), v1 );
 	BCS_CHECK_EQUAL( max(p1, p2, p3, comp), p1 );
 
+	BCS_CHECK_EQUAL( mk_cpair(v1, v3), mk_cpair(v1, v3) );
 	BCS_CHECK_EQUAL( minmax(v1, v2, v3), mk_cpair(v1, v3) );
 	BCS_CHECK_EQUAL( minmax(v1, v3, v2), mk_cpair(v1, v3) );
 	BCS_CHECK_EQUAL( minmax(v2, v1, v3), mk_cpair(v1, v3) );
