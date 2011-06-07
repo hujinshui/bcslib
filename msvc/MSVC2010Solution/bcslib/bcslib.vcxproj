@@ -11,12 +11,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\test\test_c0x_support.cpp" />
+    <ClInclude Include="..\..\..\bcslib\base\arg_check.h" />
+    <ClInclude Include="..\..\..\bcslib\base\basic_algorithms.h" />
+    <ClInclude Include="..\..\..\bcslib\base\basic_defs.h" />
+    <ClInclude Include="..\..\..\bcslib\base\basic_functors.h" />
+    <ClInclude Include="..\..\..\bcslib\base\basic_mem.h" />
+    <ClInclude Include="..\..\..\bcslib\base\config.h" />
+    <ClInclude Include="..\..\..\bcslib\base\iterator_wrappers.h" />
+    <ClInclude Include="..\..\..\bcslib\base\math_functors.h" />
+    <ClInclude Include="..\..\..\bcslib\base\monitored_allocator.h" />
+    <ClInclude Include="..\..\..\bcslib\test\execution_mon.h" />
+    <ClInclude Include="..\..\..\bcslib\test\performance_timer.h" />
+    <ClInclude Include="..\..\..\bcslib\test\test_assertion.h" />
+    <ClInclude Include="..\..\..\bcslib\test\test_units.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{DB9D9E03-4578-40E0-A9A3-333F0CE5D898}</ProjectGuid>
+    <ProjectGuid>{6F609CB4-C0AB-41F5-87B3-D266717F37AD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>test_c0x_support</RootNamespace>
+    <RootNamespace>bcslib</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -41,10 +53,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)bin_$(PlatformShortName)\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)..\..\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)bin_$(PlatformShortName)\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)..\..\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -52,7 +64,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -67,7 +79,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

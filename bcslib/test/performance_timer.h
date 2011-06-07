@@ -7,6 +7,10 @@
  *      Author: dhlin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
 #ifndef BCSLIB_PERFORMANCE_TIMER_H
 #define BCSLIB_PERFORMANCE_TIMER_H
 

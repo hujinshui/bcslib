@@ -6,6 +6,10 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
 #ifndef BCSLIB_TEST_ASSERTION_H
 #define BCSLIB_TEST_ASSERTION_H
 
