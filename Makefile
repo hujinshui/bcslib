@@ -34,7 +34,8 @@ BASE_HEADERS = bcslib/base/config.h \
 	bcslib/base/basic_algorithms.h \
 	bcslib/base/iterator_wrappers.h \
 	bcslib/base/basic_mem.h \
-	bcslib/base/monitored_allocator.h
+	bcslib/base/monitored_allocator.h \
+	bcslib/base/index_selectors.h
 
 TEST_HEADERS = bcslib/test/test_assertion.h \
 	bcslib/test/test_units.h \
@@ -42,7 +43,7 @@ TEST_HEADERS = bcslib/test/test_assertion.h \
 
 VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h bcslib/veccomp/vecnorm.h bcslib/veccomp/vecstat.h
 
-ARRAY_BASIC_HEADERS = bcslib/array/array_base.h bcslib/array/index_selection.h bcslib/array/array_index.h bcslib/array/array1d.h bcslib/array/array2d.h
+ARRAY_BASIC_HEADERS = bcslib/array/array_base.h bcslib/array/array_index.h bcslib/array/array1d.h bcslib/array/array2d.h
 
 ARRAY_COMP_HEADERS = bcslib/array/array_calc.h bcslib/array/array_eval.h
 
@@ -76,7 +77,8 @@ test_basics: bin/test_basics
 
 BASICS_TESTS = test/test_basics.cpp \
 	test/test_basic_algorithms.cpp \
-	test/test_basic_memory.cpp
+	test/test_basic_memory.cpp \
+	test/test_index_selection.cpp
 	
 bin/test_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(BASICS_TESTS)
 	$(CXX) $(CFLAGS) $(BASICS_TESTS) -o bin/test_basics 

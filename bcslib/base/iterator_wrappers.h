@@ -74,12 +74,12 @@ namespace bcs
 		{
 		}
 
-		bool operator == (const self_type& rhs) const
+		bool operator == (const forward_iterator_wrapper& rhs) const
 		{
 			return m_impl == rhs.m_impl;
 		}
 
-		bool operator != (const self_type& rhs) const
+		bool operator != (const forward_iterator_wrapper& rhs) const
 		{
 			return !(m_impl == rhs.m_impl);
 		}
@@ -169,22 +169,22 @@ namespace bcs
 		{
 		}
 
-		bool operator < (const self_type& rhs) const
+		bool operator < (const random_access_iterator_wrapper& rhs) const
 		{
 			return this->m_impl < rhs.m_impl;
 		}
 
-		bool operator <= (const self_type& rhs) const
+		bool operator <= (const random_access_iterator_wrapper& rhs) const
 		{
 			return !(this->m_impl > rhs.m_impl);
 		}
 
-		bool operator > (const self_type& rhs) const
+		bool operator > (const random_access_iterator_wrapper& rhs) const
 		{
 			return this->impl > rhs.m_impl;
 		}
 
-		bool operator >= (const self_type& rhs) const
+		bool operator >= (const random_access_iterator_wrapper& rhs) const
 		{
 			return !(this->m_impl < rhs.m_impl);
 		}
@@ -203,7 +203,7 @@ namespace bcs
 			return impl;
 		}
 
-		difference_type operator - (const self_type& rhs) const
+		difference_type operator - (const random_access_iterator_wrapper& rhs) const
 		{
 			return this->m_impl - rhs.m_impl;
 		}
