@@ -16,6 +16,7 @@ bcs::memory_allocation_monitor bcs::global_memory_allocation_monitor;
 
 extern test_suite* test_basic_algorithms_suite();
 extern test_suite* test_basic_memory_suite();
+extern test_suite* test_index_selection_suite();
 
 test_suite* master_suite()
 {
@@ -23,6 +24,7 @@ test_suite* master_suite()
 
 	msuite->add( test_basic_algorithms_suite() );
 	msuite->add( test_basic_memory_suite() );
+	msuite->add( test_index_selection_suite() );
 
 	return msuite;
 }
