@@ -10,9 +10,9 @@ ifndef CXX
 CXX=g++
 endif
 
-ifndef BOOST_HOME
-$(error "The environment variable BOOST_HOME is not defined")
-endif
+# ifndef BOOST_HOME
+# $(error "The environment variable BOOST_HOME is not defined")
+# endif
 
 
 WARNING_FLAGS = -Wall -Wextra -Wconversion -Wformat -Wno-unused-parameter
