@@ -927,10 +927,9 @@ namespace bcs
 
 }
 
-
-namespace std
+namespace bcs
 {
-	// specialize std::swap for const_block and block
+	// specialize swap for const_block and block
 
 	template<typename T, class Allocator>
 	inline void swap(bcs::const_block<T, Allocator>& lhs, bcs::const_block<T, Allocator>& rhs)
