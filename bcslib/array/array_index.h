@@ -9,8 +9,8 @@
 #ifndef BCSLIB_ARRAY_INDEX_H
 #define BCSLIB_ARRAY_INDEX_H
 
-#include <bcslib/array/array_base.h>
-#include <bcslib/array/index_selection.h>
+#include <bcslib/base/basic_defs.h>
+#include <bcslib/base/index_selectors.h>
 
 namespace bcs
 {
@@ -22,13 +22,11 @@ namespace bcs
 	 *
 	 * - I.size();	// the number of elements along the dimension
 	 * - I[i];		// the mapped index of i
-	 * - step_at(i);  // return I[i+1] - I[i];
 	 *
 	 * We note that the class indices (defined in index_selection.h)
 	 * is already an indexer class.
 	 *
 	 */
-
 
 	class id_ind
 	{
@@ -45,11 +43,6 @@ namespace bcs
 		index_t operator[] (index_t i) const
 		{
 			return i;
-		}
-
-		index_t step_at(index_t i) const
-		{
-			return 1;
 		}
 
 	private:
@@ -80,11 +73,6 @@ namespace bcs
 			return i * m_step;
 		}
 
-		index_t step_at(index_t i) const
-		{
-			return m_step;
-		}
-
 	private:
 		size_t m_n;
 		index_t m_step;
@@ -109,23 +97,20 @@ namespace bcs
 			return 0;
 		}
 
-		index_t step_at(index_t i) const
-		{
-			return 0;
-		}
-
 	private:
 		size_t m_n;
 
 	}; // end class rep_ind
 
 
+
 	// step injection
 
-	template<class TIndexer> struct step_injecter;
+	// Note: a fully generic version is given in array1d.h
+	template<class TIndexer> struct inject_step;
 
 	template<>
-	struct step_injecter<id_ind>
+	struct inject_step<id_ind>
 	{
 		typedef step_ind type;
 
@@ -137,7 +122,7 @@ namespace bcs
 
 
 	template<>
-	struct step_injecter<step_ind>
+	struct inject_step<step_ind>
 	{
 		typedef step_ind type;
 
@@ -149,7 +134,7 @@ namespace bcs
 
 
 	template<>
-	struct step_injecter<rep_ind>
+	struct inject_step<rep_ind>
 	{
 		typedef rep_ind type;
 
@@ -160,37 +145,22 @@ namespace bcs
 	};
 
 
-	template<>
-	struct step_injecter<indices>
-	{
-		typedef indices type;
+	/****************************************************************
+	 *
+	 * sub-indexer by imposing a selector upon an indexer
+	 *
+	 ****************************************************************/
 
-		static type get(const indices& idx0, index_t step)
-		{
-			size_t n = idx0.size();
-			block<index_t> *pb = new block<index_t>(n);
-			index_t *dst = pb->pbase();
-
-			for (index_t i = 0; i < (index_t)n; ++i)
-			{
-				dst[i] = idx0[i] * step;
-			}
-
-			return indices(pb);
-		}
-	};
-
-
-
-	// sub-indexer by imposing a selector upon an indexer
-
+	// Note: a fully generic version is given in array1d.h
 	template<class TIndexer, class TSelector> struct sub_indexer;
 
+	// generic specialization when TSelector is whole or rep_selector
 
 	template<class TIndexer>
 	struct sub_indexer<TIndexer, whole>
 	{
 		typedef TIndexer type;
+
 		static type get(const TIndexer& base_indexer, whole, index_t& offset)
 		{
 			offset = 0;
@@ -199,58 +169,28 @@ namespace bcs
 	};
 
 	template<class TIndexer>
-	struct sub_indexer<TIndexer, rep_range>
+	struct sub_indexer<TIndexer, rep_selector>
 	{
 		typedef rep_ind type;
-		static type get(const TIndexer& base_indexer, const rep_range& selector, index_t& offset)
+		static type get(const TIndexer& base_indexer, const rep_selector& selector, index_t& offset)
 		{
-			offset = base_indexer[selector.rep_i];
+			offset = base_indexer[selector.index()];
 			return rep_ind(selector.size());
 		}
 	};
 
-	template<class TIndexer>
-	struct sub_indexer<TIndexer, open_range>
-	{
-		typedef typename sub_indexer<TIndexer, range>::type type;
-		static type get(const TIndexer& base_indexer, const open_range& selector, index_t& offset)
-		{
-			return sub_indexer<TIndexer, range>::get(base_indexer, selector.close(base_indexer.size()), offset);
-		}
-	};
 
-	template<class TIndexer>
-	struct sub_indexer<TIndexer, open_step_range>
-	{
-		typedef typename sub_indexer<TIndexer, step_range>::type type;
-		static type get(const TIndexer& base_indexer, const open_step_range& selector, index_t& offset)
-		{
-			return sub_indexer<TIndexer, step_range>::get(base_indexer, selector.close(base_indexer.size()), offset);
-		}
-	};
-
-	template<class TIndexer>
-	struct sub_indexer<TIndexer, rev_whole>
-	{
-		typedef typename sub_indexer<TIndexer, step_range>::type type;
-		static type get(const TIndexer& base_indexer, const rev_whole& selector, index_t& offset)
-		{
-			return sub_indexer<TIndexer, step_range>::get(base_indexer, selector.close(base_indexer.size()), offset);
-		}
-	};
-
-
-	// -----
-
+	// specialized versions
 
 	template<>
 	struct sub_indexer<id_ind, range>
 	{
 		typedef id_ind type;
-		static type get(const id_ind& base_indexer, const range& selector, index_t& offset)
+
+		static type get(const id_ind& base_indexer, const range& rg, index_t& offset)
 		{
-			offset = selector.begin;
-			return id_ind(selector.size());
+			offset = rg.begin_index();
+			return id_ind(rg.size());
 		}
 	};
 
@@ -258,34 +198,23 @@ namespace bcs
 	struct sub_indexer<id_ind, step_range>
 	{
 		typedef step_ind type;
-		static type get(const id_ind& base_indexer, const step_range& selector, index_t& offset)
+
+		static type get(const step_ind& base_indexer, const step_range& rg, index_t& offset)
 		{
-			offset = selector.begin;
-			return step_ind(selector.size(), selector.step);
+			offset = rg.begin_index();
+			return step_ind(rg.size(), rg.step());
 		}
 	};
-
-	template<>
-	struct sub_indexer<id_ind, indices>
-	{
-		typedef indices type;
-		static type get(const id_ind& base_indexer, const indices& selector, index_t& offset)
-		{
-			offset = 0;
-			return selector;
-		}
-	};
-
-
 
 	template<>
 	struct sub_indexer<step_ind, range>
 	{
 		typedef step_ind type;
-		static type get(const step_ind& base_indexer, const range& selector, index_t& offset)
+
+		static type get(const step_ind& base_indexer, const range& rg, index_t& offset)
 		{
-			offset = base_indexer.step() * selector.begin;
-			return step_ind(selector.size(), base_indexer.step());
+			offset = rg.begin_index() * base_indexer.step();
+			return step_ind(rg.size(), base_indexer.step());
 		}
 	};
 
@@ -293,130 +222,13 @@ namespace bcs
 	struct sub_indexer<step_ind, step_range>
 	{
 		typedef step_ind type;
-		static type get(const step_ind& base_indexer, const step_range& selector, index_t& offset)
+
+		static type get(const step_ind& base_indexer, const step_range& rg, index_t& offset)
 		{
-			offset = base_indexer.step() * selector.begin;
-			return step_ind(selector.size(), base_indexer.step() * selector.step);
+			offset = rg.begin_index() * base_indexer.step();
+			return step_ind(rg.size(), rg.step() * base_indexer.step());
 		}
 	};
-
-	template<>
-	struct sub_indexer<step_ind, indices>
-	{
-		typedef indices type;
-		static type get(const step_ind& base_indexer, const indices& selector, index_t& offset)
-		{
-			offset = 0;
-
-			index_t n = (index_t)selector.size();
-			block<index_t>* pb = new block<index_t>((size_t)n);
-			index_t *dst = pb->pbase();
-
-			index_t s = base_indexer.step();
-			for (index_t i = 0; i < n; ++i)
-			{
-				dst[i] = selector[i] * s;
-			}
-
-			return indices(pb);
-		}
-	};
-
-
-	template<>
-	struct sub_indexer<rep_ind, range>
-	{
-		typedef rep_ind type;
-		static type get(const rep_ind& base_indexer, const range& selector, index_t& offset)
-		{
-			offset = 0;
-			return rep_ind(selector.size());
-		}
-	};
-
-
-	template<>
-	struct sub_indexer<rep_ind, step_range>
-	{
-		typedef rep_ind type;
-		static type get(const rep_ind& base_indexer, const step_range& selector, index_t& offset)
-		{
-			offset = 0;
-			return rep_ind(selector.size());
-		}
-	};
-
-
-	template<>
-	struct sub_indexer<rep_ind, indices>
-	{
-		typedef rep_ind type;
-		static type get(const rep_ind& base_indexer, const indices& selector, index_t& offset)
-		{
-			offset = 0;
-			return rep_ind(selector.size());
-		}
-	};
-
-
-	namespace _detail
-	{
-		template<class TSelector>
-		struct indice_sub_indexer
-		{
-			static indices get(const indices& base_indexer, const TSelector& selector, index_t& offset)
-			{
-				offset = 0;
-
-				index_t n = (index_t)selector.size();
-				block<index_t>* pb = new block<index_t>((size_t)n);
-				index_t *dst = pb->pbase();
-
-				typename TSelector::enumerator etor = selector.get_enumerator();
-
-				for (index_t i = 0; i < n; ++i)
-				{
-					etor.next();
-					dst[i] = base_indexer[etor.get()];
-				}
-
-				return indices(pb);
-			}
-		};
-
-	}
-
-	template<>
-	struct sub_indexer<indices, range>
-	{
-		typedef indices type;
-		static type get(const indices& base_indexer, const range& selector, index_t& offset)
-		{
-			return _detail::indice_sub_indexer<range>::get(base_indexer, selector, offset);
-		}
-	};
-
-	template<>
-	struct sub_indexer<indices, step_range>
-	{
-		typedef indices type;
-		static type get(const indices& base_indexer, const step_range& selector, index_t& offset)
-		{
-			return _detail::indice_sub_indexer<step_range>::get(base_indexer, selector, offset);
-		}
-	};
-
-	template<>
-	struct sub_indexer<indices, indices>
-	{
-		typedef indices type;
-		static type get(const indices& base_indexer, const indices& selector, index_t& offset)
-		{
-			return _detail::indice_sub_indexer<indices>::get(base_indexer, selector, offset);
-		}
-	};
-
-
 
 }
 

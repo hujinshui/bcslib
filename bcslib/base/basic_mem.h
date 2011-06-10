@@ -535,6 +535,7 @@ namespace bcs
     		, m_n(r.m_n)
     		, m_own(r.m_own)
     		{
+    			if (r.m_n > 0) copy_construct_elements(r.m_base, m_base, r.m_n);
     		}
 
     		block_impl(block_impl&& r)
@@ -874,61 +875,6 @@ namespace bcs
 	}
 
 
-	// convenient routines
-
-    template<typename T>
-    inline cref_blk_t<T> cref_blk(const T *p, size_t n)
-    {
-    	return cref_blk_t<T>(p, n);
-    }
-
-    template<typename T, class Allocator>
-    inline cref_blk_t<T> cref_arr(const const_block<T, Allocator>& blk)
-    {
-    	return cref_blk_t<T>(blk.pbase(), blk.nelems());
-    }
-
-    template<typename T, class Allocator>
-    inline cref_blk_t<T> cref_arr(const block<T, Allocator>& blk)
-    {
-    	return cref_blk_t<T>(blk.pbase(), blk.nelems());
-    }
-
-    template<typename T>
-    inline ref_blk_t<T> ref_blk(T *p, size_t n)
-    {
-    	return ref_blk_t<T>(p, n);
-    }
-
-    template<typename T, class Allocator>
-    inline ref_blk_t<T> ref_arr(block<T, Allocator>& blk)
-    {
-    	return ref_blk_t<T>(blk.pbase(), blk.nelems());
-    }
-
-
-    template<typename T>
-    inline copy_blk_t<T> copy_blk(const T *p, size_t n)
-    {
-    	return copy_blk_t<T>(p, n);
-    }
-
-    template<typename T, class Allocator>
-    inline copy_blk_t<T> copy_arr(const const_block<T, Allocator>& blk)
-    {
-    	return copy_blk_t<T>(blk.pbase(), blk.nelems());
-    }
-
-    template<typename T, class Allocator>
-    inline copy_blk_t<T> copy_arr(const block<T, Allocator>& blk)
-    {
-    	return copy_blk_t<T>(blk.pbase(), blk.nelems());
-    }
-
-}
-
-namespace bcs
-{
 	// specialize swap for const_block and block
 
 	template<typename T, class Allocator>
@@ -943,6 +889,122 @@ namespace bcs
 		lhs.swap(rhs);
 	}
 
+
+	// convenient routines
+
+    template<typename T>
+    inline cref_blk_t<T> cref_blk(const T *p, size_t n)
+    {
+    	return cref_blk_t<T>(p, n);
+    }
+
+    template<typename T, class Allocator>
+    inline cref_blk_t<T> cref_blk(const const_block<T, Allocator>& blk)
+    {
+    	return cref_blk_t<T>(blk.pbase(), blk.nelems());
+    }
+
+    template<typename T, class Allocator>
+    inline cref_blk_t<T> cref_blk(const block<T, Allocator>& blk)
+    {
+    	return cref_blk_t<T>(blk.pbase(), blk.nelems());
+    }
+
+    template<typename T>
+    inline ref_blk_t<T> ref_blk(T *p, size_t n)
+    {
+    	return ref_blk_t<T>(p, n);
+    }
+
+    template<typename T, class Allocator>
+    inline ref_blk_t<T> ref_blk(block<T, Allocator>& blk)
+    {
+    	return ref_blk_t<T>(blk.pbase(), blk.nelems());
+    }
+
+
+    template<typename T>
+    inline copy_blk_t<T> copy_blk(const T *p, size_t n)
+    {
+    	return copy_blk_t<T>(p, n);
+    }
+
+    template<typename T, class Allocator>
+    inline copy_blk_t<T> copy_blk(const const_block<T, Allocator>& blk)
+    {
+    	return copy_blk_t<T>(blk.pbase(), blk.nelems());
+    }
+
+    template<typename T, class Allocator>
+    inline copy_blk_t<T> copy_blk(const block<T, Allocator>& blk)
+    {
+    	return copy_blk_t<T>(blk.pbase(), blk.nelems());
+    }
+
+
+    // storage_base (can serve as a private base class for classes that need to keep storage)
+
+    template<typename T, class Allocator>
+    class storage_base
+    {
+    public:
+    	storage_base(size_t n)
+    	: m_block(n)
+    	{
+    	}
+
+    	storage_base(size_t n, const T& v)
+    	: m_block(n, v)
+    	{
+    	}
+
+    	storage_base(size_t n, const T *src)
+    	: m_block(copy_blk(src, n))
+    	{
+    	}
+
+    	storage_base(const storage_base& r)
+    	: m_block(r.m_block)
+    	{
+    	}
+
+    	storage_base(storage_base&& r)
+    	: m_block(std::move(r.m_block))
+    	{
+    	}
+
+    	void operator = (const storage_base& r)
+    	{
+    		m_block = r.m_block;
+    	}
+
+    	void operator = (storage_base&& r)
+    	{
+    		m_block = std::move(r.m_block);
+    	}
+
+    	void swap(storage_base& r)
+    	{
+    		m_block.swap(r.m_block);
+    	}
+
+    	T* pbase()
+    	{
+    		return m_block.pbase();
+    	}
+
+    	const T* pbase() const
+    	{
+    		return m_block.pbase();
+    	}
+
+    private:
+    	block<T, Allocator> m_block;
+
+    }; // end class storage_base
+
 }
+
+
 
 #endif 
