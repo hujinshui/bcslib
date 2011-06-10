@@ -229,6 +229,7 @@ BCS_TEST_CASE( test_const_blocks )
 	BCS_CHECK( test_block(B2, true, N, p2) );
 	BCS_CHECK( test_block(B2c, true, N) );
 	BCS_CHECK( B2c.pbase() != p2 );
+	BCS_CHECK( elements_equal(B2.pbase(), B2c.pbase(), N) );
 
 	CHECK_MEM_PENDING( 3 );
 
@@ -332,6 +333,7 @@ BCS_TEST_CASE( test_blocks )
 	BCS_CHECK( test_block(B2, true, N, p2) );
 	BCS_CHECK( test_block(B2c, true, N) );
 	BCS_CHECK( B2c.pbase() != p2 );
+	BCS_CHECK( elements_equal(B2.pbase(), B2c.pbase(), N) );
 
 	CHECK_MEM_PENDING( 3 );
 
