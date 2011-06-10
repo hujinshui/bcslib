@@ -14,6 +14,8 @@
 #include <bcslib/base/arg_check.h>
 #include <bcslib/base/iterator_wrappers.h>
 
+#include <type_traits>
+#include <array>
 #include <vector>
 
 namespace bcs
@@ -34,9 +36,12 @@ namespace bcs
 	 *  - copy-constructible and/or move-constructible
 	 *
 	 *  - S.size() -> the number of indices, of type size_type
-	 *  - S[i] -> the i-th selected index (i here is of type index_t)
+	 *  - S[i] -> the i-th selected index
 	 *  - S.begin() -> the beginning iterator, of type const_iterator
 	 *  - S.end() -> the pass-by-end iterator, of type const_iterator
+	 *
+	 *  We use a trait struct: bcs::index_selector_traits for
+	 *  compile-time decision of relevant properties.
 	 *
 	 *  All these member functions are with const qualification
 	 *
@@ -44,6 +49,30 @@ namespace bcs
 	 *  this category, such as std::vector<index_t>, std::array<index_t>,
 	 *  and std::array1d<index_t>, etc.
 	 */
+
+
+	template<class IndexSelector>
+	struct index_selector_traits
+	{
+		typedef index_t input_type;
+	};
+
+
+	template<typename TInt>
+	struct index_selector_traits<std::vector<TInt> >
+	{
+		BCS_STATIC_ASSERT_V(std::is_integral<TInt>);
+		typedef typename std::vector<TInt>::size_type input_type;
+	};
+
+
+	template<typename TInt, size_t N>
+	struct index_selector_traits<std::array<TInt, N> >
+	{
+		BCS_STATIC_ASSERT_V(std::is_integral<TInt>);
+		typedef typename std::array<TInt, N>::size_type input_type;
+	};
+
 
 
 	struct whole { };
@@ -168,7 +197,7 @@ namespace bcs
 
 		size_t size() const
 		{
-			return m_begin > m_end ? static_cast<size_t>(m_end - m_begin) : 0;
+			return m_begin < m_end ? static_cast<size_t>(m_end - m_begin) : 0;
 		}
 
 		index_t operator[] (const index_t& i) const
@@ -475,13 +504,13 @@ namespace bcs
 	template<class BoolSequence>
 	inline std::vector<index_t> indices(const BoolSequence& B)
 	{
-		return find_indices(B.begin(), B.end(), 0);
+		return find_indices(B.begin(), B.end());
 	}
 
 	template<class Sequence, typename Predicate>
 	inline std::vector<index_t> indices(const Sequence& S, Predicate pred)
 	{
-		return find_indices(S.begin(), S.end(), pred, 0);
+		return find_indices(S.begin(), S.end(), pred);
 	}
 
 
@@ -489,7 +518,7 @@ namespace bcs
 	inline std::vector<index_t> indices(const Sequence& S, const Sequence2& S2, Predicate pred)
 	{
 		check_arg(S.size() == S2.size(), "The sizes of two sequences are not the same.");
-		return find_indices(S.begin(), S.end(), S2.begin(), pred, 0);
+		return find_indices(S.begin(), S.end(), S2.begin(), pred);
 	}
 }
 
