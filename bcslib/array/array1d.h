@@ -796,6 +796,7 @@ namespace bcs
 			{
 				a[i] = base_indexer[sel[i]];
 			}
+			return a;
 		}
 	};
 

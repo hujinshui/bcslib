@@ -172,10 +172,23 @@ namespace bcs
 	struct sub_indexer<TIndexer, rep_selector>
 	{
 		typedef rep_ind type;
+
 		static type get(const TIndexer& base_indexer, const rep_selector& selector, index_t& offset)
 		{
 			offset = base_indexer[selector.index()];
 			return rep_ind(selector.size());
+		}
+	};
+
+	template<class TIndexer>
+	struct sub_indexer<TIndexer, rev_whole>
+	{
+		typedef typename sub_indexer<TIndexer, step_range>::type type;
+
+		static type get(const TIndexer& base_indexer, rev_whole, index_t& offset)
+		{
+			step_range rg = rgn(static_cast<index_t>(base_indexer.size()), rev_whole());
+			return sub_indexer<TIndexer, step_range>::get(base_indexer, rg, offset);
 		}
 	};
 
@@ -199,7 +212,7 @@ namespace bcs
 	{
 		typedef step_ind type;
 
-		static type get(const step_ind& base_indexer, const step_range& rg, index_t& offset)
+		static type get(const id_ind& base_indexer, const step_range& rg, index_t& offset)
 		{
 			offset = rg.begin_index();
 			return step_ind(rg.size(), rg.step());
