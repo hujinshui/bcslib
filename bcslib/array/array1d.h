@@ -35,7 +35,6 @@ namespace bcs
 			typedef typename std::remove_const<T>::type value_type;
 			typedef T* pointer;  // the const qualifier should be kept here
 			typedef T& reference;
-			typedef index_t difference_type;
 
 		public:
 			_aview1d_iter_impl(): m_base(0), m_pindexer(0), m_i(0) { }
@@ -49,8 +48,8 @@ namespace bcs
 
 			void move_next() { ++ m_i; }
 			void move_prev() { -- m_i; }
-			void move_forward(index_t n) { m_i += n; }
-			void move_backward(index_t n) { m_i -= n; }
+			void move_forward(ptrdiff_t n) { m_i += static_cast<index_t>(n); }
+			void move_backward(ptrdiff_t n) { m_i -= static_cast<index_t>(n); }
 
 			bool operator == (const _aview1d_iter_impl& rhs) const { return m_i == rhs.m_i; }
 			bool operator < (const _aview1d_iter_impl& rhs) const { return m_i < rhs.m_i; }
@@ -81,7 +80,6 @@ namespace bcs
 			typedef typename std::remove_const<T>::type value_type;
 			typedef T* pointer;  // the const qualifier should be kept here
 			typedef T& reference;
-			typedef index_t difference_type;
 
 		public:
 			_aview1d_iter_impl() : m_p(0), m_step(0) { }
@@ -95,8 +93,8 @@ namespace bcs
 
 			void move_next() { m_p += m_step; }
 			void move_prev() { m_p -= m_step; }
-			void move_forward(index_t n) { m_p += n * m_step; }
-			void move_backward(index_t n) { m_p -= n * m_step; }
+			void move_forward(ptrdiff_t n) { m_p += n * m_step; }
+			void move_backward(ptrdiff_t n) { m_p -= n * m_step; }
 
 			bool operator == (const _aview1d_iter_impl& rhs) const
 			{
