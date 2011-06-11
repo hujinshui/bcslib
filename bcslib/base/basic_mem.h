@@ -988,12 +988,12 @@ namespace bcs
     		m_block.swap(r.m_block);
     	}
 
-    	T* pbase()
+    	T* pointer_to_base()
     	{
     		return m_block.pbase();
     	}
 
-    	const T* pbase() const
+    	const T* pointer_to_base() const
     	{
     		return m_block.pbase();
     	}

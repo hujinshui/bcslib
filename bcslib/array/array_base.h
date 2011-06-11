@@ -160,12 +160,6 @@ namespace bcs
 
 // The macros help defining array classes
 
-#define BCS_ARR_IN(A) typename std::enable_if<is_array_view<A>::value && array_view_traits<A>::is_readable>::type
-#define BCS_ARR_IN_NDIM(A, D) typename std::enable_if<is_array_view<A, D>::value && array_view_traits<A>::is_readable>::type
-#define BCS_ARR_OUT(A) typename std::enable_if<is_array_view<A>::value && array_view_traits<A>::is_writable>::type
-#define BCS_ARR_OUT_NDIM(A, D) typename std::enable_if<is_array_view<A, D>::value && array_view_traits<A>::is_writable>::type
-
-
 #define BCS_ARRAY_CHECK_TYPE(T) \
 	static_assert(bcs::is_valid_array_element<T>::value, "T must be a valid element type");
 
