@@ -158,7 +158,7 @@ namespace bcs
 		typedef typename Impl::value_type value_type;
 		typedef typename Impl::pointer pointer;
 		typedef typename Impl::reference reference;
-		typedef ptrdiff_t difference_type;
+		typedef typename Impl::difference_type difference_type;
 
 	public:
 		random_access_iterator_wrapper()

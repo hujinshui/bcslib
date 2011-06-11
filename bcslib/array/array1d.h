@@ -240,6 +240,11 @@ namespace bcs
 			return num_dims;
 		}
 
+		size_type size() const
+		{
+			return nelems();
+		}
+
 		size_type nelems() const
 		{
 			return (size_type)m_d0;
@@ -507,7 +512,7 @@ namespace bcs
 		{
 		}
 
-		array1d(array1d& r)
+		array1d(const array1d& r)
 		: storage_base_type(r), view_type(storage_base_type::pointer_to_base(), r.nelems())
 		{
 		}
@@ -519,7 +524,7 @@ namespace bcs
 
 		template<typename TIndexer2>
 		explicit array1d(const const_aview1d<value_type, TIndexer2>& src)
-		: storage_base_type(src.nelems()), view_type(storage_base_type::pbase(), src.nelems())
+		: storage_base_type(src.nelems()), view_type(storage_base_type::pointer_to_base(), src.nelems())
 		{
 			import_from(*this, src);
 		}
@@ -754,10 +759,12 @@ namespace bcs
 	 *
 	 */
 
+	typedef array1d<index_t> arr_ind;
+
 	template<class TIndexer>
 	struct inject_step
 	{
-		typedef array1d<index_t> type;
+		typedef arr_ind type;
 
 		static type get(const TIndexer& idx0, index_t step)
 		{
@@ -775,7 +782,7 @@ namespace bcs
 	template<class TIndexer, class TSelector>
 	struct sub_indexer
 	{
-		typedef array1d<index_t> type;
+		typedef arr_ind type;
 
 		static type get(const TIndexer& base_indexer, const TSelector& sel, index_t& offset)
 		{
