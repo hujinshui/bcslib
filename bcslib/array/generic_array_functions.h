@@ -18,8 +18,13 @@
 
 namespace bcs
 {
+
 	template<class LArr, class RArr>
-	inline bool equal_array(const BCS_ARR_IN(LArr)& lhs, const BCS_ARR_IN(RArr)& rhs)
+	inline typename std::enable_if<
+		is_array_view<LArr>::value && array_view_traits<LArr>::is_readable &&
+		is_array_view<RArr>::value && array_view_traits<RArr>::is_readable,
+		bool>::type
+	equal_array(const LArr& lhs, const RArr& rhs)
 	{
 		static_assert(array_view_traits<LArr>::num_dims == array_view_traits<RArr>::num_dims,
 				"Two arrays for comparison should have the same number of dimensions.");
@@ -43,13 +48,19 @@ namespace bcs
 
 
 	template<class Arr, typename OutputIterator>
-	inline void export_to(const BCS_ARR_IN(Arr)& a, OutputIterator dst)
+	inline typename std::enable_if<
+		is_array_view<Arr>::value && array_view_traits<Arr>::is_readable,
+		void>::type
+	export_to(const Arr& a, OutputIterator dst)
 	{
 		std::copy_n(begin(a), get_num_elems(a), dst);
 	}
 
 	template<class Arr>
-	inline void export_to(const BCS_ARR_IN(Arr)& a, typename array_view_traits<Arr>::value_type* dst)
+	inline typename std::enable_if<
+		is_array_view<Arr>::value && array_view_traits<Arr>::is_readable,
+		void>::type
+	export_to(const Arr& a, typename array_view_traits<Arr>::value_type* dst)
 	{
 		if (is_dense_view(a))
 		{
@@ -63,13 +74,19 @@ namespace bcs
 
 
 	template<class Arr, typename InputIterator>
-	inline void import_from(BCS_ARR_OUT(Arr)& a, InputIterator src)
+	inline typename std::enable_if<
+		is_array_view<Arr>::value && array_view_traits<Arr>::is_writable,
+		void>::type
+	import_from(Arr& a, InputIterator src)
 	{
 		std::copy_n(src, get_num_elems(a), begin(a));
 	}
 
 	template<class Arr>
-	inline void import_from(BCS_ARR_OUT(Arr)& a, const typename array_view_traits<Arr>::value_type* src)
+	inline typename std::enable_if<
+		is_array_view<Arr>::value && array_view_traits<Arr>::is_writable,
+		void>::type
+	import_from(Arr& a, const typename array_view_traits<Arr>::value_type* src)
 	{
 		if (is_dense_view(a))
 		{
@@ -83,7 +100,10 @@ namespace bcs
 
 
 	template<class Arr>
-	inline void fill(BCS_ARR_OUT(Arr)& a, const typename array_view_traits<Arr>::value_type& v)
+	inline typename std::enable_if<
+		is_array_view<Arr>::value && array_view_traits<Arr>::is_writable,
+		void>::type
+	fill(Arr& a, const typename array_view_traits<Arr>::value_type& v)
 	{
 		if (is_dense_view(a))
 		{
@@ -96,7 +116,10 @@ namespace bcs
 	}
 
 	template<class Arr>
-	inline void set_zeros(BCS_ARR_OUT(Arr)& a)
+	inline typename std::enable_if<
+		is_array_view<Arr>::value && array_view_traits<Arr>::is_writable,
+		void>::type
+	set_zeros(Arr& a)
 	{
 		if (is_dense_view(a))
 		{
@@ -107,6 +130,7 @@ namespace bcs
 			throw std::runtime_error("set_zeros can only be applied to dense views.");
 		}
 	}
+
 
 }
 

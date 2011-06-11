@@ -130,8 +130,12 @@ bool array_integrity_test(const bcs::const_aview1d<T, TIndexer>& view)
 {
 	index_t n = view.dim0();
 
+	if (n != (index_t)view.nelems()) return false;
 	if (view.ndims() != 1) return false;
 	if (view.shape() != arr_shape(n)) return false;
+	if (get_num_elems(view) != view.nelems()) return false;
+	if (get_array_shape(view) != view.shape()) return false;
+	if (ptr_base(view) != view.pbase()) return false;
 
 	for (index_t i = 0; i < n; ++i)
 	{
@@ -139,9 +143,18 @@ bool array_integrity_test(const bcs::const_aview1d<T, TIndexer>& view)
 		if (view.ptr(i) != &(view[i])) return false;
 	}
 
-	array1d<T> acopy = make_copy(view);
-	if (!(acopy == view)) return false;
+	return true;
+}
 
+
+template<typename T, class TIndexer>
+bool array_view_equal(const bcs::const_aview1d<T, TIndexer>& view, const T *src, size_t n)
+{
+	if (view.nelems() != n) return false;
+	for (index_t i = 0; i < (index_t)n; ++i)
+	{
+		if (view(i) != src[i]) return false;
+	}
 	return true;
 }
 
@@ -149,48 +162,96 @@ bool array_integrity_test(const bcs::const_aview1d<T, TIndexer>& view)
 template<typename T, class TIndexer>
 bool array_iteration_test(const bcs::const_aview1d<T, TIndexer>& view)
 {
+	if (begin(view) != view.begin()) return false;
+	if (end(view) != view.end()) return false;
+
 	index_t n = view.dim0();
 	bcs::block<T> buffer(view.nelems());
-	for (index_t i = 0; i < n; ++i) buffer[i] = view(i);
+	T *b = buffer.pbase();
+	for (index_t i = 0; i < n; ++i) b[i] = view(i);
 
 	return collection_equal(view.begin(), view.end(), buffer.pbase(), (size_t)n);
 }
 
 
-/*
-
 BCS_TEST_CASE( test_dense_array1d )
 {
-	double src1[6] = {7, 7, 7, 7, 7, 7};
-	size_t n1 = 6;
+	double src0[5] = {0, 0, 0, 0, 0};
+	double src1[5] = {3, 4, 5, 1, 2};
+	size_t n1 = 5;
 
-	double src2[5] = {3, 4, 5, 1, 2};
-	size_t n2 = 5;
+	double v2 = 7;
+	double src2[6] = {7, 7, 7, 7, 7, 7};
+	size_t n2 = 6;
 
 	array1d<double> a0(0);
 
 	BCS_CHECK( array_integrity_test(a0) );
 	BCS_CHECK( array_iteration_test(a0) );
 
-	array1d<double> a1(n1, src1);
+	array1d<double> a1(5);
+
+	for (int i = 0; i < 5; ++i) a1(i) = src1[i];
 
 	BCS_CHECK( array_integrity_test(a1) );
 	BCS_CHECK( array_view_equal(a1, src1, n1) );
 	BCS_CHECK( array_iteration_test(a1) );
 
-	array1d<double> a2(n2, src2);
+	array1d<double> a2(n2, v2);
 
 	BCS_CHECK( array_integrity_test(a2) );
 	BCS_CHECK( array_view_equal(a2, src2, n2) );
 	BCS_CHECK( array_iteration_test(a2) );
 
-	block<double> a2_buf(n2);
-	export_to(a2, a2_buf.pbase());
+	array1d<double> a3(n1, src1);
 
-	BCS_CHECK( collection_equal(a2_buf.pbase(), a2_buf.pend(), src2, n2) );
+	BCS_CHECK( array_integrity_test(a3) );
+	BCS_CHECK( array_view_equal(a3, src1, n1) );
+	BCS_CHECK( array_iteration_test(a3) );
+
+	array1d<double> a4(a3);
+
+	BCS_CHECK( array_integrity_test(a3) );
+	BCS_CHECK( array_view_equal(a3, src1, n1) );
+	BCS_CHECK( array_iteration_test(a3) );
+
+	BCS_CHECK( a4.pbase() != a3.pbase() );
+	BCS_CHECK( array_integrity_test(a4) );
+	BCS_CHECK( array_view_equal(a4, src1, n1) );
+	BCS_CHECK( array_iteration_test(a4) );
+
+	const double *p4 = a4.pbase();
+	array1d<double> a5(std::move(a4));
+
+	BCS_CHECK( a4.pbase() == BCS_NULL );
+	BCS_CHECK( a4.nelems() == 0 );
+
+	BCS_CHECK( a5.pbase() == p4 );
+	BCS_CHECK( array_integrity_test(a5) );
+	BCS_CHECK( array_view_equal(a5, src1, n1) );
+	BCS_CHECK( array_iteration_test(a5) );
+
+
+	BCS_CHECK( a1 == a1 );
+	array1d<double> a6(a1);
+	BCS_CHECK( a1 == a6 );
+	a6[2] += 1;
+	BCS_CHECK( a1 != a6 );
+
+	block<double> buf(n1, 0);
+	export_to(a1, buf.pbase());
+	BCS_CHECK( collection_equal(buf.pbase(), buf.pend(), src1, n1) );
+	set_zeros(a1);
+	BCS_CHECK( array_view_equal(a1, src0, n1) );
+	import_from(a1, buf.pbase());
+	BCS_CHECK( array_view_equal(a1, src1, n1) );
+
+	set_zeros(a2);
+	fill(a2, v2);
+	BCS_CHECK( array_view_equal(a2, src2, n2) );
 }
 
-
+/*
 BCS_TEST_CASE( test_step_array1d )
 {
 	double src0[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -446,8 +507,9 @@ BCS_TEST_CASE( test_indices_subview )
 test_suite *test_array1d_suite()
 {
 	test_suite *suite = new test_suite( "test_array1d" );
-/*
+
 	suite->add( new test_dense_array1d() );
+/*
 	suite->add( new test_step_array1d() );
 	suite->add( new test_rep_array1d() );
 	suite->add( new test_indices_array1d() );

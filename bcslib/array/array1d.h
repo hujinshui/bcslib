@@ -212,6 +212,7 @@ namespace bcs
 		, m_d0(r.m_d0)
 		, m_indexer(std::move(r.m_indexer))
 		{
+			r.reset();
 		}
 
 		const_aview1d& operator = (const const_aview1d& r)
@@ -227,6 +228,9 @@ namespace bcs
 			m_base = r.m_base;
 			m_d0 = r.m_d0;
 			m_indexer = std::move(r.m_indexer);
+
+			r.reset();
+
 			return *this;
 		}
 
@@ -305,6 +309,13 @@ namespace bcs
 			return const_aview1d<value_type, sub_indexer_type>(m_base + offset, sindexer);
 		}
 
+	private:
+		void reset()
+		{
+			m_base = BCS_NULL;
+			m_d0 = 0;
+		}
+
 	protected:
 		pointer m_base;
 		index_type m_d0;
@@ -356,12 +367,12 @@ namespace bcs
 			const_view_type::operator = (r);
 			return *this;
 		}
-/*
+
 		aview1d& operator = (aview1d&& r)
 		{
 			const_view_type::operator = (std::move(r));
 			return *this;
-		} */
+		}
 
 	public:
 		// Element access
@@ -482,27 +493,27 @@ namespace bcs
 
 	public:
 		explicit array1d(size_type n)
-		: storage_base_type(n), view_type(storage_base_type::pbase(), n)
+		: storage_base_type(n), view_type(storage_base_type::pointer_to_base(), n)
 		{
 		}
 
 		array1d(size_type n, const value_type& x)
-		: storage_base_type(n, x), view_type(storage_base_type::pbase(), n)
+		: storage_base_type(n, x), view_type(storage_base_type::pointer_to_base(), n)
 		{
 		}
 
 		array1d(size_type n, const_pointer src)
-		: storage_base_type(n, src), view_type(storage_base_type::pbase(), n)
+		: storage_base_type(n, src), view_type(storage_base_type::pointer_to_base(), n)
 		{
 		}
 
 		array1d(array1d& r)
-		: storage_base_type(r), view_type(storage_base_type::pbase(), r.nelems())
+		: storage_base_type(r), view_type(storage_base_type::pointer_to_base(), r.nelems())
 		{
 		}
 
 		array1d(array1d&& r)
-		: storage_base_type(std::move(r)), view_type(storage_base_type::pbase(), r.nelems())
+		: storage_base_type(std::move(r)), view_type(std::move(r))
 		{
 		}
 
@@ -515,7 +526,7 @@ namespace bcs
 
 		template<typename ForwardIterator>
 		array1d(size_type n, ForwardIterator it)
-		: storage_base_type(n), view_type(storage_base_type::pbase(), n)
+		: storage_base_type(n), view_type(storage_base_type::pointer_to_base(), n)
 		{
 			import_from(*this, it);
 		}
@@ -528,7 +539,7 @@ namespace bcs
 				view_type& v = *this;
 
 				s = r;
-				v = view_type(s.pbase(), id_ind(r.nelems()));
+				v = view_type(s.pointer_to_base(), id_ind(r.nelems()));
 			}
 			return *this;
 		}
@@ -539,7 +550,7 @@ namespace bcs
 			view_type& v = *this;
 
 			s = std::move(r);
-			v = view_type(s.pbase(), id_ind(r.nelems()));
+			v = view_type(s.pointer_to_base(), id_ind(r.nelems()));
 
 			return *this;
 		}
@@ -694,7 +705,9 @@ namespace bcs
 	// export & import
 
 	template<typename T, class TIndexer, class RView>
-	inline const const_aview1d<T, TIndexer>& operator >> (const const_aview1d<T, TIndexer>& a, BCS_ARR_OUT(RView)& b)
+	inline typename std::enable_if<is_array_view<RView>::value && array_view_traits<RView>::is_writable,
+		const const_aview1d<T, TIndexer>&>::type
+	operator >> (const const_aview1d<T, TIndexer>& a, RView& b)
 	{
 		if (get_num_elems(a) != get_num_elems(b))
 		{
@@ -713,7 +726,9 @@ namespace bcs
 	}
 
 	template<typename T, class TIndexer, class RView>
-	inline aview1d<T, TIndexer>& operator << (aview1d<T, TIndexer>& a, const BCS_ARR_OUT(RView)& b)
+	inline typename std::enable_if<is_array_view<RView>::value && array_view_traits<RView>::is_readable,
+			aview1d<T, TIndexer>&>::type
+	operator << (aview1d<T, TIndexer>& a, const RView& b)
 	{
 		if (get_num_elems(a) != get_num_elems(b))
 		{
