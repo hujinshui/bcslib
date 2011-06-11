@@ -27,6 +27,87 @@ template class bcs::aview1d<double, rep_ind>;
 
 template class bcs::array1d<double>;
 
+// A class for concept checked
+
+template<class Arr>
+class const_array_view1d_concept_check
+{
+	BCS_STATIC_ASSERT_V(is_array_view<Arr>);
+	static_assert(is_array_view_ndim<Arr, 1>::value, "is_array_view_ndim<Arr, 1>");
+
+	typedef typename array_view_traits<Arr>::value_type value_type;
+	typedef std::array<index_t, 1> shape_type;
+
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::size_type, size_t);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::index_type, index_t);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::const_reference, const value_type&);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::reference, value_type&);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::const_pointer, const value_type*);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::shape_type, shape_type);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::num_dims == 1);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::is_readable == true);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::is_writable == false);
+
+	void check_const(const Arr& a)
+	{
+		BCS_ASSERT_SAME_TYPE(decltype(get_num_elems(a)), size_t);
+		BCS_ASSERT_SAME_TYPE(decltype(get_array_shape(a)), shape_type);
+
+		BCS_ASSERT_SAME_TYPE(decltype(begin(a)), typename array_view_traits<Arr>::const_iterator);
+		BCS_ASSERT_SAME_TYPE(decltype(end(a)), typename array_view_traits<Arr>::const_iterator);
+
+		BCS_ASSERT_SAME_TYPE(decltype(is_dense_view(a)), bool);
+		BCS_ASSERT_SAME_TYPE(decltype(ptr_base(a)), const value_type*);
+	}
+};
+
+template<class Arr>
+class array_view1d_concept_check
+{
+	BCS_STATIC_ASSERT_V(is_array_view<Arr>);
+	static_assert(is_array_view_ndim<Arr, 1>::value, "is_array_view_ndim<Arr, 1>");
+
+	typedef typename array_view_traits<Arr>::value_type value_type;
+	typedef std::array<index_t, 1> shape_type;
+
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::size_type, size_t);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::index_type, index_t);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::const_reference, const value_type&);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::reference, value_type&);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::const_pointer, const value_type*);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::shape_type, shape_type);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::num_dims == 1);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::is_readable == true);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::is_writable == true);
+
+	void check_const(const Arr& a)
+	{
+		BCS_ASSERT_SAME_TYPE(decltype(get_num_elems(a)), size_t);
+		BCS_ASSERT_SAME_TYPE(decltype(get_array_shape(a)), shape_type);
+
+		BCS_ASSERT_SAME_TYPE(decltype(begin(a)), typename array_view_traits<Arr>::const_iterator);
+		BCS_ASSERT_SAME_TYPE(decltype(end(a)), typename array_view_traits<Arr>::const_iterator);
+
+		BCS_ASSERT_SAME_TYPE(decltype(is_dense_view(a)), bool);
+		BCS_ASSERT_SAME_TYPE(decltype(ptr_base(a)), const value_type*);
+	}
+
+	void check_non_const(Arr& a)
+	{
+		BCS_ASSERT_SAME_TYPE(decltype(get_num_elems(a)), size_t);
+		BCS_ASSERT_SAME_TYPE(decltype(get_array_shape(a)), shape_type);
+
+		BCS_ASSERT_SAME_TYPE(decltype(begin(a)), typename array_view_traits<Arr>::iterator);
+		BCS_ASSERT_SAME_TYPE(decltype(end(a)), typename array_view_traits<Arr>::iterator);
+
+		BCS_ASSERT_SAME_TYPE(decltype(is_dense_view(a)), bool);
+		BCS_ASSERT_SAME_TYPE(decltype(ptr_base(a)), value_type*);
+	}
+};
+
+template class const_array_view1d_concept_check<bcs::const_aview1d<double> >;
+template class array_view1d_concept_check<bcs::aview1d<double> >;
+template class array_view1d_concept_check<bcs::array1d<double> >;
 
 
 template<typename T, class TIndexer>
@@ -75,6 +156,7 @@ bool array_iteration_test(const bcs::const_aview1d<T, TIndexer>& view)
 	return collection_equal(view.begin(), view.end(), buffer.pbase(), (size_t)n);
 }
 
+
 /*
 
 BCS_TEST_CASE( test_dense_array1d )
@@ -106,7 +188,6 @@ BCS_TEST_CASE( test_dense_array1d )
 	export_to(a2, a2_buf.pbase());
 
 	BCS_CHECK( collection_equal(a2_buf.pbase(), a2_buf.pend(), src2, n2) );
-
 }
 
 
