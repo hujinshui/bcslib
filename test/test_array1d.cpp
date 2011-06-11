@@ -20,10 +20,12 @@ using namespace bcs::test;
 template class bcs::const_aview1d<double, id_ind>;
 template class bcs::const_aview1d<double, step_ind>;
 template class bcs::const_aview1d<double, rep_ind>;
+template class bcs::const_aview1d<double, bcs::array1d<index_t> >;
 
 template class bcs::aview1d<double, id_ind>;
 template class bcs::aview1d<double, step_ind>;
 template class bcs::aview1d<double, rep_ind>;
+// template class bcs::aview1d<double, bcs::array1d<index_t> >;
 
 template class bcs::array1d<double>;
 
@@ -251,7 +253,7 @@ BCS_TEST_CASE( test_dense_array1d )
 	BCS_CHECK( array_view_equal(a2, src2, n2) );
 }
 
-/*
+
 BCS_TEST_CASE( test_step_array1d )
 {
 	double src0[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -259,39 +261,44 @@ BCS_TEST_CASE( test_step_array1d )
 
 	aview1d<double, step_ind> a1(src1, step_ind(3, 1));
 	double r1[] = {1, 2, 3};
+	size_t n1 = 3;
 
 	BCS_CHECK( array_integrity_test(a1) );
-	BCS_CHECK( array_view_equal(a1, r1, 3) );
+	BCS_CHECK( array_view_equal(a1, r1, n1) );
 	BCS_CHECK( array_iteration_test(a1) );
 
 	aview1d<double, step_ind> a2(src1, step_ind(4, 2));
 	double r2[] = {1, 3, 5, 7};
+	size_t n2 = 4;
 
 	BCS_CHECK( array_integrity_test(a2) );
-	BCS_CHECK( array_view_equal(a2, r2, 4) );
+	BCS_CHECK( array_view_equal(a2, r2, n2) );
 	BCS_CHECK( array_iteration_test(a2) );
 
 	aview1d<double, step_ind> a3(src1 + 7, step_ind(3, -2));
 	double r3[] = {8, 6, 4};
+	size_t n3 = 3;
 
 	BCS_CHECK( array_integrity_test(a3) );
-	BCS_CHECK( array_view_equal(a3, r3, 3) );
+	BCS_CHECK( array_view_equal(a3, r3, n3) );
 	BCS_CHECK( array_iteration_test(a3) );
 
 	aview1d<double, step_ind> a0(src0, step_ind(4, 2));
 
-	import_from(a0, src1);
-	double g1[10] = {1, 0, 2, 0, 3, 0, 4, 0, 0, 0};
-	BCS_CHECK( collection_equal(src0, src0 + 10, g1, 10) );
+	block<double> buf(a2.nelems(), 0);
+	export_to(a2, buf.pbase());
+	BCS_CHECK( collection_equal(buf.pbase(), buf.pend(), r2, n2) );
+	fill(a2, 0);
+	BCS_CHECK( array_view_equal(a2, src0, n2) );
+	import_from(a2, buf.pbase());
+	BCS_CHECK( array_view_equal(a2, r2, n2) );
 
-	fill(a0, 0.0);
-	double g2[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	BCS_CHECK( collection_equal(src0, src0 + 10, g2, 10) );
 }
 
 
 BCS_TEST_CASE( test_rep_array1d )
 {
+	double src0[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double v = 2;
 
 	aview1d<double, rep_ind> a0(&v, rep_ind(0));
@@ -302,22 +309,29 @@ BCS_TEST_CASE( test_rep_array1d )
 
 	aview1d<double, rep_ind> a1(&v, rep_ind(5));
 	double r1[5] = {2, 2, 2, 2, 2};
+	size_t n1 = 5;
 
 	BCS_CHECK( array_integrity_test(a1) );
 	BCS_CHECK( array_view_equal(a1, r1, 5) );
 	BCS_CHECK( array_iteration_test(a1) );
+
+	block<double> buf(a1.nelems(), 0);
+	export_to(a1, buf.pbase());
+	BCS_CHECK( collection_equal(buf.pbase(), buf.pend(), r1, n1) );
+	fill(a1, 0);
+	BCS_CHECK( array_view_equal(a1, src0, n1) );
+	import_from(a1, buf.pbase());
+	BCS_CHECK( array_view_equal(a1, r1, n1) );
 }
 
 
-
-
-BCS_TEST_CASE( test_indices_array1d )
+BCS_TEST_CASE( test_arrind_array1d )
 {
 	double src0[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double src1[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 	index_t inds1[4] = {1, 3, 6, 7};
-	aview1d<double, indices> a1(src1, indices(ref_arr(inds1, 4)));
+	aview1d<double, arr_ind> a1(src1, arr_ind(4, inds1));
 	double r1[] = {2, 4, 7, 8};
 
 	BCS_CHECK( array_integrity_test(a1) );
@@ -325,7 +339,8 @@ BCS_TEST_CASE( test_indices_array1d )
 	BCS_CHECK( array_iteration_test(a1) );
 
 	index_t inds2[6] = {5, 1, 4, 2, 2, 3};
-	aview1d<double, indices> a2(src1, indices(ref_arr(inds2, 6)));
+	arr_ind ai2(6, inds2);
+	aview1d<double, arr_ind> a2(src1, ai2);
 	double r2[] = {6, 2, 5, 3, 3, 4};
 
 	BCS_CHECK( array_integrity_test(a2) );
@@ -333,18 +348,42 @@ BCS_TEST_CASE( test_indices_array1d )
 	BCS_CHECK( array_iteration_test(a2) );
 
 	index_t inds0[5] = {0, 2, 3, 5, 7};
-	aview1d<double, indices> a0(src0, indices(ref_arr(inds0, 5)));
+	aview1d<double, arr_ind> a0(src0, arr_ind(5, inds0));
 
 	import_from(a0, src1);
 	double g1[10] = {1, 0, 2, 3, 0, 4, 0, 5, 0, 0};
 	BCS_CHECK( collection_equal(src0, src0 + 10, g1, 10) );
 
+	block<double> blk(a0.size());
+	export_to(a0, blk.pbase());
+	BCS_CHECK( collection_equal(blk.pbase(), blk.pend(), src1, a0.size()));
+
 	fill(a0, 0.0);
 	double g2[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	BCS_CHECK( collection_equal(src0, src0 + 10, g2, 10) );
+
+	aview1d<double, arr_ind> a1c(a1);
+
+	BCS_CHECK( array_integrity_test(a1c) );
+	BCS_CHECK( array_view_equal(a1c, r1, 4) );
+	BCS_CHECK( array_iteration_test(a1c) );
+	BCS_CHECK( a1c.get_indexer().pbase() != a1.get_indexer().pbase() );
+
+	const index_t *pi1c = a1c.get_indexer().pbase();
+
+	aview1d<double, arr_ind> a1m(std::move(a1c));
+
+	BCS_CHECK( array_integrity_test(a1m) );
+	BCS_CHECK( array_view_equal(a1m, r1, 4) );
+	BCS_CHECK( array_iteration_test(a1m) );
+	BCS_CHECK( a1m.get_indexer().pbase() == pi1c );
+
+	BCS_CHECK( a1c.pbase() == BCS_NULL );
+	BCS_CHECK( a1c.size() == 0 );
 }
 
 
+/*
 BCS_TEST_CASE( test_regular_subview )
 {
 	double src[16];
@@ -509,10 +548,10 @@ test_suite *test_array1d_suite()
 	test_suite *suite = new test_suite( "test_array1d" );
 
 	suite->add( new test_dense_array1d() );
-/*
 	suite->add( new test_step_array1d() );
 	suite->add( new test_rep_array1d() );
-	suite->add( new test_indices_array1d() );
+	suite->add( new test_arrind_array1d() );
+/*
 	suite->add( new test_regular_subview() );
 	suite->add( new test_indices_subview() );
 */
