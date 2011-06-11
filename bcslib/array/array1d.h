@@ -171,9 +171,6 @@ namespace bcs
 	template<typename T, class TIndexer>
 	class const_aview1d
 	{
-		friend class aview1d<T, TIndexer>;
-		friend class array1d<T, TIndexer>;
-
 	public:
 		BCS_ARRAY_CHECK_TYPE(T)
 		BCS_ARRAY_BASIC_TYPEDEFS(1u, T, layout_1d_t)
@@ -184,7 +181,7 @@ namespace bcs
 		typedef const_aview1d<value_type, indexer_type> const_view_type;
 		typedef aview1d<value_type, indexer_type> view_type;
 
-		typedef aview1d_iterators<T, TIndexer> _iterators;
+		typedef aview1d_iterators<value_type, indexer_type> _iterators;
 		typedef typename _iterators::const_iterator const_iterator;
 		typedef typename _iterators::iterator iterator;
 
@@ -308,8 +305,7 @@ namespace bcs
 			return const_aview1d<value_type, sub_indexer_type>(m_base + offset, sindexer);
 		}
 
-
-	private:
+	protected:
 		pointer m_base;
 		index_type m_d0;
 		indexer_type m_indexer;
@@ -321,8 +317,18 @@ namespace bcs
 	class aview1d : public const_aview1d<T, TIndexer>
 	{
 	public:
+		BCS_ARRAY_CHECK_TYPE(T)
+		BCS_ARRAY_BASIC_TYPEDEFS(1u, T, layout_1d_t)
 		static const bool is_readable = true;
 		static const bool is_writable = true;
+
+		typedef TIndexer indexer_type;
+		typedef const_aview1d<value_type, indexer_type> const_view_type;
+		typedef aview1d<value_type, indexer_type> view_type;
+
+		typedef aview1d_iterators<value_type, indexer_type> _iterators;
+		typedef typename _iterators::const_iterator const_iterator;
+		typedef typename _iterators::iterator iterator;
 
 	public:
 		aview1d(const_pointer base, const indexer_type& indexer)
@@ -350,12 +356,12 @@ namespace bcs
 			const_view_type::operator = (r);
 			return *this;
 		}
-
+/*
 		aview1d& operator = (aview1d&& r)
 		{
 			const_view_type::operator = (std::move(r));
 			return *this;
-		}
+		} */
 
 	public:
 		// Element access
@@ -459,8 +465,19 @@ namespace bcs
 	class array1d : private storage_base<T, Alloc>, public aview1d<T, id_ind>
 	{
 	public:
+		BCS_ARRAY_CHECK_TYPE(T)
+		BCS_ARRAY_BASIC_TYPEDEFS(1u, T, layout_1d_t)
 		static const bool is_readable = true;
 		static const bool is_writable = true;
+
+		typedef id_ind indexer_type;
+		typedef const_aview1d<value_type, indexer_type> const_view_type;
+		typedef aview1d<value_type, indexer_type> view_type;
+
+		typedef aview1d_iterators<value_type, indexer_type> _iterators;
+		typedef typename _iterators::const_iterator const_iterator;
+		typedef typename _iterators::iterator iterator;
+
 		typedef storage_base<T, Alloc> storage_base_type;
 
 	public:
@@ -469,7 +486,7 @@ namespace bcs
 		{
 		}
 
-		array1d(size_type n, const T& x)
+		array1d(size_type n, const value_type& x)
 		: storage_base_type(n, x), view_type(storage_base_type::pbase(), n)
 		{
 		}
@@ -490,26 +507,40 @@ namespace bcs
 		}
 
 		template<typename TIndexer2>
-		array1d(const const_aview1d<value_type, TIndexer2>& src)
-		: storage_base_type(r.nelems()), view_type(storage_base_type::pbase(), r.nelems())
+		explicit array1d(const const_aview1d<value_type, TIndexer2>& src)
+		: storage_base_type(src.nelems()), view_type(storage_base_type::pbase(), src.nelems())
 		{
 			import_from(*this, src);
+		}
+
+		template<typename ForwardIterator>
+		array1d(size_type n, ForwardIterator it)
+		: storage_base_type(n), view_type(storage_base_type::pbase(), n)
+		{
+			import_from(*this, it);
 		}
 
 		array1d& operator = (const array1d& r)
 		{
 			if (this != &r)
 			{
-				storage_base_type::operator = std::move(r);
-				reset_view(r.nelems());
+				storage_base_type &s = *this;
+				view_type& v = *this;
+
+				s = r;
+				v = view_type(s.pbase(), id_ind(r.nelems()));
 			}
 			return *this;
 		}
 
 		array1d& operator = (array1d&& r)
 		{
-			storage_base_type::operator = std::move(r);
-			reset_view(r.nelems());
+			storage_base_type &s = *this;
+			view_type& v = *this;
+
+			s = std::move(r);
+			v = view_type(s.pbase(), id_ind(r.nelems()));
+
 			return *this;
 		}
 
@@ -518,21 +549,11 @@ namespace bcs
 			using std::swap;
 
 			storage_base_type::swap(r);
-			swap(this->m_base, r.m_base);
-			swap(this->m_d0, r.m_d0);
-			swap(this->m_indexer, r.m_indexer);
+
+			view_type& v = *this;
+			view_type& rv = r;
+			swap(v, rv);
 		}
-
-	private:
-
-		void reset_view(size_type n)
-		{
-			this->m_base = pbase();
-			this->m_d0 = static_cast<index_type>(n);
-			this->m_indexer = id_ind(n);
-		}
-
-		block_type m_block;
 
 	}; // end class array1d
 

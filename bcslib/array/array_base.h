@@ -18,6 +18,7 @@
 #include <bcslib/base/basic_mem.h>
 
 #include <type_traits>
+#include <array>
 #include <string>
 
 
@@ -97,33 +98,33 @@ namespace bcs
 
 	// make array shape
 
-	inline array<index_t, 1> arr_shape(index_t n)
+	inline std::array<index_t, 1> arr_shape(index_t n)
 	{
-		array<index_t, 1> shape;
+		std::array<index_t, 1> shape;
 		shape[0] = n;
 		return shape;
 	}
 
-	inline array<index_t, 2> arr_shape(index_t d0, index_t d1)
+	inline std::array<index_t, 2> arr_shape(index_t d0, index_t d1)
 	{
-		array<index_t, 2> shape;
+		std::array<index_t, 2> shape;
 		shape[0] = d0;
 		shape[1] = d1;
 		return shape;
 	}
 
-	inline array<index_t, 3> arr_shape(index_t d0, index_t d1, index_t d2)
+	inline std::array<index_t, 3> arr_shape(index_t d0, index_t d1, index_t d2)
 	{
-		array<index_t, 3> shape;
+		std::array<index_t, 3> shape;
 		shape[0] = d0;
 		shape[1] = d1;
 		shape[2] = d2;
 		return shape;
 	}
 
-	inline array<index_t, 4> arr_shape(index_t d0, index_t d1, index_t d2, index_t d3)
+	inline std::array<index_t, 4> arr_shape(index_t d0, index_t d1, index_t d2, index_t d3)
 	{
-		array<index_t, 4> shape;
+		std::array<index_t, 4> shape;
 		shape[0] = d0;
 		shape[1] = d1;
 		shape[2] = d2;
@@ -142,7 +143,7 @@ namespace bcs
 		}
 
 		array_dim_mismatch(std::string& msg)
-		: std::string(msg)
+		: std::invalid_argument(msg)
 		{
 		}
 	};
@@ -151,7 +152,7 @@ namespace bcs
 	template<typename T>
 	struct is_valid_array_element
 	{
-		static const bool value = std::is_pod<T>::value && std::is_same<T, std::remove_const<T>::type>::value;
+		static const bool value = std::is_pod<T>::value && std::is_same<T, typename std::remove_const<T>::type>::value;
 	};
 
 }
@@ -170,7 +171,7 @@ namespace bcs
 
 #define BCS_ARRAY_BASIC_TYPEDEFS(nd, T, lorder) \
 	static const dim_num_t num_dims = nd; \
-	typedef array<index_t, nd> shape_type; \
+	typedef std::array<index_t, nd> shape_type; \
 	typedef T value_type; \
 	typedef T* pointer; \
 	typedef const T* const_pointer; \
