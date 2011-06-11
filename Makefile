@@ -40,7 +40,13 @@ BASE_HEADERS = bcslib/base/config.h \
 TEST_HEADERS = bcslib/test/test_assertion.h \
 	bcslib/test/test_units.h \
 	bcslib/test/execution_mon.h
-
+	
+ARRAY_BASIC_HEADERS = bcslib/array/array_base.h \
+	bcslib/array/array_index.h \
+	bcslib/array/generic_array_functions.h \
+	bcslib/array/array1d.h \
+	bcslib/array/array2d.h
+	
 VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h bcslib/veccomp/vecnorm.h bcslib/veccomp/vecstat.h
 
 ARRAY_BASIC_HEADERS = bcslib/array/array_base.h bcslib/array/array_index.h bcslib/array/array1d.h bcslib/array/array2d.h
@@ -57,14 +63,13 @@ IMAGE_BASIC_HEADERS = bcslib/image/image_base.h bcslib/image/image.h
 
 PROB_BASIC_HEADERS = bcslib/prob/pdistribution.h bcslib/prob/sampling.h bcslib/prob/discrete_distr.h 
 
-all: test_c0x_support test_basics
-others: test_array test_geometry test_image test_graph test_prob
+all: test_c0x_support test_basics test_array
+others: test_geometry test_image test_graph test_prob
 
 test_c0x_support: bin/test_c0x_support.out
 bin/test_c0x_support.out: test/test_c0x_support.cpp
 	$(CXX) $(CFLAGS) -c test/test_c0x_support.cpp -o bin/test_c0x_support.out
 
-test_array : bin/test_array_basics bin/test_array_comp bin/test_array_sparse bin/test_access_performance 
 test_geometry : bin/test_geometry_basics
 test_image: bin/test_image_basics
 test_graph : bin/test_graph_basics
@@ -86,9 +91,21 @@ bin/test_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(BASICS_TESTS)
 
 #------ Array tests -----------
 
-ARRAY_BASIC_TESTS = test/test_array_basics.cpp test/test_index_selection.cpp test/test_array1d.cpp test/test_array2d.cpp
+# test_array : bin/test_array_basics bin/test_array_comp bin/test_array_sparse bin/test_access_performance 
+
+test_array: bin/test_array_basics
+
+ARRAY_BASIC_TESTS = test/test_array_basics.cpp \
+	test/test_array1d.cpp
+
 bin/test_array_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 
 	$(CXX) $(CFLAGS) $(ARRAY_BASIC_TESTS) -o bin/test_array_basics
+	
+	
+	
+	
+	
+	
 	
 	
 ARRAY_COMP_TESTS = test/test_array_comp.cpp test/test_array_calc.cpp test/test_array_eval.cpp
