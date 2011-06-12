@@ -22,11 +22,22 @@ namespace bcs
 	 *
 	 * - I.size();	// the number of elements along the dimension
 	 * - I[i];		// the mapped index of i
+	 * - array_indexer_traits
 	 *
 	 * We note that the class indices (defined in index_selection.h)
 	 * is already an indexer class.
 	 *
 	 */
+
+	template<class Indexer>
+	struct array_indexer_traits
+	{
+		static bool is_continuous(const Indexer& indexer)
+		{
+			return false;
+		}
+	};
+
 
 	class id_ind
 	{
@@ -49,6 +60,15 @@ namespace bcs
 		size_t m_n;
 
 	}; // end class id_ind
+
+	template<>
+	struct array_indexer_traits<id_ind>
+	{
+		static bool is_continuous(const id_ind& indexer)
+		{
+			return true;
+		}
+	};
 
 
 	class step_ind
@@ -79,11 +99,20 @@ namespace bcs
 
 	}; // end class step_ind
 
+	template<>
+	struct array_indexer_traits<step_ind>
+	{
+		static bool is_continuous(const step_ind& indexer)
+		{
+			return indexer.step() == 1;
+		}
+	};
+
 
 	class rep_ind
 	{
 	public:
-		rep_ind(size_t n) : m_n(n)
+		explicit rep_ind(size_t n) : m_n(n)
 		{
 		}
 

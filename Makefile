@@ -96,17 +96,14 @@ bin/test_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(BASICS_TESTS)
 test_array: bin/test_array_basics
 
 ARRAY_BASIC_TESTS = test/test_array_basics.cpp \
-	test/test_array1d.cpp
+	test/test_array1d.cpp \
+	test/test_array2d.cpp
 
 bin/test_array_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 
 	$(CXX) $(CFLAGS) $(ARRAY_BASIC_TESTS) -o bin/test_array_basics
 	
-	
-	
-	
-	
-	
-	
+
+
 	
 ARRAY_COMP_TESTS = test/test_array_comp.cpp test/test_array_calc.cpp test/test_array_eval.cpp
 bin/test_array_comp: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
