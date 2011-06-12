@@ -17,16 +17,145 @@ using namespace bcs::test;
 
 // Explicit instantiation for syntax checking
 
+template class bcs::const_aview2d<double, row_major_t,    id_ind, id_ind>;
+template class bcs::const_aview2d<double, column_major_t, id_ind, id_ind>;
+template class bcs::const_aview2d<double, row_major_t,    id_ind, step_ind>;
+template class bcs::const_aview2d<double, column_major_t, id_ind, step_ind>;
+template class bcs::const_aview2d<double, row_major_t,    id_ind, arr_ind>;
+template class bcs::const_aview2d<double, column_major_t, id_ind, arr_ind>;
+
+template class bcs::const_aview2d<double, row_major_t,    step_ind, id_ind>;
+template class bcs::const_aview2d<double, column_major_t, step_ind, id_ind>;
+template class bcs::const_aview2d<double, row_major_t,    step_ind, step_ind>;
+template class bcs::const_aview2d<double, column_major_t, step_ind, step_ind>;
+template class bcs::const_aview2d<double, row_major_t,    step_ind, arr_ind>;
+template class bcs::const_aview2d<double, column_major_t, step_ind, arr_ind>;
+
+template class bcs::const_aview2d<double, row_major_t,    arr_ind, id_ind>;
+template class bcs::const_aview2d<double, column_major_t, arr_ind, id_ind>;
+template class bcs::const_aview2d<double, row_major_t,    arr_ind, step_ind>;
+template class bcs::const_aview2d<double, column_major_t, arr_ind, step_ind>;
+template class bcs::const_aview2d<double, row_major_t,    arr_ind, arr_ind>;
+template class bcs::const_aview2d<double, column_major_t, arr_ind, arr_ind>;
+
+template class bcs::aview2d<double, row_major_t,    id_ind, id_ind>;
+template class bcs::aview2d<double, column_major_t, id_ind, id_ind>;
+template class bcs::aview2d<double, row_major_t,    id_ind, step_ind>;
+template class bcs::aview2d<double, column_major_t, id_ind, step_ind>;
+template class bcs::aview2d<double, row_major_t,    id_ind, arr_ind>;
+template class bcs::aview2d<double, column_major_t, id_ind, arr_ind>;
+
+template class bcs::aview2d<double, row_major_t,    step_ind, id_ind>;
+template class bcs::aview2d<double, column_major_t, step_ind, id_ind>;
+template class bcs::aview2d<double, row_major_t,    step_ind, step_ind>;
+template class bcs::aview2d<double, column_major_t, step_ind, step_ind>;
+template class bcs::aview2d<double, row_major_t,    step_ind, arr_ind>;
+template class bcs::aview2d<double, column_major_t, step_ind, arr_ind>;
+
+template class bcs::aview2d<double, row_major_t,    arr_ind, id_ind>;
+template class bcs::aview2d<double, column_major_t, arr_ind, id_ind>;
+template class bcs::aview2d<double, row_major_t,    arr_ind, step_ind>;
+template class bcs::aview2d<double, column_major_t, arr_ind, step_ind>;
+template class bcs::aview2d<double, row_major_t,    arr_ind, arr_ind>;
+template class bcs::aview2d<double, column_major_t, arr_ind, arr_ind>;
+
 template class bcs::array2d<double, row_major_t>;
 template class bcs::array2d<double, column_major_t>;
 
-template class bcs::aview2d<double, row_major_t, step_ind, step_ind>;
-template class bcs::aview2d<double, column_major_t, step_ind, step_ind>;
 
-template class bcs::aview2d<double, row_major_t, indices, indices>;
-template class bcs::aview2d<double, column_major_t, indices, indices>;
+// A class for concept checked
+
+template<class Arr>
+class const_array_view2d_concept_check
+{
+	BCS_STATIC_ASSERT_V(is_array_view<Arr>);
+	static_assert(is_array_view_ndim<Arr, 2>::value, "is_array_view_ndim<Arr, 1>");
+
+	typedef typename array_view_traits<Arr>::value_type value_type;
+	typedef std::array<index_t, 2> shape_type;
+
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::size_type, size_t);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::index_type, index_t);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::const_reference, const value_type&);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::reference, value_type&);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::const_pointer, const value_type*);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::shape_type, shape_type);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::num_dims == 2);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::is_readable == true);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::is_writable == false);
+
+	void check_const(const Arr& a)
+	{
+		BCS_ASSERT_SAME_TYPE(decltype(get_num_elems(a)), size_t);
+		BCS_ASSERT_SAME_TYPE(decltype(get_array_shape(a)), shape_type);
+
+		BCS_ASSERT_SAME_TYPE(decltype(begin(a)), typename array_view_traits<Arr>::const_iterator);
+		BCS_ASSERT_SAME_TYPE(decltype(end(a)), typename array_view_traits<Arr>::const_iterator);
+
+		BCS_ASSERT_SAME_TYPE(decltype(is_dense_view(a)), bool);
+		BCS_ASSERT_SAME_TYPE(decltype(ptr_base(a)), const value_type*);
+	}
+};
+
+template<class Arr>
+class array_view2d_concept_check
+{
+	BCS_STATIC_ASSERT_V(is_array_view<Arr>);
+	static_assert(is_array_view_ndim<Arr, 2>::value, "is_array_view_ndim<Arr, 2>");
+
+	typedef typename array_view_traits<Arr>::value_type value_type;
+	typedef std::array<index_t, 2> shape_type;
+
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::size_type, size_t);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::index_type, index_t);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::const_reference, const value_type&);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::reference, value_type&);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::const_pointer, const value_type*);
+	BCS_ASSERT_SAME_TYPE(typename array_view_traits<Arr>::shape_type, shape_type);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::num_dims == 2);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::is_readable == true);
+	BCS_STATIC_ASSERT(array_view_traits<Arr>::is_writable == true);
+
+	void check_const(const Arr& a)
+	{
+		BCS_ASSERT_SAME_TYPE(decltype(get_num_elems(a)), size_t);
+		BCS_ASSERT_SAME_TYPE(decltype(get_array_shape(a)), shape_type);
+
+		BCS_ASSERT_SAME_TYPE(decltype(begin(a)), typename array_view_traits<Arr>::const_iterator);
+		BCS_ASSERT_SAME_TYPE(decltype(end(a)), typename array_view_traits<Arr>::const_iterator);
+
+		BCS_ASSERT_SAME_TYPE(decltype(is_dense_view(a)), bool);
+		BCS_ASSERT_SAME_TYPE(decltype(ptr_base(a)), const value_type*);
+	}
+
+	void check_non_const(Arr& a)
+	{
+		BCS_ASSERT_SAME_TYPE(decltype(get_num_elems(a)), size_t);
+		BCS_ASSERT_SAME_TYPE(decltype(get_array_shape(a)), shape_type);
+
+		BCS_ASSERT_SAME_TYPE(decltype(begin(a)), typename array_view_traits<Arr>::iterator);
+		BCS_ASSERT_SAME_TYPE(decltype(end(a)), typename array_view_traits<Arr>::iterator);
+
+		BCS_ASSERT_SAME_TYPE(decltype(is_dense_view(a)), bool);
+		BCS_ASSERT_SAME_TYPE(decltype(ptr_base(a)), value_type*);
+	}
+};
+
+template class const_array_view2d_concept_check<bcs::const_aview2d<double, row_major_t,    id_ind,   id_ind> >;
+template class const_array_view2d_concept_check<bcs::const_aview2d<double, column_major_t, id_ind,   id_ind> >;
+template class const_array_view2d_concept_check<bcs::const_aview2d<double, row_major_t,    step_ind, id_ind> >;
+template class const_array_view2d_concept_check<bcs::const_aview2d<double, column_major_t, step_ind, id_ind> >;
+
+template class array_view2d_concept_check<bcs::aview2d<double, row_major_t,    id_ind,   id_ind> >;
+template class array_view2d_concept_check<bcs::aview2d<double, column_major_t, id_ind,   id_ind> >;
+template class array_view2d_concept_check<bcs::aview2d<double, row_major_t,    step_ind, id_ind> >;
+template class array_view2d_concept_check<bcs::aview2d<double, column_major_t, step_ind, id_ind> >;
+
+template class array_view2d_concept_check<bcs::array2d<double, row_major_t> >;
+template class array_view2d_concept_check<bcs::array2d<double, column_major_t> >;
 
 
+// Auxiliary test functions
 
 template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 void print_array(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1>& view)
@@ -68,6 +197,10 @@ bool array_integrity_test(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1
 	if (view.shape() != arr_shape(m, n)) return false;
 	if (view.nelems() != (size_t)(m * n)) return false;
 
+	if (get_num_elems(view) != view.nelems()) return false;
+	if (get_array_shape(view) != view.shape()) return false;
+	if (ptr_base(view) != view.pbase()) return false;
+
 	for (index_t i = 0; i < m; ++i)
 	{
 		for (index_t j = 0; j < n; ++j)
@@ -76,9 +209,6 @@ bool array_integrity_test(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1
 		}
 	}
 
-	array2d<T, TOrd> acopy = make_copy(view);
-	if (!(acopy == view)) return false;
-
 	return true;
 }
 
@@ -86,6 +216,9 @@ bool array_integrity_test(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1
 template<typename T, class TIndexer0, class TIndexer1>
 bool array_iteration_test(const bcs::const_aview2d<T, row_major_t, TIndexer0, TIndexer1>& view)
 {
+	if (begin(view) != view.begin()) return false;
+	if (end(view) != view.end()) return false;
+
 	index_t m = view.dim0();
 	index_t n = view.dim1();
 
@@ -103,9 +236,13 @@ bool array_iteration_test(const bcs::const_aview2d<T, row_major_t, TIndexer0, TI
 	return collection_equal(view.begin(), view.end(), buffer.pbase(), (size_t)(m * n));
 }
 
+
 template<typename T, class TIndexer0, class TIndexer1>
 bool array_iteration_test(const bcs::const_aview2d<T, column_major_t, TIndexer0, TIndexer1>& view)
 {
+	if (begin(view) != view.begin()) return false;
+	if (end(view) != view.end()) return false;
+
 	index_t m = view.dim0();
 	index_t n = view.dim1();
 
@@ -124,6 +261,8 @@ bool array_iteration_test(const bcs::const_aview2d<T, column_major_t, TIndexer0,
 }
 
 
+
+/*
 
 BCS_TEST_CASE( test_dense_array2d  )
 {
@@ -866,19 +1005,19 @@ BCS_TEST_CASE( test_array2d_subviews )
 
 }
 
-
+*/
 
 
 
 test_suite *test_array2d_suite()
 {
 	test_suite *suite = new test_suite( "test_array2d" );
-
+/*
 	suite->add( new test_dense_array2d() );
 	suite->add( new test_gen_array2d() );
 	suite->add( new test_array2d_slices() );
 	suite->add( new test_array2d_subviews() );
-
+*/
 	return suite;
 }
 

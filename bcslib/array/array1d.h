@@ -289,12 +289,12 @@ namespace bcs
 
 		const_iterator begin() const
 		{
-			return _iterators::get_const_iterator(m_base, m_indexer, 0);
+			return _iterators::get_const_iterator(pbase(), m_indexer, 0);
 		}
 
 		const_iterator end() const
 		{
-			return _iterators::get_const_iterator(m_base, m_indexer, m_d0);
+			return _iterators::get_const_iterator(pbase(), m_indexer, m_d0);
 		}
 
 		// Sub-view
@@ -424,22 +424,22 @@ namespace bcs
 
 		const_iterator begin() const
 		{
-			return _iterators::get_const_iterator(this->m_base, this->m_indexer, 0);
+			return _iterators::get_const_iterator(pbase(), this->m_indexer, 0);
 		}
 
 		iterator begin()
 		{
-			return _iterators::get_iterator(this->m_base, this->m_indexer, 0);
+			return _iterators::get_iterator(pbase(), this->m_indexer, 0);
 		}
 
 		const_iterator end() const
 		{
-			return _iterators::get_const_iterator(this->m_base, this->m_indexer, this->m_d0);
+			return _iterators::get_const_iterator(pbase(), this->m_indexer, this->m_d0);
 		}
 
 		iterator end()
 		{
-			return _iterators::get_iterator(this->m_base, this->m_indexer, this->m_d0);
+			return _iterators::get_iterator(pbase(), this->m_indexer, this->m_d0);
 		}
 
 		// Sub-view
@@ -542,7 +542,7 @@ namespace bcs
 				view_type& v = *this;
 
 				s = r;
-				v = view_type(s.pointer_to_base(), id_ind(r.nelems()));
+				v = view_type(s.pointer_to_base(), r.nelems());
 			}
 			return *this;
 		}
@@ -553,7 +553,7 @@ namespace bcs
 			view_type& v = *this;
 
 			s = std::move(r);
-			v = view_type(s.pointer_to_base(), id_ind(r.nelems()));
+			v = view_type(s.pointer_to_base(), r.nelems());
 
 			return *this;
 		}
@@ -653,25 +653,6 @@ namespace bcs
 		return arr.end();
 	}
 
-
-	template<typename T, class TIndexer>
-	inline bool is_dense_view(const const_aview1d<T, TIndexer>& a)
-	{
-		return false;
-	}
-
-	template<typename T>
-	inline bool is_dense_view(const const_aview1d<T, id_ind>& a)
-	{
-		return true;
-	}
-
-	template<typename T>
-	inline bool is_dense_view(const const_aview1d<T, step_ind>& a)
-	{
-		return a.get_indexer().step() == 1;
-	}
-
 	template<typename T, class TIndexer>
 	inline const T* ptr_base(const bcs::const_aview1d<T, TIndexer>& arr)
 	{
@@ -684,6 +665,12 @@ namespace bcs
 		return arr.pbase();
 	}
 
+	template<typename T, class TIndexer>
+	inline bool is_dense_view(const const_aview1d<T, TIndexer>& a)
+	{
+		return array_indexer_traits<TIndexer>::is_continuous(a.get_indexer());
+	}
+
 
 	/******************************************************
 	 *
@@ -693,14 +680,14 @@ namespace bcs
 
 	// element-wise comparison
 
-	template<typename T, class TIndexer, class TIndexer2>
-	inline bool operator == (const const_aview1d<T, TIndexer>& lhs, const const_aview1d<T, TIndexer2>& rhs)
+	template<typename T, class LIndexer, class RIndexer>
+	inline bool operator == (const const_aview1d<T, LIndexer>& lhs, const const_aview1d<T, RIndexer>& rhs)
 	{
 		return equal_array(lhs, rhs);
 	}
 
-	template<typename T, class TIndexer, class TIndexer2>
-	inline bool operator != (const const_aview1d<T, TIndexer>& lhs, const const_aview1d<T, TIndexer2>& rhs)
+	template<typename T, class LIndexer, class RIndexer>
+	inline bool operator != (const const_aview1d<T, LIndexer>& lhs, const const_aview1d<T, RIndexer>& rhs)
 	{
 		return !(lhs == rhs);
 	}

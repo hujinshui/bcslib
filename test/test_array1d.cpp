@@ -20,12 +20,12 @@ using namespace bcs::test;
 template class bcs::const_aview1d<double, id_ind>;
 template class bcs::const_aview1d<double, step_ind>;
 template class bcs::const_aview1d<double, rep_ind>;
-template class bcs::const_aview1d<double, bcs::array1d<index_t> >;
+template class bcs::const_aview1d<double, arr_ind >;
 
 template class bcs::aview1d<double, id_ind>;
 template class bcs::aview1d<double, step_ind>;
 template class bcs::aview1d<double, rep_ind>;
-// template class bcs::aview1d<double, bcs::array1d<index_t> >;
+template class bcs::aview1d<double, arr_ind >;
 
 template class bcs::array1d<double>;
 
@@ -540,6 +540,20 @@ BCS_TEST_CASE( test_arrind_subview )
 }
 
 
+BCS_TEST_CASE( test_denseview_judge )
+{
+	index_t inds[10];
+	double src[20];
+
+	BCS_CHECK_EQUAL( is_dense_view(const_aview1d<double, id_ind>(src, 5 )), true );
+	BCS_CHECK_EQUAL( is_dense_view(const_aview1d<double, step_ind>(src, step_ind(5, 1) )), true );
+	BCS_CHECK_EQUAL( is_dense_view(const_aview1d<double, step_ind>(src, step_ind(5, 2) )), false );
+	BCS_CHECK_EQUAL( is_dense_view(const_aview1d<double, rep_ind>(src, rep_ind(3) )), false );
+	BCS_CHECK_EQUAL( is_dense_view(const_aview1d<double, arr_ind>(src, arr_ind(3, inds) )), false );
+}
+
+
+
 test_suite *test_array1d_suite()
 {
 	test_suite *suite = new test_suite( "test_array1d" );
@@ -550,6 +564,7 @@ test_suite *test_array1d_suite()
 	suite->add( new test_arrind_array1d() );
 	suite->add( new test_regular_subview() );
 	suite->add( new test_arrind_subview() );
+	suite->add( new test_denseview_judge() );
 
 	return suite;
 }
