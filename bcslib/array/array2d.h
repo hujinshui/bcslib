@@ -486,7 +486,7 @@ namespace bcs
 			return *this;
 		}
 
-	protected:
+	public:
 		const_aview2d(const_pointer pbase, const _index_core_type& idxcore)
 		: m_pbase(const_cast<pointer>(pbase)), m_idxcore(idxcore)
 		{
@@ -715,7 +715,7 @@ namespace bcs
 			return *this;
 		}
 
-	protected:
+	public:
 		aview2d(pointer pbase, const _index_core_type& idxcore)
 		: const_view_type(pbase, idxcore)
 		{
