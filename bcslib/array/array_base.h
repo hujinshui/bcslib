@@ -88,8 +88,6 @@ namespace bcs
 		typedef typename A::shape_type shape_type;
 
 		static const dim_num_t num_dims = A::num_dims;
-		static const bool is_readable = A::is_readable;
-		static const bool is_writable = A::is_writable;
 	};
 
 
