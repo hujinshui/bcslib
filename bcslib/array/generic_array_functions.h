@@ -20,10 +20,7 @@ namespace bcs
 {
 
 	template<class LArr, class RArr>
-	inline typename std::enable_if<
-		is_array_view<LArr>::value && array_view_traits<LArr>::is_readable &&
-		is_array_view<RArr>::value && array_view_traits<RArr>::is_readable,
-		bool>::type
+	inline typename std::enable_if<is_array_view<LArr>::value && is_array_view<RArr>::value, bool>::type
 	equal_array(const LArr& lhs, const RArr& rhs)
 	{
 		static_assert(array_view_traits<LArr>::num_dims == array_view_traits<RArr>::num_dims,
@@ -48,18 +45,14 @@ namespace bcs
 
 
 	template<class Arr, typename OutputIterator>
-	inline typename std::enable_if<
-		is_array_view<Arr>::value && array_view_traits<Arr>::is_readable,
-		void>::type
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
 	export_to(const Arr& a, OutputIterator dst)
 	{
 		std::copy_n(begin(a), get_num_elems(a), dst);
 	}
 
 	template<class Arr>
-	inline typename std::enable_if<
-		is_array_view<Arr>::value && array_view_traits<Arr>::is_readable,
-		void>::type
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
 	export_to(const Arr& a, typename array_view_traits<Arr>::value_type* dst)
 	{
 		if (is_dense_view(a))
@@ -74,18 +67,14 @@ namespace bcs
 
 
 	template<class Arr, typename InputIterator>
-	inline typename std::enable_if<
-		is_array_view<Arr>::value && array_view_traits<Arr>::is_writable,
-		void>::type
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
 	import_from(Arr& a, InputIterator src)
 	{
 		std::copy_n(src, get_num_elems(a), begin(a));
 	}
 
 	template<class Arr>
-	inline typename std::enable_if<
-		is_array_view<Arr>::value && array_view_traits<Arr>::is_writable,
-		void>::type
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
 	import_from(Arr& a, const typename array_view_traits<Arr>::value_type* src)
 	{
 		if (is_dense_view(a))
@@ -100,9 +89,7 @@ namespace bcs
 
 
 	template<class Arr>
-	inline typename std::enable_if<
-		is_array_view<Arr>::value && array_view_traits<Arr>::is_writable,
-		void>::type
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
 	fill(Arr& a, const typename array_view_traits<Arr>::value_type& v)
 	{
 		if (is_dense_view(a))
@@ -116,9 +103,7 @@ namespace bcs
 	}
 
 	template<class Arr>
-	inline typename std::enable_if<
-		is_array_view<Arr>::value && array_view_traits<Arr>::is_writable,
-		void>::type
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
 	set_zeros(Arr& a)
 	{
 		if (is_dense_view(a))

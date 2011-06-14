@@ -15,7 +15,6 @@ namespace bcs
 {
 	// forward declaration
 
-	template<typename T, typename TOrd, class TIndexer0=id_ind, class TIndexer1=id_ind> class const_aview2d;
 	template<typename T, typename TOrd, class TIndexer0=id_ind, class TIndexer1=id_ind> class aview2d;
 	template<typename T, typename TOrd, class Alloc=aligned_allocator<T> > class array2d;
 
@@ -58,71 +57,59 @@ namespace bcs
 		};
 
 
-		template<typename TOrd, class TIndexer0, class TIndexer1> struct array2d_slices0;
-		template<typename TOrd, class TIndexer0, class TIndexer1> struct array2d_slices1;
+		template<typename TOrd, class TIndexer0, class TIndexer1> struct array2d_slices;
 
 		template<class TIndexer0, class TIndexer1>
-		struct array2d_slices0<row_major_t, TIndexer0, TIndexer1>
+		struct array2d_slices<row_major_t, TIndexer0, TIndexer1>
 		{
-			typedef TIndexer1 indexer_type;
+			typedef TIndexer1 slice0_indexer_type;
+			typedef typename inject_step<TIndexer0>::type slice1_indexer_type;
 
-			static indexer_type get_indexer(index_t base_d0, index_t base_d1, const TIndexer1& idx1)
+			static slice0_indexer_type slice0_indexer(index_t base_d0, index_t base_d1, const TIndexer1& idx1)
 			{
 				return idx1;
 			}
 
-			static index_t slice_offset(index_t base_d0, index_t base_d1, const TIndexer0& idx0, index_t i)
+			static index_t slice0_offset(index_t base_d0, index_t base_d1, const TIndexer0& idx0, index_t i)
 			{
 				return idx0[i] * base_d1;
 			}
 
-		};
-
-		template<class TIndexer0, class TIndexer1>
-		struct array2d_slices1<row_major_t, TIndexer0, TIndexer1>
-		{
-			typedef typename inject_step<TIndexer0>::type indexer_type;
-
-			static indexer_type get_indexer(index_t base_d0, index_t base_d1, const TIndexer0& idx0)
+			static slice1_indexer_type slice1_indexer(index_t base_d0, index_t base_d1, const TIndexer0& idx0)
 			{
 				return inject_step<TIndexer0>::get(idx0, base_d1);
 			}
 
-			static index_t slice_offset(index_t base_d0, index_t base_d1, const TIndexer1& idx1, index_t j)
+			static index_t slice1_offset(index_t base_d0, index_t base_d1, const TIndexer1& idx1, index_t j)
 			{
 				return idx1[j];
 			}
+
 		};
 
 
 		template<class TIndexer0, class TIndexer1>
-		struct array2d_slices0<column_major_t, TIndexer0, TIndexer1>
+		struct array2d_slices<column_major_t, TIndexer0, TIndexer1>
 		{
-			typedef typename inject_step<TIndexer1>::type indexer_type;
+			typedef typename inject_step<TIndexer1>::type slice0_indexer_type;
+			typedef TIndexer0 slice1_indexer_type;
 
-			static indexer_type get_indexer(index_t base_d0, index_t base_d1, const TIndexer1& idx1)
+			static slice0_indexer_type slice0_indexer(index_t base_d0, index_t base_d1, const TIndexer1& idx1)
 			{
 				return inject_step<TIndexer1>::get(idx1, base_d0);
 			}
 
-			static index_t slice_offset(index_t base_d0, index_t base_d1, const TIndexer0& idx0, index_t i)
+			static index_t slice0_offset(index_t base_d0, index_t base_d1, const TIndexer0& idx0, index_t i)
 			{
 				return idx0[i];
 			}
 
-		};
-
-		template<class TIndexer0, class TIndexer1>
-		struct array2d_slices1<column_major_t, TIndexer0, TIndexer1>
-		{
-			typedef TIndexer0 indexer_type;
-
-			static indexer_type get_indexer(index_t base_d0, index_t base_d1, const TIndexer0& idx0)
+			static slice1_indexer_type slice1_indexer(index_t base_d0, index_t base_d1, const TIndexer0& idx0)
 			{
 				return idx0;
 			}
 
-			static index_t slice_offset(index_t base_d0, index_t base_d1, const TIndexer1& idx1, index_t j)
+			static index_t slice1_offset(index_t base_d0, index_t base_d1, const TIndexer1& idx1, index_t j)
 			{
 				return idx1[j] * base_d0;
 			}
@@ -135,11 +122,11 @@ namespace bcs
 		class _aview2d_index_core
 		{
 		public:
-			typedef _detail::array2d_slices0<TOrd, TIndexer0, TIndexer1> _slices0;
-			typedef _detail::array2d_slices1<TOrd, TIndexer0, TIndexer1> _slices1;
+			typedef _detail::array2d_slices<TOrd, TIndexer0, TIndexer1> _slices;
 
-			typedef typename _slices0::indexer_type slice0_indexer_type;
-			typedef typename _slices1::indexer_type slice1_indexer_type;
+			typedef typename _slices::slice0_indexer_type slice0_indexer_type;
+			typedef typename _slices::slice1_indexer_type slice1_indexer_type;
+
 		public:
 			_aview2d_index_core(const index_t& base_d0, const index_t& base_d1, const TIndexer0& ind0, const TIndexer1& ind1)
 			: m_base_d0(base_d0), m_base_d1(base_d1)
@@ -244,22 +231,22 @@ namespace bcs
 		public:
 			index_t sliceI0_offset(const index_t& i) const
 			{
-				return _slices0::slice_offset(m_base_d0, m_base_d1, m_indexer0, i);
+				return _slices::slice0_offset(m_base_d0, m_base_d1, m_indexer0, i);
 			}
 
 			index_t sliceI1_offset(const index_t& j) const
 			{
-				return _slices1::slice_offset(m_base_d0, m_base_d1, m_indexer1, j);
+				return _slices::slice1_offset(m_base_d0, m_base_d1, m_indexer1, j);
 			}
 
 			slice0_indexer_type sliceI0_indexer() const
 			{
-				return _slices0::get_indexer(m_base_d0, m_base_d1, m_indexer1);
+				return _slices::slice0_indexer(m_base_d0, m_base_d1, m_indexer1);
 			}
 
 			slice1_indexer_type sliceI1_indexer() const
 			{
-				return _slices1::get_indexer(m_base_d0, m_base_d1, m_indexer0);
+				return _slices::slice1_indexer(m_base_d0, m_base_d1, m_indexer0);
 			}
 
 		private:
@@ -429,17 +416,14 @@ namespace bcs
 	// main classes
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	class const_aview2d
+	class aview2d
 	{
 	public:
 		BCS_ARRAY_CHECK_TYPE(T)
 		BCS_ARRAY_BASIC_TYPEDEFS(2u, T, TOrd)
-		static const bool is_readable = true;
-		static const bool is_writable = false;
 
 		typedef TIndexer0 indexer0_type;
 		typedef TIndexer1 indexer1_type;
-		typedef const_aview2d<value_type, layout_order, indexer0_type, indexer1_type> const_view_type;
 		typedef aview2d<value_type, layout_order, indexer0_type, indexer1_type> view_type;
 
 		typedef aview2d_iterators<T, TOrd, TIndexer0, TIndexer1> _iterators;
@@ -451,24 +435,24 @@ namespace bcs
 		typedef typename _index_core_type::slice1_indexer_type slice1_indexer_type;
 
 	public:
-		const_aview2d(const_pointer pbase, index_type base_d0, index_type base_d1,
+		aview2d(pointer pbase, index_type base_d0, index_type base_d1,
 				const indexer0_type& indexer0, const indexer1_type& indexer1)
-		: m_pbase(const_cast<pointer>(pbase)), m_idxcore(base_d0, base_d1, indexer0, indexer1)
+		: m_pbase(pbase), m_idxcore(base_d0, base_d1, indexer0, indexer1)
 		{
 		}
 
-		const_aview2d(const const_aview2d& r)
+		aview2d(const aview2d& r)
 		: m_pbase(r.m_pbase), m_idxcore(r.m_idxcore)
 		{
 		}
 
-		const_aview2d(const_aview2d&& r)
+		aview2d(aview2d&& r)
 		: m_pbase(r.m_pbase), m_idxcore(std::move(r.m_idxcore))
 		{
 			r.m_pbase = BCS_NULL;
 		}
 
-		const_aview2d& operator = (const const_aview2d& r)
+		aview2d& operator = (const aview2d& r)
 		{
 			if (this != &r)
 			{
@@ -478,7 +462,7 @@ namespace bcs
 			return *this;
 		}
 
-		const_aview2d& operator = (const_aview2d&& r)
+		aview2d& operator = (aview2d&& r)
 		{
 			m_pbase = r.m_pbase;
 			m_idxcore = std::move(r.m_idxcore);
@@ -487,8 +471,8 @@ namespace bcs
 		}
 
 	public:
-		const_aview2d(const_pointer pbase, const _index_core_type& idxcore)
-		: m_pbase(const_cast<pointer>(pbase)), m_idxcore(idxcore)
+		aview2d(pointer pbase, const _index_core_type& idxcore)
+		: m_pbase(pbase), m_idxcore(idxcore)
 		{
 		}
 
@@ -559,9 +543,15 @@ namespace bcs
 		}
 
 
+	public:
 		// Element access
 
 		const_pointer pbase() const
+		{
+			return m_pbase;
+		}
+
+		pointer pbase()
 		{
 			return m_pbase;
 		}
@@ -571,7 +561,17 @@ namespace bcs
 			return m_pbase + m_idxcore.offset(i, j);
 		}
 
+		pointer ptr(index_type i, index_type j)
+		{
+			return m_pbase + m_idxcore.offset(i, j);
+		}
+
 		const_reference operator() (index_type i, index_type j) const
+		{
+			return m_pbase[m_idxcore.offset(i, j)];
+		}
+
+		reference operator() (index_type i, index_type j)
 		{
 			return m_pbase[m_idxcore.offset(i, j)];
 		}
@@ -590,228 +590,46 @@ namespace bcs
 			return _iterators::get_const_iterator(pbase(), m_idxcore, e_i, e_j);
 		}
 
-
-		// Slice
-
-		const_aview1d<value_type, slice0_indexer_type> sliceI0(index_type i) const
-		{
-			return const_aview1d<value_type, slice0_indexer_type>(
-					pbase() + m_idxcore.sliceI0_offset(i), m_idxcore.sliceI0_indexer());
-		}
-
-		const_aview1d<value_type, slice1_indexer_type> sliceI1(index_type j) const
-		{
-			typedef _detail::array2d_slices1<layout_order, indexer0_type, indexer1_type> _slices;
-
-			return const_aview1d<value_type, slice1_indexer_type>(
-					pbase() + m_idxcore.sliceI1_offset(j), m_idxcore.sliceI1_indexer());
-		}
-
-		const_aview1d<value_type, slice0_indexer_type> row(index_type i) const
-		{
-			return sliceI0(i);
-		}
-
-		const_aview1d<value_type, slice1_indexer_type> column(index_type j) const
-		{
-			return sliceI1(j);
-		}
-
-
-		// Sub-View
-
-		template<class TSelector>
-		const_aview1d<value_type, typename sub_indexer<slice0_indexer_type, TSelector>::type>
-		V(index_type i, const TSelector& sel) const
-		{
-			return sliceI0(i).V(sel);
-		}
-
-		template<class TSelector>
-		const_aview1d<value_type, typename sub_indexer<slice1_indexer_type, TSelector>::type>
-		V(const TSelector& sel, index_type j) const
-		{
-			return sliceI1(j).V(sel);
-		}
-
-		template<class TSelector0, class TSelector1>
-		const_aview2d<value_type, layout_order,
-			typename sub_indexer<indexer0_type, TSelector0>::type,
-			typename sub_indexer<indexer1_type, TSelector1>::type>
-		V(const TSelector0& sel0, const TSelector1& sel1) const
-		{
-			typedef typename sub_indexer<indexer0_type, TSelector0>::type sub_indexer0_t;
-			typedef typename sub_indexer<indexer1_type, TSelector1>::type sub_indexer1_t;
-
-			index_t o0 = 0;
-			index_t o1 = 0;
-
-			sub_indexer0_t si0 = sub_indexer<indexer0_type, TSelector0>::get(get_indexer0(), sel0, o0);
-			sub_indexer1_t si1 = sub_indexer<indexer1_type, TSelector1>::get(get_indexer1(), sel1, o1);
-
-			index_t offset = m_idxcore.offset(o0, o1);
-
-			return const_aview2d<value_type, layout_order, sub_indexer0_t, sub_indexer1_t>(
-					pbase() + offset, base_dim0(), base_dim1(), si0, si1);
-		}
-
-
-	protected:
-		pointer m_pbase;
-		_index_core_type m_idxcore;
-
-	}; // end class const_aview2d
-
-
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	class aview2d : public const_aview2d<T, TOrd, TIndexer0, TIndexer1>
-	{
-	public:
-		BCS_ARRAY_CHECK_TYPE(T)
-		BCS_ARRAY_BASIC_TYPEDEFS(2u, T, TOrd)
-		static const bool is_readable = true;
-		static const bool is_writable = true;
-
-		typedef TIndexer0 indexer0_type;
-		typedef TIndexer1 indexer1_type;
-		typedef const_aview2d<value_type, layout_order, indexer0_type, indexer1_type> const_view_type;
-		typedef aview2d<value_type, layout_order, indexer0_type, indexer1_type> view_type;
-
-		typedef aview2d_iterators<T, TOrd, TIndexer0, TIndexer1> _iterators;
-		typedef typename _iterators::const_iterator const_iterator;
-		typedef typename _iterators::iterator iterator;
-
-		typedef _detail::_aview2d_index_core<TOrd, TIndexer0, TIndexer1> _index_core_type;
-		typedef typename _index_core_type::slice0_indexer_type slice0_indexer_type;
-		typedef typename _index_core_type::slice1_indexer_type slice1_indexer_type;
-
-	public:
-		aview2d(pointer base, index_type base_d0, index_type base_d1,
-				const indexer0_type& indexer0, const indexer1_type& indexer1)
-		: const_view_type(base, base_d0, base_d1, indexer0, indexer1)
-		{
-		}
-
-		aview2d(const aview2d& r)
-		: const_view_type(r)
-		{
-		}
-
-		aview2d(aview2d&& r)
-		: const_view_type(std::move(r))
-		{
-		}
-
-		aview2d& operator = (const aview2d& r)
-		{
-			const_view_type::operator = (r);
-			return *this;
-		}
-
-		aview2d& operator = (aview2d&& r)
-		{
-			const_view_type::operator = (std::move(r));
-			return *this;
-		}
-
-	public:
-		aview2d(pointer pbase, const _index_core_type& idxcore)
-		: const_view_type(pbase, idxcore)
-		{
-		}
-
-	public:
-		// Element access
-
-		const_pointer pbase() const
-		{
-			return this->m_pbase;
-		}
-
-		pointer pbase()
-		{
-			return this->m_pbase;
-		}
-
-		const_pointer ptr(index_type i, index_type j) const
-		{
-			return this->m_pbase + this->m_idxcore.offset(i, j);
-		}
-
-		pointer ptr(index_type i, index_type j)
-		{
-			return this->m_pbase + this->m_idxcore.offset(i, j);
-		}
-
-		const_reference operator() (index_type i, index_type j) const
-		{
-			return this->m_pbase[this->m_idxcore.offset(i, j)];
-		}
-
-		reference operator() (index_type i, index_type j)
-		{
-			return this->m_pbase[this->m_idxcore.offset(i, j)];
-		}
-
-		// Iteration
-
-		const_iterator begin() const
-		{
-			return _iterators::get_const_iterator(pbase(), this->m_idxcore, 0, 0);
-		}
-
-		const_iterator end() const
-		{
-			index_t e_i, e_j;
-			this->m_idxcore.get_pass_by_end_indices(e_i, e_j);
-			return _iterators::get_const_iterator(pbase(), this->m_idxcore, e_i, e_j);
-		}
-
 		iterator begin()
 		{
-			return _iterators::get_iterator(pbase(), this->m_idxcore, 0, 0);
+			return _iterators::get_iterator(pbase(), m_idxcore, 0, 0);
 		}
 
 		iterator end()
 		{
 			index_t e_i, e_j;
-			this->m_idxcore.get_pass_by_end_indices(e_i, e_j);
-			return _iterators::get_iterator(pbase(), this->m_idxcore, e_i, e_j);
+			m_idxcore.get_pass_by_end_indices(e_i, e_j);
+			return _iterators::get_iterator(pbase(), m_idxcore, e_i, e_j);
 		}
 
 
 		// Slice
 
-		const_aview1d<value_type, slice0_indexer_type> sliceI0(index_type i) const
+		const aview1d<value_type, slice0_indexer_type> sliceI0(index_type i) const
 		{
-			return const_aview1d<value_type, slice0_indexer_type>(
-					pbase() + this->m_idxcore.sliceI0_offset(i), this->m_idxcore.sliceI0_indexer());
+			return aview1d<value_type, slice0_indexer_type>(
+					m_pbase + m_idxcore.sliceI0_offset(i), m_idxcore.sliceI0_indexer());
 		}
 
-		const_aview1d<value_type, slice1_indexer_type> sliceI1(index_type j) const
+		const aview1d<value_type, slice1_indexer_type> sliceI1(index_type j) const
 		{
-			typedef _detail::array2d_slices1<layout_order, indexer0_type, indexer1_type> _slices;
-
-			return const_aview1d<value_type, slice1_indexer_type>(
-					pbase() + this->m_idxcore.sliceI1_offset(j), this->m_idxcore.sliceI1_indexer());
+			return aview1d<value_type, slice1_indexer_type>(
+					m_pbase + m_idxcore.sliceI1_offset(j), m_idxcore.sliceI1_indexer());
 		}
 
 		aview1d<value_type, slice0_indexer_type> sliceI0(index_type i)
 		{
 			return aview1d<value_type, slice0_indexer_type>(
-					pbase() + this->m_idxcore.sliceI0_offset(i), this->m_idxcore.sliceI0_indexer());
+					m_pbase + m_idxcore.sliceI0_offset(i), m_idxcore.sliceI0_indexer());
 		}
 
 		aview1d<value_type, slice1_indexer_type> sliceI1(index_type j)
 		{
-			typedef _detail::array2d_slices1<layout_order, indexer0_type, indexer1_type> _slices;
-
 			return aview1d<value_type, slice1_indexer_type>(
-					pbase() + this->m_idxcore.sliceI1_offset(j), this->m_idxcore.sliceI1_indexer());
+					m_pbase + m_idxcore.sliceI1_offset(j), m_idxcore.sliceI1_indexer());
 		}
 
-		const_aview1d<value_type, slice0_indexer_type> row(index_type i) const
+		const aview1d<value_type, slice0_indexer_type> row(index_type i) const
 		{
 			return sliceI0(i);
 		}
@@ -821,7 +639,7 @@ namespace bcs
 			return sliceI0(i);
 		}
 
-		const_aview1d<value_type, slice1_indexer_type> column(index_type j) const
+		const aview1d<value_type, slice1_indexer_type> column(index_type j) const
 		{
 			return sliceI1(j);
 		}
@@ -834,7 +652,7 @@ namespace bcs
 		// Sub-view
 
 		template<class TSelector>
-		const_aview1d<value_type, typename sub_indexer<slice0_indexer_type, TSelector>::type>
+		const aview1d<value_type, typename sub_indexer<slice0_indexer_type, TSelector>::type>
 		V(index_type i, const TSelector& sel) const
 		{
 			return sliceI0(i).V(sel);
@@ -848,7 +666,7 @@ namespace bcs
 		}
 
 		template<class TSelector>
-		const_aview1d<value_type, typename sub_indexer<slice1_indexer_type, TSelector>::type>
+		const aview1d<value_type, typename sub_indexer<slice1_indexer_type, TSelector>::type>
 		V(const TSelector& sel, index_type j) const
 		{
 			return sliceI1(j).V(sel);
@@ -862,7 +680,7 @@ namespace bcs
 		}
 
 		template<class TSelector0, class TSelector1>
-		const_aview2d<value_type, layout_order,
+		const aview2d<value_type, layout_order,
 			typename sub_indexer<indexer0_type, TSelector0>::type,
 			typename sub_indexer<indexer1_type, TSelector1>::type>
 		V(const TSelector0& sel0, const TSelector1& sel1) const
@@ -876,10 +694,10 @@ namespace bcs
 			sub_indexer0_t si0 = sub_indexer<indexer0_type, TSelector0>::get(this->get_indexer0(), sel0, o0);
 			sub_indexer1_t si1 = sub_indexer<indexer1_type, TSelector1>::get(this->get_indexer1(), sel1, o1);
 
-			index_t offset = this->m_idxcore.offset(o0, o1);
+			index_t offset = m_idxcore.offset(o0, o1);
 
-			return const_aview2d<value_type, layout_order, sub_indexer0_t, sub_indexer1_t>(
-					pbase() + offset, this->base_dim0(), this->base_dim1(), si0, si1);
+			return aview2d<value_type, layout_order, sub_indexer0_t, sub_indexer1_t>(
+					m_pbase + offset, this->base_dim0(), this->base_dim1(), si0, si1);
 		}
 
 
@@ -898,11 +716,15 @@ namespace bcs
 			sub_indexer0_t si0 = sub_indexer<indexer0_type, TSelector0>::get(this->get_indexer0(), sel0, o0);
 			sub_indexer1_t si1 = sub_indexer<indexer1_type, TSelector1>::get(this->get_indexer1(), sel1, o1);
 
-			index_t offset = this->m_idxcore.offset(o0, o1);
+			index_t offset = m_idxcore.offset(o0, o1);
 
 			return aview2d<value_type, layout_order, sub_indexer0_t, sub_indexer1_t>(
-					pbase() + offset, this->base_dim0(), this->base_dim1(), si0, si1);
+					m_pbase + offset, this->base_dim0(), this->base_dim1(), si0, si1);
 		}
+
+	protected:
+		pointer m_pbase;
+		_index_core_type m_idxcore;
 
 	}; // end class aview2d
 
@@ -920,7 +742,6 @@ namespace bcs
 
 		typedef id_ind indexer0_type;
 		typedef id_ind indexer1_type;
-		typedef const_aview2d<value_type, layout_order, indexer0_type, indexer1_type> const_view_type;
 		typedef aview2d<value_type, layout_order, indexer0_type, indexer1_type> view_type;
 
 		typedef aview2d_iterators<T, TOrd, id_ind, id_ind> _iterators;
@@ -993,7 +814,7 @@ namespace bcs
 			view_type& v = *this;
 
 			s = std::move(r);
-			v = view_type(s.pointer_to_base(), r._index_core());
+			v = view_type(s.pointer_to_base(), std::move(r._index_core()));
 
 			return *this;
 		}
@@ -1021,16 +842,10 @@ namespace bcs
 	 ********************************************/
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	struct is_array_view<bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1> > { static const bool value = true; };
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	struct is_array_view<bcs::aview2d<T, TOrd, TIndexer0, TIndexer1> > { static const bool value = true; };
 
 	template<typename T, typename TOrd, class Alloc>
 	struct is_array_view<bcs::array2d<T, TOrd, Alloc> > { static const bool value = true; };
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	struct is_array_view_ndim<bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1>, 2> { static const bool value = true; };
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	struct is_array_view_ndim<bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>, 2> { static const bool value = true; };
@@ -1040,19 +855,19 @@ namespace bcs
 
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline std::array<index_t, 2> get_array_shape(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1>& arr)
+	inline std::array<index_t, 2> get_array_shape(const bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>& arr)
 	{
 		return arr.shape();
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline size_t get_num_elems(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1>& arr)
+	inline size_t get_num_elems(const bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>& arr)
 	{
 		return arr.nelems();
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline const T& get(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1>& arr, index_t i, index_t j)
+	inline const T& get(const bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>& arr, index_t i, index_t j)
 	{
 		return arr(i, j);
 	}
@@ -1064,15 +879,15 @@ namespace bcs
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline typename bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1>::const_iterator
-	begin(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1>& arr)
+	inline typename bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>::const_iterator
+	begin(const bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>& arr)
 	{
 		return arr.begin();
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline typename bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1>::const_iterator
-	end(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1>& arr)
+	inline typename bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>::const_iterator
+	end(const bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>& arr)
 	{
 		return arr.end();
 	}
@@ -1092,7 +907,7 @@ namespace bcs
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline const T* ptr_base(const bcs::const_aview2d<T, TOrd, TIndexer0, TIndexer1>& arr)
+	inline const T* ptr_base(const bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>& arr)
 	{
 		return arr.pbase();
 	}
@@ -1105,14 +920,14 @@ namespace bcs
 
 
 	template<typename T, class TIndexer0, class TIndexer1>
-	bool is_dense_view(const const_aview2d<T, row_major_t, TIndexer0, TIndexer1>& view)
+	bool is_dense_view(const aview2d<T, row_major_t, TIndexer0, TIndexer1>& view)
 	{
 		return array_indexer_traits<TIndexer1>::is_continuous(view.get_indexer1()) &&
 				(view.dim1() == view.base_dim1() || view.dim0() == 1);
 	}
 
 	template<typename T, class TIndexer0, class TIndexer1>
-	bool is_dense_view(const const_aview2d<T, column_major_t, TIndexer0, TIndexer1>& view)
+	bool is_dense_view(const aview2d<T, column_major_t, TIndexer0, TIndexer1>& view)
 	{
 		return array_indexer_traits<TIndexer0>::is_continuous(view.get_indexer0()) &&
 				(view.dim0() == view.base_dim0() || view.dim1() == 1);
@@ -1122,9 +937,9 @@ namespace bcs
 	// functions to make dense view
 
 	template<typename T, typename TOrd>
-	const_aview2d<T, TOrd, id_ind, id_ind> dense_const_aview2d(const T *pbase, size_t m, size_t n, TOrd ord)
+	const aview2d<T, TOrd, id_ind, id_ind> dense_aview2d(const T *pbase, size_t m, size_t n, TOrd ord)
 	{
-		return const_aview2d<T, TOrd, id_ind, id_ind>(pbase,
+		return aview2d<T, TOrd, id_ind, id_ind>(const_cast<T*>(pbase),
 				static_cast<index_t>(m), static_cast<index_t>(n), m, n);
 	}
 
@@ -1147,16 +962,16 @@ namespace bcs
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
 	inline bool operator == (
-			const const_aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
-			const const_aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+			const aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
 		return equal_array(lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
 	inline bool operator != (
-			const const_aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
-			const const_aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+			const aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
 		return !(lhs == rhs);
 	}
@@ -1164,9 +979,9 @@ namespace bcs
 	// export & import
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, class RView>
-	inline typename std::enable_if<is_array_view<RView>::value && array_view_traits<RView>::is_writable,
-		const const_aview2d<T, TOrd, TIndexer0, TIndexer1>&>::type
-	operator >> (const const_aview2d<T, TOrd, TIndexer0, TIndexer1>& a, RView& b)
+	inline typename std::enable_if<is_array_view<RView>::value,
+		const aview2d<T, TOrd, TIndexer0, TIndexer1>&>::type
+	operator >> (const aview2d<T, TOrd, TIndexer0, TIndexer1>& a, RView& b)
 	{
 		if (get_num_elems(a) != get_num_elems(b))
 		{
@@ -1185,7 +1000,7 @@ namespace bcs
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, class RView>
-	inline typename std::enable_if<is_array_view<RView>::value && array_view_traits<RView>::is_readable,
+	inline typename std::enable_if<is_array_view<RView>::value,
 			aview2d<T, TOrd, TIndexer0, TIndexer1>&>::type
 	operator << (aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const RView& b)
 	{
