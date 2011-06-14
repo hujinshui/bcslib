@@ -790,7 +790,7 @@ namespace bcs
 		template<typename ForwardIterator>
 		array2d(size_type m, size_type n, ForwardIterator it)
 		: storage_base_type(m * n)
-		, view_type(storage_base_type::pointer_to_base(), m, n, m, n)
+		, view_type(storage_base_type::pointer_to_base(), static_cast<index_t>(m), static_cast<index_t>(n), m, n)
 		{
 			import_from(*this, it);
 		}
