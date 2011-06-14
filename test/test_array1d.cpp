@@ -136,12 +136,43 @@ bool array_iteration_test(const bcs::aview1d<T, TIndexer>& view)
 }
 
 
+template<typename T, class TIndexer>
+bool test_generic_operations(bcs::aview1d<T, TIndexer>& view, const double *src)
+{
+	block<T> blk(view.nelems());
+	export_to(view, blk.pbase());
+
+	if (!collection_equal(blk.pbase(), blk.pend(), src, view.nelems())) return false;
+
+	index_t d = view.dim0();
+	if (is_dense_view(view))
+	{
+		set_zeros(view);
+		for (index_t i = 0; i < d; ++i)
+		{
+			if (view(i) != T(0)) return false;
+		}
+	}
+
+	fill(view, T(1));
+	for (index_t i = 0; i < d; ++i)
+	{
+		if (view(i) != T(1)) return false;
+	}
+
+	import_from(view, src);
+	if (!array_view_equal(view, src, view.nelems())) return false;
+
+	return true;
+}
+
+
+
 // Test cases
 
 
 BCS_TEST_CASE( test_dense_array1d )
 {
-	double src0[5] = {0, 0, 0, 0, 0};
 	double src1[5] = {3, 4, 5, 1, 2};
 	size_t n1 = 5;
 
@@ -203,17 +234,7 @@ BCS_TEST_CASE( test_dense_array1d )
 	a6[2] += 1;
 	BCS_CHECK( a1 != a6 );
 
-	block<double> buf(n1, 0);
-	export_to(a1, buf.pbase());
-	BCS_CHECK( collection_equal(buf.pbase(), buf.pend(), src1, n1) );
-	set_zeros(a1);
-	BCS_CHECK( array_view_equal(a1, src0, n1) );
-	import_from(a1, buf.pbase());
-	BCS_CHECK( array_view_equal(a1, src1, n1) );
-
-	set_zeros(a2);
-	fill(a2, v2);
-	BCS_CHECK( array_view_equal(a2, src2, n2) );
+	BCS_CHECK( test_generic_operations(a1, src1) );
 }
 
 
@@ -248,20 +269,12 @@ BCS_TEST_CASE( test_step_array1d )
 
 	aview1d<double, step_ind> a0(src0, step_ind(4, 2));
 
-	block<double> buf(a2.nelems(), 0);
-	export_to(a2, buf.pbase());
-	BCS_CHECK( collection_equal(buf.pbase(), buf.pend(), r2, n2) );
-	fill(a2, 0);
-	BCS_CHECK( array_view_equal(a2, src0, n2) );
-	import_from(a2, buf.pbase());
-	BCS_CHECK( array_view_equal(a2, r2, n2) );
-
+	BCS_CHECK( test_generic_operations(a2, r2) );
 }
 
 
 BCS_TEST_CASE( test_rep_array1d )
 {
-	double src0[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double v = 2;
 
 	aview1d<double, rep_ind> a0(&v, rep_ind(0));
@@ -275,16 +288,10 @@ BCS_TEST_CASE( test_rep_array1d )
 	size_t n1 = 5;
 
 	BCS_CHECK( array_integrity_test(a1) );
-	BCS_CHECK( array_view_equal(a1, r1, 5) );
+	BCS_CHECK( array_view_equal(a1, r1, n1) );
 	BCS_CHECK( array_iteration_test(a1) );
 
-	block<double> buf(a1.nelems(), 0);
-	export_to(a1, buf.pbase());
-	BCS_CHECK( collection_equal(buf.pbase(), buf.pend(), r1, n1) );
-	fill(a1, 0);
-	BCS_CHECK( array_view_equal(a1, src0, n1) );
-	import_from(a1, buf.pbase());
-	BCS_CHECK( array_view_equal(a1, r1, n1) );
+	BCS_CHECK( test_generic_operations(a1, r1) );
 }
 
 
@@ -343,6 +350,8 @@ BCS_TEST_CASE( test_arrind_array1d )
 
 	BCS_CHECK( a1c.pbase() == BCS_NULL );
 	BCS_CHECK( a1c.size() == 0 );
+
+	BCS_CHECK( test_generic_operations(a1, r1) );
 }
 
 

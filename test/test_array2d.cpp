@@ -125,6 +125,46 @@ void print_collection(FwdIter first, FwdIter last)
 }
 
 
+template<typename T, class TIndexer0, class TIndexer1>
+bool array_view_equal(const bcs::aview2d<T, row_major_t, TIndexer0, TIndexer1>& view, const T *src, size_t m, size_t n)
+{
+	if (view.nrows() != m) return false;
+	if (view.ncolumns() != n) return false;
+
+	index_t d0 = view.dim0();
+	index_t d1 = view.dim1();
+
+	for (index_t i = 0; i < d0; ++i)
+	{
+		for (index_t j = 0; j < d1; ++j)
+		{
+			if (view(i, j) != src[i * d1 + j]) return false;
+		}
+	}
+	return true;
+}
+
+
+template<typename T, class TIndexer0, class TIndexer1>
+bool array_view_equal(const bcs::aview2d<T, column_major_t, TIndexer0, TIndexer1>& view, const T *src, size_t m, size_t n)
+{
+	if (view.nrows() != m) return false;
+	if (view.ncolumns() != n) return false;
+
+	index_t d0 = view.dim0();
+	index_t d1 = view.dim1();
+
+	for (index_t i = 0; i < d0; ++i)
+	{
+		for (index_t j = 0; j < d1; ++j)
+		{
+			if (view(i, j) != src[i + j * d0]) return false;
+		}
+	}
+	return true;
+}
+
+
 template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 bool array_integrity_test(const bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>& view)
 {
@@ -201,9 +241,6 @@ bool array_iteration_test(const bcs::aview2d<T, column_major_t, TIndexer0, TInde
 }
 
 
-
-/*
-
 BCS_TEST_CASE( test_dense_array2d  )
 {
 	double src[24];
@@ -254,6 +291,7 @@ BCS_TEST_CASE( test_dense_array2d  )
 
 }
 
+/*
 
 BCS_TEST_CASE( test_gen_array2d )
 {
