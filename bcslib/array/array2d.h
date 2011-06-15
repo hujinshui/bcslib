@@ -255,12 +255,9 @@ namespace bcs
 				typename sub_indexer<TIndexer1, TSelector1>::type>
 			subview_index_core(const TSelector0& sel0, const TSelector1& sel1, index_t& offset) const
 			{
-				typedef _aview2d_index_core<TOrd,
-						typename sub_indexer<TIndexer0, TSelector0>::type,
-						typename sub_indexer<TIndexer1, TSelector1>::type> result_type;
-
 				typedef typename sub_indexer<TIndexer0, TSelector0>::type sub_indexer0_t;
 				typedef typename sub_indexer<TIndexer1, TSelector1>::type sub_indexer1_t;
+				typedef _aview2d_index_core<TOrd, sub_indexer0_t, sub_indexer1_t> result_type;
 
 				index_t o0, o1;
 				sub_indexer0_t si0 = sub_indexer<TIndexer0, TSelector0>::get(get_indexer0(), sel0, o0);
