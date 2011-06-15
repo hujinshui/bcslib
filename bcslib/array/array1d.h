@@ -579,9 +579,9 @@ namespace bcs
 
 	// export & import
 
-	template<typename T, class TIndexer, class RView>
-	inline typename std::enable_if<is_array_view<RView>::value, const aview1d<T, TIndexer>&>::type
-	operator >> (const aview1d<T, TIndexer>& a, RView& b)
+	template<typename T, class LIndexer, class RIndexer>
+	inline const aview1d<T, LIndexer>&
+	operator >> (const aview1d<T, LIndexer>& a, aview1d<T, RIndexer>& b)
 	{
 		if (get_num_elems(a) != get_num_elems(b))
 		{
@@ -599,9 +599,9 @@ namespace bcs
 		return a;
 	}
 
-	template<typename T, class TIndexer, class RView>
-	inline typename std::enable_if<is_array_view<RView>::value, aview1d<T, TIndexer>&>::type
-	operator << (aview1d<T, TIndexer>& a, const RView& b)
+	template<typename T, class LIndexer, class RIndexer>
+	inline aview1d<T, LIndexer>&
+	operator << (aview1d<T, LIndexer>& a, const aview1d<T, RIndexer>& b)
 	{
 		if (get_num_elems(a) != get_num_elems(b))
 		{

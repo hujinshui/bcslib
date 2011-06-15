@@ -987,10 +987,9 @@ namespace bcs
 
 	// export & import
 
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, class RView>
-	inline typename std::enable_if<is_array_view<RView>::value,
-		const aview2d<T, TOrd, TIndexer0, TIndexer1>&>::type
-	operator >> (const aview2d<T, TOrd, TIndexer0, TIndexer1>& a, RView& b)
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline const aview2d<T, TOrd, LIndexer0, LIndexer1>&
+	operator >> (const aview2d<T, TOrd, LIndexer0, LIndexer1>& a, aview2d<T, TOrd, RIndexer0, RIndexer1>& b)
 	{
 		if (get_num_elems(a) != get_num_elems(b))
 		{
@@ -1008,10 +1007,9 @@ namespace bcs
 		return a;
 	}
 
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, class RView>
-	inline typename std::enable_if<is_array_view<RView>::value,
-			aview2d<T, TOrd, TIndexer0, TIndexer1>&>::type
-	operator << (aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const RView& b)
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline aview2d<T, TOrd, LIndexer0, LIndexer1>&
+	operator << (aview2d<T, TOrd, LIndexer0, LIndexer1>& a, const aview2d<T, TOrd, RIndexer0, RIndexer1>& b)
 	{
 		if (get_num_elems(a) != get_num_elems(b))
 		{
