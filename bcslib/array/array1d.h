@@ -332,7 +332,7 @@ namespace bcs
 		{
 			typedef typename sub_indexer<indexer_type, TSelector>::type sub_indexer_type;
 
-			index_t offset = 0;
+			index_t offset;
 			sub_indexer_type sindexer =
 					sub_indexer<indexer_type, TSelector>::get(m_indexer, selector, offset);
 
@@ -345,7 +345,7 @@ namespace bcs
 		{
 			typedef typename sub_indexer<indexer_type, TSelector>::type sub_indexer_type;
 
-			index_t offset = 0;
+			index_t offset;
 			sub_indexer_type sindexer =
 					sub_indexer<indexer_type, TSelector>::get(m_indexer, selector, offset);
 

@@ -249,6 +249,27 @@ namespace bcs
 				return _slices::slice1_indexer(m_base_d0, m_base_d1, m_indexer0);
 			}
 
+			template<class TSelector0, class TSelector1>
+			_aview2d_index_core<TOrd,
+				typename sub_indexer<TIndexer0, TSelector0>::type,
+				typename sub_indexer<TIndexer1, TSelector1>::type>
+			subview_index_core(const TSelector0& sel0, const TSelector1& sel1, index_t& offset) const
+			{
+				typedef _aview2d_index_core<TOrd,
+						typename sub_indexer<TIndexer0, TSelector0>::type,
+						typename sub_indexer<TIndexer1, TSelector1>::type> result_type;
+
+				typedef typename sub_indexer<TIndexer0, TSelector0>::type sub_indexer0_t;
+				typedef typename sub_indexer<TIndexer1, TSelector1>::type sub_indexer1_t;
+
+				index_t o0, o1;
+				sub_indexer0_t si0 = sub_indexer<TIndexer0, TSelector0>::get(get_indexer0(), sel0, o0);
+				sub_indexer1_t si1 = sub_indexer<TIndexer1, TSelector1>::get(get_indexer1(), sel1, o1);
+
+				offset = layout_aux2d<TOrd>::offset(m_base_d0, m_base_d1, o0, o1);
+				return result_type(m_base_d0, m_base_d1, std::move(si0), std::move(si1));
+			}
+
 		private:
 			void reset()
 			{
@@ -679,6 +700,7 @@ namespace bcs
 			return sliceI1(j).V(sel);
 		}
 
+
 		template<class TSelector0, class TSelector1>
 		const aview2d<value_type, layout_order,
 			typename sub_indexer<indexer0_type, TSelector0>::type,
@@ -688,16 +710,11 @@ namespace bcs
 			typedef typename sub_indexer<indexer0_type, TSelector0>::type sub_indexer0_t;
 			typedef typename sub_indexer<indexer1_type, TSelector1>::type sub_indexer1_t;
 
-			index_t o0 = 0;
-			index_t o1 = 0;
-
-			sub_indexer0_t si0 = sub_indexer<indexer0_type, TSelector0>::get(this->get_indexer0(), sel0, o0);
-			sub_indexer1_t si1 = sub_indexer<indexer1_type, TSelector1>::get(this->get_indexer1(), sel1, o1);
-
-			index_t offset = m_idxcore.offset(o0, o1);
+			index_t offset;
+			auto sub_idxcore = m_idxcore.subview_index_core(sel0, sel1, offset);
 
 			return aview2d<value_type, layout_order, sub_indexer0_t, sub_indexer1_t>(
-					m_pbase + offset, this->base_dim0(), this->base_dim1(), si0, si1);
+					m_pbase + offset, std::move(sub_idxcore));
 		}
 
 
@@ -710,16 +727,11 @@ namespace bcs
 			typedef typename sub_indexer<indexer0_type, TSelector0>::type sub_indexer0_t;
 			typedef typename sub_indexer<indexer1_type, TSelector1>::type sub_indexer1_t;
 
-			index_t o0 = 0;
-			index_t o1 = 0;
-
-			sub_indexer0_t si0 = sub_indexer<indexer0_type, TSelector0>::get(this->get_indexer0(), sel0, o0);
-			sub_indexer1_t si1 = sub_indexer<indexer1_type, TSelector1>::get(this->get_indexer1(), sel1, o1);
-
-			index_t offset = m_idxcore.offset(o0, o1);
+			index_t offset;
+			auto sub_idxcore = m_idxcore.subview_index_core(sel0, sel1, offset);
 
 			return aview2d<value_type, layout_order, sub_indexer0_t, sub_indexer1_t>(
-					m_pbase + offset, this->base_dim0(), this->base_dim1(), si0, si1);
+					m_pbase + offset, std::move(sub_idxcore));
 		}
 
 	protected:
