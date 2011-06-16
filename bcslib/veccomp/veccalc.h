@@ -9,96 +9,44 @@
 #ifndef BCSLIB_VECCALC_H
 #define BCSLIB_VECCALC_H
 
-#include <bcslib/base/config.h>
 #include <bcslib/base/basic_defs.h>
-#include <bcslib/base/basic_funcs.h>
+#include <bcslib/veccomp/sse_basic.h>
+
+#include <cmath>
 
 namespace bcs
 {
 
-	// generic calculation functions
-
-	template<typename T, typename TFunc>
-	void vec_calc(size_t n, const T *x, T *y, TFunc f)
-	{
-		for (size_t i = 0; i < n; ++i)
-		{
-			*y++ = f(*x++);
-		}
-	}
-
-	template<typename T, typename TFunc>
-	void vec_calc(size_t n, const T *x1, const T *x2, T *y, TFunc f)
-	{
-		for (size_t i = 0; i < n; ++i)
-		{
-			*y++ = f(*x1++, *x2++);
-		}
-	}
-
-	template<typename T, typename TFunc>
-	void vec_calc(size_t n, const T *x1, const T& x2, T *y, TFunc f)
-	{
-		for (size_t i = 0; i < n; ++i)
-		{
-			*y++ = f(*x1++, x2);
-		}
-	}
-
-	template<typename T, typename TFunc>
-	void vec_calc(size_t n, const T& x1, const T* x2, T *y, TFunc f)
-	{
-		for (size_t i = 0; i < n; ++i)
-		{
-			*y++ = f(x1, *x2++);
-		}
-	}
-
-	template<typename T, typename TFunc>
-	void vec_calc_inplace(size_t n, T *y, const T *x, TFunc f)
-	{
-		for (size_t i = 0; i < n; ++i)
-		{
-			f(*y++, *x++);
-		}
-	}
-
-	template<typename T, typename TFunc>
-	void vec_calc_inplace(size_t n, T *y, const T &x, TFunc f)
-	{
-		for (size_t i = 0; i < n; ++i)
-		{
-			f(*y++, x);
-		}
-	}
-
-
-	// simple calculation: add, subtract, multiple, divide, and negate
+	/********************************************
+	 *
+	 *  Arithmetic Calculation
+	 *
+	 *******************************************/
 
 	// add
 
 	template<typename T>
 	inline void vec_add(size_t n, const T* x1, const T *x2, T *y)
 	{
-		vec_calc(n, x1, x2, y, std::plus<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = x1[i] + x2[i];
 	}
 
 	template<typename T>
 	inline void vec_add(size_t n, const T* x1, const T& x2, T *y)
 	{
-		vec_calc(n, x1, x2, y, std::plus<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = x1[i] + x2;
 	}
 
 	template<typename T>
 	inline void vec_add_inplace(size_t n, T *y, const T *x)
 	{
-		vec_calc_inplace(n, y, x, inplace_plus<T>());
+		for (size_t i = 0; i < n; ++i) y[i] += x[i];
 	}
 
 	template<typename T>
 	inline void vec_add_inplace(size_t n, T *y, const T& x)
 	{
-		vec_calc_inplace(n, y, x, inplace_plus<T>());
+		for (size_t i = 0; i < n; ++i) y[i] += x;
 	}
 
 	// sub
@@ -106,37 +54,37 @@ namespace bcs
 	template<typename T>
 	inline void vec_sub(size_t n, const T* x1, const T *x2, T *y)
 	{
-		vec_calc(n, x1, x2, y, std::minus<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = x1[i] - x2[i];
 	}
 
 	template<typename T>
 	inline void vec_sub(size_t n, const T* x1, const T& x2, T *y)
 	{
-		vec_calc(n, x1, x2, y, std::minus<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = x1[i] - x2;
 	}
 
 	template<typename T>
 	inline void vec_sub(size_t n, const T& x1, const T* x2, T *y)
 	{
-		vec_calc(n, x1, x2, y, std::minus<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = x1 - x2[i];
 	}
 
 	template<typename T>
 	inline void vec_sub_inplace(size_t n, T *y, const T *x)
 	{
-		vec_calc_inplace(n, y, x, inplace_minus<T>());
+		for (size_t i = 0; i < n; ++i) y[i] -= x[i];
 	}
 
 	template<typename T>
 	inline void vec_sub_inplace(size_t n, T *y, const T& x)
 	{
-		vec_calc_inplace(n, y, x, inplace_minus<T>());
+		for (size_t i = 0; i < n; ++i) y[i] -= x;
 	}
 
 	template<typename T>
 	inline void vec_sub_inplace(size_t n, const T& x, T *y)
 	{
-		vec_sub(n, x, y, y);
+		for (size_t i = 0; i < n; ++i) y[i] = x - y[i];
 	}
 
 
@@ -145,25 +93,25 @@ namespace bcs
 	template<typename T>
 	inline void vec_mul(size_t n, const T* x1, const T *x2, T *y)
 	{
-		vec_calc(n, x1, x2, y, std::multiplies<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = x1[i] * x2[i];
 	}
 
 	template<typename T>
 	inline void vec_mul(size_t n, const T* x1, const T& x2, T *y)
 	{
-		vec_calc(n, x1, x2, y, std::multiplies<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = x1[i] * x2;
 	}
 
 	template<typename T>
 	inline void vec_mul_inplace(size_t n, T *y, const T *x)
 	{
-		vec_calc_inplace(n, y, x, inplace_multiplies<T>());
+		for (size_t i = 0; i < n; ++i) y[i] *= x[i];
 	}
 
 	template<typename T>
 	inline void vec_mul_inplace(size_t n, T *y, const T& x)
 	{
-		vec_calc_inplace(n, y, x, inplace_multiplies<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = x;
 	}
 
 	// div
@@ -171,37 +119,37 @@ namespace bcs
 	template<typename T>
 	inline void vec_div(size_t n, const T* x1, const T *x2, T *y)
 	{
-		vec_calc(n, x1, x2, y, std::divides<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = x1[i] / x2[i];
 	}
 
 	template<typename T>
 	inline void vec_div(size_t n, const T* x1, const T& x2, T *y)
 	{
-		vec_calc(n, x1, x2, y, std::divides<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = x1[i] / x2;
 	}
 
 	template<typename T>
 	inline void vec_div(size_t n, const T& x1, const T* x2, T *y)
 	{
-		vec_calc(n, x1, x2, y, std::divides<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = x1 / x2[i];
 	}
 
 	template<typename T>
 	inline void vec_div_inplace(size_t n, T *y, const T *x)
 	{
-		vec_calc_inplace(n, y, x, inplace_divides<T>());
+		for (size_t i = 0; i < n; ++i) y[i] /= x[i];
 	}
 
 	template<typename T>
 	inline void vec_div_inplace(size_t n, T *y, const T& x)
 	{
-		vec_calc_inplace(n, y, x, inplace_divides<T>());
+		for (size_t i = 0; i < n; ++i) y[i] /= x;
 	}
 
 	template<typename T>
 	inline void vec_div_inplace(size_t n, const T& x, T *y)
 	{
-		vec_div(n, x, y, y);
+		for (size_t i = 0; i < n; ++i) y[i] = x / y[i];
 	}
 
 	// negate
@@ -209,13 +157,13 @@ namespace bcs
 	template<typename T>
 	inline void vec_negate(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, std::negate<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = -x[i];
 	}
 
 	template<typename T>
 	inline void vec_negate(size_t n, T *y)
 	{
-		vec_negate(n, y, y);
+		for (size_t i = 0; i < n; ++i) y[i] = -y[i];
 	}
 
 
@@ -224,127 +172,127 @@ namespace bcs
 	template<typename T>
 	inline void vec_abs(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, abs_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::abs(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_sqr(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, sqr_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = sqr(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_sqrt(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, sqrt_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::sqrt(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_pow(size_t n, const T *x, const T* e, T *y)
 	{
-		vec_calc(n, x, e, y, pow_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::pow(x[i], e[i]);
 	}
 
 	template<typename T>
 	inline void vec_pow(size_t n, const T *x, const T& e, T *y)
 	{
-		vec_calc(n, x, e, y, pow_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::pow(x[i], e);
 	}
 
 	template<typename T>
 	inline void vec_pow_n(size_t n, const T *x, int e, T *y)
 	{
-		vec_calc(n, x, y, pow_n_fun<T>(e));
+		for (size_t i = 0; i < n; ++i) y[i] = std::pow(x[i], e);
 	}
 
 	template<typename T>
 	inline void vec_exp(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, exp_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::exp(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_log(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, log_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::log(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_log10(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, log10_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::log10(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_ceil(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, ceil_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::ceil(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_floor(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, floor_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::floor(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_sin(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, sin_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::sin(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_cos(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, cos_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::cos(x[i], e);
 	}
 
 	template<typename T>
 	inline void vec_tan(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, tan_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::tan(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_asin(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, asin_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::asin(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_acos(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, acos_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::acos(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_atan(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, atan_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::atan(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_atan2(size_t n, const T *x1, const T* x2, T *y)
 	{
-		vec_calc(n, x1, x2, y, atan2_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::tan(x1[i], x2[i]);
 	}
 
 	template<typename T>
 	inline void vec_sinh(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, sinh_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::sinh(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_cosh(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, cosh_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::cosh(x[i]);
 	}
 
 	template<typename T>
 	inline void vec_tanh(size_t n, const T *x, T *y)
 	{
-		vec_calc(n, x, y, tanh_fun<T>());
+		for (size_t i = 0; i < n; ++i) y[i] = std::tanh(x[i]);
 	}
 }
 

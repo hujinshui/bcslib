@@ -11,7 +11,6 @@
 #include <functional>
 #include <vector>
 
-#include <bcslib/base/basic_functors.h>
 #include <bcslib/base/basic_algorithms.h>
 
 using namespace bcs;
@@ -604,15 +603,25 @@ BCS_TEST_CASE( test_tuple_sort )
 
 }
 
+
+struct my_inplace_plus
+{
+	void operator() (int& s, int& a)
+	{
+		s += a;
+	}
+};
+
+
 BCS_TEST_CASE( test_cumulation )
 {
 	int a[5] = {1, 2, 3, 4, 5};
 
 	int s = 10;
-	cumulate(s, a, a+5, inplace_plus<int>());
+	cumulate(s, a, a+5, my_inplace_plus());
 	BCS_CHECK_EQUAL(s, 25);
 
-	cumulate_n(s, a, 3, inplace_plus<int>());
+	cumulate_n(s, a, 3, my_inplace_plus());
 	BCS_CHECK_EQUAL(s, 31);
 }
 
