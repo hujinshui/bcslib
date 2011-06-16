@@ -88,6 +88,22 @@ namespace bcs
 		static const size_t value = N;
 	};
 
+
+	/**
+	 * Some convenient functions
+	 */
+	template<typename T>
+	inline T sqr(T x)
+	{
+		return x * x;
+	}
+
+	template<typename T>
+	inline T cube(T x)
+	{
+		return x * x * x;
+	}
+
 }
 
 #endif
