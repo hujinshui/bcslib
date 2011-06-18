@@ -944,64 +944,82 @@ namespace bcs
 
     // storage_base (can serve as a private base class for classes that need to keep storage)
 
+    struct do_share { };
+
     template<typename T, class Allocator>
-    class storage_base
+    class sharable_storage_base
     {
     public:
-    	storage_base(size_t n)
-    	: m_block(n)
+    	typedef block<T, Allocator> block_type;
+
+    	sharable_storage_base(size_t n)
+    	: m_sp_block(new block_type(n))
     	{
     	}
 
-    	storage_base(size_t n, const T& v)
-    	: m_block(n, v)
+    	sharable_storage_base(size_t n, const T& v)
+    	: m_sp_block(new block_type(n, v))
     	{
     	}
 
-    	storage_base(size_t n, const T *src)
-    	: m_block(copy_blk(src, n))
+    	sharable_storage_base(size_t n, const T *src)
+    	: m_sp_block(new block_type(copy_blk(src, n)))
     	{
     	}
 
-    	storage_base(const storage_base& r)
-    	: m_block(r.m_block)
+    	sharable_storage_base(const sharable_storage_base& r)
+    	: m_sp_block(new block_type(*(r.m_sp_block)))
     	{
     	}
 
-    	storage_base(storage_base&& r)
-    	: m_block(std::move(r.m_block))
+    	sharable_storage_base(sharable_storage_base&& r)
+    	: m_sp_block(std::move(r.m_sp_block))
     	{
     	}
 
-    	void operator = (const storage_base& r)
+    	void operator = (const sharable_storage_base& r)
     	{
-    		m_block = r.m_block;
+    		if (this != &r)
+    		{
+    			m_sp_block.reset(new block_type(*(r.m_sp_block)));
+    		}
     	}
 
-    	void operator = (storage_base&& r)
+    	void operator = (sharable_storage_base&& r)
     	{
-    		m_block = std::move(r.m_block);
+    		m_sp_block = std::move(r.m_sp_block);
     	}
 
-    	void swap(storage_base& r)
+    	void swap(sharable_storage_base& r)
     	{
-    		m_block.swap(r.m_block);
+    		m_sp_block.swap(r.m_sp_block);
     	}
 
     	T* pointer_to_base()
     	{
-    		return m_block.pbase();
+    		return m_sp_block->pbase();
     	}
 
     	const T* pointer_to_base() const
     	{
-    		return m_block.pbase();
+    		return m_sp_block->pbase();
+    	}
+
+    public:
+    	sharable_storage_base(const sharable_storage_base& r, do_share)
+    	: m_sp_block(r.m_sp_block)
+    	{
+    	}
+
+    	void share_from(const sharable_storage_base& r)
+    	{
+    		m_sp_block = r.m_sp_block;
     	}
 
     private:
-    	block<T, Allocator> m_block;
+    	std::shared_ptr<block_type> m_sp_block;
 
-    }; // end class storage_base
+    }; // end class sharable_storage_base
 
 }
 

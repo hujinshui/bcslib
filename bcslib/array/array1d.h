@@ -370,7 +370,7 @@ namespace bcs
 	// stand-alone array class
 
 	template<typename T, class Alloc>
-	class array1d : private storage_base<T, Alloc>, public aview1d<T, id_ind>
+	class array1d : private sharable_storage_base<T, Alloc>, public aview1d<T, id_ind>
 	{
 	public:
 		BCS_ARRAY_CHECK_TYPE(T)
@@ -383,7 +383,7 @@ namespace bcs
 		typedef typename _iterators::const_iterator const_iterator;
 		typedef typename _iterators::iterator iterator;
 
-		typedef storage_base<T, Alloc> storage_base_type;
+		typedef sharable_storage_base<T, Alloc> storage_base_type;
 
 	public:
 		explicit array1d(size_type n)
@@ -458,6 +458,20 @@ namespace bcs
 			view_type& v = *this;
 			view_type& rv = r;
 			swap(v, rv);
+		}
+
+		// sharing
+
+	public:
+		array1d(const array1d& r, do_share ds)
+		: storage_base_type(r, ds), view_type(storage_base_type::pointer_to_base(), r.nelems())
+		{
+
+		}
+
+		array1d shared_copy() const
+		{
+			return array1d(*this, do_share());
 		}
 
 	}; // end class array1d

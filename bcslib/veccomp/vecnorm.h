@@ -11,7 +11,6 @@
 
 #include <bcslib/base/config.h>
 #include <bcslib/base/basic_defs.h>
-#include <bcslib/base/basic_funcs.h>
 
 #include <stdexcept>
 

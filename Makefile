@@ -46,7 +46,10 @@ ARRAY_BASIC_HEADERS = bcslib/array/array_base.h \
 	bcslib/array/array1d.h \
 	bcslib/array/array2d.h
 	
-VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h bcslib/veccomp/vecnorm.h bcslib/veccomp/vecstat.h
+VEC_COMP_HEADERS = bcslib/veccomp/sse_basic.h \
+	bcslib/veccomp/veccalc.h \
+	bcslib/veccomp/vecnorm.h \
+	bcslib/veccomp/vecstat.h
 
 ARRAY_BASIC_HEADERS = bcslib/array/array_base.h bcslib/array/array_index.h bcslib/array/array1d.h bcslib/array/array2d.h
 

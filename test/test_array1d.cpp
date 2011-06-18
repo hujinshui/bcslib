@@ -227,12 +227,18 @@ BCS_TEST_CASE( test_dense_array1d )
 	BCS_CHECK( array_view_equal(a5, src1, n1) );
 	BCS_CHECK( array_iteration_test(a5) );
 
-
 	BCS_CHECK( a1 == a1 );
 	array1d<double> a6(a1);
 	BCS_CHECK( a1 == a6 );
 	a6[2] += 1;
 	BCS_CHECK( a1 != a6 );
+
+	array1d<double> a7 = a1.shared_copy();
+
+	BCS_CHECK( a7.pbase() == a1.pbase() );
+	BCS_CHECK( array_integrity_test(a7) );
+	BCS_CHECK( array_view_equal(a7, src1, n1) );
+	BCS_CHECK( array_iteration_test(a7) );
 
 	BCS_CHECK( test_generic_operations(a1, src1) );
 }
