@@ -10,7 +10,6 @@
 #define BCSLIB_VECCALC_H
 
 #include <bcslib/base/basic_defs.h>
-#include <bcslib/veccomp/sse_basic.h>
 
 #include <cmath>
 

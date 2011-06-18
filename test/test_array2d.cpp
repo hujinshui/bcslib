@@ -367,12 +367,18 @@ BCS_TEST_CASE( test_dense_array2d  )
 	BCS_CHECK( array_view_equal(a5_rm, src, m, n) );
 	BCS_CHECK( array_iteration_test(a5_rm) );
 
-
 	BCS_CHECK( a1_rm == a1_rm );
 	array2d<double, row_major_t> a6_rm(a1_rm);
 	BCS_CHECK( a1_rm == a6_rm );
 	a6_rm(1, 1) += 1;
 	BCS_CHECK( a1_rm != a6_rm );
+
+	array2d<double, row_major_t> a7_rm = a1_rm.shared_copy();
+
+	BCS_CHECK( a7_rm.pbase() == a1_rm.pbase() );
+	BCS_CHECK( array_integrity_test(a7_rm) );
+	BCS_CHECK( array_view_equal(a7_rm, src, m, n) );
+	BCS_CHECK( array_iteration_test(a7_rm) );
 
 	BCS_CHECK( test_generic_operations(a1_rm, src) );
 
@@ -431,12 +437,18 @@ BCS_TEST_CASE( test_dense_array2d  )
 	BCS_CHECK( array_view_equal(a5_cm, src, m, n) );
 	BCS_CHECK( array_iteration_test(a5_cm) );
 
-
 	BCS_CHECK( a1_cm == a1_cm );
 	array2d<double, column_major_t> a6_cm(a1_cm);
 	BCS_CHECK( a1_cm == a6_cm );
 	a6_cm(1, 1) += 1;
 	BCS_CHECK( a1_cm != a6_cm );
+
+	array2d<double, column_major_t> a7_cm = a1_cm.shared_copy();
+
+	BCS_CHECK( a7_cm.pbase() == a1_cm.pbase() );
+	BCS_CHECK( array_integrity_test(a7_cm) );
+	BCS_CHECK( array_view_equal(a7_cm, src, m, n) );
+	BCS_CHECK( array_iteration_test(a7_cm) );
 
 	BCS_CHECK( test_generic_operations(a1_cm, src) );
 

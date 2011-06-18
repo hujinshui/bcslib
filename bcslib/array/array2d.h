@@ -376,7 +376,7 @@ namespace bcs
 
 			reference ref() const { return *m_p; }
 
-			bool operator == (const _aview2d_iter_impl& rhs) const { return m_i == rhs.m_i && m_j == rhs.m_j; }
+			bool operator == (const _aview2d_iter_impl& rhs) const { return m_j == rhs.m_j && m_i == rhs.m_i; }
 
 			void move_next()
 			{
@@ -741,7 +741,7 @@ namespace bcs
 	// stand-alone array2d
 
 	template<typename T, typename TOrd, class Alloc>
-	class array2d : private storage_base<T, Alloc>, public aview2d<T, TOrd, id_ind, id_ind>
+	class array2d : private sharable_storage_base<T, Alloc>, public aview2d<T, TOrd, id_ind, id_ind>
 	{
 	public:
 		BCS_ARRAY_CHECK_TYPE(T)
@@ -757,7 +757,7 @@ namespace bcs
 		typedef typename _iterators::const_iterator const_iterator;
 		typedef typename _iterators::iterator iterator;
 
-		typedef storage_base<T, Alloc> storage_base_type;
+		typedef sharable_storage_base<T, Alloc> storage_base_type;
 
 	public:
 		explicit array2d(size_type m, size_type n)
@@ -837,6 +837,20 @@ namespace bcs
 			view_type& v = *this;
 			view_type& rv = r;
 			swap(v, rv);
+		}
+
+		// sharing
+
+	public:
+		array2d(const array2d& r, do_share ds)
+		: storage_base_type(r, ds)
+		, view_type(storage_base_type::pointer_to_base(), r._index_core())
+		{
+		}
+
+		array2d shared_copy() const
+		{
+			return array2d(*this, do_share());
 		}
 
 	}; // end class array2d
