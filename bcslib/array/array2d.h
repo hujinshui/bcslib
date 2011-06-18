@@ -855,7 +855,11 @@ namespace bcs
 
 	}; // end class array2d
 
-
+	template<typename T, typename TOrd, class Alloc>
+	inline void swap(array2d<T, TOrd, Alloc>& lhs, array2d<T, TOrd, Alloc>& rhs)
+	{
+		lhs.swap(rhs);
+	}
 
 
 	/********************************************

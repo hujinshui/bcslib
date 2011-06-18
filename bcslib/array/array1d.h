@@ -484,6 +484,31 @@ namespace bcs
 	}
 
 
+	template<typename T, class Alloc>
+	inline const array1d<T, Alloc>& evaluate(const array1d<T, Alloc>& a)
+	{
+		return a;
+	}
+
+	template<typename T, class Alloc>
+	inline array1d<T, Alloc> evaluate(array1d<T, Alloc>&& a)
+	{
+		return std::move(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline const aview1d<T, TIndexer>& evaluate(const aview1d<T, TIndexer>& a)
+	{
+		return a;
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer> evaluate(aview1d<T, TIndexer>&& a)
+	{
+		return std::move(a);
+	}
+
+
 
 	/********************************************
 	 *
