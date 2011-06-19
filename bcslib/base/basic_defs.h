@@ -96,6 +96,21 @@ namespace bcs
 
 
 	/**
+	 * lazy enable_if
+	 */
+	template<bool Cond, class TypeHost>
+	struct lazy_enable_if
+	{
+		typedef typename TypeHost::type type;
+	};
+
+	template<class TypeHost>
+	struct lazy_enable_if<false, TypeHost>
+	{
+	};
+
+
+	/**
 	 * Some convenient functions
 	 */
 	template<typename T>

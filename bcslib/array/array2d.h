@@ -994,18 +994,6 @@ namespace bcs
 		return view;
 	}
 
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	struct array_cloner<aview2d<T, TOrd, TIndexer0, TIndexer1> >
-	{
-		typedef array2d<T, TOrd> result_type;
-
-		result_type operator()(const aview2d<T, TOrd, TIndexer0, TIndexer1>& view) const
-		{
-			return view;
-		}
-	};
-
-
 
 	/******************************************************
 	 *

@@ -8,9 +8,9 @@
 
 
 #include <bcslib/test/test_units.h>
+#include <bcslib/test/test_array_aux.h>
 #include <bcslib/array/array1d.h>
 
-#include <iostream>
 
 using namespace bcs;
 using namespace bcs::test;
@@ -73,21 +73,6 @@ template class array_view1d_concept_check<bcs::array1d<double> >;
 
 
 template<typename T, class TIndexer>
-void print_array(const bcs::aview1d<T, TIndexer>& view, const char *title = 0)
-{
-	if (title != 0)
-		std::cout << title << ' ';
-
-	index_t n = (index_t)view.nelems();
-	for (index_t i = 0; i < n; ++i)
-	{
-		std::cout << view(i) << ' ';
-	}
-	std::cout << std::endl;
-}
-
-
-template<typename T, class TIndexer>
 bool array_integrity_test(const bcs::aview1d<T, TIndexer>& view)
 {
 	index_t n = view.dim0();
@@ -107,19 +92,6 @@ bool array_integrity_test(const bcs::aview1d<T, TIndexer>& view)
 
 	return true;
 }
-
-
-template<typename T, class TIndexer>
-bool array_view_equal(const bcs::aview1d<T, TIndexer>& view, const T *src, size_t n)
-{
-	if (view.nelems() != n) return false;
-	for (index_t i = 0; i < (index_t)n; ++i)
-	{
-		if (view(i) != src[i]) return false;
-	}
-	return true;
-}
-
 
 template<typename T, class TIndexer>
 bool array_iteration_test(const bcs::aview1d<T, TIndexer>& view)

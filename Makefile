@@ -96,24 +96,30 @@ bin/test_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(BASICS_TESTS)
 
 # test_array : bin/test_array_basics bin/test_array_comp bin/test_array_sparse bin/test_access_performance 
 
-test_array: bin/test_array_basics
+ARRAY_TEST_HEADERS = $(TEST_HEADERS) bcslib/test/test_array_aux.h
+
+test_array: bin/test_array_basics bin/test_array_comp
 
 ARRAY_BASIC_TESTS = test/test_array_basics.cpp \
 	test/test_array1d.cpp \
 	test/test_array2d.cpp
 
-bin/test_array_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 
+bin/test_array_basics: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 
 	$(CXX) $(CFLAGS) $(ARRAY_BASIC_TESTS) -o bin/test_array_basics
 	
-
-
 	
-ARRAY_COMP_TESTS = test/test_array_comp.cpp test/test_array_calc.cpp test/test_array_eval.cpp
-bin/test_array_comp: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
+ARRAY_COMP_TESTS = test/test_array_comp.cpp \
+	test/test_array_calc.cpp 
+	
+#test/test_array_eval.cpp
+
+bin/test_array_comp: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
 	$(CXX) $(CFLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp
+
+
 	
 ARRAY_SPARSE_TESTS = test/test_array_sparse.cpp test/test_spvec.cpp test/test_dynamic_spvec.cpp
-bin/test_array_sparse: $(BASE_HEADERS) $(TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_SPARSE_HEADERS) $(ARRAY_SPARSE_TESTS)
+bin/test_array_sparse: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_SPARSE_HEADERS) $(ARRAY_SPARSE_TESTS)
 	$(CXX) $(CFLAGS) $(ARRAY_SPARSE_TESTS) -o bin/test_array_sparse	
 
 

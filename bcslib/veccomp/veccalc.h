@@ -48,6 +48,7 @@ namespace bcs
 		for (size_t i = 0; i < n; ++i) y[i] += x;
 	}
 
+
 	// sub
 
 	template<typename T>
@@ -166,7 +167,31 @@ namespace bcs
 	}
 
 
-	// elementary functions
+	/********************************************
+	 *
+	 *  Arithmetic Functors
+	 *
+	 *******************************************/
+
+	template<typename T>
+	struct vec_add_functor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x1, const T *x2, T *y) const { return vec_add(n, x1, x2, y); }
+		void operator() (size_t n, const T *x1, const T &x2, T *y) const { return vec_add(n, x1, x2, y); }
+		void operator() (size_t n, const T &x1, const T *x2, T *y) const { return vec_add(n, x2, x1, y); }
+
+		void operator() (size_t n, T *y, const T *x) const { return vec_add_inplace(n, y, x); }
+		void operator() (size_t n, T *y, const T &x) const { return vec_add_inplace(n, y, x); }
+	};
+
+
+	/********************************************
+	 *
+	 *  Elementary Function Evaluation
+	 *
+	 *******************************************/
 
 	template<typename T>
 	inline void vec_abs(size_t n, const T *x, T *y)
@@ -243,7 +268,7 @@ namespace bcs
 	template<typename T>
 	inline void vec_cos(size_t n, const T *x, T *y)
 	{
-		for (size_t i = 0; i < n; ++i) y[i] = std::cos(x[i], e);
+		for (size_t i = 0; i < n; ++i) y[i] = std::cos(x[i]);
 	}
 
 	template<typename T>

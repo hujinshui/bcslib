@@ -8,9 +8,9 @@
 
 
 #include <bcslib/test/test_units.h>
+#include <bcslib/test/test_array_aux.h>
 #include <bcslib/array/array2d.h>
 
-#include <iostream>
 
 using namespace bcs;
 using namespace bcs::test;
@@ -97,21 +97,7 @@ template class array_view2d_concept_check<bcs::array2d<double, column_major_t> >
 
 // Auxiliary test functions
 
-template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-void print_array(const bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>& view)
-{
-	index_t m = (index_t)view.nrows();
-	index_t n = (index_t)view.ncolumns();
 
-	for (index_t i = 0; i < m; ++i)
-	{
-		for (index_t j = 0; j < n; ++j)
-		{
-			std::cout << view(i, j) << ' ';
-		}
-		std::cout << std::endl;
-	}
-}
 
 
 template<typename FwdIter>
@@ -123,66 +109,6 @@ void print_collection(FwdIter first, FwdIter last)
 	}
 	std::cout << std::endl;
 }
-
-
-template<typename T, class TIndexer0, class TIndexer1>
-bool array_view_equal(const bcs::aview2d<T, row_major_t, TIndexer0, TIndexer1>& view, const T *src, size_t m, size_t n)
-{
-	if (view.nrows() != m) return false;
-	if (view.ncolumns() != n) return false;
-
-	index_t d0 = view.dim0();
-	index_t d1 = view.dim1();
-
-	for (index_t i = 0; i < d0; ++i)
-	{
-		for (index_t j = 0; j < d1; ++j)
-		{
-			if (view(i, j) != *(src++)) return false;
-		}
-	}
-	return true;
-}
-
-
-template<typename T, class TIndexer0, class TIndexer1>
-bool array_view_equal(const bcs::aview2d<T, column_major_t, TIndexer0, TIndexer1>& view, const T *src, size_t m, size_t n)
-{
-	if (view.nrows() != m) return false;
-	if (view.ncolumns() != n) return false;
-
-	index_t d0 = view.dim0();
-	index_t d1 = view.dim1();
-
-	for (index_t j = 0; j < d1; ++j)
-	{
-		for (index_t i = 0; i < d0; ++i)
-		{
-			if (view(i, j) != *(src++)) return false;
-		}
-	}
-	return true;
-}
-
-template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-bool array_view_equal(const bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>& view, const T& v, size_t m, size_t n)
-{
-	if (view.nrows() != m) return false;
-	if (view.ncolumns() != n) return false;
-
-	index_t d0 = view.dim0();
-	index_t d1 = view.dim1();
-
-	for (index_t i = 0; i < d0; ++i)
-	{
-		for (index_t j = 0; j < d1; ++j)
-		{
-			if (view(i, j) != v) return false;
-		}
-	}
-	return true;
-}
-
 
 
 template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
