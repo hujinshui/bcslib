@@ -52,6 +52,48 @@ namespace bcs
 	}
 
 
+	// subtraction
+
+	template<class Arr1, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
+	_arr_binop<Arr1, Arr2, vec_vec_sub>>::type
+	sub_arr_arr(const Arr1& a1, const Arr2& a2)
+	{
+		return _arr_binop<Arr1, Arr2, vec_vec_sub>::default_evaluate(a1, a2);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	_arr_uniop<Arr, vec_sca_sub>>::type
+	sub_arr_sca(const Arr& a, const T& x)
+	{
+		return _arr_uniop<Arr, vec_sca_sub>::evaluate_with_scalar(a, x);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	_arr_uniop<Arr, sca_vec_sub>>::type
+	sub_sca_arr(const T& x, const Arr& a)
+	{
+		return _arr_uniop<Arr, sca_vec_sub>::evaluate_with_scalar(a, x);
+	}
+
+	template<class Arr1, typename Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
+	_arr_ipop_R1<Arr1, Arr2, vec_vec_sub_ip>>::type
+	sub_arr_arr_inplace(Arr1& a1, const Arr2& a2)
+	{
+		return _arr_ipop_R1<Arr1, Arr2, vec_vec_sub_ip>::default_evaluate(a1, a2);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	_arr_ipop<Arr, vec_sca_sub_ip>>::type
+	sub_arr_sca_inplace(Arr& a, const T& x)
+	{
+		return _arr_ipop<Arr, vec_sca_sub_ip>::evaluate_with_scalar(a, x);
+	}
+
 
 }
 

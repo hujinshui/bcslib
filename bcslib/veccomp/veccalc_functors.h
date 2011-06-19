@@ -14,6 +14,8 @@
 namespace bcs
 {
 
+	// addition
+
 	template<typename T>
 	struct vec_vec_add
 	{
@@ -47,6 +49,55 @@ namespace bcs
 		typedef T result_value_type;
 		void operator() (size_t n, T *y) const { vec_add_inplace(n, y, s); }
 	};
+
+
+	// subtraction
+
+	template<typename T>
+	struct vec_vec_sub
+	{
+		typedef T result_value_type;
+		void operator() (size_t n, const T *x1, const T *x2, T *y) const { vec_sub(n, x1, x2, y); }
+	};
+
+	template<typename T>
+	struct vec_sca_sub
+	{
+		T s;
+		vec_sca_sub(const T& s_) : s(s_) { }
+
+		typedef T result_value_type;
+		void operator() (size_t n, const T *x1, T *y) const { vec_sub(n, x1, s, y); }
+	};
+
+	template<typename T>
+	struct sca_vec_sub
+	{
+		T s;
+		sca_vec_sub(const T& s_) : s(s_) { }
+
+		typedef T result_value_type;
+		void operator() (size_t n, const T *x2, T *y) const { vec_sub(n, s, x2, y); }
+	};
+
+	template<typename T>
+	struct vec_vec_sub_ip
+	{
+		typedef T result_value_type;
+		void operator() (size_t n, T *y, const T *x) const { vec_sub_inplace(n, y, x); }
+	};
+
+	template<typename T>
+	struct vec_sca_sub_ip
+	{
+		T s;
+		vec_sca_sub_ip(const T& s_) : s(s_) { }
+
+		typedef T result_value_type;
+		void operator() (size_t n, T *y) const { vec_sub_inplace(n, y, s); }
+	};
+
+
 
 }
 

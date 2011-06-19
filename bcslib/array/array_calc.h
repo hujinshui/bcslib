@@ -36,9 +36,9 @@ namespace bcs
 	}
 
 	template<typename T, class LIndexer>
-	inline array1d<T> operator + (const aview1d<T, LIndexer>& lhs, const T& v2)
+	inline array1d<T> operator + (const aview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		return add_arr_sca(lhs, v2);
+		return add_arr_sca(lhs, rhs);
 	}
 
 	template<typename T, class RIndexer>
@@ -72,9 +72,9 @@ namespace bcs
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
-	inline array2d<T, TOrd> operator + (const aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& v2)
+	inline array2d<T, TOrd> operator + (const aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		return add_arr_sca(lhs, v2);
+		return add_arr_sca(lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
@@ -100,6 +100,80 @@ namespace bcs
 	}
 
 
+
+	// subtraction
+
+	// 1D
+
+	template<typename T, class LIndexer, class RIndexer>
+	inline array1d<T> operator - (const aview1d<T, LIndexer>& lhs, const aview1d<T, RIndexer>& rhs)
+	{
+		return sub_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, class LIndexer>
+	inline array1d<T> operator - (const aview1d<T, LIndexer>& lhs, const T& rhs)
+	{
+		return sub_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, class LIndexer>
+	inline array1d<T> operator - (const T& lhs, const aview1d<T, LIndexer>& rhs)
+	{
+		return sub_sca_arr(lhs, rhs);
+	}
+
+	template<typename T, class LIndexer, class RIndexer>
+	inline aview1d<T, LIndexer>& operator -= (aview1d<T, LIndexer>& lhs, const aview1d<T, RIndexer>& rhs)
+	{
+		sub_arr_arr_inplace(lhs, rhs);
+		return lhs;
+	}
+
+	template<typename T, class LIndexer>
+	inline aview1d<T, LIndexer>& operator -= (aview1d<T, LIndexer>& lhs, const T& rhs)
+	{
+		sub_arr_sca_inplace(lhs, rhs);
+		return lhs;
+	}
+
+	// 2D
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline array2d<T, TOrd> operator - (
+			const aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return sub_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline array2d<T, TOrd> operator - (const aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+	{
+		return sub_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline array2d<T, TOrd> operator - (const T& lhs, const aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return sub_sca_arr(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline aview2d<T, TOrd, LIndexer0, LIndexer1>& operator -= (
+			aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		sub_arr_arr_inplace(lhs, rhs);
+		return lhs;
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline aview2d<T, TOrd, LIndexer0, LIndexer1>& operator -= (aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+	{
+		sub_arr_sca_inplace(lhs, rhs);
+		return lhs;
+	}
 
 }
 
