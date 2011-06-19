@@ -111,7 +111,7 @@ namespace bcs
 	template<typename T>
 	inline void vec_mul_inplace(size_t n, T *y, const T& x)
 	{
-		for (size_t i = 0; i < n; ++i) y[i] = x;
+		for (size_t i = 0; i < n; ++i) y[i] *= x;
 	}
 
 	// div
@@ -166,12 +166,6 @@ namespace bcs
 		for (size_t i = 0; i < n; ++i) y[i] = -y[i];
 	}
 
-
-	/********************************************
-	 *
-	 *  Arithmetic Functors
-	 *
-	 *******************************************/
 
 
 	/********************************************

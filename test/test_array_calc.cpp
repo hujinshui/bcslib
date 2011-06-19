@@ -266,7 +266,7 @@ BCS_TEST_CASE( test_array_sub )
 
 }
 
-/*
+
 BCS_TEST_CASE( test_array_mul )
 {
 	double src1[] = {1, 3, 5, 9, 2, 7, 8, 5, 1};
@@ -276,28 +276,28 @@ BCS_TEST_CASE( test_array_mul )
 
 	array1d<double> x1(5, src1);
 	array1d<double> x2(5, src2);
-	const_aview1d<double, step_ind> xs1(src1, step_ind(5, 2));
-	const_aview1d<double, step_ind> xs2(src2, step_ind(5, 2));
+	aview1d<double, step_ind> xs1(src1, step_ind(5, 2));
+	aview1d<double, step_ind> xs2(src2, step_ind(5, 2));
 
 	double ra1[] = {5, 18, 10, 36, 16};
-	BCS_CHECK( array_view_approx(x1 * x2, ra1, 5) );
+	BCS_CHECK( array_view_equal(x1 * x2, ra1, 5) );
 
 	double ra2[] = {5, 6, 40, 81, 6};
-	BCS_CHECK( array_view_approx(x1 * xs2, ra2, 5) );
+	BCS_CHECK( array_view_equal(x1 * xs2, ra2, 5) );
 
 	double ra3[] = {5, 30, 4, 32, 8};
-	BCS_CHECK( array_view_approx(xs1 * x2, ra3, 5) );
+	BCS_CHECK( array_view_equal(xs1 * x2, ra3, 5) );
 
 	double ra4[] = {5, 10, 16, 72, 3};
-	BCS_CHECK( array_view_approx(xs1 * xs2, ra4, 5) );
+	BCS_CHECK( array_view_equal(xs1 * xs2, ra4, 5) );
 
 	double ra5[] = {2, 6, 10, 18, 4};
-	BCS_CHECK( array_view_approx(x1 * 2.0, ra5, 5) );
-	BCS_CHECK( array_view_approx(2.0 * x1, ra5, 5) );
+	BCS_CHECK( array_view_equal(x1 * 2.0, ra5, 5) );
+	BCS_CHECK( array_view_equal(2.0 * x1, ra5, 5) );
 
 	double ra6[] = {2, 10, 4, 16, 2};
-	BCS_CHECK( array_view_approx(xs1 * 2.0, ra6, 5) );
-	BCS_CHECK( array_view_approx(2.0 * xs1, ra6, 5) );
+	BCS_CHECK( array_view_equal(xs1 * 2.0, ra6, 5) );
+	BCS_CHECK( array_view_equal(2.0 * xs1, ra6, 5) );
 
 	array1d<double> y1(5);
 	double y2_buf[10];
@@ -305,54 +305,54 @@ BCS_TEST_CASE( test_array_mul )
 
 	y1 << x1;
 	y1 *= x2;
-	BCS_CHECK( array_view_approx(y1, ra1, 5) );
+	BCS_CHECK( array_view_equal(y1, ra1, 5) );
 
 	y1 << x1;
 	y1 *= xs2;
-	BCS_CHECK( array_view_approx(y1, ra2, 5) );
+	BCS_CHECK( array_view_equal(y1, ra2, 5) );
 
 	y1 << x1;
 	y1 *= 2.0;
-	BCS_CHECK( array_view_approx(y1, ra5, 5) );
+	BCS_CHECK( array_view_equal(y1, ra5, 5) );
 
 	y2 << x1;
 	y2 *= x2;
-	BCS_CHECK( array_view_approx(y2, ra1, 5) );
+	BCS_CHECK( array_view_equal(y2, ra1, 5) );
 
 	y2 << x1;
 	y2 *= xs2;
-	BCS_CHECK( array_view_approx(y2, ra2, 5) );
+	BCS_CHECK( array_view_equal(y2, ra2, 5) );
 
 	y2 << x1;
 	y2 *= 2.0;
-	BCS_CHECK( array_view_approx(y2, ra5, 5) );
+	BCS_CHECK( array_view_equal(y2, ra5, 5) );
 
 	// 2D
 
 	array2d<double, row_major_t> X1(2, 3, src1);
 	array2d<double, row_major_t> X2(2, 3, src2);
-	const_aview2d<double, row_major_t, step_ind, id_ind> X1s(src1, 3, 3, step_ind(2, 2), id_ind(3));
-	const_aview2d<double, row_major_t, step_ind, id_ind> X2s(src2, 3, 3, step_ind(2, 2), id_ind(3));
+	aview2d<double, row_major_t, step_ind, id_ind> X1s(src1, 3, 3, step_ind(2, 2), id_ind(3));
+	aview2d<double, row_major_t, step_ind, id_ind> X2s(src2, 3, 3, step_ind(2, 2), id_ind(3));
 
 	double rb1[] = {5, 18, 10, 36, 16, 7};
-	BCS_CHECK( array_view_approx(X1 * X2, rb1, 2, 3) );
+	BCS_CHECK( array_view_equal(X1 * X2, rb1, 2, 3) );
 
 	double rb2[] = {5, 18, 10, 81, 0, 21};
-	BCS_CHECK( array_view_approx(X1 * X2s, rb2, 2, 3) );
+	BCS_CHECK( array_view_equal(X1 * X2s, rb2, 2, 3) );
 
 	double rb3[] = {5, 18, 10, 32, 40, 1};
-	BCS_CHECK( array_view_approx(X1s * X2, rb3, 2, 3) );
+	BCS_CHECK( array_view_equal(X1s * X2, rb3, 2, 3) );
 
 	double rb4[] = {5, 18, 10, 72, 0, 3};
-	BCS_CHECK( array_view_approx(X1s * X2s, rb4, 2, 3) );
+	BCS_CHECK( array_view_equal(X1s * X2s, rb4, 2, 3) );
 
 	double rb5[] = {2, 6, 10, 18, 4, 14};
-	BCS_CHECK( array_view_approx(X1 * 2.0, rb5, 2, 3) );
-	BCS_CHECK( array_view_approx(2.0 * X1, rb5, 2, 3) );
+	BCS_CHECK( array_view_equal(X1 * 2.0, rb5, 2, 3) );
+	BCS_CHECK( array_view_equal(2.0 * X1, rb5, 2, 3) );
 
 	double rb6[] = {2, 6, 10, 16, 10, 2};
-	BCS_CHECK( array_view_approx(X1s * 2.0, rb6, 2, 3) );
-	BCS_CHECK( array_view_approx(2.0 * X1s, rb6, 2, 3) );
+	BCS_CHECK( array_view_equal(X1s * 2.0, rb6, 2, 3) );
+	BCS_CHECK( array_view_equal(2.0 * X1s, rb6, 2, 3) );
 
 	array2d<double, row_major_t> Y1(2, 3);
 	double Y2_buf[20];
@@ -360,29 +360,28 @@ BCS_TEST_CASE( test_array_mul )
 
 	Y1 << X1;
 	Y1 *= X2;
-	BCS_CHECK( array_view_approx(Y1, rb1, 2, 3) );
+	BCS_CHECK( array_view_equal(Y1, rb1, 2, 3) );
 
 	Y1 << X1;
 	Y1 *= X2s;
-	BCS_CHECK( array_view_approx(Y1, rb2, 2, 3) );
+	BCS_CHECK( array_view_equal(Y1, rb2, 2, 3) );
 
 	Y1 << X1;
 	Y1 *= 2.0;
-	BCS_CHECK( array_view_approx(Y1, rb5, 2, 3) );
+	BCS_CHECK( array_view_equal(Y1, rb5, 2, 3) );
 
 	Y2 << X1;
 	Y2 *= X2;
-	BCS_CHECK( array_view_approx(Y2, rb1, 2, 3) );
+	BCS_CHECK( array_view_equal(Y2, rb1, 2, 3) );
 
 	Y2 << X1;
 	Y2 *= X2s;
-	BCS_CHECK( array_view_approx(Y2, rb2, 2, 3) );
+	BCS_CHECK( array_view_equal(Y2, rb2, 2, 3) );
 
 	Y2 << X1;
 	Y2 *= 2.0;
-	BCS_CHECK( array_view_approx(Y2, rb5, 2, 3) );
+	BCS_CHECK( array_view_equal(Y2, rb5, 2, 3) );
 }
-
 
 
 BCS_TEST_CASE( test_array_div )
@@ -394,30 +393,30 @@ BCS_TEST_CASE( test_array_div )
 
 	array1d<double> x1(5, src1);
 	array1d<double> x2(5, src2);
-	const_aview1d<double, step_ind> xs1(src1, step_ind(5, 2));
-	const_aview1d<double, step_ind> xs2(src2, step_ind(5, 2));
+	aview1d<double, step_ind> xs1(src1, step_ind(5, 2));
+	aview1d<double, step_ind> xs2(src2, step_ind(5, 2));
 
 	double ra1[] = {1.0/5, 3.0/6, 5.0/2, 9.0/4, 2.0/8};
-	BCS_CHECK( array_view_approx(x1 / x2, ra1, 5) );
+	BCS_CHECK( array_view_equal(x1 / x2, ra1, 5) );
 
 	double ra2[] = {1.0/5, 3.0/2, 5.0/8, 9.0/9, 2.0/3};
-	BCS_CHECK( array_view_approx(x1 / xs2, ra2, 5) );
+	BCS_CHECK( array_view_equal(x1 / xs2, ra2, 5) );
 
 	double ra3[] = {1.0/5, 5.0/6, 2.0/2, 8.0/4, 1.0/8};
-	BCS_CHECK( array_view_approx(xs1 / x2, ra3, 5) );
+	BCS_CHECK( array_view_equal(xs1 / x2, ra3, 5) );
 
 	double ra4[] = {1.0/5, 5.0/2, 2.0/8, 8.0/9, 1.0/3};
-	BCS_CHECK( array_view_approx(xs1 / xs2, ra4, 5) );
+	BCS_CHECK( array_view_equal(xs1 / xs2, ra4, 5) );
 
 	double ra5l[] = {1.0/2, 3.0/2, 5.0/2, 9.0/2, 2.0/2};
 	double ra5r[] = {2.0/1, 2.0/3, 2.0/5, 2.0/9, 2.0/2};
-	BCS_CHECK( array_view_approx(x1 / 2.0, ra5l, 5) );
-	BCS_CHECK( array_view_approx(2.0 / x1, ra5r, 5) );
+	BCS_CHECK( array_view_equal(x1 / 2.0, ra5l, 5) );
+	BCS_CHECK( array_view_equal(2.0 / x1, ra5r, 5) );
 
 	double ra6l[] = {1.0/2, 5.0/2, 2.0/2, 8.0/2, 1.0/2};
 	double ra6r[] = {2.0/1, 2.0/5, 2.0/2, 2.0/8, 2.0/1};
-	BCS_CHECK( array_view_approx(xs1 / 2.0, ra6l, 5) );
-	BCS_CHECK( array_view_approx(2.0 / xs1, ra6r, 5) );
+	BCS_CHECK( array_view_equal(xs1 / 2.0, ra6l, 5) );
+	BCS_CHECK( array_view_equal(2.0 / xs1, ra6r, 5) );
 
 	array1d<double> y1(5);
 	double y2_buf[10];
@@ -425,64 +424,56 @@ BCS_TEST_CASE( test_array_div )
 
 	y1 << x1;
 	y1 /= x2;
-	BCS_CHECK( array_view_approx(y1, ra1, 5) );
+	BCS_CHECK( array_view_equal(y1, ra1, 5) );
 
 	y1 << x1;
 	y1 /= xs2;
-	BCS_CHECK( array_view_approx(y1, ra2, 5) );
+	BCS_CHECK( array_view_equal(y1, ra2, 5) );
 
 	y1 << x1;
 	y1 /= 2.0;
-	BCS_CHECK( array_view_approx(y1, ra5l, 5) );
-
-	y1 << x1;
-	be_divided(2.0, y1);
-	BCS_CHECK( array_view_approx(y1, ra5r, 5) );
+	BCS_CHECK( array_view_equal(y1, ra5l, 5) );
 
 	y2 << x1;
 	y2 /= x2;
-	BCS_CHECK( array_view_approx(y2, ra1, 5) );
+	BCS_CHECK( array_view_equal(y2, ra1, 5) );
 
 	y2 << x1;
 	y2 /= xs2;
-	BCS_CHECK( array_view_approx(y2, ra2, 5) );
+	BCS_CHECK( array_view_equal(y2, ra2, 5) );
 
 	y2 << x1;
 	y2 /= 2.0;
-	BCS_CHECK( array_view_approx(y2, ra5l, 5) );
-
-	y2 << x1;
-	be_divided(2.0, y2);
-	BCS_CHECK( array_view_approx(y2, ra5r, 5) );
+	BCS_CHECK( array_view_equal(y2, ra5l, 5) );
 
 	// 2D
 
 	array2d<double, row_major_t> X1(2, 3, src1);
 	array2d<double, row_major_t> X2(2, 3, src2);
-	const_aview2d<double, row_major_t, step_ind, id_ind> X1s(src1, 3, 3, step_ind(2, 2), id_ind(3));
-	const_aview2d<double, row_major_t, step_ind, id_ind> X2s(src2, 3, 3, step_ind(2, 2), id_ind(3));
+	aview2d<double, row_major_t, step_ind, id_ind> X1s(src1, 3, 3, step_ind(2, 2), id_ind(3));
+	aview2d<double, row_major_t, step_ind, id_ind> X2s(src2, 3, 3, step_ind(2, 2), id_ind(3));
 
 	double rb1[] = {1.0/5, 3.0/6, 5.0/2, 9.0/4, 2.0/8, 7.0/1};
-	BCS_CHECK( array_view_approx(X1 / X2, rb1, 2, 3) );
+	BCS_CHECK( array_view_equal(X1 / X2, rb1, 2, 3) );
 
 	double rb2[] = {1.0/5, 3.0/6, 5.0/2, 9.0/9, 2.0/10, 7.0/3};
-	BCS_CHECK( array_view_approx(X1 / X2s, rb2, 2, 3) );
+	BCS_CHECK( array_view_equal(X1 / X2s, rb2, 2, 3) );
 
 	double rb3[] = {1.0/5, 3.0/6, 5.0/2, 8.0/4, 5.0/8, 1.0/1};
-	BCS_CHECK( array_view_approx(X1s / X2, rb3, 2, 3) );
+	BCS_CHECK( array_view_equal(X1s / X2, rb3, 2, 3) );
 
 	double rb4[] = {1.0/5, 3.0/6, 5.0/2, 8.0/9, 5.0/10, 1.0/3};
-	BCS_CHECK( array_view_approx(X1s / X2s, rb4, 2, 3) );
+	BCS_CHECK( array_view_equal(X1s / X2s, rb4, 2, 3) );
 
 	double rb5l[] = {1.0/2, 3.0/2, 5.0/2, 9.0/2, 2.0/2, 7.0/2};
 	double rb5r[] = {2.0/1, 2.0/3, 2.0/5, 2.0/9, 2.0/2, 2.0/7};
-	BCS_CHECK( array_view_approx(X1 / 2.0, rb5l, 2, 3) );
-	BCS_CHECK( array_view_approx(2.0 / X1, rb5r, 2, 3) );
+	BCS_CHECK( array_view_equal(X1 / 2.0, rb5l, 2, 3) );
+	BCS_CHECK( array_view_equal(2.0 / X1, rb5r, 2, 3) );
 
 	double rb6l[] = {1.0/2, 3.0/2, 5.0/2, 8.0/2, 5.0/2, 1.0/2};
 	double rb6r[] = {2.0/1, 2.0/3, 2.0/5, 2.0/8, 2.0/5, 2.0/1};
-	BCS_CHECK( array_view_approx(X1s / 2.0, rb6l, 2, 3) );
-	BCS_CHECK( array_view_approx(2.0 / X1s, rb6r, 2, 3) );
+	BCS_CHECK( array_view_equal(X1s / 2.0, rb6l, 2, 3) );
+	BCS_CHECK( array_view_equal(2.0 / X1s, rb6r, 2, 3) );
 
 	array2d<double, row_major_t> Y1(2, 3);
 	double Y2_buf[20];
@@ -490,35 +481,28 @@ BCS_TEST_CASE( test_array_div )
 
 	Y1 << X1;
 	Y1 /= X2;
-	BCS_CHECK( array_view_approx(Y1, rb1, 2, 3) );
+	BCS_CHECK( array_view_equal(Y1, rb1, 2, 3) );
 
 	Y1 << X1;
 	Y1 /= X2s;
-	BCS_CHECK( array_view_approx(Y1, rb2, 2, 3) );
+	BCS_CHECK( array_view_equal(Y1, rb2, 2, 3) );
 
 	Y1 << X1;
 	Y1 /= 2.0;
-	BCS_CHECK( array_view_approx(Y1, rb5l, 2, 3) );
-
-	Y1 << X1;
-	be_divided(2.0, Y1);
-	BCS_CHECK( array_view_approx(Y1, rb5r, 2, 3) );
+	BCS_CHECK( array_view_equal(Y1, rb5l, 2, 3) );
 
 	Y2 << X1;
 	Y2 /= X2;
-	BCS_CHECK( array_view_approx(Y2, rb1, 2, 3) );
+	BCS_CHECK( array_view_equal(Y2, rb1, 2, 3) );
 
 	Y2 << X1;
 	Y2 /= X2s;
-	BCS_CHECK( array_view_approx(Y2, rb2, 2, 3) );
+	BCS_CHECK( array_view_equal(Y2, rb2, 2, 3) );
 
 	Y2 << X1;
 	Y2 /= 2.0;
-	BCS_CHECK( array_view_approx(Y2, rb5l, 2, 3) );
+	BCS_CHECK( array_view_equal(Y2, rb5l, 2, 3) );
 
-	Y2 << X1;
-	be_divided(2.0, Y2);
-	BCS_CHECK( array_view_approx(Y2, rb5r, 2, 3) );
 }
 
 
@@ -529,46 +513,47 @@ BCS_TEST_CASE( test_array_neg )
 	// 1D
 
 	array1d<double> x1(5, src1);
-	const_aview1d<double, step_ind> xs1(src1, step_ind(5, 2));
+	aview1d<double, step_ind> xs1(src1, step_ind(5, 2));
 
 	double ra1[] = {-1, -3, -5, -9, -2};
-	BCS_CHECK( array_view_approx(-x1, ra1, 5) );
+	BCS_CHECK( array_view_equal(-x1, ra1, 5) );
 	double ra2[] = {-1, -5, -2, -8, -1};
-	BCS_CHECK( array_view_approx(-xs1, ra2, 5) );
+	BCS_CHECK( array_view_equal(-xs1, ra2, 5) );
 
 	array1d<double> y1(5, src1);
-	be_negated(y1);
-	BCS_CHECK( array_view_approx(y1, ra1, 5) );
+	neg_arr_inplace(y1);
+	BCS_CHECK( array_view_equal(y1, ra1, 5) );
 
 	double y2_buf[10];
 	aview1d<double, step_ind> y2(y2_buf, step_ind(5, 2));
 	y2 << x1;
-	be_negated(y2);
-	BCS_CHECK( array_view_approx(y2, ra1, 5) );
+	neg_arr_inplace(y2);
+	BCS_CHECK( array_view_equal(y2, ra1, 5) );
 
 	// 2D
 
 	array2d<double, row_major_t> X1(2, 3, src1);
-	const_aview2d<double, row_major_t, step_ind, id_ind> Xs1(src1, 3, 3, step_ind(2, 2), id_ind(3));
+	aview2d<double, row_major_t, step_ind, id_ind> Xs1(src1, 3, 3, step_ind(2, 2), id_ind(3));
 
 	double rb1[] = {-1, -3, -5, -9, -2, -7};
-	BCS_CHECK( array_view_approx(-X1, rb1, 2, 3) );
+	BCS_CHECK( array_view_equal(-X1, rb1, 2, 3) );
 	double rb2[] = {-1, -3, -5, -8, -5, -1};
-	BCS_CHECK( array_view_approx(-Xs1, rb2, 2, 3) );
+	BCS_CHECK( array_view_equal(-Xs1, rb2, 2, 3) );
 
 	array2d<double, row_major_t> Y1(2, 3, src1);
-	be_negated(Y1);
-	BCS_CHECK( array_view_approx(Y1, rb1, 2, 3) );
+	neg_arr_inplace(Y1);
+	BCS_CHECK( array_view_equal(Y1, rb1, 2, 3) );
 
 	double Y2_buf[10];
 	aview2d<double, row_major_t, step_ind, id_ind> Y2(Y2_buf, 3, 3, step_ind(2, 2), id_ind(3));
 	Y2 << X1;
-	be_negated(Y2);
-	BCS_CHECK( array_view_approx(Y2, rb1, 2, 3) );
+	neg_arr_inplace(Y2);
+	BCS_CHECK( array_view_equal(Y2, rb1, 2, 3) );
 
 }
 
 
+/*
 BCS_TEST_CASE( test_array_abs )
 {
 	const int N = 6;
@@ -912,13 +897,11 @@ test_suite *test_array_calc_suite()
 
 	suite->add( new test_array_add() );
 	suite->add( new test_array_sub() );
-
-/*
 	suite->add( new test_array_mul() );
 	suite->add( new test_array_div() );
 	suite->add( new test_array_neg() );
 
-
+/*
 	suite->add( new test_array_abs() );
 	suite->add( new test_array_sqr_sqrt() );
 	suite->add( new test_array_pow() );
