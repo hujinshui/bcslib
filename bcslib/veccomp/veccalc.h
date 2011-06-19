@@ -173,19 +173,6 @@ namespace bcs
 	 *
 	 *******************************************/
 
-	template<typename T>
-	struct vec_add_functor
-	{
-		typedef T result_value_type;
-
-		void operator() (size_t n, const T *x1, const T *x2, T *y) const { return vec_add(n, x1, x2, y); }
-		void operator() (size_t n, const T *x1, const T &x2, T *y) const { return vec_add(n, x1, x2, y); }
-		void operator() (size_t n, const T &x1, const T *x2, T *y) const { return vec_add(n, x2, x1, y); }
-
-		void operator() (size_t n, T *y, const T *x) const { return vec_add_inplace(n, y, x); }
-		void operator() (size_t n, T *y, const T &x) const { return vec_add_inplace(n, y, x); }
-	};
-
 
 	/********************************************
 	 *
