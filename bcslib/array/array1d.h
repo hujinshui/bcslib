@@ -261,6 +261,8 @@ namespace bcs
 			return *this;
 		}
 
+		inline operator array1d<T>() const;
+
 	public:
 		// Element access
 
@@ -413,13 +415,6 @@ namespace bcs
 		{
 		}
 
-		template<typename TIndexer2>
-		array1d(const aview1d<value_type, TIndexer2>& src)
-		: storage_base_type(src.nelems()), view_type(storage_base_type::pointer_to_base(), src.nelems())
-		{
-			import_from(*this, src);
-		}
-
 		template<typename ForwardIterator>
 		array1d(size_type n, ForwardIterator it)
 		: storage_base_type(n), view_type(storage_base_type::pointer_to_base(), n)
@@ -484,32 +479,6 @@ namespace bcs
 	{
 		lhs.swap(rhs);
 	}
-
-
-	template<typename T, class Alloc>
-	inline const array1d<T, Alloc>& evaluate(const array1d<T, Alloc>& a)
-	{
-		return a;
-	}
-
-	template<typename T, class Alloc>
-	inline array1d<T, Alloc> evaluate(array1d<T, Alloc>&& a)
-	{
-		return std::move(a);
-	}
-
-	template<typename T, class TIndexer>
-	inline const aview1d<T, TIndexer>& evaluate(const aview1d<T, TIndexer>& a)
-	{
-		return a;
-	}
-
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer> evaluate(aview1d<T, TIndexer>&& a)
-	{
-		return std::move(a);
-	}
-
 
 
 	/********************************************
@@ -596,6 +565,41 @@ namespace bcs
 	{
 		return array_indexer_traits<TIndexer>::is_continuous(a.get_indexer());
 	}
+
+
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>::operator array1d<T>() const
+	{
+		array1d<T> arr(nelems());
+		if (is_dense_view(*this))
+		{
+			import_from(arr, pbase());
+		}
+		else
+		{
+			import_from(arr, begin());
+		}
+		return arr;
+	}
+
+
+	template<typename T, class TIndexer>
+	inline array1d<T> clone_array(const aview1d<T, TIndexer>& view)
+	{
+		return view;
+	}
+
+	template<typename T, class TIndexer>
+	struct array_cloner<aview1d<T, TIndexer> >
+	{
+		typedef array1d<T> result_type;
+
+		result_type operator()(const aview1d<T, TIndexer>& view) const
+		{
+			return view;
+		}
+	};
 
 
 	/******************************************************

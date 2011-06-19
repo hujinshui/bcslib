@@ -34,7 +34,8 @@ BASE_HEADERS = bcslib/base/config.h \
 	bcslib/base/iterator_wrappers.h \
 	bcslib/base/basic_mem.h \
 	bcslib/base/monitored_allocator.h \
-	bcslib/base/index_selectors.h
+	bcslib/base/index_selectors.h \
+	bcslib/base/sexpression.h
 
 TEST_HEADERS = bcslib/test/test_assertion.h \
 	bcslib/test/test_units.h \
