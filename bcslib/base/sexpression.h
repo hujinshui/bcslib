@@ -43,6 +43,8 @@ namespace bcs
 
 		const result_type& get() const { return m_val; }
 
+		const result_type& evaluate() const { return m_val; }
+
 	private:
 		soperand(const soperand& );
 		soperand& operator = (const soperand& );
@@ -63,6 +65,8 @@ namespace bcs
 		soperand_cref(soperand_cref&& r) : m_cref(r.m_cref) { }
 
 		const result_type& get() const { return m_cref; }
+
+		const result_type& evaluate() const { return m_cref; }
 
 	private:
 		soperand_cref(const soperand_cref& );
@@ -148,6 +152,11 @@ namespace bcs
 			return m_fun();
 		}
 
+		operator result_type() const
+		{
+			return evaluate();
+		}
+
 	private:
 		sexpression(const sexpression& );
 		sexpression& operator = (const sexpression& );
@@ -192,6 +201,11 @@ namespace bcs
 		result_type evaluate() const
 		{
 			return m_fun(m_c1.evaluate());
+		}
+
+		operator result_type() const
+		{
+			return evaluate();
 		}
 
 	private:
@@ -243,6 +257,11 @@ namespace bcs
 		result_type evaluate() const
 		{
 			return m_fun(m_c1.evaluate(), m_c2.evaluate());
+		}
+
+		operator result_type() const
+		{
+			return evaluate();
 		}
 
 	private:

@@ -590,11 +590,28 @@ namespace bcs
 	}
 
 	template<typename T, class TIndexer>
-	struct array_cloner<aview1d<T, TIndexer> >
+	struct array_creater<aview1d<T, TIndexer> >
 	{
+		typedef std::array<index_t, 1> shape_type;
 		typedef array1d<T> result_type;
 
-		result_type operator()(const aview1d<T, TIndexer>& view) const
+		template<typename U>
+		struct remap
+		{
+			typedef array1d<U> result_type;
+
+			static result_type create(const shape_type& shape)
+			{
+				return result_type(static_cast<size_t>(shape[0]));
+			}
+		};
+
+		static result_type create(const shape_type& shape)
+		{
+			return result_type(static_cast<size_t>(shape[0]));
+		}
+
+		static result_type copy(const aview1d<T, TIndexer>& view)
 		{
 			return view;
 		}

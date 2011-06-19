@@ -153,8 +153,19 @@ namespace bcs
 		static const bool value = std::is_pod<T>::value && std::is_same<T, typename std::remove_const<T>::type>::value;
 	};
 
+	template<class Arr1, class Arr2>
+	struct is_compatible_array_views
+	{
+		typedef array_view_traits<Arr1> _trs1;
+		typedef array_view_traits<Arr2> _trs2;
 
-	template<typename Arr> struct array_cloner;  // a functor for forming lazy expression
+		static const bool value = is_array_view<Arr1>::value && is_array_view<Arr2>::value &&
+				std::is_same<typename _trs1::value_type, typename _trs2::value_type>::value &&
+				array_view_traits<Arr1>::num_dims == array_view_traits<Arr2>::num_dims &&
+				std::is_same<typename _trs1::layout_order, typename _trs2::layout_order>::value;
+	};
+
+	template<typename Arr> struct array_creater; // a helper class for constructing arrays
 
 }
 

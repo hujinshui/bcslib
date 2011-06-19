@@ -41,6 +41,15 @@ namespace bcs
 		}
 	}
 
+	inline void check_arg(bool cond, const char* message)
+	{
+		if (!cond)
+		{
+			throw std::invalid_argument(message);
+		}
+	}
+
+
 	// index checking
 
 	namespace _detail
