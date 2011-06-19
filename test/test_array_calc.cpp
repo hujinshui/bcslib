@@ -61,9 +61,9 @@ BCS_TEST_CASE( test_array_add )
 	double ra1[] = {6, 9, 7, 13, 10};
 	BCS_CHECK( array_view_equal(x1 + x2, ra1, 5) );
 
-/*
+
 	double ra2[] = {6, 5, 13, 18, 5};
-	BCS_CHECK( array_view_approx(x1 + xs2, ra2, 5) );
+	BCS_CHECK( array_view_equal(x1 + xs2, ra2, 5) );
 
 	double ra3[] = {6, 11, 4, 12, 9};
 	BCS_CHECK( array_view_approx(xs1 + x2, ra3, 5) );
@@ -79,6 +79,7 @@ BCS_TEST_CASE( test_array_add )
 	BCS_CHECK( array_view_approx(xs1 + 2.0, ra6, 5) );
 	BCS_CHECK( array_view_approx(2.0 + xs1, ra6, 5) );
 
+/*
 	array1d<double> y1(5);
 	double y2_buf[10];
 	aview1d<double, step_ind> y2(y2_buf, step_ind(5, 2));

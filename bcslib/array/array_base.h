@@ -154,7 +154,7 @@ namespace bcs
 	};
 
 	template<class Arr1, class Arr2>
-	struct is_compatible_array_views
+	struct is_compatible_aviews
 	{
 		typedef array_view_traits<Arr1> _trs1;
 		typedef array_view_traits<Arr2> _trs2;
@@ -163,6 +163,15 @@ namespace bcs
 				std::is_same<typename _trs1::value_type, typename _trs2::value_type>::value &&
 				array_view_traits<Arr1>::num_dims == array_view_traits<Arr2>::num_dims &&
 				std::is_same<typename _trs1::layout_order, typename _trs2::layout_order>::value;
+	};
+
+	template<class Arr, class TV>
+	struct is_compatible_aview_v
+	{
+		typedef array_view_traits<Arr> _trs;
+
+		static const bool value = is_array_view<Arr>::value &&
+				std::is_convertible<TV, typename _trs::value_type>::value;
 	};
 
 	template<typename Arr> struct array_creater; // a helper class for constructing arrays

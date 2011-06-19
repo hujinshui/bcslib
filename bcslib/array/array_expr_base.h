@@ -21,8 +21,50 @@ namespace bcs
 	 *
 	 ******************************************************/
 
+
+	template<typename VecFunc, class Arr1>
+	class unary_array_operator
+	{
+	public:
+		typedef typename array_creater<Arr1>::template remap<typename VecFunc::result_value_type> _rcreater;
+		typedef typename _rcreater::result_type result_type;
+
+		unary_array_operator(VecFunc f) : m_vecfunc(f)
+		{
+		}
+
+		result_type operator() (const Arr1& a1) const
+		{
+			return evaluate(m_vecfunc, a1);
+		}
+
+	public:
+		static result_type evaluate(VecFunc vfunc, const Arr1& a1)
+		{
+			result_type r = _rcreater::create(get_array_shape(a1));
+			size_t n = get_num_elems(a1);
+
+			if (is_dense_view(a1))
+			{
+				vfunc(n, ptr_base(a1), ptr_base(r));
+			}
+			else
+			{
+				auto a1c = clone_array(a1);
+				vfunc(n, ptr_base(a1c), ptr_base(r));
+			}
+
+			return r;
+		}
+
+	private:
+		VecFunc m_vecfunc;
+
+	}; // end class unary_array_operator
+
+
 	template<typename VecFunc, class Arr1, class Arr2>
-	class binary_array_array_operator
+	class binary_array_operator
 	{
 	public:
 		static_assert(array_view_traits<Arr1>::num_dims == array_view_traits<Arr2>::num_dims,
@@ -36,7 +78,7 @@ namespace bcs
 		typedef typename array_creater<Arr1>::template remap<typename VecFunc::result_value_type> _rcreater;
 		typedef typename _rcreater::result_type result_type;
 
-		binary_array_array_operator(VecFunc f) : m_vecfunc(f)
+		binary_array_operator(VecFunc f) : m_vecfunc(f)
 		{
 		}
 
@@ -85,7 +127,7 @@ namespace bcs
 	private:
 		VecFunc m_vecfunc;
 
-	}; // end class binary_array_array_operator
+	}; // end class binary_array_operator
 
 
 	/******************************************************
@@ -94,12 +136,34 @@ namespace bcs
 	 *
 	 ******************************************************/
 
-	template<typename Arr1, typename Arr2, template<typename U> class VecFuncTemplate>
-	struct _arr_op_aa
+	template<typename Arr1, template<typename U> class VecFuncTemplate>
+	struct _arr_uniop
 	{
 		typedef typename array_view_traits<Arr1>::value_type value_type;
 		typedef VecFuncTemplate<value_type> vecfunc_type;
-		typedef binary_array_array_operator<vecfunc_type, Arr1, Arr2> operator_type;
+		typedef unary_array_operator<vecfunc_type, Arr1> operator_type;
+		typedef typename operator_type::result_type result_type;
+
+		typedef result_type type;  // serve as host
+
+		static result_type default_evaluate(const Arr1& a1)
+		{
+			return operator_type::evaluate(vecfunc_type(), a1);
+		}
+
+		static result_type evaluate_with_scalar(const Arr1& a1, const value_type& v)
+		{
+			return operator_type::evaluate(vecfunc_type(v), a1);
+		}
+	};
+
+
+	template<typename Arr1, typename Arr2, template<typename U> class VecFuncTemplate>
+	struct _arr_binop
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		typedef VecFuncTemplate<value_type> vecfunc_type;
+		typedef binary_array_operator<vecfunc_type, Arr1, Arr2> operator_type;
 		typedef typename operator_type::result_type result_type;
 
 		typedef result_type type;  // serve as host
