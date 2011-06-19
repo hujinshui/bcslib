@@ -45,7 +45,7 @@ namespace bcs
 		vec_sca_add_ip(const T& s_) : s(s_) { }
 
 		typedef T result_value_type;
-		void operator() (size_t n, T *y, const T &x) const { vec_add_inplace(n, y, x); }
+		void operator() (size_t n, T *y) const { vec_add_inplace(n, y, s); }
 	};
 
 }

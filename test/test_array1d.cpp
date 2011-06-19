@@ -513,7 +513,7 @@ BCS_TEST_CASE( test_aview1d_clone )
 }
 
 
-BCS_TEST_CASE( test_denseview_judge )
+BCS_TEST_CASE( test_denseview_judge_1d )
 {
 	index_t inds[10];
 	double src[20];
@@ -537,7 +537,7 @@ test_suite *test_array1d_suite()
 	suite->add( new test_regular_subview() );
 	suite->add( new test_arrind_subview() );
 	suite->add( new test_aview1d_clone() );
-	suite->add( new test_denseview_judge() );
+	suite->add( new test_denseview_judge_1d() );
 
 	return suite;
 }

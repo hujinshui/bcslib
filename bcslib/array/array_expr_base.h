@@ -10,6 +10,7 @@
 #define ARRAY_EXPR_BASE_H_
 
 #include <bcslib/array/array_base.h>
+#include <bcslib/array/generic_array_functions.h>
 #include <bcslib/base/sexpression.h>
 
 namespace bcs
@@ -26,6 +27,8 @@ namespace bcs
 	class unary_array_operator
 	{
 	public:
+		static_assert(is_array_view<Arr1>::value, "Operands must be of array view types.");
+
 		typedef typename array_creater<Arr1>::template remap<typename VecFunc::result_value_type> _rcreater;
 		typedef typename _rcreater::result_type result_type;
 
@@ -67,6 +70,9 @@ namespace bcs
 	class binary_array_operator
 	{
 	public:
+		static_assert(is_array_view<Arr1>::value && is_array_view<Arr2>::value,
+				"Operands must be of array view types.");
+
 		static_assert(array_view_traits<Arr1>::num_dims == array_view_traits<Arr2>::num_dims,
 				"Operand arrays are required to have the same number of dimensions.");
 
@@ -130,6 +136,110 @@ namespace bcs
 	}; // end class binary_array_operator
 
 
+	template<typename InplaceVecFunc, class Arr>
+	class array_inplace_operator
+	{
+	public:
+		static_assert(is_array_view<Arr>::value, "Operands must be of array view types.");
+
+		array_inplace_operator(InplaceVecFunc f) : m_vecfunc(f)
+		{
+		}
+
+		void operator() (Arr& a) const
+		{
+			return evaluate(m_vecfunc, a);
+		}
+
+	public:
+		static void evaluate(InplaceVecFunc vfunc, Arr& a)
+		{
+			size_t n = get_num_elems(a);
+
+			if (is_dense_view(a))
+			{
+				vfunc(n, ptr_base(a));
+			}
+			else
+			{
+				auto ac = clone_array(a);
+				vfunc(n, ptr_base(ac));
+				import_from(a, ptr_base(ac));
+			}
+		}
+
+	private:
+		InplaceVecFunc m_vecfunc;
+
+	}; // end class array_inplace_operator
+
+
+	template<typename InplaceVecFunc, class Arr, class RArr1>
+	class array_inplace_operator_R1
+	{
+	public:
+		static_assert(is_array_view<Arr>::value && is_array_view<RArr1>::value,
+				"Operands must be of array view types.");
+
+		static_assert(array_view_traits<Arr>::num_dims == array_view_traits<RArr1>::num_dims,
+				"Operand arrays are required to have the same number of dimensions.");
+
+		static_assert(std::is_same<
+				typename array_view_traits<Arr>::layout_order,
+				typename array_view_traits<RArr1>::layout_order>::value,
+				"Operand arrays are required to have the same layout order.");
+
+		array_inplace_operator_R1(InplaceVecFunc f) : m_vecfunc(f)
+		{
+		}
+
+		void operator() (Arr& a, const RArr1& r1) const
+		{
+			return evaluate(m_vecfunc, a, r1);
+		}
+
+	public:
+		static void evaluate(InplaceVecFunc vfunc, Arr& a, const RArr1& r1)
+		{
+			size_t n = get_num_elems(a);
+
+			if (is_dense_view(a))
+			{
+				if (is_dense_view(r1))
+				{
+					vfunc(n, ptr_base(a), ptr_base(r1));
+				}
+				else
+				{
+					auto r1c = clone_array(r1);
+					vfunc(n, ptr_base(a), ptr_base(r1c));
+				}
+			}
+			else
+			{
+				auto ac = clone_array(a);
+				if (is_dense_view(r1))
+				{
+					vfunc(n, ptr_base(ac), ptr_base(r1));
+				}
+				else
+				{
+					auto r1c = clone_array(r1);
+					vfunc(n, ptr_base(ac), ptr_base(r1c));
+				}
+				import_from(a, ptr_base(ac));
+			}
+		}
+
+	private:
+		InplaceVecFunc m_vecfunc;
+
+	}; // end // end class array_inplace_operator
+
+
+
+
+
 	/******************************************************
 	 *
 	 *  Meta-programming helper
@@ -171,6 +281,45 @@ namespace bcs
 		static result_type default_evaluate(const Arr1& a1, const Arr2& a2)
 		{
 			return operator_type::evaluate(vecfunc_type(), a1, a2);
+		}
+	};
+
+
+	template<typename Arr, template<typename U> class VecFuncTemplate>
+	struct _arr_ipop
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		typedef VecFuncTemplate<value_type> vecfunc_type;
+		typedef array_inplace_operator<vecfunc_type, Arr> operator_type;
+		typedef void result_type;
+
+		typedef result_type type;  // serve as host
+
+		static void default_evaluate(Arr& a)
+		{
+			operator_type::evaluate(vecfunc_type(), a);
+		}
+
+		static void evaluate_with_scalar(Arr& a, const value_type& v)
+		{
+			operator_type::evaluate(vecfunc_type(v), a);
+		}
+	};
+
+
+	template<typename Arr, typename RArr1, template<typename U> class VecFuncTemplate>
+	struct _arr_ipop_R1
+	{
+		typedef typename array_view_traits<RArr1>::value_type value_type;
+		typedef VecFuncTemplate<value_type> vecfunc_type;
+		typedef array_inplace_operator_R1<vecfunc_type, Arr, RArr1> operator_type;
+		typedef void result_type;
+
+		typedef result_type type;  // serve as host
+
+		static void default_evaluate(Arr& a, const RArr1& r1)
+		{
+			operator_type::evaluate(vecfunc_type(), a, r1);
 		}
 	};
 
