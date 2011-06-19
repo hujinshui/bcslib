@@ -97,10 +97,9 @@ bin/test_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(BASICS_TESTS)
 #------ Array tests -----------
 
 # test_array : bin/test_array_basics bin/test_array_comp bin/test_array_sparse bin/test_access_performance 
+test_array: bin/test_array_basics bin/test_array_comp
 
 ARRAY_TEST_HEADERS = $(TEST_HEADERS) bcslib/test/test_array_aux.h
-
-test_array: bin/test_array_basics bin/test_array_comp
 
 ARRAY_BASIC_TESTS = test/test_array_basics.cpp \
 	test/test_array1d.cpp \
