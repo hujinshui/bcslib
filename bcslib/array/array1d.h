@@ -14,7 +14,6 @@
 #include <bcslib/array/generic_array_functions.h>
 
 #include <bcslib/base/iterator_wrappers.h>
-#include <bcslib/base/sexpression.h>
 
 namespace bcs
 {
