@@ -9,9 +9,10 @@
 #ifndef BCSLIB_ARRAY_CALC_H
 #define BCSLIB_ARRAY_CALC_H
 
-#include <bcslib/array/array_expr_base.h>
-#include <bcslib/veccomp/veccalc_functors.h>
+#include <bcslib/array/generic_array_calc.h>
 
+#include <bcslib/array/array1d.h>
+#include <bcslib/array/array2d.h>
 #include <bcslib/base/arg_check.h>
 #include <type_traits>
 
@@ -26,21 +27,7 @@ namespace bcs
 
 	// addition
 
-	template<class Arr1, class Arr2>
-	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
-	_arr_binop<Arr1, Arr2, vec_vec_add>>::type
-	add_arr_arr (const Arr1& a1, const Arr2& a2)
-	{
-		return _arr_binop<Arr1, Arr2, vec_vec_add>::default_evaluate(a1, a2);
-	}
-
-	template<class Arr, typename T>
-	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
-	_arr_uniop<Arr, vec_sca_add>>::type
-	add_arr_sca (const Arr& a1, const T& x2)
-	{
-		return _arr_uniop<Arr, vec_sca_add>::evaluate_with_scalar(a1, x2);
-	}
+	// 1D
 
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<T> operator + (const aview1d<T, LIndexer>& lhs, const aview1d<T, RIndexer>& rhs)
@@ -59,6 +46,59 @@ namespace bcs
 	{
 		return add_arr_sca(rhs, lhs);
 	}
+
+	template<typename T, class LIndexer, class RIndexer>
+	inline aview1d<T, LIndexer>& operator += (aview1d<T, LIndexer>& lhs, const aview1d<T, RIndexer>& rhs)
+	{
+		add_arr_arr_inplace(lhs, rhs);
+		return lhs;
+	}
+
+	template<typename T, class LIndexer>
+	inline aview1d<T, LIndexer>& operator += (aview1d<T, LIndexer>& lhs, const T& rhs)
+	{
+		add_arr_sca_inplace(lhs, rhs);
+		return lhs;
+	}
+
+	// 2D
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline array2d<T, TOrd> operator + (
+			const aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return add_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline array2d<T, TOrd> operator + (const aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& v2)
+	{
+		return add_arr_sca(lhs, v2);
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline array2d<T, TOrd> operator + (const T& lhs, const aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return add_arr_sca(rhs, lhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline aview2d<T, TOrd, LIndexer0, LIndexer1>& operator += (
+			aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const aview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		add_arr_arr_inplace(lhs, rhs);
+		return lhs;
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline aview2d<T, TOrd, LIndexer0, LIndexer1>& operator += (aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+	{
+		add_arr_sca_inplace(lhs, rhs);
+		return lhs;
+	}
+
 
 
 }

@@ -1074,6 +1074,61 @@ BCS_TEST_CASE( test_array2d_subviews )
 }
 
 
+BCS_TEST_CASE( test_denseview_judge_2d )
+{
+	double src[60];
+
+	// row_major
+
+	typedef aview2d<double, row_major_t, step_ind, step_ind> arr_rm_t;
+
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(5, 1), step_ind(6, 1)) ), true );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(5, 1), step_ind(3, 2)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(5, 1), step_ind(4, 1)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(5, 1), step_ind(1, 2)) ), false );
+
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(3, 2), step_ind(6, 1)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(3, 2), step_ind(3, 2)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(3, 2), step_ind(4, 1)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(3, 2), step_ind(1, 2)) ), false );
+
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(4, 1), step_ind(6, 1)) ), true );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(4, 1), step_ind(3, 2)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(4, 1), step_ind(4, 1)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(4, 1), step_ind(1, 2)) ), false );
+
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(1, 2), step_ind(6, 1)) ), true );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(1, 2), step_ind(3, 2)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(1, 2), step_ind(4, 1)) ), true );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(1, 2), step_ind(1, 2)) ), true );
+
+	// column_major
+
+	typedef aview2d<double, column_major_t, step_ind, step_ind> arr_cm_t;
+
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(5, 1), step_ind(6, 1)) ), true );
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(5, 1), step_ind(3, 2)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(5, 1), step_ind(4, 1)) ), true );
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(5, 1), step_ind(1, 2)) ), true );
+
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(3, 2), step_ind(6, 1)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(3, 2), step_ind(3, 2)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(3, 2), step_ind(4, 1)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(3, 2), step_ind(1, 2)) ), false );
+
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(4, 1), step_ind(6, 1)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(4, 1), step_ind(3, 2)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(4, 1), step_ind(4, 1)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(4, 1), step_ind(1, 2)) ), true );
+
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(1, 2), step_ind(6, 1)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(1, 2), step_ind(3, 2)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_cm_t(src, 5, 6, step_ind(1, 2), step_ind(4, 1)) ), false );
+	BCS_CHECK_EQUAL( is_dense_view( arr_rm_t(src, 5, 6, step_ind(1, 2), step_ind(1, 2)) ), true );
+}
+
+
+
 BCS_TEST_CASE( test_aview2d_clone )
 {
 	double src[24] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
@@ -1122,6 +1177,7 @@ test_suite *test_array2d_suite()
 	suite->add( new test_gen_array2d() );
 	suite->add( new test_array2d_slices() );
 	suite->add( new test_array2d_subviews() );
+	suite->add( new test_denseview_judge_2d() );
 	suite->add( new test_aview2d_clone() );
 
 	return suite;

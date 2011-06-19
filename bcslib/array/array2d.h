@@ -941,31 +941,39 @@ namespace bcs
 
 
 	template<typename T, class TIndexer0, class TIndexer1>
-	bool is_dense_view(const aview2d<T, row_major_t, TIndexer0, TIndexer1>& view)
+	inline bool is_dense_view(const aview2d<T, row_major_t, TIndexer0, TIndexer1>& view)
 	{
-		return array_indexer_traits<TIndexer1>::is_continuous(view.get_indexer1()) &&
-				(view.dim1() == view.base_dim1() || view.dim0() == 1);
+		return (array_indexer_traits<TIndexer1>::is_continuous(view.get_indexer1())  // each row is continuous
+				|| view.dim1() == 1)
+				&& (
+				( array_indexer_traits<TIndexer0>::is_continuous(view.get_indexer0()) &&  // rows are consecutive
+				  view.dim1() == view.base_dim1() )
+				|| view.dim0() == 1);
 	}
 
 	template<typename T, class TIndexer0, class TIndexer1>
-	bool is_dense_view(const aview2d<T, column_major_t, TIndexer0, TIndexer1>& view)
+	inline bool is_dense_view(const aview2d<T, column_major_t, TIndexer0, TIndexer1>& view)
 	{
-		return array_indexer_traits<TIndexer0>::is_continuous(view.get_indexer0()) &&
-				(view.dim0() == view.base_dim0() || view.dim1() == 1);
+		return (array_indexer_traits<TIndexer0>::is_continuous(view.get_indexer0()) // each column is continuous
+				|| view.dim0() == 1)
+				&& (
+				( array_indexer_traits<TIndexer1>::is_continuous(view.get_indexer1()) && // columns are consecutive
+				  view.dim0() == view.base_dim0() )
+				|| view.dim1() == 1);
 	}
 
 
 	// functions to make dense view
 
 	template<typename T, typename TOrd>
-	const aview2d<T, TOrd, id_ind, id_ind> dense_aview2d(const T *pbase, size_t m, size_t n, TOrd ord)
+	inline const aview2d<T, TOrd, id_ind, id_ind> dense_aview2d(const T *pbase, size_t m, size_t n, TOrd ord)
 	{
 		return aview2d<T, TOrd, id_ind, id_ind>(const_cast<T*>(pbase),
 				static_cast<index_t>(m), static_cast<index_t>(n), m, n);
 	}
 
 	template<typename T, typename TOrd>
-	aview2d<T, TOrd, id_ind, id_ind> dense_aview2d(T *pbase, size_t m, size_t n, TOrd ord)
+	inline aview2d<T, TOrd, id_ind, id_ind> dense_aview2d(T *pbase, size_t m, size_t n, TOrd ord)
 	{
 		return aview2d<T, TOrd, id_ind, id_ind>(pbase,
 				static_cast<index_t>(m), static_cast<index_t>(n), m, n);
@@ -993,6 +1001,39 @@ namespace bcs
 	{
 		return view;
 	}
+
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	struct array_creater<aview2d<T, TOrd, TIndexer0, TIndexer1> >
+	{
+		typedef std::array<index_t, 2> shape_type;
+		typedef array2d<T, TOrd> result_type;
+
+		template<typename U>
+		struct remap
+		{
+			typedef array2d<U, TOrd> result_type;
+
+			static result_type create(const shape_type& shape)
+			{
+				return result_type(
+					static_cast<size_t>(shape[0]),
+					static_cast<size_t>(shape[1]));
+			}
+		};
+
+		static result_type create(const shape_type& shape)
+		{
+			return result_type(
+				static_cast<size_t>(shape[0]),
+				static_cast<size_t>(shape[1]));
+		}
+
+		static result_type copy(const aview2d<T, TOrd, TIndexer0, TIndexer1>& view)
+		{
+			return view;
+		}
+	};
 
 
 	/******************************************************
