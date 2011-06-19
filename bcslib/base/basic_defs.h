@@ -90,6 +90,12 @@ namespace bcs
 
 
 	/**
+	 * means no type is there
+	 */
+	struct nil_type { };
+
+
+	/**
 	 * Some convenient functions
 	 */
 	template<typename T>
