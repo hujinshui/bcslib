@@ -38,7 +38,8 @@ BASE_HEADERS = bcslib/base/config.h \
 
 TEST_HEADERS = bcslib/test/test_assertion.h \
 	bcslib/test/test_units.h \
-	bcslib/test/execution_mon.h
+	bcslib/test/execution_mon.h \
+	bcslib/test/performance_timer.h
 	
 ARRAY_BASIC_HEADERS = bcslib/array/array_base.h \
 	bcslib/array/array_index.h \
@@ -46,8 +47,7 @@ ARRAY_BASIC_HEADERS = bcslib/array/array_base.h \
 	bcslib/array/array1d.h \
 	bcslib/array/array2d.h
 	
-VEC_COMP_HEADERS = bcslib/veccomp/sse_basic.h \
-	bcslib/veccomp/veccalc.h \
+VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h \
 	bcslib/veccomp/vecnorm.h \
 	bcslib/veccomp/vecstat.h
 

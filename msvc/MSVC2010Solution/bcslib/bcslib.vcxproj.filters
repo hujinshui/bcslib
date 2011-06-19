@@ -15,6 +15,9 @@
     <Filter Include="Header Files\test">
       <UniqueIdentifier>{1c5e6744-bbff-40f5-8284-7ca7f88b79b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\array">
+      <UniqueIdentifier>{c8e0f768-62d8-4d7c-8f77-a37567ddc0de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\bcslib\base\arg_check.h">
@@ -24,9 +27,6 @@
       <Filter>Header Files\base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\bcslib\base\basic_defs.h">
-      <Filter>Header Files\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\bcslib\base\basic_functors.h">
       <Filter>Header Files\base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\bcslib\base\basic_mem.h">
@@ -55,6 +55,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\bcslib\test\test_units.h">
       <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\base\index_selectors.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\array_base.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\array_index.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\array1d.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\array2d.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\generic_array_functions.h">
+      <Filter>Header Files\array</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

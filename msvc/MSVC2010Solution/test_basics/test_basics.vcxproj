@@ -81,6 +81,7 @@
     <ClCompile Include="..\..\..\test\test_basics.cpp" />
     <ClCompile Include="..\..\..\test\test_basic_algorithms.cpp" />
     <ClCompile Include="..\..\..\test\test_basic_memory.cpp" />
+    <ClCompile Include="..\..\..\test\test_index_selection.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

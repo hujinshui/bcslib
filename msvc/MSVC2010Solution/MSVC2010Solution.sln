@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bcslib", "bcslib\bcslib.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_basics", "test_basics\test_basics.vcxproj", "{6113AECC-0262-4E27-A6B7-466EBD806CD8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_array_basics", "test_array_basics\test_array_basics.vcxproj", "{BB2C5C9F-974F-443D-8B08-AAE77F9E99AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -25,6 +27,10 @@ Global
 		{6113AECC-0262-4E27-A6B7-466EBD806CD8}.Debug|Win32.Build.0 = Debug|Win32
 		{6113AECC-0262-4E27-A6B7-466EBD806CD8}.Release|Win32.ActiveCfg = Release|Win32
 		{6113AECC-0262-4E27-A6B7-466EBD806CD8}.Release|Win32.Build.0 = Release|Win32
+		{BB2C5C9F-974F-443D-8B08-AAE77F9E99AD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BB2C5C9F-974F-443D-8B08-AAE77F9E99AD}.Debug|Win32.Build.0 = Debug|Win32
+		{BB2C5C9F-974F-443D-8B08-AAE77F9E99AD}.Release|Win32.ActiveCfg = Release|Win32
+		{BB2C5C9F-974F-443D-8B08-AAE77F9E99AD}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
