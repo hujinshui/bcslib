@@ -1148,6 +1148,45 @@ BCS_TEST_CASE( test_array2d_subviews )
 }
 
 
+BCS_TEST_CASE( test_aview2d_clone )
+{
+	double src[24] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+
+	aview2d<double, row_major_t, id_ind, id_ind> view1_rm(src, 3, 5, id_ind(3), id_ind(5));
+	array2d<double, row_major_t> a1_rm = clone_array(view1_rm);
+
+	BCS_CHECK( array_integrity_test(a1_rm) );
+	BCS_CHECK( array_iteration_test(a1_rm) );
+	BCS_CHECK( a1_rm.pbase() != view1_rm.pbase() );
+	BCS_CHECK_EQUAL( a1_rm, view1_rm );
+
+	aview2d<double, row_major_t, step_ind, step_ind> view2_rm(src, 4, 5, step_ind(2, 2), step_ind(3, 2));
+	array2d<double, row_major_t> a2_rm = clone_array(view2_rm);
+
+	BCS_CHECK( array_integrity_test(a2_rm) );
+	BCS_CHECK( array_iteration_test(a2_rm) );
+	BCS_CHECK( a2_rm.pbase() != view2_rm.pbase() );
+	BCS_CHECK_EQUAL( a2_rm, view2_rm );
+
+
+	aview2d<double, column_major_t, id_ind, id_ind> view1_cm(src, 3, 5, id_ind(3), id_ind(5));
+	array2d<double, column_major_t> a1_cm = clone_array(view1_cm);
+
+	BCS_CHECK( array_integrity_test(a1_cm) );
+	BCS_CHECK( array_iteration_test(a1_cm) );
+	BCS_CHECK( a1_cm.pbase() != view1_cm.pbase() );
+	BCS_CHECK_EQUAL( a1_cm, view1_cm );
+
+	aview2d<double, column_major_t, step_ind, step_ind> view2_cm(src, 4, 5, step_ind(2, 2), step_ind(3, 2));
+	array2d<double, column_major_t> a2_cm = clone_array(view2_cm);
+
+	BCS_CHECK( array_integrity_test(a2_rm) );
+	BCS_CHECK( array_iteration_test(a2_rm) );
+	BCS_CHECK( a2_cm.pbase() != view2_cm.pbase() );
+	BCS_CHECK_EQUAL( a2_cm, view2_cm );
+}
+
+
 
 test_suite *test_array2d_suite()
 {
@@ -1157,6 +1196,7 @@ test_suite *test_array2d_suite()
 	suite->add( new test_gen_array2d() );
 	suite->add( new test_array2d_slices() );
 	suite->add( new test_array2d_subviews() );
+	suite->add( new test_aview2d_clone() );
 
 	return suite;
 }

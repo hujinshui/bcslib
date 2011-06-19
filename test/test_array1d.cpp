@@ -518,6 +518,29 @@ BCS_TEST_CASE( test_arrind_subview )
 }
 
 
+BCS_TEST_CASE( test_aview1d_clone )
+{
+	double src[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+	aview1d<double, id_ind> view1(src, 5);
+	array1d<double> a1 = clone_array(view1);
+
+	BCS_CHECK( array_integrity_test(a1) );
+	BCS_CHECK( array_iteration_test(a1) );
+	BCS_CHECK( a1.pbase() != view1.pbase() );
+	BCS_CHECK_EQUAL( a1, view1 );
+
+	aview1d<double, step_ind> view2(src, step_ind(3, 2));
+	array1d<double> a2 = clone_array(view2);
+
+	BCS_CHECK( array_integrity_test(a2) );
+	BCS_CHECK( array_iteration_test(a2) );
+	BCS_CHECK( a2.pbase() != view2.pbase() );
+	BCS_CHECK_EQUAL( a2, view2 );
+
+}
+
+
 BCS_TEST_CASE( test_denseview_judge )
 {
 	index_t inds[10];
@@ -531,7 +554,6 @@ BCS_TEST_CASE( test_denseview_judge )
 }
 
 
-
 test_suite *test_array1d_suite()
 {
 	test_suite *suite = new test_suite( "test_array1d" );
@@ -542,6 +564,7 @@ test_suite *test_array1d_suite()
 	suite->add( new test_arrind_array1d() );
 	suite->add( new test_regular_subview() );
 	suite->add( new test_arrind_subview() );
+	suite->add( new test_aview1d_clone() );
 	suite->add( new test_denseview_judge() );
 
 	return suite;

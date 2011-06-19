@@ -488,6 +488,8 @@ namespace bcs
 			return *this;
 		}
 
+		inline operator array2d<T, TOrd>() const;
+
 	public:
 		aview2d(pointer pbase, const _index_core_type& idxcore)
 		: m_pbase(pbase), m_idxcore(idxcore)
@@ -788,14 +790,6 @@ namespace bcs
 		{
 		}
 
-		template<typename RIndexer0, typename RIndexer1>
-		explicit array2d(const aview2d<value_type, layout_order, RIndexer0, RIndexer1>& src)
-		: storage_base_type(src.nelems())
-		, view_type(storage_base_type::pointer_to_base(), src.dim0(), src.dim1(), src.nrows(), src.ncolumns())
-		{
-			import_from(*this, src);
-		}
-
 		template<typename ForwardIterator>
 		array2d(size_type m, size_type n, ForwardIterator it)
 		: storage_base_type(m * n)
@@ -976,6 +970,40 @@ namespace bcs
 		return aview2d<T, TOrd, id_ind, id_ind>(pbase,
 				static_cast<index_t>(m), static_cast<index_t>(n), m, n);
 	}
+
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>::operator array2d<T, TOrd>() const
+	{
+		array2d<T, TOrd> arr(nrows(), ncolumns());
+		if (is_dense_view(*this))
+		{
+			import_from(arr, pbase());
+		}
+		else
+		{
+			import_from(arr, begin());
+		}
+		return arr;
+	}
+
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> clone_array(const aview2d<T, TOrd, TIndexer0, TIndexer1>& view)
+	{
+		return view;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	struct array_cloner<aview2d<T, TOrd, TIndexer0, TIndexer1> >
+	{
+		typedef array2d<T, TOrd> result_type;
+
+		result_type operator()(const aview2d<T, TOrd, TIndexer0, TIndexer1>& view) const
+		{
+			return view;
+		}
+	};
 
 
 

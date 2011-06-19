@@ -153,6 +153,9 @@ namespace bcs
 		static const bool value = std::is_pod<T>::value && std::is_same<T, typename std::remove_const<T>::type>::value;
 	};
 
+
+	template<typename Arr> struct array_cloner;  // a functor for forming lazy expression
+
 }
 
 
