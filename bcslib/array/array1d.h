@@ -12,7 +12,9 @@
 #include <bcslib/array/array_base.h>
 #include <bcslib/array/array_index.h>
 #include <bcslib/array/generic_array_functions.h>
+
 #include <bcslib/base/iterator_wrappers.h>
+#include <bcslib/base/sexpression.h>
 
 namespace bcs
 {
@@ -412,7 +414,7 @@ namespace bcs
 		}
 
 		template<typename TIndexer2>
-		explicit array1d(const aview1d<value_type, TIndexer2>& src)
+		array1d(const aview1d<value_type, TIndexer2>& src)
 		: storage_base_type(src.nelems()), view_type(storage_base_type::pointer_to_base(), src.nelems())
 		{
 			import_from(*this, src);
