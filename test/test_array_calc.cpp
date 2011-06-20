@@ -832,6 +832,138 @@ BCS_TEST_CASE( test_array_floor_and_ceil )
 }
 
 
+BCS_TEST_CASE( test_array_trigonometric_funs )
+{
+	const int N = 6;
+	double src[N] = {-0.9, -0.5, -0.2, 0.1, 0.4, 0.8};
+	double src_e[N] = {0.8, 0.5, 0.3, -0.2, -0.5, -0.6};
+	double res[N];
+
+	const int nr = 2;
+	const int nc = 3;
+
+	array1d<double> x(N, src);
+	array2d<double, row_major_t> Xr(nr, nc, src);
+	array2d<double, column_major_t> Xc(nr, nc, src);
+
+	array1d<double> e(N, src_e);
+	array2d<double, row_major_t> Er(nr, nc, src_e);
+	array2d<double, column_major_t> Ec(nr, nc, src_e);
+
+	array1d<double> x2(N);
+	array2d<double, row_major_t> Xr2(nr, nc);
+	array2d<double, column_major_t> Xc2(nr, nc);
+
+	// sin
+
+	for (int i = 0; i < N; ++i) res[i] = std::sin(src[i]);
+
+	BCS_CHECK( array_view_equal( sin(x), res, N ) );
+	x2 << x; sin_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( sin(Xr), res, nr, nc) );
+	Xr2 << Xr; sin_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( sin(Xc), res, nr, nc) );
+	Xc2 << Xc; sin_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
+	// cos
+
+	for (int i = 0; i < N; ++i) res[i] = std::cos(src[i]);
+
+	BCS_CHECK( array_view_equal( cos(x), res, N ) );
+	x2 << x; cos_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( cos(Xr), res, nr, nc) );
+	Xr2 << Xr; cos_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( cos(Xc), res, nr, nc) );
+	Xc2 << Xc; cos_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
+	// tan
+
+	for (int i = 0; i < N; ++i) res[i] = std::tan(src[i]);
+
+	BCS_CHECK( array_view_equal( tan(x), res, N ) );
+	x2 << x; tan_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( tan(Xr), res, nr, nc) );
+	Xr2 << Xr; tan_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( tan(Xc), res, nr, nc) );
+	Xc2 << Xc; tan_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
+	// asin
+
+	for (int i = 0; i < N; ++i) res[i] = std::asin(src[i]);
+
+	BCS_CHECK( array_view_equal( asin(x), res, N ) );
+	x2 << x; asin_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( asin(Xr), res, nr, nc) );
+	Xr2 << Xr; asin_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( asin(Xc), res, nr, nc) );
+	Xc2 << Xc; asin_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
+	// acos
+
+	for (int i = 0; i < N; ++i) res[i] = std::acos(src[i]);
+
+	BCS_CHECK( array_view_equal( acos(x), res, N ) );
+	x2 << x; acos_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( acos(Xr), res, nr, nc) );
+	Xr2 << Xr; acos_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( acos(Xc), res, nr, nc) );
+	Xc2 << Xc; acos_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
+	// atan
+
+	for (int i = 0; i < N; ++i) res[i] = std::atan(src[i]);
+
+	BCS_CHECK( array_view_equal( atan(x), res, N ) );
+	x2 << x; atan_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( atan(Xr), res, nr, nc) );
+	Xr2 << Xr; atan_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( atan(Xc), res, nr, nc) );
+	Xc2 << Xc; atan_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
+	// atan2
+
+	for (int i = 0; i < N; ++i) res[i] = std::atan2(src[i], src_e[i]);
+
+	BCS_CHECK( array_view_equal( atan2(x, e), res, N ) );
+
+	BCS_CHECK( array_view_equal( atan2(Xr, Er), res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( atan2(Xc, Ec), res, nr, nc) );
+
+}
+
+
+
 
 test_suite *test_array_calc_suite()
 {
@@ -847,10 +979,9 @@ test_suite *test_array_calc_suite()
 	suite->add( new test_array_power_and_root_funs() );
 	suite->add( new test_array_exp_and_log_funs() );
 	suite->add( new test_array_floor_and_ceil() );
+	suite->add( new test_array_trigonometric_funs() );
 
 	/*
-	suite->add( new test_array_trifuncs() );
-	suite->add( new test_array_arc_trifuncs() );
 	suite->add( new test_array_htrifuncs() );
 	*/
 

@@ -298,7 +298,7 @@ namespace bcs
 	template<typename T>
 	inline void vec_atan2(size_t n, const T *x1, const T* x2, T *y)
 	{
-		for (size_t i = 0; i < n; ++i) y[i] = std::tan(x1[i], x2[i]);
+		for (size_t i = 0; i < n; ++i) y[i] = std::atan2(x1[i], x2[i]);
 	}
 
 

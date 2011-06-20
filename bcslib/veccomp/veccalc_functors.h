@@ -293,6 +293,8 @@ namespace bcs
 
 	// exponential and logarithm functions
 
+	// exp
+
 	template<typename T>
 	struct vec_exp_ftor
 	{
@@ -302,6 +304,8 @@ namespace bcs
 		void operator() (size_t n, T *y) const { return vec_exp(n, y, y); }
 	};
 
+	// log
+
 	template<typename T>
 	struct vec_log_ftor
 	{
@@ -310,6 +314,8 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y) const { return vec_log(n, x, y); }
 		void operator() (size_t n, T *y) const { return vec_log(n, y, y); }
 	};
+
+	// log10
 
 	template<typename T>
 	struct vec_log10_ftor
@@ -323,6 +329,8 @@ namespace bcs
 
 	// rounding functions
 
+	// floor
+
 	template<typename T>
 	struct vec_floor_ftor
 	{
@@ -332,6 +340,8 @@ namespace bcs
 		void operator() (size_t n, T *y) const { return vec_floor(n, y, y); }
 	};
 
+	// ceil
+
 	template<typename T>
 	struct vec_ceil_ftor
 	{
@@ -340,6 +350,86 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y) const { return vec_ceil(n, x, y); }
 		void operator() (size_t n, T *y) const { return vec_ceil(n, y, y); }
 	};
+
+
+	// trigonometric functions
+
+	// sin
+
+	template<typename T>
+	struct vec_sin_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_sin(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_sin(n, y, y); }
+	};
+
+	// cos
+
+	template<typename T>
+	struct vec_cos_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_cos(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_cos(n, y, y); }
+	};
+
+	// tan
+
+	template<typename T>
+	struct vec_tan_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_tan(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_tan(n, y, y); }
+	};
+
+	// asin
+
+	template<typename T>
+	struct vec_asin_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_asin(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_asin(n, y, y); }
+	};
+
+	// acos
+
+	template<typename T>
+	struct vec_acos_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_acos(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_acos(n, y, y); }
+	};
+
+	// atan
+
+	template<typename T>
+	struct vec_atan_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_atan(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_atan(n, y, y); }
+	};
+
+	// atan2
+
+	template<typename T>
+	struct vec_atan2_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *a, const T *b, T *y) const { return vec_atan2(n, a, b, y); }
+	};
+
 
 }
 
