@@ -167,18 +167,20 @@ namespace bcs
 	}
 
 
-
-	/********************************************
-	 *
-	 *  Elementary Function Evaluation
-	 *
-	 *******************************************/
+	// absolute values
 
 	template<typename T>
 	inline void vec_abs(size_t n, const T *x, T *y)
 	{
 		for (size_t i = 0; i < n; ++i) y[i] = std::abs(x[i]);
 	}
+
+
+	/********************************************
+	 *
+	 *  Elementary Function Evaluation
+	 *
+	 *******************************************/
 
 	template<typename T>
 	inline void vec_sqr(size_t n, const T *x, T *y)
