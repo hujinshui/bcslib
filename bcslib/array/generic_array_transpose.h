@@ -11,6 +11,8 @@
 
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/basic_mem.h>
+#include <bcslib/array/array_base.h>
+
 #include <algorithm>
 #include <cmath>
 
@@ -18,7 +20,6 @@
 
 namespace bcs
 {
-
 
 	/**
 	 * Transpose the matrix in source to destination (using direct assignment)
@@ -166,6 +167,39 @@ namespace bcs
 			blockwise_transpose_matrix(src, dst, m, n, bdim, cache.data);
 		}
 	}
+
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view_ndim<Arr, 2>::value,
+	typename array_creater<Arr>::result_type>::type
+	transpose(const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_t;
+		typedef typename array_creater<Arr>::result_type result_t;
+
+		auto sh = get_array_shape(a);
+		auto rsh = arr_shape(sh[1], sh[0]);
+
+		size_t m = static_cast<size_t>(sh[0]);
+		size_t n = static_cast<size_t>(sh[1]);
+
+		result_t r = array_creater<Arr>::create(rsh);
+
+		if (is_dense_view(a))
+		{
+			transpose_matrix(ptr_base(a), ptr_base(r), m, n);
+		}
+		else
+		{
+			scoped_buffer<value_t> buf(m * n);
+			std::copy_n(begin(a), m * n, buf.pbase());
+			transpose_matrix(buf.pbase(), ptr_base(r), m, n);
+		}
+
+		return r;
+	}
+
+
 
 }
 

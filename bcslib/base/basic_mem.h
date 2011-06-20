@@ -382,6 +382,84 @@ namespace bcs
 
 	/********************************************
 	 *
+	 *	scoped_buffer
+	 *
+	 ********************************************/
+
+    /**
+     * A very simple & efficient temporary buffer, which
+     * can only be used within a local scope.
+     *
+     * No element construction when allocated.
+     */
+    template<typename T, class Allocator=aligned_allocator<T> >
+    class scoped_buffer : private noncopyable
+    {
+    public:
+		typedef T value_type;
+		typedef Allocator allocator_type;
+
+		typedef typename allocator_type::size_type size_type;
+		typedef typename allocator_type::difference_type difference_type;
+
+		typedef typename allocator_type::pointer pointer;
+		typedef typename allocator_type::reference reference;
+		typedef typename allocator_type::const_pointer const_pointer;
+		typedef typename allocator_type::const_reference const_reference;
+
+    public:
+    	explicit scoped_buffer(size_type n)
+    	: m_allocator()
+    	, m_pbase(safe_allocate(m_allocator, n))
+    	, m_n(n)
+    	{
+    	}
+
+    	~scoped_buffer()
+    	{
+    		safe_deallocate(m_allocator, m_pbase, m_n);
+    	}
+
+		size_type nelems() const
+		{
+			return m_n;
+		}
+
+		const_pointer pbase() const
+		{
+			return m_pbase;
+		}
+
+		pointer pbase()
+		{
+			return m_pbase;
+		}
+
+		const_reference operator[] (size_type i) const
+		{
+			return m_pbase[i];
+		}
+
+		reference operator[] (size_type i)
+		{
+			return m_pbase[i];
+		}
+
+		const allocator_type& get_allocator() const
+		{
+			return m_allocator;
+		}
+
+    private:
+    	Allocator m_allocator;
+    	T *m_pbase;
+    	size_t m_n;
+
+    }; // end class scoped_buffer
+
+
+	/********************************************
+	 *
 	 *	const_block and block
 	 *
 	 ********************************************/
@@ -658,7 +736,7 @@ namespace bcs
     }
 
 
-    template<typename T, typename Allocator=std::allocator<T> >
+    template<typename T, typename Allocator=aligned_allocator<T> >
 	class const_block
 	{
 	public:
@@ -767,7 +845,7 @@ namespace bcs
 	}; // end class const_block
 
 
-    template<typename T, typename Allocator=std::allocator<T> >
+    template<typename T, typename Allocator=aligned_allocator<T> >
 	class block
 	{
     	friend class const_block<T, Allocator>;
@@ -984,7 +1062,7 @@ namespace bcs
 
     struct do_share { };
 
-    template<typename T, class Allocator>
+    template<typename T, class Allocator=aligned_allocator<T> >
     class sharable_storage_base
     {
     public:

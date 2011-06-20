@@ -29,6 +29,8 @@ namespace bcs
 	public:
 		static_assert(is_array_view<Arr1>::value, "Operands must be of array view types.");
 
+		typedef typename array_view_traits<Arr1>::value_type arr1_value_type;
+
 		typedef typename array_creater<Arr1>::template remap<typename VecFunc::result_value_type> _rcreater;
 		typedef typename _rcreater::result_type result_type;
 
@@ -53,8 +55,10 @@ namespace bcs
 			}
 			else
 			{
-				auto a1c = clone_array(a1);
-				vfunc(n, ptr_base(a1c), ptr_base(r));
+				scoped_buffer<arr1_value_type> buf1(n);
+				export_to(a1, buf1.pbase());
+
+				vfunc(n, buf1.pbase(), ptr_base(r));
 			}
 
 			return r;
@@ -80,6 +84,9 @@ namespace bcs
 				typename array_view_traits<Arr1>::layout_order,
 				typename array_view_traits<Arr2>::layout_order>::value,
 				"Operand arrays are required to have the same layout order.");
+
+		typedef typename array_view_traits<Arr1>::value_type arr1_value_type;
+		typedef typename array_view_traits<Arr2>::value_type arr2_value_type;
 
 		typedef typename array_creater<Arr1>::template remap<typename VecFunc::result_value_type> _rcreater;
 		typedef typename _rcreater::result_type result_type;
@@ -108,22 +115,27 @@ namespace bcs
 				}
 				else
 				{
-					auto a2c = clone_array(a2);
-					vfunc(n, ptr_base(a1), ptr_base(a2c), ptr_base(r));
+					scoped_buffer<arr2_value_type> buf2(n);
+					export_to(a2, buf2.pbase());
+
+					vfunc(n, ptr_base(a1), buf2.pbase(), ptr_base(r));
 				}
 			}
 			else
 			{
-				auto a1c = clone_array(a1);
+				scoped_buffer<arr1_value_type> buf1(n);
+				export_to(a1, buf1.pbase());
 
 				if (is_dense_view(a2))
 				{
-					vfunc(n, ptr_base(a1c), ptr_base(a2), ptr_base(r));
+					vfunc(n, buf1.pbase(), ptr_base(a2), ptr_base(r));
 				}
 				else
 				{
-					auto a2c = clone_array(a2);
-					vfunc(n, ptr_base(a1c), ptr_base(a2c), ptr_base(r));
+					scoped_buffer<arr2_value_type> buf2(n);
+					export_to(a2, buf2.pbase());
+
+					vfunc(n, buf1.pbase(), buf2.pbase(), ptr_base(r));
 				}
 			}
 
@@ -141,6 +153,8 @@ namespace bcs
 	{
 	public:
 		static_assert(is_array_view<Arr>::value, "Operands must be of array view types.");
+
+		typedef typename array_view_traits<Arr>::value_type arr_value_type;
 
 		array_inplace_operator(InplaceVecFunc f) : m_vecfunc(f)
 		{
@@ -162,9 +176,10 @@ namespace bcs
 			}
 			else
 			{
-				auto ac = clone_array(a);
-				vfunc(n, ptr_base(ac));
-				import_from(a, ptr_base(ac));
+				scoped_buffer<arr_value_type> buf(n);
+				export_to(a, buf.pbase());
+				vfunc(n, buf.pbase());
+				import_from(a, buf.pbase());
 			}
 		}
 
@@ -189,6 +204,9 @@ namespace bcs
 				typename array_view_traits<RArr1>::layout_order>::value,
 				"Operand arrays are required to have the same layout order.");
 
+		typedef typename array_view_traits<Arr>::value_type arr_value_type;
+		typedef typename array_view_traits<RArr1>::value_type rarr1_value_type;
+
 		array_inplace_operator_R1(InplaceVecFunc f) : m_vecfunc(f)
 		{
 		}
@@ -211,23 +229,27 @@ namespace bcs
 				}
 				else
 				{
-					auto r1c = clone_array(r1);
-					vfunc(n, ptr_base(a), ptr_base(r1c));
+					scoped_buffer<rarr1_value_type> buf_r1(n);
+					export_to(r1, buf_r1.pbase());
+					vfunc(n, ptr_base(a), buf_r1.pbase());
 				}
 			}
 			else
 			{
-				auto ac = clone_array(a);
+				scoped_buffer<arr_value_type> buf(n);
+				export_to(a, buf.pbase());
+
 				if (is_dense_view(r1))
 				{
-					vfunc(n, ptr_base(ac), ptr_base(r1));
+					vfunc(n, buf.pbase(), ptr_base(r1));
 				}
 				else
 				{
-					auto r1c = clone_array(r1);
-					vfunc(n, ptr_base(ac), ptr_base(r1c));
+					scoped_buffer<rarr1_value_type> buf_r1(n);
+					export_to(r1, buf_r1.pbase());
+					vfunc(n, buf.pbase(), buf_r1.pbase());
 				}
-				import_from(a, ptr_base(ac));
+				import_from(a, buf.pbase());
 			}
 		}
 
