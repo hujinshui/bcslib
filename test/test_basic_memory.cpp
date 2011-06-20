@@ -22,8 +22,6 @@ template class bcs::aligned_allocator<int>;
 template class bcs::cref_blk_t<int>;
 template class bcs::ref_blk_t<int>;
 template class bcs::copy_blk_t<int>;
-template class bcs::const_block<int>;
-template class bcs::block<int>;
 template class bcs::const_block<int, aligned_allocator<int> >;
 template class bcs::block<int, aligned_allocator<int> >;
 template class bcs::const_block<int, monitored_allocator<int> >;
