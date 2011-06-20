@@ -781,6 +781,55 @@ BCS_TEST_CASE( test_array_exp_and_log_funs )
 }
 
 
+BCS_TEST_CASE( test_array_floor_and_ceil )
+{
+	const int N = 6;
+	double src[N] = {1.8, 2.1, -3.4, 4.0, -5.8, 6.0};
+	double res[N];
+
+	const int nr = 2;
+	const int nc = 3;
+
+	array1d<double> x(N, src);
+	array2d<double, row_major_t> Xr(nr, nc, src);
+	array2d<double, column_major_t> Xc(nr, nc, src);
+
+	array1d<double> x2(N);
+	array2d<double, row_major_t> Xr2(nr, nc);
+	array2d<double, column_major_t> Xc2(nr, nc);
+
+	// floor
+
+	for (int i = 0; i < N; ++i) res[i] = std::floor(src[i]);
+
+	BCS_CHECK( array_view_equal( floor(x), res, N ) );
+	x2 << x; floor_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( floor(Xr), res, nr, nc) );
+	Xr2 << Xr; floor_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( floor(Xc), res, nr, nc) );
+	Xc2 << Xc; floor_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
+	// ceil
+
+	for (int i = 0; i < N; ++i) res[i] = std::ceil(src[i]);
+
+	BCS_CHECK( array_view_equal( ceil(x), res, N ) );
+	x2 << x; ceil_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( ceil(Xr), res, nr, nc) );
+	Xr2 << Xr; ceil_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( ceil(Xc), res, nr, nc) );
+	Xc2 << Xc; ceil_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+}
 
 
 
@@ -795,11 +844,11 @@ test_suite *test_array_calc_suite()
 	suite->add( new test_array_neg() );
 	suite->add( new test_array_abs() );
 
-
 	suite->add( new test_array_power_and_root_funs() );
 	suite->add( new test_array_exp_and_log_funs() );
+	suite->add( new test_array_floor_and_ceil() );
+
 	/*
-	suite->add( new test_array_ceil_floor() );
 	suite->add( new test_array_trifuncs() );
 	suite->add( new test_array_arc_trifuncs() );
 	suite->add( new test_array_htrifuncs() );

@@ -659,6 +659,64 @@ namespace bcs
 	}
 
 
+	// rounding functions
+
+	// floor
+
+	template<typename T, class TIndexer>
+	inline array1d<T> floor(const aview1d<T, TIndexer>& a)
+	{
+		return floor_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> floor(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return floor_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& floor_ip(aview1d<T, TIndexer>& a)
+	{
+		floor_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& floor_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		floor_arr_inplace(a);
+		return a;
+	}
+
+	// ceil
+
+	template<typename T, class TIndexer>
+	inline array1d<T> ceil(const aview1d<T, TIndexer>& a)
+	{
+		return ceil_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> ceil(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return ceil_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& ceil_ip(aview1d<T, TIndexer>& a)
+	{
+		ceil_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& ceil_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		ceil_arr_inplace(a);
+		return a;
+	}
+
 }
 
 #endif 

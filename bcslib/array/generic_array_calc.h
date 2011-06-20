@@ -375,6 +375,45 @@ namespace bcs
 	}
 
 
+	// rounding functions
+
+	// floor
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_floor_ftor>>::type
+	floor_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_floor_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	floor_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_floor_ftor>::default_evaluate(a);
+	}
+
+
+	// ceil
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_ceil_ftor>>::type
+	ceil_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_ceil_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	ceil_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_ceil_ftor>::default_evaluate(a);
+	}
+
+
+
 
 }
 

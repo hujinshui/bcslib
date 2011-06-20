@@ -321,6 +321,25 @@ namespace bcs
 	};
 
 
+	// rounding functions
+
+	template<typename T>
+	struct vec_floor_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_floor(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_floor(n, y, y); }
+	};
+
+	template<typename T>
+	struct vec_ceil_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_ceil(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_ceil(n, y, y); }
+	};
 
 }
 
