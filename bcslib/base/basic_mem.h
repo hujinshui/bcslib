@@ -30,8 +30,46 @@
 #endif
 
 
+#ifndef BCS_DEFAULT_ALIGNMENT
+#define BCS_DEFAULT_ALIGNMENT 32
+#endif
+
+
 namespace bcs
 {
+
+	/********************************************
+	 *
+	 *	aligned array on stack
+	 *
+	 ********************************************/
+
+	template<typename T, size_t N>
+	struct aligned_array
+	{
+#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
+		__declspec(align(BCS_DEFAULT_ALIGNMENT)) T data[N];
+#elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
+		T data[N] __attribute__((aligned(BCS_DEFAULT_ALIGNMENT)));
+#endif
+
+		const T& operator[] (size_t i) const
+		{
+			return data[i];
+		}
+
+		T& operator[] (size_t i)
+		{
+			return data[i];
+		}
+
+		size_t size() const
+		{
+			return N;
+		}
+
+	}; // end struct aligned_array
+
 
 	/********************************************
 	 *
@@ -241,7 +279,7 @@ namespace bcs
     class aligned_allocator
     {
     public:
-    	static const size_t default_memory_alignment = 32;
+    	static const size_t default_memory_alignment = BCS_DEFAULT_ALIGNMENT;
 
     	typedef T value_type;
     	typedef T* pointer;
