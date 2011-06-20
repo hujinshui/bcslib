@@ -182,6 +182,8 @@ namespace bcs
 	 *
 	 *******************************************/
 
+	// power and root functions
+
 	template<typename T>
 	inline void vec_sqr(size_t n, const T *x, T *y)
 	{
@@ -192,6 +194,18 @@ namespace bcs
 	inline void vec_sqrt(size_t n, const T *x, T *y)
 	{
 		for (size_t i = 0; i < n; ++i) y[i] = std::sqrt(x[i]);
+	}
+
+	template<typename T>
+	inline void vec_rcp(size_t n, const T *x, T *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = T(1) / x[i];
+	}
+
+	template<typename T>
+	inline void vec_rsqrt(size_t n, const T *x, T *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = T(1) / std::sqrt(x[i]);
 	}
 
 	template<typename T>
@@ -206,11 +220,8 @@ namespace bcs
 		for (size_t i = 0; i < n; ++i) y[i] = std::pow(x[i], e);
 	}
 
-	template<typename T>
-	inline void vec_pow_n(size_t n, const T *x, int e, T *y)
-	{
-		for (size_t i = 0; i < n; ++i) y[i] = std::pow(x[i], e);
-	}
+
+	// exponential and logarithm functions
 
 	template<typename T>
 	inline void vec_exp(size_t n, const T *x, T *y)
@@ -230,6 +241,9 @@ namespace bcs
 		for (size_t i = 0; i < n; ++i) y[i] = std::log10(x[i]);
 	}
 
+
+	// rounding functions
+
 	template<typename T>
 	inline void vec_ceil(size_t n, const T *x, T *y)
 	{
@@ -241,6 +255,9 @@ namespace bcs
 	{
 		for (size_t i = 0; i < n; ++i) y[i] = std::floor(x[i]);
 	}
+
+
+	// trigonometric functions
 
 	template<typename T>
 	inline void vec_sin(size_t n, const T *x, T *y)
@@ -283,6 +300,9 @@ namespace bcs
 	{
 		for (size_t i = 0; i < n; ++i) y[i] = std::tan(x1[i], x2[i]);
 	}
+
+
+	// hyperbolic functions
 
 	template<typename T>
 	inline void vec_sinh(size_t n, const T *x, T *y)
