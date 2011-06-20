@@ -290,6 +290,38 @@ namespace bcs
 	};
 
 
+
+	// exponential and logarithm functions
+
+	template<typename T>
+	struct vec_exp_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_exp(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_exp(n, y, y); }
+	};
+
+	template<typename T>
+	struct vec_log_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_log(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_log(n, y, y); }
+	};
+
+	template<typename T>
+	struct vec_log10_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_log10(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_log10(n, y, y); }
+	};
+
+
+
 }
 
 #endif 
