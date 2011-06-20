@@ -20,15 +20,6 @@ using namespace bcs;
 using namespace bcs::test;
 
 
-void test_copy_syntax()
-{
-	double src[100];
-
-	const_aview1d<double, step_ind> view(src, step_ind(10, 2));
-
-	std::copy(view.begin(), view.end(), src);
-}
-
 
 double time_copy_memory(int nrepeats, const size_t nelems, const double *src, double *buf)
 {
@@ -63,7 +54,7 @@ double time_raw_for_loop(int nrepeats, const size_t nelems, const double *src, d
 
 double time_dense1d_export(int nrepeats, const size_t nelems, const double *src, double *buf)
 {
-	const_aview1d<double> view(src, nelems);
+	const aview1d<double> view = readonly_aview1d(src, nelems);
 
 	export_to(view, buf);
 
@@ -80,7 +71,7 @@ double time_dense1d_export(int nrepeats, const size_t nelems, const double *src,
 
 double time_dense1d_access(int nrepeats, const size_t nelems, const double *src, double *buf)
 {
-	const_aview1d<double> view(src, nelems);
+	const aview1d<double> view = readonly_aview1d(src, nelems);
 
 	index_t n = (index_t)nelems;
 
@@ -99,7 +90,7 @@ double time_dense1d_access(int nrepeats, const size_t nelems, const double *src,
 
 double time_step1d_export(int nrepeats, const size_t nelems, const double *src, double *buf)
 {
-	const_aview1d<double, step_ind> view(src, step_ind(nelems, 2));
+	const aview1d<double, step_ind> view = readonly_aview1d(src, step_ind(nelems, 2));
 
 	export_to(view, buf);
 
@@ -115,7 +106,7 @@ double time_step1d_export(int nrepeats, const size_t nelems, const double *src, 
 
 double time_step1d_access(int nrepeats, const size_t nelems, const double *src, double *buf)
 {
-	const_aview1d<double, step_ind> view(src, step_ind(nelems, 2));
+	const aview1d<double, step_ind> view = readonly_aview1d(src, step_ind(nelems, 2));
 
 	index_t n = (index_t)nelems;
 

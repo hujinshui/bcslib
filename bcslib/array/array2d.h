@@ -740,6 +740,33 @@ namespace bcs
 	}; // end class aview2d
 
 
+	template<typename T>
+	inline const aview2d<T, row_major_t> get_aview2d_rm(const T *base, size_t m, size_t n)
+	{
+		return aview2d<T, row_major_t>(const_cast<T*>(base), (index_t)m, (index_t)n, m, n);
+	}
+
+	template<typename T>
+	inline const aview2d<T, column_major_t> get_aview2d_cm(const T *base, size_t m, size_t n)
+	{
+		return aview2d<T, column_major_t>(const_cast<T*>(base), (index_t)m, (index_t)n, m, n);
+	}
+
+	template<typename T, class TIndexer0, class TIndexer1>
+	inline const aview2d<T, row_major_t> get_aview2d_rm(const T *base, size_t base_m, size_t base_n,
+			const TIndexer0& idxer0, const TIndexer1& idxer1)
+	{
+		return aview2d<T, row_major_t>(const_cast<T*>(base), (index_t)base_m, (index_t)base_n, idxer0, idxer1);
+	}
+
+	template<typename T, class TIndexer0, class TIndexer1>
+	inline const aview2d<T, column_major_t> get_aview2d_rm(const T *base, size_t base_m, size_t base_n,
+			const TIndexer0& idxer0, const TIndexer1& idxer1)
+	{
+		return aview2d<T, column_major_t>(const_cast<T*>(base), (index_t)base_m, (index_t)base_n, idxer0, idxer1);
+	}
+
+
 	// stand-alone array2d
 
 	template<typename T, typename TOrd, class Alloc>
@@ -962,22 +989,6 @@ namespace bcs
 				|| view.dim1() == 1);
 	}
 
-
-	// functions to make dense view
-
-	template<typename T, typename TOrd>
-	inline const aview2d<T, TOrd, id_ind, id_ind> dense_aview2d(const T *pbase, size_t m, size_t n, TOrd ord)
-	{
-		return aview2d<T, TOrd, id_ind, id_ind>(const_cast<T*>(pbase),
-				static_cast<index_t>(m), static_cast<index_t>(n), m, n);
-	}
-
-	template<typename T, typename TOrd>
-	inline aview2d<T, TOrd, id_ind, id_ind> dense_aview2d(T *pbase, size_t m, size_t n, TOrd ord)
-	{
-		return aview2d<T, TOrd, id_ind, id_ind>(pbase,
-				static_cast<index_t>(m), static_cast<index_t>(n), m, n);
-	}
 
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
