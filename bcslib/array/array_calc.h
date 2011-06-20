@@ -717,6 +717,195 @@ namespace bcs
 		return a;
 	}
 
+
+	// trigonometric functions
+
+	// sin
+
+	template<typename T, class TIndexer>
+	inline array1d<T> sin(const aview1d<T, TIndexer>& a)
+	{
+		return sin_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> sin(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return sin_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& sin_ip(aview1d<T, TIndexer>& a)
+	{
+		sin_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& sin_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		sin_arr_inplace(a);
+		return a;
+	}
+
+	// cos
+
+	template<typename T, class TIndexer>
+	inline array1d<T> cos(const aview1d<T, TIndexer>& a)
+	{
+		return cos_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> cos(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return cos_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& cos_ip(aview1d<T, TIndexer>& a)
+	{
+		cos_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& cos_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		cos_arr_inplace(a);
+		return a;
+	}
+
+	// tan
+
+	template<typename T, class TIndexer>
+	inline array1d<T> tan(const aview1d<T, TIndexer>& a)
+	{
+		return tan_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> tan(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return tan_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& tan_ip(aview1d<T, TIndexer>& a)
+	{
+		tan_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& tan_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		tan_arr_inplace(a);
+		return a;
+	}
+
+	// asin
+
+	template<typename T, class TIndexer>
+	inline array1d<T> asin(const aview1d<T, TIndexer>& a)
+	{
+		return asin_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> asin(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return asin_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& asin_ip(aview1d<T, TIndexer>& a)
+	{
+		asin_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& asin_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		asin_arr_inplace(a);
+		return a;
+	}
+
+	// acos
+
+	template<typename T, class TIndexer>
+	inline array1d<T> acos(const aview1d<T, TIndexer>& a)
+	{
+		return acos_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> acos(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return acos_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& acos_ip(aview1d<T, TIndexer>& a)
+	{
+		acos_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& acos_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		acos_arr_inplace(a);
+		return a;
+	}
+
+
+	// atan
+
+	template<typename T, class TIndexer>
+	inline array1d<T> atan(const aview1d<T, TIndexer>& a)
+	{
+		return atan_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> atan(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return atan_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& atan_ip(aview1d<T, TIndexer>& a)
+	{
+		atan_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& atan_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		atan_arr_inplace(a);
+		return a;
+	}
+
+
+	// atan2
+
+	template<typename T, class TIndexer>
+	inline array1d<T> atan2(const aview1d<T, TIndexer>& a, const aview1d<T, TIndexer>& b)
+	{
+		return atan2_arr(a, b);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> atan2(
+			const aview2d<T, TOrd, TIndexer0, TIndexer1>& a,
+			const aview2d<T, TOrd, TIndexer0, TIndexer1>& b)
+	{
+		return atan2_arr(a, b);
+	}
+
 }
 
 #endif 

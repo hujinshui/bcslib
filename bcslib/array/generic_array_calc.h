@@ -413,6 +413,119 @@ namespace bcs
 	}
 
 
+	// trigonometric functions
+
+	// sin
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_sin_ftor>>::type
+	sin_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_sin_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	sin_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_sin_ftor>::default_evaluate(a);
+	}
+
+	// cos
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_cos_ftor>>::type
+	cos_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_cos_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	cos_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_cos_ftor>::default_evaluate(a);
+	}
+
+	// tan
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_tan_ftor>>::type
+	tan_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_tan_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	tan_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_tan_ftor>::default_evaluate(a);
+	}
+
+	// asin
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_asin_ftor>>::type
+	asin_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_asin_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	asin_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_asin_ftor>::default_evaluate(a);
+	}
+
+	// acos
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_acos_ftor>>::type
+	acos_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_acos_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	acos_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_acos_ftor>::default_evaluate(a);
+	}
+
+	// atan
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_atan_ftor>>::type
+	atan_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_atan_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	atan_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_atan_ftor>::default_evaluate(a);
+	}
+
+	// atan2
+
+	template<class Arr, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr, Arr2>::value,
+	_arr_binop<Arr, Arr2, vec_atan2_ftor>>::type
+	atan2_arr(const Arr& a, const Arr2& b)
+	{
+		return _arr_binop<Arr, Arr2, vec_atan2_ftor>::default_evaluate(a, b);
+	}
 
 
 }
