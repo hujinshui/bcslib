@@ -79,6 +79,26 @@ namespace bcs
 
 	namespace _detail
 	{
+		template<typename T, bool IsTriviallyConstructible> struct __element_construct_helper;
+
+		template<typename T>
+		struct __element_construct_helper<T, true>
+		{
+			static void default_construct(T *, size_t) { }
+		};
+
+		template<typename T>
+		struct __element_construct_helper<T, false>
+		{
+			static void default_construct(T *p, size_t n)
+			{
+				for (size_t i = 0; i < n; ++i)
+				{
+					new (p + i) T();  // construction via placement new
+				}
+			}
+		};
+
 		template<typename T, bool IsTriviallyCopyable> struct __element_copy_helper;
 
 		template<typename T>
@@ -177,6 +197,13 @@ namespace bcs
 			}
 		};
 
+	}
+
+
+	template<typename T>
+	inline void default_construct_elements(T *a, size_t n)
+	{
+		_detail::__element_construct_helper<T, std::is_pod<T>::value>::default_construct(a, n);
 	}
 
 
@@ -389,8 +416,6 @@ namespace bcs
     /**
      * A very simple & efficient temporary buffer, which
      * can only be used within a local scope.
-     *
-     * No element construction when allocated.
      */
     template<typename T, class Allocator=aligned_allocator<T> >
     class scoped_buffer : private noncopyable
@@ -413,6 +438,7 @@ namespace bcs
     	, m_pbase(safe_allocate(m_allocator, n))
     	, m_n(n)
     	{
+    		default_construct_elements(m_pbase, n);
     	}
 
     	~scoped_buffer()
@@ -588,12 +614,14 @@ namespace bcs
     		: m_allocator()
     		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
     		{
+    			default_construct_elements(m_base, n);
     		}
 
     		block_impl(size_type n, const allocator_type& allocator)
     		: m_allocator(allocator)
     		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
     		{
+    			default_construct_elements(m_base, n);
     		}
 
     		block_impl(size_type n, const_reference v)
