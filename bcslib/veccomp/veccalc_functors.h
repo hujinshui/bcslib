@@ -214,6 +214,82 @@ namespace bcs
 	};
 
 
+	// power and root functions
+
+	// sqr
+
+	template<typename T>
+	struct vec_sqr_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_sqr(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_sqr(n, y, y); }
+	};
+
+	// sqrt
+
+	template<typename T>
+	struct vec_sqrt_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_sqrt(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_sqrt(n, y, y); }
+	};
+
+
+	// rcp
+
+	template<typename T>
+	struct vec_rcp_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_rcp(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_rcp(n, y, y); }
+	};
+
+
+	// rsqrt
+
+	template<typename T>
+	struct vec_rsqrt_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_rsqrt(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_rsqrt(n, y, y); }
+	};
+
+
+	// pow (vec-vec)
+
+	template<typename T>
+	struct vec_pow_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, const T *e, T *y) const { return vec_pow(n, x, e, y); }
+		void operator() (size_t n, T *y, const T* e) const { return vec_pow(n, y, e, y); }
+	};
+
+
+	// pow (vec-scalar)
+
+	template<typename T>
+	struct vec_sca_pow_ftor
+	{
+		typedef T result_value_type;
+
+		T e;
+		vec_sca_pow_ftor(const T& e_) : e(e_) { }
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_pow(n, x, e, y); }
+		void operator() (size_t n, T *y) const { return vec_pow(n, y, e, y); }
+	};
+
+
 }
 
 #endif 

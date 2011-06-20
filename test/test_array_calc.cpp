@@ -587,91 +587,133 @@ BCS_TEST_CASE( test_array_abs )
 }
 
 
-/*
-BCS_TEST_CASE( test_array_sqr_sqrt )
+BCS_TEST_CASE( test_array_power_and_root_funs )
 {
 	const int N = 6;
 	double src[N] = {1, 2, 3, 4, 5, 6};
+	double es[N] = {1.3, 2.4, 1.2, 4.1, 2.7, 2.5};
 	double res[N];
-	double res_s[3];
 
-	array1d<double> x(6, src);
-	const_aview1d<double, step_ind> xs(src, step_ind(3, 2));
-	array2d<double, row_major_t> Xr(2, 3, src);
-	array2d<double, column_major_t> Xc(2, 3, src);
+	const int nr = 2;
+	const int nc = 3;
+
+	array1d<double> x(N, src);
+	array2d<double, row_major_t> Xr(nr, nc, src);
+	array2d<double, column_major_t> Xc(nr, nc, src);
+
+	array1d<double> x2(N);
+	array2d<double, row_major_t> Xr2(nr, nc);
+	array2d<double, column_major_t> Xc2(nr, nc);
+
+	array1d<double> e(N, es);
+	array2d<double, row_major_t> Er(nr, nc, es);
+	array2d<double, column_major_t> Ec(nr, nc, es);
 
 	// sqr
 
 	for (int i = 0; i < N; ++i) res[i] = src[i] * src[i];
-	for (int i = 0; i < 3; ++i) res_s[i] = sqr(src[i*2]);
 
-	BCS_CHECK( array_view_approx( sqr(x), res, 6 ) );
-	BCS_CHECK( array_view_approx( sqr(xs), res_s, 3 ) );
-	BCS_CHECK( array_view_approx( sqr(Xr), res, 2, 3) );
-	BCS_CHECK( array_view_approx( sqr(Xc), res, 2, 3) );
+	BCS_CHECK( array_view_equal( sqr(x), res, N ) );
+	x2 << x; sqr_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( sqr(Xr), res, nr, nc) );
+	Xr2 << Xr; sqr_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( sqr(Xc), res, nr, nc) );
+	Xc2 << Xc; sqr_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
 
 	// sqrt
 
 	for (int i = 0; i < N; ++i) res[i] = std::sqrt(src[i]);
-	for (int i = 0; i < 3; ++i) res_s[i] = std::sqrt(src[i*2]);
 
-	BCS_CHECK( array_view_approx( sqrt(x), res, 6 ) );
-	BCS_CHECK( array_view_approx( sqrt(xs), res_s, 3 ) );
-	BCS_CHECK( array_view_approx( sqrt(Xr), res, 2, 3) );
-	BCS_CHECK( array_view_approx( sqrt(Xc), res, 2, 3) );
-}
+	BCS_CHECK( array_view_equal( sqrt(x), res, N ) );
+	x2 << x; sqrt_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( sqrt(Xr), res, nr, nc) );
+	Xr2 << Xr; sqrt_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( sqrt(Xc), res, nr, nc) );
+	Xc2 << Xc; sqrt_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
 
 
-BCS_TEST_CASE( test_array_pow )
-{
-	const int N = 6;
-	double src[N] = {1.2, 1.8, 2.3, 2.6, 2.9, 3.5};
-	double src_e[N] = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
-	double res[N];
-	double res_s[3];
+	// rcp
 
-	array1d<double> x(6, src);
-	const_aview1d<double, step_ind> xs(src, step_ind(3, 2));
-	array2d<double, row_major_t> Xr(2, 3, src);
-	array2d<double, column_major_t> Xc(2, 3, src);
+	for (int i = 0; i < N; ++i) res[i] = 1.0 / src[i];
 
-	array1d<double> e(6, src_e);
-	const_aview1d<double, step_ind> es(src_e, step_ind(3, 2));
-	array2d<double, row_major_t> Er(2, 3, src_e);
-	array2d<double, column_major_t> Ec(2, 3, src_e);
+	BCS_CHECK( array_view_equal( rcp(x), res, N ) );
+	x2 << x; rcp_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( rcp(Xr), res, nr, nc) );
+	Xr2 << Xr; rcp_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( rcp(Xc), res, nr, nc) );
+	Xc2 << Xc; rcp_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
+
+	// rsqrt
+
+	for (int i = 0; i < N; ++i) res[i] = 1.0 / std::sqrt(src[i]);
+
+	BCS_CHECK( array_view_equal( rsqrt(x), res, N ) );
+	x2 << x; rsqrt_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( rsqrt(Xr), res, nr, nc) );
+	Xr2 << Xr; rsqrt_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( rsqrt(Xc), res, nr, nc) );
+	Xc2 << Xc; rsqrt_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
 
 	// pow
 
-	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], src_e[i]);
-	for (int i = 0; i < 3; ++i) res_s[i] = std::pow(src[i*2], src_e[i*2]);
+	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], es[i]);
 
-	BCS_CHECK( array_view_approx( pow(x, e),   res, 6 ) );
-	BCS_CHECK( array_view_approx( pow(xs, es), res_s, 3 ) );
-	BCS_CHECK( array_view_approx( pow(Xr, Er), res, 2, 3) );
-	BCS_CHECK( array_view_approx( pow(Xc, Ec), res, 2, 3) );
+	BCS_CHECK( array_view_equal( pow(x, e), res, N ) );
+	x2 << x; pow_ip(x2, e);
+	BCS_CHECK( array_view_equal( x2, res, N) );
 
-	// pow (e)
+	BCS_CHECK( array_view_equal( pow(Xr, Er), res, nr, nc) );
+	Xr2 << Xr; pow_ip(Xr2, Er);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
 
-	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], 3.2);
-	for (int i = 0; i < 3; ++i) res_s[i] = std::pow(src[i*2], 3.2);
+	BCS_CHECK( array_view_equal( pow(Xc, Ec), res, nr, nc) );
+	Xc2 << Xc; pow_ip(Xc2, Ec);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
 
-	BCS_CHECK( array_view_approx( pow(x, 3.2),  res, 6 ) );
-	BCS_CHECK( array_view_approx( pow(xs, 3.2), res_s, 3 ) );
-	BCS_CHECK( array_view_approx( pow(Xr, 3.2), res, 2, 3) );
-	BCS_CHECK( array_view_approx( pow(Xc, 3.2), res, 2, 3) );
+	// pow with constant exponent
 
-	// pow_n
+	double q = 2.3;
 
-	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], 3);
-	for (int i = 0; i < 3; ++i) res_s[i] = std::pow(src[i*2], 3);
+	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], q);
 
-	BCS_CHECK( array_view_approx( pow_n(x,  3), res, 6 ) );
-	BCS_CHECK( array_view_approx( pow_n(xs, 3), res_s, 3 ) );
-	BCS_CHECK( array_view_approx( pow_n(Xr, 3), res, 2, 3) );
-	BCS_CHECK( array_view_approx( pow_n(Xc, 3), res, 2, 3) );
+	BCS_CHECK( array_view_equal( pow(x, q), res, N ) );
+	x2 << x; pow_ip(x2, q);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( pow(Xr, q), res, nr, nc) );
+	Xr2 << Xr; pow_ip(Xr2, q);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( pow(Xc, q), res, nr, nc) );
+	Xc2 << Xc; pow_ip(Xc2, q);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
 
 }
 
+
+
+/*
 
 BCS_TEST_CASE( test_array_exp_log )
 {
@@ -914,8 +956,9 @@ test_suite *test_array_calc_suite()
 	suite->add( new test_array_neg() );
 	suite->add( new test_array_abs() );
 
+
+	suite->add( new test_array_power_and_root_funs() );
 	/*
-	suite->add( new test_array_sqr_sqrt() );
 	suite->add( new test_array_pow() );
 	suite->add( new test_array_exp_log() );
 	suite->add( new test_array_ceil_floor() );

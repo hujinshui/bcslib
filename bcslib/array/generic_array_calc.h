@@ -16,6 +16,11 @@
 
 namespace bcs
 {
+	/********************************************
+	 *
+	 *  Arithmetic Calculation
+	 *
+	 *******************************************/
 
 	// addition
 
@@ -199,6 +204,123 @@ namespace bcs
 	{
 		_arr_ipop<Arr, vec_abs_ftor>::default_evaluate(a);
 	}
+
+
+	/********************************************
+	 *
+	 *  Other Elementary functions
+	 *
+	 *******************************************/
+
+	// power and root functions
+
+	// sqr
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_sqr_ftor>>::type
+	sqr_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_sqr_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	sqr_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_sqr_ftor>::default_evaluate(a);
+	}
+
+	// sqrt
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_sqrt_ftor>>::type
+	sqrt_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_sqrt_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	sqrt_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_sqrt_ftor>::default_evaluate(a);
+	}
+
+
+	// rcp
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_rcp_ftor>>::type
+	rcp_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_rcp_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	rcp_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_rcp_ftor>::default_evaluate(a);
+	}
+
+	// rsqrt
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_rsqrt_ftor>>::type
+	rsqrt_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_rsqrt_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	rsqrt_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_rsqrt_ftor>::default_evaluate(a);
+	}
+
+
+	// pow
+
+	template<class Arr, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr, Arr2>::value,
+	_arr_binop<Arr, Arr2, vec_pow_ftor>>::type
+	pow_arr(const Arr& a, const Arr2& e)
+	{
+		return _arr_binop<Arr, Arr2, vec_pow_ftor>::default_evaluate(a, e);
+	}
+
+	template<class Arr, class Arr2>
+	inline typename std::enable_if<is_compatible_aviews<Arr, Arr2>::value, void>::type
+	pow_arr_inplace(Arr& a, const Arr2& e)
+	{
+		_arr_ipop_R1<Arr, Arr2, vec_pow_ftor>::default_evaluate(a, e);
+	}
+
+
+	// pow with constant exponent
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	_arr_uniop<Arr, vec_sca_pow_ftor>>::type
+	pow_arr_sca(const Arr& a, const T& e)
+	{
+		return _arr_uniop<Arr, vec_sca_pow_ftor>::evaluate_with_scalar(a, e);
+	}
+
+
+	template<class Arr, typename T>
+	inline typename std::enable_if<is_compatible_aview_v<Arr, T>::value, void>::type
+	pow_arr_sca_inplace(Arr& a, const T& x)
+	{
+		_arr_ipop<Arr, vec_sca_pow_ftor>::evaluate_with_scalar(a, x);
+	}
+
+
 
 
 }
