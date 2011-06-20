@@ -431,6 +431,41 @@ namespace bcs
 	};
 
 
+	// hyperbolic functions
+
+	// sinh
+
+	template<typename T>
+	struct vec_sinh_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_sinh(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_sinh(n, y, y); }
+	};
+
+	// cosh
+
+	template<typename T>
+	struct vec_cosh_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_cosh(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_cosh(n, y, y); }
+	};
+
+	// tanh
+
+	template<typename T>
+	struct vec_tanh_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_tanh(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_tanh(n, y, y); }
+	};
+
 }
 
 #endif 

@@ -963,6 +963,71 @@ BCS_TEST_CASE( test_array_trigonometric_funs )
 }
 
 
+BCS_TEST_CASE( test_array_hyperbolic_funs )
+{
+	const int N = 6;
+	double src[N] = {-0.9, -0.5, -0.2, 0.1, 0.4, 0.8};
+	double res[N];
+
+	const int nr = 2;
+	const int nc = 3;
+
+	array1d<double> x(N, src);
+	array2d<double, row_major_t> Xr(nr, nc, src);
+	array2d<double, column_major_t> Xc(nr, nc, src);
+
+	array1d<double> x2(N);
+	array2d<double, row_major_t> Xr2(nr, nc);
+	array2d<double, column_major_t> Xc2(nr, nc);
+
+	// sinh
+
+	for (int i = 0; i < N; ++i) res[i] = std::sinh(src[i]);
+
+	BCS_CHECK( array_view_equal( sinh(x), res, N ) );
+	x2 << x; sinh_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( sinh(Xr), res, nr, nc) );
+	Xr2 << Xr; sinh_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( sinh(Xc), res, nr, nc) );
+	Xc2 << Xc; sinh_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
+	// cosh
+
+	for (int i = 0; i < N; ++i) res[i] = std::cosh(src[i]);
+
+	BCS_CHECK( array_view_equal( cosh(x), res, N ) );
+	x2 << x; cosh_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( cosh(Xr), res, nr, nc) );
+	Xr2 << Xr; cosh_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( cosh(Xc), res, nr, nc) );
+	Xc2 << Xc; cosh_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
+	// tanh
+
+	for (int i = 0; i < N; ++i) res[i] = std::tanh(src[i]);
+
+	BCS_CHECK( array_view_equal( tanh(x), res, N ) );
+	x2 << x; tanh_ip(x2);
+	BCS_CHECK( array_view_equal( x2, res, N) );
+
+	BCS_CHECK( array_view_equal( tanh(Xr), res, nr, nc) );
+	Xr2 << Xr; tanh_ip(Xr2);
+	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
+
+	BCS_CHECK( array_view_equal( tanh(Xc), res, nr, nc) );
+	Xc2 << Xc; tanh_ip(Xc2);
+	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+}
 
 
 test_suite *test_array_calc_suite()
@@ -980,10 +1045,7 @@ test_suite *test_array_calc_suite()
 	suite->add( new test_array_exp_and_log_funs() );
 	suite->add( new test_array_floor_and_ceil() );
 	suite->add( new test_array_trigonometric_funs() );
-
-	/*
-	suite->add( new test_array_htrifuncs() );
-	*/
+	suite->add( new test_array_hyperbolic_funs() );
 
 	return suite;
 }

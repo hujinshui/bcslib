@@ -528,6 +528,57 @@ namespace bcs
 	}
 
 
+	// sinh
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_sinh_ftor>>::type
+	sinh_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_sinh_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	sinh_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_sinh_ftor>::default_evaluate(a);
+	}
+
+	// cosh
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_cosh_ftor>>::type
+	cosh_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_cosh_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	cosh_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_cosh_ftor>::default_evaluate(a);
+	}
+
+	// tanh
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_tanh_ftor>>::type
+	tanh_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_tanh_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	tanh_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_tanh_ftor>::default_evaluate(a);
+	}
+
 }
 
 #endif 
