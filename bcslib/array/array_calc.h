@@ -572,6 +572,93 @@ namespace bcs
 	}
 
 
+	// exponential and logarithm functions
+
+	// exp
+
+	template<typename T, class TIndexer>
+	inline array1d<T> exp(const aview1d<T, TIndexer>& a)
+	{
+		return exp_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> exp(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return exp_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& exp_ip(aview1d<T, TIndexer>& a)
+	{
+		exp_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& exp_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		exp_arr_inplace(a);
+		return a;
+	}
+
+	// log
+
+	template<typename T, class TIndexer>
+	inline array1d<T> log(const aview1d<T, TIndexer>& a)
+	{
+		return log_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> log(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return log_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& log_ip(aview1d<T, TIndexer>& a)
+	{
+		log_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& log_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		log_arr_inplace(a);
+		return a;
+	}
+
+	// log10
+
+	template<typename T, class TIndexer>
+	inline array1d<T> log10(const aview1d<T, TIndexer>& a)
+	{
+		return log10_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> log10(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return log10_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& log10_ip(aview1d<T, TIndexer>& a)
+	{
+		log10_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& log10_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		log10_arr_inplace(a);
+		return a;
+	}
+
+
 }
 
 #endif 

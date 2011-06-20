@@ -321,6 +321,59 @@ namespace bcs
 	}
 
 
+	// exponential and logarithm functions
+
+	// exp
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_exp_ftor>>::type
+	exp_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_exp_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	exp_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_exp_ftor>::default_evaluate(a);
+	}
+
+	// log
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_log_ftor>>::type
+	log_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_log_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	log_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_log_ftor>::default_evaluate(a);
+	}
+
+	// log10
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_arr_uniop<Arr, vec_log10_ftor>>::type
+	log10_arr(const Arr& a)
+	{
+		return _arr_uniop<Arr, vec_log10_ftor>::default_evaluate(a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
+	log10_arr_inplace(Arr& a)
+	{
+		_arr_ipop<Arr, vec_log10_ftor>::default_evaluate(a);
+	}
+
 
 
 }
