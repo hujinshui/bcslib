@@ -906,6 +906,93 @@ namespace bcs
 		return atan2_arr(a, b);
 	}
 
+
+	// hyperbolic functions
+
+	// sinh
+
+	template<typename T, class TIndexer>
+	inline array1d<T> sinh(const aview1d<T, TIndexer>& a)
+	{
+		return sinh_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> sinh(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return sinh_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& sinh_ip(aview1d<T, TIndexer>& a)
+	{
+		sinh_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& sinh_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		sinh_arr_inplace(a);
+		return a;
+	}
+
+	// cosh
+
+	template<typename T, class TIndexer>
+	inline array1d<T> cosh(const aview1d<T, TIndexer>& a)
+	{
+		return cosh_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> cosh(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return cosh_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& cosh_ip(aview1d<T, TIndexer>& a)
+	{
+		cosh_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& cosh_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		cosh_arr_inplace(a);
+		return a;
+	}
+
+	// tanh
+
+	template<typename T, class TIndexer>
+	inline array1d<T> tanh(const aview1d<T, TIndexer>& a)
+	{
+		return tanh_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> tanh(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return tanh_arr(a);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& tanh_ip(aview1d<T, TIndexer>& a)
+	{
+		tanh_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& tanh_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		tanh_arr_inplace(a);
+		return a;
+	}
+
 }
 
 #endif 
