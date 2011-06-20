@@ -96,8 +96,8 @@ bin/test_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(BASICS_TESTS)
 
 #------ Array tests -----------
 
-# test_array : bin/test_array_basics bin/test_array_comp bin/test_array_sparse bin/test_access_performance 
-test_array: bin/test_array_basics bin/test_array_comp
+# test_array : bin/test_array_basics bin/test_array_comp bin/test_array_sparse  
+test_array: bin/test_array_basics bin/test_array_comp bin/test_access_performance
 
 ARRAY_TEST_HEADERS = $(TEST_HEADERS) bcslib/test/test_array_aux.h
 
@@ -126,6 +126,10 @@ bin/test_array_sparse: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADE
 
 bin/test_access_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) test/test_access_performance.cpp
 	$(CXX) $(CFLAGS) -O3 test/test_access_performance.cpp -o bin/test_access_performance
+
+
+
+
 
 
 GEOMETRY_BASIC_TESTS = test/test_geometry_basics.cpp test/test_geometry_primitives.cpp test/test_poly_scan.cpp
