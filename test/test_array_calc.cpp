@@ -541,19 +541,18 @@ BCS_TEST_CASE( test_array_neg )
 	BCS_CHECK( array_view_equal(-Xs1, rb2, 2, 3) );
 
 	array2d<double, row_major_t> Y1(2, 3, src1);
-	neg_arr_inplace(Y1);
+	neg_ip(Y1);
 	BCS_CHECK( array_view_equal(Y1, rb1, 2, 3) );
 
 	double Y2_buf[10];
 	aview2d<double, row_major_t, step_ind, id_ind> Y2(Y2_buf, 3, 3, step_ind(2, 2), id_ind(3));
 	Y2 << X1;
-	neg_arr_inplace(Y2);
+	neg_ip(Y2);
 	BCS_CHECK( array_view_equal(Y2, rb1, 2, 3) );
 
 }
 
 
-/*
 BCS_TEST_CASE( test_array_abs )
 {
 	const int N = 6;
@@ -562,20 +561,33 @@ BCS_TEST_CASE( test_array_abs )
 	for (int i = 0; i < N; ++i) res[i] = std::abs(src[i]);
 
 	array1d<double> x(6, src);
-	BCS_CHECK( array_view_approx( abs(x), res, 6 ) );
+	array1d<double> xc = clone_array(x);
+	BCS_CHECK( array_view_equal( abs(x), res, 6 ) );
+	abs_ip(xc);
+	BCS_CHECK( array_view_equal( xc, res, 6 ) );
 
 	double res_s[3] = {1, 3, 5};
-	const_aview1d<double, step_ind> xs(src, step_ind(3, 2));
-	BCS_CHECK( array_view_approx( abs(xs), res_s, 3) );
+	aview1d<double, step_ind> xs(src, step_ind(3, 2));
+	array1d<double> xsc = clone_array(xs);
+	BCS_CHECK( array_view_equal( abs(xs), res_s, 3) );
+	abs_ip(xsc);
+	BCS_CHECK( array_view_equal( xsc, res_s, 3) );
 
 	array2d<double, row_major_t> Xr(2, 3, src);
-	BCS_CHECK( array_view_approx( abs(Xr), res, 2, 3) );
+	array2d<double, row_major_t> Xrc = clone_array(Xr);
+	BCS_CHECK( array_view_equal( abs(Xr), res, 2, 3) );
+	abs_ip(Xrc);
+	BCS_CHECK( array_view_equal( Xrc, res, 2, 3) );
 
 	array2d<double, column_major_t> Xc(2, 3, src);
+	array2d<double, column_major_t> Xcc = clone_array(Xc);
 	BCS_CHECK( array_view_approx( abs(Xc), res, 2, 3) );
+	abs_ip(Xcc);
+	BCS_CHECK( array_view_equal( Xcc, res, 2, 3) );
 }
 
 
+/*
 BCS_TEST_CASE( test_array_sqr_sqrt )
 {
 	const int N = 6;
@@ -900,9 +912,9 @@ test_suite *test_array_calc_suite()
 	suite->add( new test_array_mul() );
 	suite->add( new test_array_div() );
 	suite->add( new test_array_neg() );
-
-/*
 	suite->add( new test_array_abs() );
+
+	/*
 	suite->add( new test_array_sqr_sqrt() );
 	suite->add( new test_array_pow() );
 	suite->add( new test_array_exp_log() );

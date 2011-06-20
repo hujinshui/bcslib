@@ -189,6 +189,8 @@ namespace bcs
 	{
 		typedef T result_value_type;
 		void operator() (size_t n, const T *x, T *y) const { vec_negate(n, x, y); }
+
+
 	};
 
 
@@ -198,6 +200,19 @@ namespace bcs
 		typedef T result_value_type;
 		void operator() (size_t n, T *y) const { vec_negate(n, y); }
 	};
+
+
+	// absolute value
+
+	template<typename T>
+	struct vec_abs_ftor
+	{
+		typedef T result_value_type;
+
+		void operator() (size_t n, const T *x, T *y) const { return vec_abs(n, x, y); }
+		void operator() (size_t n, T *y) const { return vec_abs(n, y, y); }
+	};
+
 
 }
 

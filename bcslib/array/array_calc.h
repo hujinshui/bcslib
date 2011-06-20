@@ -341,6 +341,50 @@ namespace bcs
 		return neg_arr(rhs);
 	}
 
+	template<typename T, class RIndexer>
+	inline aview1d<T, RIndexer>& neg_ip(aview1d<T, RIndexer>& a)
+	{
+		neg_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline aview2d<T, TOrd, RIndexer0, RIndexer1>& neg_ip(aview2d<T, TOrd, RIndexer0, RIndexer1>& a)
+	{
+		neg_arr_inplace(a);
+		return a;
+	}
+
+
+	// absolute value
+
+	template<typename T, class RIndexer>
+	inline array1d<T> abs(const aview1d<T, RIndexer>& a)
+	{
+		return abs_arr(a);
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline array2d<T, TOrd> abs(const aview2d<T, TOrd, RIndexer0, RIndexer1>& a)
+	{
+		return abs_arr(a);
+	}
+
+	template<typename T, class RIndexer>
+	inline aview1d<T, RIndexer>& abs_ip(aview1d<T, RIndexer>& a)
+	{
+		abs_arr_inplace(a);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline aview2d<T, TOrd, RIndexer0, RIndexer1>& abs_ip(aview2d<T, TOrd, RIndexer0, RIndexer1>& a)
+	{
+		abs_arr_inplace(a);
+		return a;
+	}
+
+
 }
 
 #endif 
