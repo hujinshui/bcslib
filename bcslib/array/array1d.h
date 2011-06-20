@@ -370,6 +370,21 @@ namespace bcs
 	}; // end class aview1d
 
 
+	template<typename T>
+	inline const aview1d<T, id_ind> get_aview1d(const T *base, size_t n)
+	{
+		return aview1d<T>(const_cast<T*>(base), n);
+	}
+
+
+	template<typename T, class TIndexer>
+	inline const aview1d<T, TIndexer> get_aview1d(const T *base, const TIndexer& idxer)
+	{
+		return aview1d<T, TIndexer>(const_cast<T*>(base), idxer);
+	}
+
+
+
 	// stand-alone array class
 
 	template<typename T, class Alloc>
