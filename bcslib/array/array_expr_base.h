@@ -256,8 +256,124 @@ namespace bcs
 	private:
 		InplaceVecFunc m_vecfunc;
 
-	}; // end // end class array_inplace_operator
+	}; // end class array_inplace_operator_R1
 
+
+
+	template<typename VecFunc, class Arr>
+	class unary_array_stats_evaluator
+	{
+	public:
+		static_assert(is_array_view<Arr>::value, "Operands must be of array view types.");
+
+		typedef typename array_view_traits<Arr>::value_type arr_value_type;
+
+		typedef typename VecFunc::result_type result_type;
+
+	public:
+		unary_array_stats_evaluator(VecFunc vfunc) : m_vecfunc(vfunc)
+		{
+		}
+
+		result_type operator() (const Arr& a) const
+		{
+			return evaluate(m_vecfunc, a);
+		}
+
+	public:
+		static result_type evaluate(VecFunc vfunc, const Arr& a)
+		{
+			size_t n = get_num_elems(a);
+
+			if (is_dense_view(a))
+			{
+				return vfunc(n, ptr_base(a));
+			}
+			else
+			{
+				scoped_buffer<arr_value_type> buf(n);
+				export_to(a, buf.pbase());
+				return vfunc(n, buf.pbase());
+			}
+		}
+
+
+	private:
+		VecFunc m_vecfunc;
+
+	}; // end class unary_array_stats_evaluator
+
+
+	template<typename VecFunc, class Arr1, class Arr2>
+	class binary_array_stats_evaluator
+	{
+	public:
+		static_assert(is_array_view<Arr1>::value && is_array_view<Arr2>::value,
+				"Operands must be of array view types.");
+
+		static_assert(array_view_traits<Arr1>::num_dims == array_view_traits<Arr2>::num_dims,
+				"Operand arrays are required to have the same number of dimensions.");
+
+		static_assert(std::is_same<
+				typename array_view_traits<Arr1>::layout_order,
+				typename array_view_traits<Arr2>::layout_order>::value,
+				"Operand arrays are required to have the same layout order.");
+
+		typedef typename array_view_traits<Arr1>::value_type arr1_value_type;
+		typedef typename array_view_traits<Arr2>::value_type arr2_value_type;
+
+		typedef typename VecFunc::result_type result_type;
+
+	public:
+		binary_array_stats_evaluator(VecFunc vfunc) : m_vecfunc(vfunc)
+		{
+		}
+
+		result_type operator() (const Arr1& a, const Arr2& b) const
+		{
+			return evaluate(m_vecfunc, a, b);
+		}
+
+	public:
+		static result_type evaluate(VecFunc vfunc, const Arr1& a, const Arr2& b)
+		{
+			size_t n = get_num_elems(a);
+
+			if (is_dense_view(a))
+			{
+				if (is_dense_view(b))
+				{
+					return vfunc(n, ptr_base(a), ptr_base(b));
+				}
+				else
+				{
+					scoped_buffer<arr2_value_type> buf2(n);
+					export_to(b, buf2.pbase());
+					return vfunc(n, ptr_base(a), buf2.pbase());
+				}
+			}
+			else
+			{
+				scoped_buffer<arr1_value_type> buf1(n);
+				export_to(a, buf1.pbase());
+
+				if (is_dense_view(b))
+				{
+					return vfunc(n, buf1.pbase(), ptr_base(b));
+				}
+				else
+				{
+					scoped_buffer<arr2_value_type> buf2(n);
+					export_to(b, buf2.pbase());
+					return vfunc(n, buf1.pbase(), buf2.pbase());
+				}
+			}
+		}
+
+	private:
+		VecFunc m_vecfunc;
+
+	}; // end class binary_array_stats_evaluator
 
 
 
