@@ -9,10 +9,7 @@
 #ifndef BCSLIB_VECSTAT_H
 #define BCSLIB_VECSTAT_H
 
-#include <bcslib/base/config.h>
 #include <bcslib/base/basic_defs.h>
-#include <bcslib/base/basic_funcs.h>
-
 #include <algorithm>
 
 namespace bcs

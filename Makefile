@@ -56,8 +56,8 @@ VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h \
 
 ARRAY_COMP_HEADERS = bcslib/array/array_expr_base.h \
 	bcslib/array/generic_array_calc.h \
-	bcslib/array/array_calc.h \
-	bcslib/array/array_eval.h
+	bcslib/array/array_calc.h 
+	
 
 ARRAY_SPARSE_HEADERS = bcslib/array/sparse_vector.h bcslib/array/dynamic_sparse_vector.h
 
