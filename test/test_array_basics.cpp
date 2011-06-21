@@ -12,6 +12,7 @@ using namespace bcs::test;
 
 extern test_suite* test_array1d_suite();
 extern test_suite* test_array2d_suite();
+extern test_suite* test_array_transposition_suite();
 
 test_suite* master_suite()
 {
@@ -19,6 +20,7 @@ test_suite* master_suite()
 
 	msuite->add( test_array1d_suite() );
 	msuite->add( test_array2d_suite() );
+	msuite->add( test_array_transposition_suite() );
 
 	return msuite;
 }

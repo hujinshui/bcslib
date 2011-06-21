@@ -10,6 +10,7 @@
 #define BCSLIB_ARRAY2D_H
 
 #include <bcslib/array/array1d.h>
+#include <bcslib/array/generic_array_transpose.h>
 
 namespace bcs
 {
@@ -404,6 +405,29 @@ namespace bcs
 		}; // end class _aview2d_iter_imple for column_major
 
 
+		template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+		class _arr2d_transpose_t
+		{
+		public:
+			typedef T value_type;
+			typedef aview2d<T, TOrd, TIndexer0, TIndexer1> aview_type;
+
+			explicit _arr2d_transpose_t(const aview_type& a) : m_cref(a) { }
+
+			_arr2d_transpose_t(const _arr2d_transpose_t& r) : m_cref(r.m_cref) { }
+
+			const aview_type& get() const
+			{
+				return m_cref;
+			}
+
+			inline operator array2d<T, TOrd>();
+
+		private:
+			const aview_type& m_cref;
+		};
+
+
 	} // end namespace _detail
 
 
@@ -451,6 +475,9 @@ namespace bcs
 		typedef _detail::_aview2d_index_core<TOrd, TIndexer0, TIndexer1> _index_core_type;
 		typedef typename _index_core_type::slice0_indexer_type slice0_indexer_type;
 		typedef typename _index_core_type::slice1_indexer_type slice1_indexer_type;
+
+	private:
+		typedef _detail::_arr2d_transpose_t<T, TOrd, TIndexer0, TIndexer1> _transpose_t;
 
 	public:
 		aview2d(pointer pbase, index_type base_d0, index_type base_d1,
@@ -562,6 +589,11 @@ namespace bcs
 			return arr_shape(base_dim0(), base_dim1());
 		}
 
+		// just for temporary use in an expression, not allowed to pass around
+		_transpose_t Tp() const
+		{
+			return _transpose_t(*this);
+		}
 
 	public:
 		// Element access
@@ -825,6 +857,7 @@ namespace bcs
 			import_from(*this, it);
 		}
 
+
 		array2d& operator = (const array2d& r)
 		{
 			if (this != &r)
@@ -880,6 +913,13 @@ namespace bcs
 	inline void swap(array2d<T, TOrd, Alloc>& lhs, array2d<T, TOrd, Alloc>& rhs)
 	{
 		lhs.swap(rhs);
+	}
+
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline _detail::_arr2d_transpose_t<T, TOrd, TIndexer0, TIndexer1>::operator array2d<T, TOrd>()
+	{
+		return transpose(m_cref);
 	}
 
 
@@ -1113,6 +1153,14 @@ namespace bcs
 
 		return a;
 	}
+
+
+	/******************************************************
+	 *
+	 *  Overloaded operators
+	 *
+	 ******************************************************/
+
 }
 
 
