@@ -55,8 +55,8 @@ VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h \
 	bcslib/veccomp/vecstat_functors.h
 
 ARRAY_COMP_HEADERS = bcslib/array/array_expr_base.h \
-	bcslib/array/generic_array_calc.h \
-	bcslib/array/array_calc.h 
+	bcslib/array/generic_array_calc.h bcslib/array/array_calc.h \
+	bcslib/array/generic_array_stat.h bcslib/array/array_stat.h 
 	
 
 ARRAY_SPARSE_HEADERS = bcslib/array/sparse_vector.h bcslib/array/dynamic_sparse_vector.h
@@ -112,9 +112,8 @@ bin/test_array_basics: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADE
 	
 	
 ARRAY_COMP_TESTS = test/test_array_comp.cpp \
-	test/test_array_calc.cpp 
-	
-#test/test_array_eval.cpp
+	test/test_array_calc.cpp \
+	test/test_array_stat.cpp
 
 bin/test_array_comp: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
 	$(CXX) $(CFLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp

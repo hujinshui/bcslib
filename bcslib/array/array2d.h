@@ -785,14 +785,14 @@ namespace bcs
 	}
 
 	template<typename T, class TIndexer0, class TIndexer1>
-	inline const aview2d<T, row_major_t, TIndexer0, TIndexer1> get_aview2d_rm(const T *base, size_t base_m, size_t base_n,
+	inline const aview2d<T, row_major_t, TIndexer0, TIndexer1> get_aview2d_rm_ex(const T *base, size_t base_m, size_t base_n,
 			const TIndexer0& idxer0, const TIndexer1& idxer1)
 	{
 		return aview2d<T, row_major_t, TIndexer0, TIndexer1>(const_cast<T*>(base), (index_t)base_m, (index_t)base_n, idxer0, idxer1);
 	}
 
 	template<typename T, class TIndexer0, class TIndexer1>
-	inline const aview2d<T, column_major_t, TIndexer0, TIndexer1> get_aview2d_cm(const T *base, size_t base_m, size_t base_n,
+	inline const aview2d<T, column_major_t, TIndexer0, TIndexer1> get_aview2d_cm_ex(const T *base, size_t base_m, size_t base_n,
 			const TIndexer0& idxer0, const TIndexer1& idxer1)
 	{
 		return aview2d<T, column_major_t, TIndexer0, TIndexer1>(const_cast<T*>(base), (index_t)base_m, (index_t)base_n, idxer0, idxer1);

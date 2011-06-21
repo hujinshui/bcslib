@@ -14,9 +14,6 @@
 #include <bcslib/array/array2d.h>
 #include <bcslib/array/array_calc.h>
 
-#include <iostream>
-#include <vector>
-
 using namespace bcs;
 using namespace bcs::test;
 

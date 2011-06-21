@@ -90,7 +90,7 @@ double time_dense1d_access(int nrepeats, const size_t nelems, const double *src,
 
 double time_step1d_export(int nrepeats, const size_t nelems, const double *src, double *buf)
 {
-	const aview1d<double, step_ind> view = get_aview1d(src, step_ind(nelems, 2));
+	const aview1d<double, step_ind> view = get_aview1d_ex(src, step_ind(nelems, 2));
 
 	export_to(view, buf);
 
@@ -106,7 +106,7 @@ double time_step1d_export(int nrepeats, const size_t nelems, const double *src, 
 
 double time_step1d_access(int nrepeats, const size_t nelems, const double *src, double *buf)
 {
-	const aview1d<double, step_ind> view = get_aview1d(src, step_ind(nelems, 2));
+	const aview1d<double, step_ind> view = get_aview1d_ex(src, step_ind(nelems, 2));
 
 	index_t n = (index_t)nelems;
 
@@ -205,7 +205,7 @@ double time_dense2d_cm_access(int nrepeats, const size_t m, const size_t n, cons
 
 double time_step2d_rm_export(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
 {
-	const aview2d<double, row_major_t, step_ind, step_ind> view = get_aview2d_rm(
+	const aview2d<double, row_major_t, step_ind, step_ind> view = get_aview2d_rm_ex(
 			src, 2*m, 2*n, step_ind(m, 2), step_ind(n,2));
 
 	export_to(view, buf);
@@ -222,7 +222,7 @@ double time_step2d_rm_export(int nrepeats, const size_t m, const size_t n, const
 
 double time_step2d_cm_export(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
 {
-	const aview2d<double, column_major_t, step_ind, step_ind> view = get_aview2d_cm(
+	const aview2d<double, column_major_t, step_ind, step_ind> view = get_aview2d_cm_ex(
 			src, 2*m, 2*n, step_ind(m,2), step_ind(n,2));
 
 	export_to(view, buf);
@@ -240,7 +240,7 @@ double time_step2d_cm_export(int nrepeats, const size_t m, const size_t n, const
 
 double time_step2d_rm_access(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
 {
-	const aview2d<double, row_major_t, step_ind, step_ind> view = get_aview2d_rm(
+	const aview2d<double, row_major_t, step_ind, step_ind> view = get_aview2d_rm_ex(
 			src, 2*m, 2*n, step_ind(m, 2), step_ind(n,2));
 
 	index_t d0 = (index_t)m;
@@ -265,7 +265,7 @@ double time_step2d_rm_access(int nrepeats, const size_t m, const size_t n, const
 
 double time_step2d_cm_access(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
 {
-	const aview2d<double, column_major_t, step_ind, step_ind> view = get_aview2d_cm(
+	const aview2d<double, column_major_t, step_ind, step_ind> view = get_aview2d_cm_ex(
 			src, 2*m, 2*n, step_ind(m,2), step_ind(n,2));
 
 	index_t d0 = (index_t)m;
