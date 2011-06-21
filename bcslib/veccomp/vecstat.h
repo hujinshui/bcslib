@@ -110,7 +110,7 @@ namespace bcs
 	}
 
 	template<typename T>
-	inline std::pair<size_t, T> vec_index_min(size_t n, const T *x)
+	inline size_t vec_index_min(size_t n, const T *x)
 	{
 		check_arg(n > 0, "n must be positive for vec_index_min.");
 
@@ -126,12 +126,12 @@ namespace bcs
 			}
 		}
 
-		return std::make_pair(p, v);
+		return p;
 	}
 
 
 	template<typename T>
-	inline std::pair<index_t, T> vec_index_max(size_t n, const T *x)
+	inline size_t vec_index_max(size_t n, const T *x)
 	{
 		check_arg(n > 0, "n must be positive for vec_index_min.");
 
@@ -147,7 +147,7 @@ namespace bcs
 			}
 		}
 
-		return std::make_pair(p, v);
+		return p;
 	}
 
 
