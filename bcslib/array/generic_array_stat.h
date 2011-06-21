@@ -29,6 +29,13 @@ namespace bcs
 		return _uniarr_stat<Arr, vec_sum_ftor>::default_evaluate(a);
 	}
 
+	template<class Arr, typename Slicing>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	_uniarr_slice_stat<Arr, Slicing, vec_sum_ftor> >::type
+	sum_arr(const Arr& a, Slicing)
+	{
+		return _uniarr_slice_stat<Arr, Slicing, vec_sum_ftor>::default_evaluate(a);
+	}
 
 }
 

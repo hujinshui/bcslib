@@ -30,7 +30,6 @@ namespace bcs
 	struct row_major_t { };
 	struct column_major_t { };
 
-
 	/*********
 	 *
 	 * The concept of an array class
@@ -90,8 +89,17 @@ namespace bcs
 		static const dim_num_t num_dims = A::num_dims;
 	};
 
+	template<class Arr>
+	struct is_row_major
+	{
+		static const bool value = std::is_same<typename array_view_traits<Arr>::layout_order, row_major_t>::value;
+	};
 
-	template<class A, dim_num_t K> struct array_dim;
+	template<class Arr>
+	struct is_column_major
+	{
+		static const bool value = std::is_same<typename array_view_traits<Arr>::layout_order, column_major_t>::value;
+	};
 
 
 	// make array shape

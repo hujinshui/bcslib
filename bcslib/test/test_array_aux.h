@@ -128,6 +128,7 @@ namespace bcs
 			return true;
 		}
 
+		// printing
 
 		template<typename T, class TIndexer>
 		void print_array(const bcs::aview1d<T, TIndexer>& view, const char *title = 0)
@@ -158,6 +159,66 @@ namespace bcs
 				}
 				std::cout << std::endl;
 			}
+		}
+
+
+		// accumulation
+
+		template<typename T, class TIndexer, class Accumulator>
+		typename Accumulator::result_type accum_all(const aview1d<T, TIndexer>& a, Accumulator accum)
+		{
+			for (index_t i = 0; i < a.dim0(); ++i)
+			{
+				accum.put(a(i));
+			}
+			return accum.get();
+		}
+
+		template<typename T, typename TOrd, class TIndexer0, class TIndexer1, class Accumulator>
+		typename Accumulator::result_type accum_all(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a, Accumulator accum)
+		{
+			for (index_t i = 0; i < a.dim0(); ++i)
+			{
+				for (index_t j = 0; j < a.dim1(); ++j)
+				{
+					accum.put(a(i, j));
+				}
+			}
+			return accum.get();
+		}
+
+		template<typename T, typename TOrd, class TIndexer0, class TIndexer1, class Accumulator>
+		array1d<typename Accumulator::result_type> accum_prow(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a, Accumulator accum0)
+		{
+			array1d<typename Accumulator::result_type> r(a.nrows());
+
+			for (index_t i = 0; i < a.dim0(); ++i)
+			{
+				Accumulator accum(accum0);
+				for (index_t j = 0; j < a.dim1(); ++j)
+				{
+					accum.put(a(i, j));
+				}
+				r(i) = accum.get();
+			}
+			return r;
+		}
+
+		template<typename T, typename TOrd, class TIndexer0, class TIndexer1, class Accumulator>
+		array1d<typename Accumulator::result_type> accum_pcol(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a, Accumulator accum0)
+		{
+			array1d<typename Accumulator::result_type> r(a.ncolumns());
+
+			for (index_t j = 0; j < a.dim1(); ++j)
+			{
+				Accumulator accum(accum0);
+				for (index_t i = 0; i < a.dim0(); ++i)
+				{
+					accum.put(a(i, j));
+				}
+				r(j) = accum.get();
+			}
+			return r;
 		}
 
 	}

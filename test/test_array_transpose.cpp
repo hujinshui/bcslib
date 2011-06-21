@@ -58,7 +58,7 @@ BCS_TEST_CASE( test_direct_transpose )
 {
 	size_t Nmax = 16;
 	double src[16];
-	for (size_t i = 0; i < Nmax; ++i) src[i] = i + 1;
+	for (size_t i = 0; i < Nmax; ++i) src[i] = (double)(i + 1);
 
 	// 1 x 2
 
@@ -147,7 +147,7 @@ BCS_TEST_CASE( test_blockwise_transpose )
 {
 	const size_t Nmax = 200;
 	double src[Nmax];
-	for (size_t i = 0; i < Nmax; ++i) src[i] = i + 1;
+	for (size_t i = 0; i < Nmax; ++i) src[i] = (double)(i + 1);
 
 	double dst[Nmax];
 	double r[Nmax];
@@ -200,7 +200,7 @@ BCS_TEST_CASE( test_array2d_transpose )
 	const size_t Nmax = 40000;
 
 	scoped_buffer<double> buf(Nmax);
-	for (size_t i = 0; i < Nmax; ++i) buf[i] = i + 1;
+	for (size_t i = 0; i < Nmax; ++i) buf[i] = (double)(i + 1);
 	const double *src = buf.pbase();
 
 	size_t ds[6] = {2, 5, 11, 20, 55, 83};
