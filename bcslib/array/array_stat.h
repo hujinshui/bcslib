@@ -31,6 +31,11 @@ namespace bcs
 		return sum_arr(a);
 	}
 
+	template<typename T, typename TOrd, class TIndexer1, class TIndexer2, typename Slicing>
+	array1d<T> sum(const aview2d<T, TOrd, TIndexer1, TIndexer2>& a, Slicing)
+	{
+		return sum_arr(a, Slicing());
+	}
 
 
 }

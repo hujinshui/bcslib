@@ -1053,40 +1053,6 @@ namespace bcs
 		return view;
 	}
 
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	struct array_creater<aview2d<T, TOrd, TIndexer0, TIndexer1> >
-	{
-		typedef std::array<index_t, 2> shape_type;
-		typedef array2d<T, TOrd> result_type;
-
-		template<typename U>
-		struct remap
-		{
-			typedef array2d<U, TOrd> result_type;
-
-			static result_type create(const shape_type& shape)
-			{
-				return result_type(
-					static_cast<size_t>(shape[0]),
-					static_cast<size_t>(shape[1]));
-			}
-		};
-
-		static result_type create(const shape_type& shape)
-		{
-			return result_type(
-				static_cast<size_t>(shape[0]),
-				static_cast<size_t>(shape[1]));
-		}
-
-		static result_type copy(const aview2d<T, TOrd, TIndexer0, TIndexer1>& view)
-		{
-			return view;
-		}
-	};
-
-
 	/******************************************************
 	 *
 	 *  Overloaded operators
@@ -1157,9 +1123,40 @@ namespace bcs
 
 	/******************************************************
 	 *
-	 *  Overloaded operators
+	 *  Creaters
 	 *
 	 ******************************************************/
+
+	namespace _detail
+	{
+		template<typename T, typename TOrd>
+		struct _array_creater<T, 2, TOrd>
+		{
+			typedef array2d<T, TOrd> result_type;
+			typedef std::array<index_t, 2> shape_type;
+
+			static result_type create(const shape_type& shape)
+			{
+				size_t m = static_cast<size_t>(shape[0]);
+				size_t n = static_cast<size_t>(shape[1]);
+
+				return result_type(m, n);
+			}
+		};
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	struct array_creater<aview2d<T, TOrd, TIndexer0, TIndexer1> > : public _detail::_array_creater<T, 2, TOrd>
+	{
+		typedef array2d<T, TOrd> result_type;
+
+		template<typename U=T, dim_num_t D=2>
+		struct remap
+		{
+			typedef _detail::_array_creater<U, D, TOrd> type;
+		};
+	};
+
 
 }
 

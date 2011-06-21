@@ -604,34 +604,6 @@ namespace bcs
 		return view;
 	}
 
-	template<typename T, class TIndexer>
-	struct array_creater<aview1d<T, TIndexer> >
-	{
-		typedef std::array<index_t, 1> shape_type;
-		typedef array1d<T> result_type;
-
-		template<typename U>
-		struct remap
-		{
-			typedef array1d<U> result_type;
-
-			static result_type create(const shape_type& shape)
-			{
-				return result_type(static_cast<size_t>(shape[0]));
-			}
-		};
-
-		static result_type create(const shape_type& shape)
-		{
-			return result_type(static_cast<size_t>(shape[0]));
-		}
-
-		static result_type copy(const aview1d<T, TIndexer>& view)
-		{
-			return view;
-		}
-	};
-
 
 	/******************************************************
 	 *
@@ -742,6 +714,42 @@ namespace bcs
 			}
 			return a;
 		}
+	};
+
+
+	/******************************************************
+	 *
+	 *  array creaters
+	 *
+	 ******************************************************/
+
+	namespace _detail
+	{
+		template<typename T, dim_num_t D, typename TOrd> struct _array_creater;
+
+		template<typename T, typename TOrd>
+		struct _array_creater<T, 1, TOrd>
+		{
+			typedef array1d<T> result_type;
+			typedef std::array<index_t, 1> shape_type;
+
+			static result_type create(const shape_type& shape)
+			{
+				return result_type(static_cast<size_t>(shape[0]));
+			}
+		};
+	}
+
+	template<typename T, class TIndexer>
+	struct array_creater<aview1d<T, TIndexer> > : public _detail::_array_creater<T, 1, layout_1d_t>
+	{
+		typedef array1d<T> result_type;
+
+		template<typename U=T>
+		struct remap
+		{
+			typedef _detail::_array_creater<U, 1, layout_1d_t> type;
+		};
 	};
 
 }

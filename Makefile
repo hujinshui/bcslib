@@ -47,7 +47,7 @@ ARRAY_BASIC_HEADERS = bcslib/array/array_base.h \
 	bcslib/array/generic_array_functions.h \
 	bcslib/array/generic_array_transpose.h \
 	bcslib/array/array1d.h \
-	bcslib/array/array2d.h
+	bcslib/array/array2d.h 
 	 	
 VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h \
 	bcslib/veccomp/veccalc_functors.h \
@@ -116,7 +116,7 @@ ARRAY_COMP_TESTS = test/test_array_comp.cpp \
 	test/test_array_stat.cpp
 
 bin/test_array_comp: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
-	$(CXX) $(CFLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp
+	$(CXX) $(CFLAGS) -O2 $(ARRAY_COMP_TESTS) -o bin/test_array_comp
 
 
 	
