@@ -9,6 +9,7 @@
 #ifndef BCSLIB_CONFIG_H
 #define BCSLIB_CONFIG_H
 
+// Platform-specific stuff
 
 #define BCSLIB_MSVC 0x01
 #define BCSLIB_GCC 0x02
@@ -16,7 +17,6 @@
 
 #define BCS_WINDOWS_INTERFACE 0x11
 #define BCS_POSIX_INTERFACE 0x12
-
 
 #if (defined(_WIN32) || defined(_WIN64)) && defined(_MSC_VER)
 	#if _MSC_VER < 1600
@@ -44,6 +44,12 @@
 #else
 	#error BCSLib can only be used with Microsoft Visual C++, GCC (G++), or clang (clang++).
 #endif
+
+
+// Library switches
+
+#define BCS_USE_INTEL_IPPS
+#define BCS_USE_INTEL_MKL
 
 
 #endif
