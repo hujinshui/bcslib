@@ -378,7 +378,7 @@ namespace bcs
 
 
 	template<typename T, class TIndexer>
-	inline const aview1d<T, TIndexer> get_aview1d(const T *base, const TIndexer& idxer)
+	inline const aview1d<T, TIndexer> get_aview1d_ex(const T *base, const TIndexer& idxer)
 	{
 		return aview1d<T, TIndexer>(const_cast<T*>(base), idxer);
 	}

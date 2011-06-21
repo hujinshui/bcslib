@@ -11,14 +11,14 @@
 using namespace bcs::test;
 
 extern test_suite* test_array_calc_suite();
-// extern test_suite* test_array_eval_suite();
+extern test_suite* test_array_stat_suite();
 
 test_suite* master_suite()
 {
 	test_suite* msuite = new test_suite( "array_computation" );
 
 	msuite->add( test_array_calc_suite() );
-	// msuite->add( test_array_eval_suite() );
+	msuite->add( test_array_stat_suite() );
 
 	return msuite;
 }

@@ -389,19 +389,19 @@ namespace bcs
 	{
 		typedef typename array_view_traits<Arr1>::value_type value_type;
 		typedef VecFuncTemplate<value_type> vecfunc_type;
-		typedef unary_array_operator<vecfunc_type, Arr1> operator_type;
-		typedef typename operator_type::result_type result_type;
+		typedef unary_array_operator<vecfunc_type, Arr1> evaluator_type;
+		typedef typename evaluator_type::result_type result_type;
 
 		typedef result_type type;  // serve as host
 
 		static result_type default_evaluate(const Arr1& a1)
 		{
-			return operator_type::evaluate(vecfunc_type(), a1);
+			return evaluator_type::evaluate(vecfunc_type(), a1);
 		}
 
 		static result_type evaluate_with_scalar(const Arr1& a1, const value_type& v)
 		{
-			return operator_type::evaluate(vecfunc_type(v), a1);
+			return evaluator_type::evaluate(vecfunc_type(v), a1);
 		}
 	};
 
@@ -411,14 +411,14 @@ namespace bcs
 	{
 		typedef typename array_view_traits<Arr1>::value_type value_type;
 		typedef VecFuncTemplate<value_type> vecfunc_type;
-		typedef binary_array_operator<vecfunc_type, Arr1, Arr2> operator_type;
-		typedef typename operator_type::result_type result_type;
+		typedef binary_array_operator<vecfunc_type, Arr1, Arr2> evaluator_type;
+		typedef typename evaluator_type::result_type result_type;
 
 		typedef result_type type;  // serve as host
 
 		static result_type default_evaluate(const Arr1& a1, const Arr2& a2)
 		{
-			return operator_type::evaluate(vecfunc_type(), a1, a2);
+			return evaluator_type::evaluate(vecfunc_type(), a1, a2);
 		}
 	};
 
@@ -428,19 +428,19 @@ namespace bcs
 	{
 		typedef typename array_view_traits<Arr>::value_type value_type;
 		typedef VecFuncTemplate<value_type> vecfunc_type;
-		typedef array_inplace_operator<vecfunc_type, Arr> operator_type;
+		typedef array_inplace_operator<vecfunc_type, Arr> evaluator_type;
 		typedef void result_type;
 
 		typedef result_type type;  // serve as host
 
 		static void default_evaluate(Arr& a)
 		{
-			operator_type::evaluate(vecfunc_type(), a);
+			evaluator_type::evaluate(vecfunc_type(), a);
 		}
 
 		static void evaluate_with_scalar(Arr& a, const value_type& v)
 		{
-			operator_type::evaluate(vecfunc_type(v), a);
+			evaluator_type::evaluate(vecfunc_type(v), a);
 		}
 	};
 
@@ -450,16 +450,56 @@ namespace bcs
 	{
 		typedef typename array_view_traits<RArr1>::value_type value_type;
 		typedef VecFuncTemplate<value_type> vecfunc_type;
-		typedef array_inplace_operator_R1<vecfunc_type, Arr, RArr1> operator_type;
+		typedef array_inplace_operator_R1<vecfunc_type, Arr, RArr1> evaluator_type;
 		typedef void result_type;
 
 		typedef result_type type;  // serve as host
 
 		static void default_evaluate(Arr& a, const RArr1& r1)
 		{
-			operator_type::evaluate(vecfunc_type(), a, r1);
+			evaluator_type::evaluate(vecfunc_type(), a, r1);
 		}
 	};
+
+
+	template<typename Arr, template<typename U> class VecFuncTemplate>
+	struct _uniarr_stat
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		typedef VecFuncTemplate<value_type> vecfunc_type;
+		typedef unary_array_stats_evaluator<vecfunc_type, Arr> evaluator_type;
+		typedef typename vecfunc_type::result_type result_type;
+
+		typedef result_type type;
+
+		static result_type default_evaluate(const Arr& a1)
+		{
+			return evaluator_type::evaluate(vecfunc_type(), a1);
+		}
+
+		static result_type evaluate_with_scalar(const Arr& a1, const value_type& v)
+		{
+			return evaluator_type::evaluate(vecfunc_type(v), a1);
+		}
+	};
+
+
+	template<typename Arr1, typename Arr2, template<typename U> class VecFuncTemplate>
+	struct _binarr_stat
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		typedef VecFuncTemplate<value_type> vecfunc_type;
+		typedef binary_array_stats_evaluator<vecfunc_type, Arr1, Arr2> evaluator_type;
+		typedef typename vecfunc_type::result_type result_type;
+
+		typedef result_type type;
+
+		static result_type default_evaluate(const Arr1& a1, const Arr2& a2)
+		{
+			return evaluator_type::evaluate(vecfunc_type(), a1, a2);
+		}
+	};
+
 
 
 }

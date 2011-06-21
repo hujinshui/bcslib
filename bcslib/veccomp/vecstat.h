@@ -156,38 +156,33 @@ namespace bcs
 	template<typename T>
 	inline T vec_median_inplace(size_t n, T *x)
 	{
-		if (n > 0)
+		check_arg(n > 0, "n must be positive for vec_index_min.");
+
+		if (n == 1)
 		{
-			if (n == 1)
-			{
-				return *x;
-			}
-			else if (n == 2)
-			{
-				T x0 = x[0];
-				T x1 = x[1];
-				return x0 + (x1 - x0) / 2;
-			}
-			else if (n % 2 == 0) // even
-			{
-		        T *pm = x + (n/2);
-		        std::nth_element(x, pm, x+n);
-
-		        T v1 = *pm;
-		        T v0 = *(std::max_element(x, pm));
-
-		        return v0 + (v1 - v0) / 2;
-			}
-			else  // odd
-			{
-				T *pm = x + (n/2);
-				std::nth_element(x, pm, x+n);
-				return *pm;
-			}
+			return *x;
 		}
-		else
+		else if (n == 2)
 		{
-			throw empty_accumulation("Cannot take median over an empty collection.");
+			T x0 = x[0];
+			T x1 = x[1];
+			return x0 + (x1 - x0) / 2;
+		}
+		else if (n % 2 == 0) // even
+		{
+	        T *pm = x + (n/2);
+	        std::nth_element(x, pm, x+n);
+
+	        T v1 = *pm;
+	        T v0 = *(std::max_element(x, pm));
+
+	        return v0 + (v1 - v0) / 2;
+		}
+		else  // odd
+		{
+			T *pm = x + (n/2);
+			std::nth_element(x, pm, x+n);
+			return *pm;
 		}
 	}
 
