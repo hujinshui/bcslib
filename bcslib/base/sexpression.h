@@ -37,40 +37,15 @@ namespace bcs
 	public:
 		typedef T result_type;
 
-		soperand(T&& x) : m_val(std::move(x)) { }
-
-		soperand(soperand&& r) : m_val(std::move(r.m_val)) { }
-
-		const result_type& get() const { return m_val; }
-
-		const result_type& evaluate() const { return m_val; }
-
-	private:
-		soperand(const soperand& );
-		soperand& operator = (const soperand& );
-
-	private:
-		T m_val;
-	};
-
-
-	template<class T>
-	class soperand_cref
-	{
-	public:
-		typedef T result_type;
-
-		soperand_cref(const T& x) : m_cref(x) { }
-
-		soperand_cref(soperand_cref&& r) : m_cref(r.m_cref) { }
+		soperand(const T& x) : m_cref(x) { }
 
 		const result_type& get() const { return m_cref; }
 
 		const result_type& evaluate() const { return m_cref; }
 
 	private:
-		soperand_cref(const soperand_cref& );
-		soperand_cref& operator = (const soperand_cref& );
+		soperand(const soperand& );
+		soperand& operator = (const soperand& );
 
 	private:
 		const T& m_cref;
@@ -84,35 +59,11 @@ namespace bcs
 	};
 
 	template<class T>
-	struct is_sexpression<soperand_cref<T> >
-	{
-		static const bool value = true;
-	};
-
-	template<class T>
 	inline const T& evaluate(const soperand<T>& op)
 	{
 		return op.get();
 	}
 
-	template<class T>
-	inline const T& evaluate(const soperand_cref<T>& op)
-	{
-		return op.get();
-	}
-
-
-	template<class T>
-	inline soperand<T> forward_operand(T&& x)
-	{
-		return std::move(x);
-	}
-
-	template<class T>
-	inline soperand_cref<T> forward_operand(const T& x)
-	{
-		return x;
-	}
 
 
 	// unary
@@ -144,8 +95,6 @@ namespace bcs
 
 	public:
 		sexpression(func_type f) : m_fun(f) { }
-
-		sexpression(sexpression&& r) : m_fun(r.m_fun) { }
 
 		result_type evaluate() const
 		{
@@ -186,15 +135,9 @@ namespace bcs
 		typedef typename std::result_of<func_type(child1_result_type)>::type result_type;
 
 	public:
-		sexpression(func_type f, child1_type&& c1)
+		sexpression(func_type f, const child1_type& c1)
 		: m_fun(f)
-		, m_c1(std::move(c1))
-		{
-		}
-
-		sexpression(sexpression&& r)
-		: m_fun(r.m_fun)
-		, m_c1(std::move(r.m_c1))
+		, m_c1(c1)
 		{
 		}
 
@@ -214,7 +157,7 @@ namespace bcs
 
 	private:
 		func_type m_fun;
-		child1_type m_c1;
+		const child1_type& m_c1;
 	};
 
 	template<typename Func, class C1>
@@ -241,16 +184,7 @@ namespace bcs
 
 	public:
 		sexpression(func_type f, child1_type&& c1, child2_type&& c2)
-		: m_fun(f)
-		, m_c1(std::move(c1))
-		, m_c2(std::move(c2))
-		{
-		}
-
-		sexpression(sexpression&& r)
-		: m_fun(r.m_fun)
-		, m_c1(std::move(r.m_c1))
-		, m_c2(std::move(r.m_c2))
+		: m_fun(f), m_c1(c1), m_c2(c2)
 		{
 		}
 
@@ -270,8 +204,8 @@ namespace bcs
 
 	private:
 		func_type m_fun;
-		child1_type m_c1;
-		child2_type m_c2;
+		const child1_type& m_c1;
+		const child2_type& m_c2;
 	};
 
 	template<typename Func, class C1, class C2>

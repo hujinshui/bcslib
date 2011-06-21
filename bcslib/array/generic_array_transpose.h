@@ -49,7 +49,7 @@ namespace bcs
 	{
 		using std::swap;
 
-		for (size_t i = 0; i < m; ++i)
+		for (size_t i = 1; i < n; ++i)
 		{
 			for (size_t j = 0; j < i; ++j)
 			{
@@ -87,7 +87,7 @@ namespace bcs
 
 			// copy transposed cache [bu x bu] to destination block [bn x bm]
 			c = cache;
-			for (size_t i = 0; i < bn; ++i, c += bu, pd += bm)
+			for (size_t i = 0; i < bn; ++i, c += bu, pd += m)
 			{
 				for (size_t j = 0; j < bm; ++j)
 				{
@@ -169,6 +169,30 @@ namespace bcs
 	}
 
 
+	namespace _detail
+	{
+		template<typename TOrd> struct _transposer_helper;
+
+		template<> struct _transposer_helper<row_major_t>
+		{
+			static void get_mn(const std::array<index_t, 2>& shape, size_t& m, size_t& n)
+			{
+				m = static_cast<size_t>(shape[0]);
+				n = static_cast<size_t>(shape[1]);
+			}
+		};
+
+		template<> struct _transposer_helper<column_major_t>
+		{
+			static void get_mn(const std::array<index_t, 2>& shape, size_t& m, size_t& n)
+			{
+				m = static_cast<size_t>(shape[1]);
+				n = static_cast<size_t>(shape[0]);
+			}
+		};
+	}
+
+
 	template<class Arr>
 	inline typename std::enable_if<is_array_view_ndim<Arr, 2>::value,
 	typename array_creater<Arr>::result_type>::type
@@ -176,12 +200,13 @@ namespace bcs
 	{
 		typedef typename array_view_traits<Arr>::value_type value_t;
 		typedef typename array_creater<Arr>::result_type result_t;
+		typedef typename array_view_traits<Arr>::layout_order ord_t;
 
 		auto sh = get_array_shape(a);
 		auto rsh = arr_shape(sh[1], sh[0]);
 
-		size_t m = static_cast<size_t>(sh[0]);
-		size_t n = static_cast<size_t>(sh[1]);
+		size_t m, n;
+		_detail::_transposer_helper<ord_t>::get_mn(sh, m, n);
 
 		result_t r = array_creater<Arr>::create(rsh);
 
@@ -200,6 +225,16 @@ namespace bcs
 	}
 
 
+	template<class Arr>
+	struct transpose_ftor
+	{
+		typedef typename array_creater<Arr>::result_type result_type;
+
+		result_type evaluate(const Arr& a)
+		{
+			return transpose(a);
+		}
+	};
 
 }
 
