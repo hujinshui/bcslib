@@ -71,20 +71,12 @@ namespace bcs
 	public:
 		static result_type evaluate(VecFunc vfunc, const Arr1& a1)
 		{
-			result_type r = _rcreater::create(get_array_shape(a1));
 			size_t n = get_num_elems(a1);
 
-			if (is_dense_view(a1))
-			{
-				vfunc(n, ptr_base(a1), ptr_base(r));
-			}
-			else
-			{
-				scoped_buffer<arr1_value_type> buf1(n);
-				export_to(a1, buf1.pbase());
+			scoped_aview_read_proxy<Arr1> ap1(a1);
+			result_type r = _rcreater::create(get_array_shape(a1));
 
-				vfunc(n, buf1.pbase(), ptr_base(r));
-			}
+			vfunc(n, ap1.pbase(), ptr_base(r));
 
 			return r;
 		}
@@ -129,40 +121,15 @@ namespace bcs
 		static result_type evaluate(VecFunc vfunc, const Arr1& a1, const Arr2& a2)
 		{
 			check_arg(get_array_shape(a1) == get_array_shape(a2), "The shapes of operand arrays are inconsistent.");
-			result_type r = _rcreater::create(get_array_shape(a1));
+
 			size_t n = get_num_elems(a1);
 
-			if (is_dense_view(a1))
-			{
-				if (is_dense_view(a2))
-				{
-					vfunc(n, ptr_base(a1), ptr_base(a2), ptr_base(r));
-				}
-				else
-				{
-					scoped_buffer<arr2_value_type> buf2(n);
-					export_to(a2, buf2.pbase());
+			scoped_aview_read_proxy<Arr1> ap1(a1);
+			scoped_aview_read_proxy<Arr2> ap2(a2);
 
-					vfunc(n, ptr_base(a1), buf2.pbase(), ptr_base(r));
-				}
-			}
-			else
-			{
-				scoped_buffer<arr1_value_type> buf1(n);
-				export_to(a1, buf1.pbase());
+			result_type r = _rcreater::create(get_array_shape(a1));
 
-				if (is_dense_view(a2))
-				{
-					vfunc(n, buf1.pbase(), ptr_base(a2), ptr_base(r));
-				}
-				else
-				{
-					scoped_buffer<arr2_value_type> buf2(n);
-					export_to(a2, buf2.pbase());
-
-					vfunc(n, buf1.pbase(), buf2.pbase(), ptr_base(r));
-				}
-			}
+			vfunc(n, ap1.pbase(), ap2.pbase(), ptr_base(r));
 
 			return r;
 		}
@@ -195,17 +162,9 @@ namespace bcs
 		{
 			size_t n = get_num_elems(a);
 
-			if (is_dense_view(a))
-			{
-				vfunc(n, ptr_base(a));
-			}
-			else
-			{
-				scoped_buffer<arr_value_type> buf(n);
-				export_to(a, buf.pbase());
-				vfunc(n, buf.pbase());
-				import_from(a, buf.pbase());
-			}
+			scoped_aview_write_proxy<Arr> ap(a, true);
+			vfunc(n, ap.pbase());
+			ap.commit();
 		}
 
 	private:
@@ -246,36 +205,10 @@ namespace bcs
 		{
 			size_t n = get_num_elems(a);
 
-			if (is_dense_view(a))
-			{
-				if (is_dense_view(r1))
-				{
-					vfunc(n, ptr_base(a), ptr_base(r1));
-				}
-				else
-				{
-					scoped_buffer<rarr1_value_type> buf_r1(n);
-					export_to(r1, buf_r1.pbase());
-					vfunc(n, ptr_base(a), buf_r1.pbase());
-				}
-			}
-			else
-			{
-				scoped_buffer<arr_value_type> buf(n);
-				export_to(a, buf.pbase());
-
-				if (is_dense_view(r1))
-				{
-					vfunc(n, buf.pbase(), ptr_base(r1));
-				}
-				else
-				{
-					scoped_buffer<rarr1_value_type> buf_r1(n);
-					export_to(r1, buf_r1.pbase());
-					vfunc(n, buf.pbase(), buf_r1.pbase());
-				}
-				import_from(a, buf.pbase());
-			}
+			scoped_aview_write_proxy<Arr> ap(a, true);
+			scoped_aview_read_proxy<RArr1> r1p(r1);
+			vfunc(n, ap.pbase(), r1p.pbase());
+			ap.commit();
 		}
 
 	private:
@@ -310,16 +243,8 @@ namespace bcs
 		{
 			size_t n = get_num_elems(a);
 
-			if (is_dense_view(a))
-			{
-				return vfunc(n, ptr_base(a));
-			}
-			else
-			{
-				scoped_buffer<arr_value_type> buf(n);
-				export_to(a, buf.pbase());
-				return vfunc(n, buf.pbase());
-			}
+			scoped_aview_read_proxy<Arr> ap(a);
+			return vfunc(n, ap.pbase());
 		}
 
 
@@ -363,15 +288,8 @@ namespace bcs
 
 			if (slicing::template is_slice_major<Arr>::value)
 			{
-				if (is_dense_view(a))
-				{
-					return do_eval(vfunc, ns, slen, ptr_base(a));
-				}
-				else
-				{
-					auto ac = clone_array(a);
-					return do_eval(vfunc, ns, slen, ptr_base(ac));
-				}
+				scoped_aview_read_proxy<Arr> ap(a);
+				return do_eval(vfunc, ns, slen, ap.pbase());
 			}
 			else
 			{
@@ -435,43 +353,100 @@ namespace bcs
 	public:
 		static result_type evaluate(VecFunc vfunc, const Arr1& a, const Arr2& b)
 		{
+			check_arg(get_array_shape(a) == get_array_shape(b), "The shapes of operand arrays are inconsistent.");
 			size_t n = get_num_elems(a);
 
-			if (is_dense_view(a))
-			{
-				if (is_dense_view(b))
-				{
-					return vfunc(n, ptr_base(a), ptr_base(b));
-				}
-				else
-				{
-					scoped_buffer<arr2_value_type> buf2(n);
-					export_to(b, buf2.pbase());
-					return vfunc(n, ptr_base(a), buf2.pbase());
-				}
-			}
-			else
-			{
-				scoped_buffer<arr1_value_type> buf1(n);
-				export_to(a, buf1.pbase());
+			scoped_aview_read_proxy<Arr1> ap(a);
+			scoped_aview_read_proxy<Arr2> bp(b);
 
-				if (is_dense_view(b))
-				{
-					return vfunc(n, buf1.pbase(), ptr_base(b));
-				}
-				else
-				{
-					scoped_buffer<arr2_value_type> buf2(n);
-					export_to(b, buf2.pbase());
-					return vfunc(n, buf1.pbase(), buf2.pbase());
-				}
-			}
+			return vfunc(n, ap.pbase(), bp.pbase());
 		}
 
 	private:
 		VecFunc m_vecfunc;
 
 	}; // end class binary_array_stats_evaluator
+
+
+
+	template<typename VecFunc, class Arr1, class Arr2, class Slicing>
+	class binary_array_slice_stats_evaluator
+	{
+	public:
+		static_assert(is_array_view_ndim<Arr1, 2>::value && is_array_view_ndim<Arr2, 2>::value,
+				"Operands must be of 2D array view types.");
+
+		static_assert(array_view_traits<Arr1>::num_dims == array_view_traits<Arr2>::num_dims,
+				"Operand arrays are required to have the same number of dimensions.");
+
+		static_assert(std::is_same<
+				typename array_view_traits<Arr1>::layout_order,
+				typename array_view_traits<Arr2>::layout_order>::value,
+				"Operand arrays are required to have the same layout order.");
+
+		typedef typename array_view_traits<Arr1>::value_type arr1_value_type;
+		typedef typename array_view_traits<Arr2>::value_type arr2_value_type;
+
+		typedef typename VecFunc::result_type result_value_type;
+
+		typedef typename array_creater<Arr1>::template remap<result_value_type, 1>::type _rcreater;
+		typedef typename _rcreater::result_type result_type;
+
+		typedef Slicing slicing;
+
+	public:
+		binary_array_slice_stats_evaluator(VecFunc vfunc) : m_vecfunc(vfunc)
+		{
+		}
+
+		result_type operator() (const Arr1& a, const Arr2& b) const
+		{
+			return evaluate(m_vecfunc, a, b);
+		}
+
+	public:
+		static result_type evaluate(VecFunc vfunc, const Arr1& a, const Arr2& b)
+		{
+			check_arg(get_array_shape(a) == get_array_shape(b), "The shapes of operand arrays are inconsistent.");
+			auto shape = get_array_shape(a);
+			index_t ns = slicing::get_num_slices(shape[0], shape[1]);
+			index_t slen = slicing::get_slice_length(shape[0], shape[1]);
+
+			if (slicing::template is_slice_major<Arr1>::value)
+			{
+				scoped_aview_read_proxy<Arr1> ap(a);
+				scoped_aview_read_proxy<Arr2> bp(b);
+
+				return do_eval(vfunc, ns, slen, ap.pbase(), bp.pbase());
+			}
+			else
+			{
+				auto ta = transpose(a);
+				auto tb = transpose(b);
+
+				return do_eval(vfunc, ns, slen, ptr_base(ta), ptr_base(tb));
+			}
+		}
+
+	private:
+		static result_type do_eval(VecFunc vfunc, index_t ns, index_t slen, const arr1_value_type *x, const arr2_value_type *y)
+		{
+			result_type r = _rcreater::create(arr_shape(ns));
+			size_t sl = static_cast<size_t>(slen);
+
+			result_value_type *pd = ptr_base(r);
+			for (index_t i = 0; i < ns; ++i, x += slen, y += slen)
+			{
+				pd[i] = vfunc(sl, x, y);
+			}
+
+			return r;
+		}
+
+	private:
+		VecFunc m_vecfunc;
+
+	}; // end class binary_array_perrow_stats_evaluator
 
 
 

@@ -117,6 +117,73 @@ namespace bcs
 	}
 
 
+	template<class Arr>
+	class scoped_aview_read_proxy
+	{
+	public:
+		typedef typename array_view_traits<Arr>::value_type value_type;
+
+		scoped_aview_read_proxy(const Arr& a)
+		: is_copy(!is_dense_view(a))
+		, m_buf(is_copy ? get_num_elems(a) : size_t(0))
+		, m_pbase(is_copy ? m_buf.pbase() : ptr_base(a))
+		{
+			if (is_copy)
+			{
+				export_to(a, m_buf.pbase());
+			}
+		}
+
+		const value_type *pbase()
+		{
+			return m_pbase;
+		}
+
+	private:
+		bool is_copy;
+		scoped_buffer<value_type> m_buf;
+		const value_type *m_pbase;
+	};
+
+
+	template<class Arr>
+	class scoped_aview_write_proxy
+	{
+	public:
+		typedef typename array_view_traits<Arr>::value_type value_type;
+
+		scoped_aview_write_proxy(Arr& a, bool use_init_contents)
+		: m_rarr(a)
+		, is_copy(!is_dense_view(a))
+		, m_buf(is_copy ? get_num_elems(a) : size_t(0))
+		, m_pbase(is_copy ? m_buf.pbase() : ptr_base(a))
+		{
+			if (is_copy && use_init_contents)
+			{
+				export_to(a, m_buf.pbase());
+			}
+		}
+
+		value_type *pbase()
+		{
+			return m_pbase;
+		}
+
+		void commit()
+		{
+			if (is_copy)
+			{
+				import_from(m_rarr, m_pbase);
+			}
+		}
+
+	private:
+		Arr& m_rarr;
+		bool is_copy;
+		scoped_buffer<value_type> m_buf;
+		value_type *m_pbase;
+	};
+
 }
 
 #endif 

@@ -32,6 +32,17 @@ namespace bcs
 	}
 
 	template<typename T>
+	inline T vec_dot_prod(size_t n, const T *x, const T *y)
+	{
+		T s(0);
+		for (size_t i = 0; i < n; ++i)
+		{
+			s += x[i] * y[i];
+		}
+		return s;
+	}
+
+	template<typename T>
 	inline T vec_sum_log(size_t n, const T *x)
 	{
 		T s(0);
@@ -188,17 +199,6 @@ namespace bcs
 
 
 	// norms
-
-	template<typename T>
-	inline T vec_dot_prod(size_t n, const T *x, const T *y)
-	{
-		T s(0);
-		for (size_t i = 0; i < n; ++i)
-		{
-			s += x[i] * y[i];
-		}
-		return s;
-	}
 
 	template<typename T>
 	inline T vec_norm_L0(size_t n, const T *x)

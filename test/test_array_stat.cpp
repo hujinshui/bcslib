@@ -58,8 +58,8 @@ BCS_TEST_CASE( test_sum_and_mean )
 
 	BCS_CHECK_EQUAL( sum(v2d_rm, per_row()), accum_prow(v2d_rm, dsum()) );
 	BCS_CHECK_EQUAL( sum(v2d_cm, per_row()), accum_prow(v2d_cm, dsum()) );
-	BCS_CHECK_EQUAL( sum(v2d_rm, per_col()), accum_pcol(v2d_rm, dsum()));
-	BCS_CHECK_EQUAL( sum(v2d_cm, per_col()), accum_pcol(v2d_cm, dsum()));
+	BCS_CHECK_EQUAL( sum(v2d_rm, per_col()), accum_pcol(v2d_rm, dsum()) );
+	BCS_CHECK_EQUAL( sum(v2d_cm, per_col()), accum_pcol(v2d_cm, dsum()) );
 
 	BCS_CHECK_EQUAL( sum(v1d_s), accum_all(v1d_s, dsum()) );
 	BCS_CHECK_EQUAL( sum(v2d_rm_s), accum_all(v2d_rm_s, dsum()) );
@@ -67,8 +67,8 @@ BCS_TEST_CASE( test_sum_and_mean )
 
 	BCS_CHECK_EQUAL( sum(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dsum()) );
 	BCS_CHECK_EQUAL( sum(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dsum()) );
-	BCS_CHECK_EQUAL( sum(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dsum()));
-	BCS_CHECK_EQUAL( sum(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dsum()));
+	BCS_CHECK_EQUAL( sum(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dsum()) );
+	BCS_CHECK_EQUAL( sum(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dsum()) );
 
 }
 
