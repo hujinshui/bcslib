@@ -116,7 +116,7 @@ ARRAY_COMP_TESTS = test/test_array_comp.cpp \
 	test/test_array_stat.cpp
 
 bin/test_array_comp: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
-	$(CXX) $(CFLAGS) -O2 $(ARRAY_COMP_TESTS) -o bin/test_array_comp
+	$(CXX) $(CFLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp
 
 
 	
