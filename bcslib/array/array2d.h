@@ -515,8 +515,6 @@ namespace bcs
 			return *this;
 		}
 
-		inline operator array2d<T, TOrd>() const;
-
 	public:
 		aview2d(pointer pbase, const _index_core_type& idxcore)
 		: m_pbase(pbase), m_idxcore(idxcore)
@@ -1030,27 +1028,19 @@ namespace bcs
 	}
 
 
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>::operator array2d<T, TOrd>() const
-	{
-		array2d<T, TOrd> arr(nrows(), ncolumns());
-		if (is_dense_view(*this))
-		{
-			import_from(arr, pbase());
-		}
-		else
-		{
-			import_from(arr, begin());
-		}
-		return arr;
-	}
-
-
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> clone_array(const aview2d<T, TOrd, TIndexer0, TIndexer1>& view)
 	{
-		return view;
+		array2d<T, TOrd> arr(view.nrows(), view.ncolumns());
+		if (is_dense_view(view))
+		{
+			import_from(arr, view.pbase());
+		}
+		else
+		{
+			import_from(arr, view.begin());
+		}
+		return arr;
 	}
 
 	/******************************************************

@@ -260,8 +260,6 @@ namespace bcs
 			return *this;
 		}
 
-		inline operator array1d<T>() const;
-
 	public:
 		// Element access
 
@@ -580,28 +578,19 @@ namespace bcs
 		return array_indexer_traits<TIndexer>::is_continuous(a.get_indexer());
 	}
 
-
-
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>::operator array1d<T>() const
-	{
-		array1d<T> arr(nelems());
-		if (is_dense_view(*this))
-		{
-			import_from(arr, pbase());
-		}
-		else
-		{
-			import_from(arr, begin());
-		}
-		return arr;
-	}
-
-
 	template<typename T, class TIndexer>
 	inline array1d<T> clone_array(const aview1d<T, TIndexer>& view)
 	{
-		return view;
+		array1d<T> arr(view.nelems());
+		if (is_dense_view(view))
+		{
+			import_from(arr, view.pbase());
+		}
+		else
+		{
+			import_from(arr, view.begin());
+		}
+		return arr;
 	}
 
 
