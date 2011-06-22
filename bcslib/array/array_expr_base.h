@@ -316,7 +316,7 @@ namespace bcs
 	private:
 		VecFunc m_vecfunc;
 
-	}; // end class unary_array_perrow_stats_evaluator
+	}; // end class unary_array_slice_stats_evaluator
 
 
 
@@ -446,7 +446,7 @@ namespace bcs
 	private:
 		VecFunc m_vecfunc;
 
-	}; // end class binary_array_perrow_stats_evaluator
+	}; // end class binary_array_slice_stats_evaluator
 
 
 
@@ -593,8 +593,24 @@ namespace bcs
 		}
 	};
 
+	template<typename Arr1, typename Arr2, typename Slicing, template<typename U> class VecFuncTemplate>
+	struct _binarr_slice_stat
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		typedef VecFuncTemplate<value_type> vecfunc_type;
+		typedef binary_array_slice_stats_evaluator<vecfunc_type, Arr1, Arr2, Slicing> evaluator_type;
+		typedef typename evaluator_type::result_type result_type;
 
+		typedef result_type type;
+
+		static result_type default_evaluate(const Arr1& a1, const Arr2& a2)
+		{
+			return evaluator_type::evaluate(vecfunc_type(), a1, a2);
+		}
+	};
 
 }
 
 #endif 
+
+

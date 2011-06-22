@@ -173,6 +173,18 @@ namespace bcs
 				std::is_same<typename _trs1::layout_order, typename _trs2::layout_order>::value;
 	};
 
+
+	template<class Arr1, class Arr2, dim_num_t NDim>
+	struct is_compatible_aviews_ndim
+	{
+		typedef array_view_traits<Arr1> _trs1;
+		typedef array_view_traits<Arr2> _trs2;
+
+		static const bool value = is_array_view_ndim<Arr1, NDim>::value && is_array_view_ndim<Arr2, NDim>::value &&
+				std::is_same<typename _trs1::value_type, typename _trs2::value_type>::value &&
+				std::is_same<typename _trs1::layout_order, typename _trs2::layout_order>::value;
+	};
+
 	template<class Arr, class TV>
 	struct is_compatible_aview_v
 	{

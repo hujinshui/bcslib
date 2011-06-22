@@ -164,6 +164,8 @@ namespace bcs
 
 		// accumulation
 
+		// unary
+
 		template<typename T, class TIndexer, class Accumulator>
 		typename Accumulator::result_type accum_all(const aview1d<T, TIndexer>& a, Accumulator accum)
 		{
@@ -220,6 +222,74 @@ namespace bcs
 			}
 			return r;
 		}
+
+
+		// binary
+
+		template<typename T, class LIndexer, class RIndexer, class Accumulator>
+		typename Accumulator::result_type accum_all(
+				const aview1d<T, LIndexer>& a, const aview1d<T, RIndexer>& b, Accumulator accum)
+		{
+			for (index_t i = 0; i < a.dim0(); ++i)
+			{
+				accum.put(a(i), b(i));
+			}
+			return accum.get();
+		}
+
+		template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1, class Accumulator>
+		typename Accumulator::result_type accum_all(
+				const aview2d<T, TOrd, LIndexer0, LIndexer1>& a,
+				const aview2d<T, TOrd, RIndexer0, RIndexer1>& b, Accumulator accum)
+		{
+			for (index_t i = 0; i < a.dim0(); ++i)
+			{
+				for (index_t j = 0; j < a.dim1(); ++j)
+				{
+					accum.put(a(i, j), b(i, j));
+				}
+			}
+			return accum.get();
+		}
+
+		template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1, class Accumulator>
+		array1d<typename Accumulator::result_type> accum_prow(
+				const aview2d<T, TOrd, LIndexer0, LIndexer1>& a,
+				const aview2d<T, TOrd, RIndexer0, RIndexer1>& b, Accumulator accum0)
+		{
+			array1d<typename Accumulator::result_type> r(a.nrows());
+
+			for (index_t i = 0; i < a.dim0(); ++i)
+			{
+				Accumulator accum(accum0);
+				for (index_t j = 0; j < a.dim1(); ++j)
+				{
+					accum.put(a(i, j), b(i, j));
+				}
+				r(i) = accum.get();
+			}
+			return r;
+		}
+
+		template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1, class Accumulator>
+		array1d<typename Accumulator::result_type> accum_pcol(
+				const aview2d<T, TOrd, LIndexer0, LIndexer1>& a,
+				const aview2d<T, TOrd, RIndexer0, RIndexer1>& b, Accumulator accum0)
+		{
+			array1d<typename Accumulator::result_type> r(a.ncolumns());
+
+			for (index_t j = 0; j < a.dim1(); ++j)
+			{
+				Accumulator accum(accum0);
+				for (index_t i = 0; i < a.dim0(); ++i)
+				{
+					accum.put(a(i, j), b(i, j));
+				}
+				r(j) = accum.get();
+			}
+			return r;
+		}
+
 
 	}
 }

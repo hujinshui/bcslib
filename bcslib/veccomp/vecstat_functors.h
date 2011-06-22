@@ -29,6 +29,17 @@ namespace bcs
 
 
 	template<typename T>
+	struct vec_dot_prod_ftor
+	{
+		typedef T result_type;
+
+		result_type operator() (size_t n, const T *x, const T *y) const
+		{
+			return vec_dot_prod(n, x, y);
+		}
+	};
+
+	template<typename T>
 	struct vec_sum_log_ftor
 	{
 		typedef T result_type;
@@ -47,7 +58,7 @@ namespace bcs
 
 		result_type operator() (size_t n, const T *x, const T *y) const
 		{
-			return vec_sum_xlogy(n, x);
+			return vec_sum_xlogy(n, x, y);
 		}
 	};
 
@@ -123,17 +134,6 @@ namespace bcs
 
 
 	// norms
-
-	template<typename T>
-	struct vec_dot_prod_ftor
-	{
-		typedef T result_type;
-
-		result_type operator() (size_t n, const T *x, const T *y) const
-		{
-			return vec_dot_prod(n, x);
-		}
-	};
 
 	template<typename T>
 	struct vec_norm_L0_ftor
