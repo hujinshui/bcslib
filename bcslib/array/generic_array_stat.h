@@ -10,7 +10,7 @@
 #define BCSLIB_GENERIC_ARRAY_STAT_H_
 
 #include <bcslib/array/array_base.h>
-#include <bcslib/array/array_expr_base.h>
+#include <bcslib/array/generic_array_eval.h>
 
 #include <bcslib/veccomp/vecstat_functors.h>
 
@@ -23,18 +23,20 @@ namespace bcs
 
 	template<class Arr>
 	inline typename lazy_enable_if<is_array_view<Arr>::value,
-	_uniarr_stat<Arr, vec_sum_ftor> >::type
+	array_stats_resultT<vec_sum_ftor, Arr> >::type
 	sum_arr(const Arr& a)
 	{
-		return _uniarr_stat<Arr, vec_sum_ftor>::default_evaluate(a);
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_stats(vec_sum_ftor<value_type>(), a);
 	}
 
 	template<class Arr, typename Slicing>
 	inline typename lazy_enable_if<is_array_view_ndim<Arr, 2>::value,
-	_uniarr_slice_stat<Arr, Slicing, vec_sum_ftor> >::type
+	array_slice_stats_resultT<vec_sum_ftor, Slicing, Arr> >::type
 	sum_arr(const Arr& a, Slicing)
 	{
-		return _uniarr_slice_stat<Arr, Slicing, vec_sum_ftor>::default_evaluate(a);
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_slice_stats(vec_sum_ftor<value_type>(), a, Slicing());
 	}
 
 
@@ -42,72 +44,80 @@ namespace bcs
 
 	template<class Arr1, class Arr2>
 	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
-	_binarr_stat<Arr1, Arr2, vec_dot_prod_ftor> >::type
+	array_stats_resultT<vec_dot_prod_ftor, Arr1, Arr2> >::type
 	vdot_arr(const Arr1& a, const Arr2& b)
 	{
-		return _binarr_stat<Arr1, Arr2, vec_dot_prod_ftor>::default_evaluate(a, b);
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return evaluate_arr_stats(vec_dot_prod_ftor<value_type>(), a, b);
 	}
 
 	template<class Arr1, class Arr2, typename Slicing>
 	inline typename lazy_enable_if<is_compatible_aviews_ndim<Arr1, Arr2, 2>::value,
-	_binarr_slice_stat<Arr1, Arr2, Slicing, vec_dot_prod_ftor> >::type
+	array_slice_stats_resultT<vec_dot_prod_ftor, Slicing, Arr1, Arr2> >::type
 	vdot_arr(const Arr1& a, const Arr2& b, Slicing)
 	{
-		return _binarr_slice_stat<Arr1, Arr2, Slicing, vec_dot_prod_ftor>::default_evaluate(a, b);
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return evaluate_arr_slice_stats(vec_dot_prod_ftor<value_type>(), a, b, Slicing());
 	}
 
 	// sum_log
 
 	template<class Arr>
 	inline typename lazy_enable_if<is_array_view<Arr>::value,
-	_uniarr_stat<Arr, vec_sum_log_ftor> >::type
+	array_stats_resultT<vec_sum_log_ftor, Arr> >::type
 	sum_log_arr(const Arr& a)
 	{
-		return _uniarr_stat<Arr, vec_sum_log_ftor>::default_evaluate(a);
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_stats(vec_sum_log_ftor<value_type>(), a);
 	}
 
 	template<class Arr, typename Slicing>
 	inline typename lazy_enable_if<is_array_view_ndim<Arr, 2>::value,
-	_uniarr_slice_stat<Arr, Slicing, vec_sum_log_ftor> >::type
+	array_slice_stats_resultT<vec_sum_log_ftor, Slicing, Arr> >::type
 	sum_log_arr(const Arr& a, Slicing)
 	{
-		return _uniarr_slice_stat<Arr, Slicing, vec_sum_log_ftor>::default_evaluate(a);
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_slice_stats(vec_sum_log_ftor<value_type>(), a, Slicing());
 	}
 
 	// sum_xlogy
 
 	template<class Arr1, class Arr2>
 	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
-	_binarr_stat<Arr1, Arr2, vec_sum_xlogy_ftor> >::type
+	array_stats_resultT<vec_sum_xlogy_ftor, Arr1, Arr2> >::type
 	sum_xlogy_arr(const Arr1& a, const Arr2& b)
 	{
-		return _binarr_stat<Arr1, Arr2, vec_sum_xlogy_ftor>::default_evaluate(a, b);
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return evaluate_arr_stats(vec_sum_xlogy_ftor<value_type>(), a, b);
 	}
 
 	template<class Arr1, class Arr2, typename Slicing>
 	inline typename lazy_enable_if<is_compatible_aviews_ndim<Arr1, Arr2, 2>::value,
-	_binarr_slice_stat<Arr1, Arr2, Slicing, vec_sum_xlogy_ftor> >::type
+	array_slice_stats_resultT<vec_sum_xlogy_ftor, Slicing, Arr1, Arr2> >::type
 	sum_xlogy_arr(const Arr1& a, const Arr2& b, Slicing)
 	{
-		return _binarr_slice_stat<Arr1, Arr2, Slicing, vec_sum_xlogy_ftor>::default_evaluate(a, b);
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return evaluate_arr_slice_stats(vec_sum_xlogy_ftor<value_type>(), a, b, Slicing());
 	}
 
 	// mean
 
 	template<class Arr>
 	inline typename lazy_enable_if<is_array_view<Arr>::value,
-	_uniarr_stat<Arr, vec_mean_ftor> >::type
+	array_stats_resultT<vec_mean_ftor, Arr> >::type
 	mean_arr(const Arr& a)
 	{
-		return _uniarr_stat<Arr, vec_mean_ftor>::default_evaluate(a);
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_stats(vec_mean_ftor<value_type>(), a);
 	}
 
 	template<class Arr, typename Slicing>
 	inline typename lazy_enable_if<is_array_view_ndim<Arr, 2>::value,
-	_uniarr_slice_stat<Arr, Slicing, vec_mean_ftor> >::type
+	array_slice_stats_resultT<vec_mean_ftor, Slicing, Arr> >::type
 	mean_arr(const Arr& a, Slicing)
 	{
-		return _uniarr_slice_stat<Arr, Slicing, vec_mean_ftor>::default_evaluate(a);
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_slice_stats(vec_mean_ftor<value_type>(), a, Slicing());
 	}
 
 }
