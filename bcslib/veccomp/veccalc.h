@@ -15,6 +15,125 @@
 
 namespace bcs
 {
+	/********************************************
+	 *
+	 *  Order comparison
+	 *
+	 *******************************************/
+
+	// eq
+
+	template<typename T>
+	inline void vec_eq(size_t n, const T *x1, const T *x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] == x2[i]);
+	}
+
+	template<typename T>
+	inline void vec_eq(size_t n, const T *x1, const T& x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] == x2);
+	}
+
+	// ne
+
+	template<typename T>
+	inline void vec_ne(size_t n, const T *x1, const T *x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] != x2[i]);
+	}
+
+	template<typename T>
+	inline void vec_ne(size_t n, const T *x1, const T& x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] != x2);
+	}
+
+	// gt
+
+	template<typename T>
+	inline void vec_gt(size_t n, const T *x1, const T *x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] > x2[i]);
+	}
+
+	template<typename T>
+	inline void vec_gt(size_t n, const T *x1, const T& x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] > x2);
+	}
+
+	// ge
+
+	template<typename T>
+	inline void vec_ge(size_t n, const T *x1, const T *x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] >= x2[i]);
+	}
+
+	template<typename T>
+	inline void vec_ge(size_t n, const T *x1, const T& x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] >= x2);
+	}
+
+	// lt
+
+	template<typename T>
+	inline void vec_lt(size_t n, const T *x1, const T *x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] < x2[i]);
+	}
+
+	template<typename T>
+	inline void vec_lt(size_t n, const T *x1, const T& x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] < x2);
+	}
+
+	// le
+
+	template<typename T>
+	inline void vec_le(size_t n, const T *x1, const T *x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] <= x2[i]);
+	}
+
+	template<typename T>
+	inline void vec_le(size_t n, const T *x1, const T& x2, bool *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] <= x2);
+	}
+
+	// max_each
+
+	template<typename T>
+	inline void vec_max_each(size_t n, const T* x1, const T* x2, T *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] < x2[i] ? x2[i] : x1[i]);
+	}
+
+	template<typename T>
+	inline void vec_max_each(size_t n, const T* x1, const T& x2, T *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] < x2 ? x2 : x1[i]);
+	}
+
+	// min_each
+
+	template<typename T>
+	inline void vec_min_each(size_t n, const T* x1, const T* x2, T *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] > x2[i] ? x2[i] : x1[i]);
+	}
+
+	template<typename T>
+	inline void vec_min_each(size_t n, const T* x1, const T& x2, T *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] > x2 ? x2 : x1[i]);
+	}
+
+
 
 	/********************************************
 	 *
