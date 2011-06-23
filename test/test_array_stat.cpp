@@ -129,6 +129,54 @@ struct dminmax
 };
 
 
+struct dmin_index
+{
+	typedef index_t result_type;
+
+	index_t i;
+	index_t p;
+	double s;
+
+	dmin_index() : i(-1), p(0), s(std::numeric_limits<double>::infinity()) { }
+
+	void put(double x)
+	{
+		++i;
+		if (x < s)
+		{
+			p = i;
+			s = x;
+		}
+	}
+
+	result_type get() const { return p; }
+};
+
+
+struct dmax_index
+{
+	typedef index_t result_type;
+
+	index_t i;
+	index_t p;
+	double s;
+
+	dmax_index() : i(-1), p(0), s(-std::numeric_limits<double>::infinity()) { }
+
+	void put(double x)
+	{
+		++i;
+		if (x > s)
+		{
+			p = i;
+			s = x;
+		}
+	}
+
+	result_type get() const { return p; }
+};
+
+
 
 
 BCS_TEST_CASE( test_sum_dot_and_mean )
@@ -346,6 +394,45 @@ BCS_TEST_CASE( test_min_and_max )
 	BCS_CHECK_EQUAL( minmax(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dminmax()) );
 	BCS_CHECK_EQUAL( minmax(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dminmax()) );
 
+	// min_index
+
+	BCS_CHECK_EQUAL( min_index(v1d), accum_all(v1d, dmin_index()) );
+	BCS_CHECK_EQUAL( min_index2d(v2d_rm), (arr_shape(0, 1)) );
+	BCS_CHECK_EQUAL( min_index2d(v2d_cm), (arr_shape(1, 0)) );
+
+	BCS_CHECK_EQUAL( min_index(v2d_rm, per_row()), accum_prow(v2d_rm, dmin_index()) );
+	BCS_CHECK_EQUAL( min_index(v2d_cm, per_row()), accum_prow(v2d_cm, dmin_index()) );
+	BCS_CHECK_EQUAL( min_index(v2d_rm, per_col()), accum_pcol(v2d_rm, dmin_index()) );
+	BCS_CHECK_EQUAL( min_index(v2d_cm, per_col()), accum_pcol(v2d_cm, dmin_index()) );
+
+	BCS_CHECK_EQUAL( min_index(v1d_s), accum_all(v1d_s, dmin_index()) );
+	BCS_CHECK_EQUAL( min_index2d(v2d_rm_s), (arr_shape(1, 2)) );
+	BCS_CHECK_EQUAL( min_index2d(v2d_cm_s), (arr_shape(1, 1)) );
+
+	BCS_CHECK_EQUAL( min_index(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dmin_index()) );
+	BCS_CHECK_EQUAL( min_index(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dmin_index()) );
+	BCS_CHECK_EQUAL( min_index(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dmin_index()) );
+	BCS_CHECK_EQUAL( min_index(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dmin_index()) );
+
+	// max_index
+
+	BCS_CHECK_EQUAL( max_index(v1d), accum_all(v1d, dmax_index()) );
+	BCS_CHECK_EQUAL( max_index2d(v2d_rm), (arr_shape(0, 2)) );
+	BCS_CHECK_EQUAL( max_index2d(v2d_cm), (arr_shape(0, 1)) );
+
+	BCS_CHECK_EQUAL( max_index(v2d_rm, per_row()), accum_prow(v2d_rm, dmax_index()) );
+	BCS_CHECK_EQUAL( max_index(v2d_cm, per_row()), accum_prow(v2d_cm, dmax_index()) );
+	BCS_CHECK_EQUAL( max_index(v2d_rm, per_col()), accum_pcol(v2d_rm, dmax_index()) );
+	BCS_CHECK_EQUAL( max_index(v2d_cm, per_col()), accum_pcol(v2d_cm, dmax_index()) );
+
+	BCS_CHECK_EQUAL( max_index(v1d_s), accum_all(v1d_s, dmax_index()) );
+	BCS_CHECK_EQUAL( max_index2d(v2d_rm_s), (arr_shape(0, 1)) );
+	BCS_CHECK_EQUAL( max_index2d(v2d_cm_s), (arr_shape(1, 2)) );
+
+	BCS_CHECK_EQUAL( max_index(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dmax_index()) );
+	BCS_CHECK_EQUAL( max_index(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dmax_index()) );
+	BCS_CHECK_EQUAL( max_index(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dmax_index()) );
+	BCS_CHECK_EQUAL( max_index(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dmax_index()) );
 }
 
 

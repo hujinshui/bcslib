@@ -183,6 +183,75 @@ namespace bcs
 		return evaluate_arr_slice_stats(vec_minmax_ftor<value_type>(), a, Slicing());
 	}
 
+	// min_index
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view_ndim<Arr, 1>::value,
+	index_t>::type
+	min_index_arr(const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_stats(vec_min_index_ftor<value_type>(), a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view_ndim<Arr, 2>::value,
+	std::array<index_t, 2>>::type
+	min_index_arr2d(const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		index_t idx = evaluate_arr_stats(vec_min_index_ftor<value_type>(), a);
+
+		auto shape = get_array_shape(a);
+		return layout_aux2d<typename array_view_traits<Arr>::layout_order>::ind2sub(shape[0], shape[1], idx);
+	}
+
+	template<class Arr, typename Slicing>
+	inline typename lazy_enable_if<is_array_view_ndim<Arr, 2>::value,
+	array_slice_stats_resultT<vec_min_index_ftor, Slicing, Arr> >::type
+	min_index_arr(const Arr& a, Slicing)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_slice_stats(vec_min_index_ftor<value_type>(), a, Slicing());
+	}
+
+	// max_index
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view_ndim<Arr, 1>::value,
+	index_t>::type
+	max_index_arr(const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_stats(vec_max_index_ftor<value_type>(), a);
+	}
+
+	template<class Arr>
+	inline typename std::enable_if<is_array_view_ndim<Arr, 2>::value,
+	std::array<index_t, 2>>::type
+	max_index_arr2d(const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		index_t idx = evaluate_arr_stats(vec_max_index_ftor<value_type>(), a);
+
+		auto shape = get_array_shape(a);
+		return layout_aux2d<typename array_view_traits<Arr>::layout_order>::ind2sub(shape[0], shape[1], idx);
+	}
+
+	template<class Arr, typename Slicing>
+	inline typename lazy_enable_if<is_array_view_ndim<Arr, 2>::value,
+	array_slice_stats_resultT<vec_max_index_ftor, Slicing, Arr> >::type
+	max_index_arr(const Arr& a, Slicing)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_slice_stats(vec_max_index_ftor<value_type>(), a, Slicing());
+	}
+
+
+	// norms
+
+
+
 }
 
 
