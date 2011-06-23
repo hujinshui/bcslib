@@ -20,6 +20,7 @@ namespace bcs
 
 	// forward declaration
 
+	template<typename T, class TIndexer=id_ind> class caview1d;
 	template<typename T, class TIndexer=id_ind> class aview1d;
 	template<typename T, class Alloc=aligned_allocator<T> > class array1d;
 
@@ -167,13 +168,14 @@ namespace bcs
 	// main classes
 
 	template<typename T, class TIndexer>
-	class aview1d
+	class caview1d
 	{
 	public:
 		BCS_ARRAY_CHECK_TYPE(T)
 		BCS_ARRAY_BASIC_TYPEDEFS(1u, T, layout_1d_t)
 
 		typedef TIndexer indexer_type;
+		typedef caview1d<value_type, indexer_type> cview_type;
 		typedef aview1d<value_type, indexer_type> view_type;
 
 		typedef aview1d_iterators<value_type, indexer_type> _iterators;
@@ -212,28 +214,28 @@ namespace bcs
 		}
 
 	public:
-		aview1d(pointer pbase, const indexer_type& indexer)
-		: m_pbase(pbase)
+		caview1d(const_pointer pbase, const indexer_type& indexer)
+		: m_pbase(const_cast<pointer>(pbase))
 		, m_d0(static_cast<index_t>(indexer.size()))
 		, m_indexer(indexer)
 		{
 		}
 
-		aview1d(pointer pbase, indexer_type&& indexer)
-		: m_pbase(pbase)
+		caview1d(const_pointer pbase, indexer_type&& indexer)
+		: m_pbase(const_cast<pointer>(pbase))
 		, m_d0(static_cast<index_t>(indexer.size()))
 		, m_indexer(std::move(indexer))
 		{
 		}
 
-		aview1d(const aview1d& r)
+		caview1d(const caview1d& r)
 		: m_pbase(r.m_pbase)
 		, m_d0(r.m_d0)
 		, m_indexer(r.m_indexer)
 		{
 		}
 
-		aview1d(aview1d&& r)
+		caview1d(caview1d&& r)
 		: m_pbase(r.m_pbase)
 		, m_d0(r.m_d0)
 		, m_indexer(std::move(r.m_indexer))
@@ -241,7 +243,7 @@ namespace bcs
 			r.reset();
 		}
 
-		aview1d& operator = (const aview1d& r)
+		caview1d& operator = (const caview1d& r)
 		{
 			m_pbase = r.m_pbase;
 			m_d0 = r.m_d0;
@@ -249,7 +251,7 @@ namespace bcs
 			return *this;
 		}
 
-		aview1d& operator = (aview1d&& r)
+		caview1d& operator = (caview1d&& r)
 		{
 			m_pbase = r.m_pbase;
 			m_d0 = r.m_d0;
@@ -268,17 +270,7 @@ namespace bcs
 			return m_pbase;
 		}
 
-		pointer pbase()
-		{
-			return m_pbase;
-		}
-
 		const_pointer ptr(index_type i) const
-		{
-			return m_pbase + m_indexer[i];
-		}
-
-		pointer ptr(index_type i)
 		{
 			return m_pbase + m_indexer[i];
 		}
@@ -288,17 +280,7 @@ namespace bcs
 			return m_pbase[m_indexer[i]];
 		}
 
-		reference operator[] (index_type i)
-		{
-			return m_pbase[m_indexer[i]];
-		}
-
 		const_reference operator() (index_type i) const
-		{
-			return m_pbase[m_indexer[i]];
-		}
-
-		reference operator() (index_type i)
 		{
 			return m_pbase[m_indexer[i]];
 		}
@@ -310,25 +292,15 @@ namespace bcs
 			return _iterators::get_const_iterator(pbase(), m_indexer, 0);
 		}
 
-		iterator begin()
-		{
-			return _iterators::get_iterator(pbase(), m_indexer, 0);
-		}
-
 		const_iterator end() const
 		{
 			return _iterators::get_const_iterator(pbase(), m_indexer, m_d0);
 		}
 
-		iterator end()
-		{
-			return _iterators::get_iterator(pbase(), m_indexer, m_d0);
-		}
-
 		// Sub-view
 
 		template<class TSelector>
-		const aview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>
+		caview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>
 		V(const TSelector& selector) const
 		{
 			typedef typename sub_indexer<indexer_type, TSelector>::type sub_indexer_type;
@@ -337,7 +309,151 @@ namespace bcs
 			sub_indexer_type sindexer =
 					sub_indexer<indexer_type, TSelector>::get(m_indexer, selector, offset);
 
-			return aview1d<value_type, sub_indexer_type>(m_pbase + offset, sindexer);
+			return caview1d<value_type, sub_indexer_type>(m_pbase + offset, sindexer);
+		}
+
+	protected:
+		pointer m_pbase;
+		index_type m_d0;
+		indexer_type m_indexer;
+
+	private:
+		void reset()
+		{
+			m_pbase = BCS_NULL;
+			m_d0 = 0;
+		}
+
+	}; // end class caview1d
+
+
+
+	template<typename T, class TIndexer>
+	class aview1d : public caview1d<T, TIndexer>
+	{
+	public:
+		BCS_ARRAY_CHECK_TYPE(T)
+		BCS_ARRAY_BASIC_TYPEDEFS(1u, T, layout_1d_t)
+
+		typedef TIndexer indexer_type;
+		typedef caview1d<value_type, indexer_type> cview_type;
+		typedef aview1d<value_type, indexer_type> view_type;
+
+		typedef aview1d_iterators<value_type, indexer_type> _iterators;
+		typedef typename _iterators::const_iterator const_iterator;
+		typedef typename _iterators::iterator iterator;
+
+	public:
+		aview1d(pointer pbase, const indexer_type& indexer)
+		: cview_type(pbase, indexer)
+		{
+		}
+
+		aview1d(pointer pbase, indexer_type&& indexer)
+		: cview_type(pbase, std::move(indexer))
+		{
+		}
+
+		aview1d(aview1d& r)
+		: cview_type(r)
+		{
+		}
+
+		aview1d(aview1d&& r)
+		: cview_type(std::move(r))
+		{
+		}
+
+		aview1d& operator = (const aview1d& r)
+		{
+			cview_type::operator = (r);
+			return *this;
+		}
+
+		aview1d& operator = (aview1d&& r)
+		{
+			cview_type::operator = (std::move(r));
+			return *this;
+		}
+
+	public:
+		// Element access
+
+		const_pointer pbase() const
+		{
+			return this->m_pbase;
+		}
+
+		pointer pbase()
+		{
+			return this->m_pbase;
+		}
+
+		const_pointer ptr(index_type i) const
+		{
+			return this->m_pbase + this->m_indexer[i];
+		}
+
+		pointer ptr(index_type i)
+		{
+			return this->m_pbase + this->m_indexer[i];
+		}
+
+		const_reference operator[] (index_type i) const
+		{
+			return this->m_pbase[this->m_indexer[i]];
+		}
+
+		reference operator[] (index_type i)
+		{
+			return this->m_pbase[this->m_indexer[i]];
+		}
+
+		const_reference operator() (index_type i) const
+		{
+			return this->m_pbase[this->m_indexer[i]];
+		}
+
+		reference operator() (index_type i)
+		{
+			return this->m_pbase[this->m_indexer[i]];
+		}
+
+		// Iteration
+
+		const_iterator begin() const
+		{
+			return _iterators::get_const_iterator(pbase(), this->m_indexer, 0);
+		}
+
+		iterator begin()
+		{
+			return _iterators::get_iterator(pbase(), this->m_indexer, 0);
+		}
+
+		const_iterator end() const
+		{
+			return _iterators::get_const_iterator(pbase(), this->m_indexer, this->m_d0);
+		}
+
+		iterator end()
+		{
+			return _iterators::get_iterator(pbase(), this->m_indexer, this->m_d0);
+		}
+
+		// Sub-view
+
+		template<class TSelector>
+		caview1d<value_type, typename sub_indexer<indexer_type, TSelector>::type>
+		V(const TSelector& selector) const
+		{
+			typedef typename sub_indexer<indexer_type, TSelector>::type sub_indexer_type;
+
+			index_t offset;
+			sub_indexer_type sindexer =
+					sub_indexer<indexer_type, TSelector>::get(this->m_indexer, selector, offset);
+
+			return caview1d<value_type, sub_indexer_type>(this->m_pbase + offset, sindexer);
 		}
 
 		template<class TSelector>
@@ -348,37 +464,39 @@ namespace bcs
 
 			index_t offset;
 			sub_indexer_type sindexer =
-					sub_indexer<indexer_type, TSelector>::get(m_indexer, selector, offset);
+					sub_indexer<indexer_type, TSelector>::get(this->m_indexer, selector, offset);
 
-			return aview1d<value_type, sub_indexer_type>(m_pbase + offset, sindexer);
+			return aview1d<value_type, sub_indexer_type>(this->m_pbase + offset, sindexer);
 		}
-
-	private:
-		void reset()
-		{
-			m_pbase = BCS_NULL;
-			m_d0 = 0;
-		}
-
-	protected:
-		pointer m_pbase;
-		index_type m_d0;
-		indexer_type m_indexer;
 
 	}; // end class aview1d
 
 
 	template<typename T>
-	inline const aview1d<T, id_ind> get_aview1d(const T *base, size_t n)
+	inline caview1d<T> get_aview1d(const T *base, size_t n)
 	{
-		return aview1d<T>(const_cast<T*>(base), n);
+		return caview1d<T>(base, n);
 	}
 
 
 	template<typename T, class TIndexer>
-	inline const aview1d<T, TIndexer> get_aview1d_ex(const T *base, const TIndexer& idxer)
+	inline caview1d<T, TIndexer> get_aview1d_ex(const T *base, const TIndexer& idxer)
 	{
-		return aview1d<T, TIndexer>(const_cast<T*>(base), idxer);
+		return caview1d<T, TIndexer>(base, idxer);
+	}
+
+
+	template<typename T>
+	inline aview1d<T> get_aview1d(T *base, size_t n)
+	{
+		return aview1d<T>(base, n);
+	}
+
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer> get_aview1d_ex(T *base, const TIndexer& idxer)
+	{
+		return aview1d<T, TIndexer>(base, idxer);
 	}
 
 
@@ -393,6 +511,7 @@ namespace bcs
 		BCS_ARRAY_BASIC_TYPEDEFS(1u, T, layout_1d_t)
 
 		typedef id_ind indexer_type;
+		typedef caview1d<value_type, indexer_type> cview_type;
 		typedef aview1d<value_type, indexer_type> view_type;
 
 		typedef aview1d_iterators<value_type, indexer_type> _iterators;
@@ -500,32 +619,38 @@ namespace bcs
 	 ********************************************/
 
 	template<typename T, class TIndexer>
-	struct is_array_view<bcs::aview1d<T, TIndexer> > { static const bool value = true; };
-
-	template<typename T, class Alloc>
-	struct is_array_view<bcs::array1d<T, Alloc> > { static const bool value = true; };
+	struct is_array_view<bcs::caview1d<T, TIndexer> > : public std::true_type { };
 
 	template<typename T, class TIndexer>
-	struct is_array_view_ndim<bcs::aview1d<T, TIndexer>, 1> { static const bool value = true; };
+	struct is_array_view<bcs::aview1d<T, TIndexer> > : public std::true_type { };
 
 	template<typename T, class Alloc>
-	struct is_array_view_ndim<bcs::array1d<T, Alloc>, 1> { static const bool value = true; };
+	struct is_array_view<bcs::array1d<T, Alloc> > : public std::true_type { };
+
+	template<typename T, class TIndexer>
+	struct is_array_view_ndim<bcs::caview1d<T, TIndexer>, 1> : public std::true_type { };
+
+	template<typename T, class TIndexer>
+	struct is_array_view_ndim<bcs::aview1d<T, TIndexer>, 1> : public std::true_type { };
+
+	template<typename T, class Alloc>
+	struct is_array_view_ndim<bcs::array1d<T, Alloc>, 1> : public std::true_type { };
 
 
 	template<typename T, class TIndexer>
-	inline std::array<index_t, 1> get_array_shape(const bcs::aview1d<T, TIndexer>& arr)
+	inline std::array<index_t, 1> get_array_shape(const bcs::caview1d<T, TIndexer>& arr)
 	{
 		return arr.shape();
 	}
 
 	template<typename T, class TIndexer>
-	inline size_t get_num_elems(const bcs::aview1d<T, TIndexer>& arr)
+	inline size_t get_num_elems(const bcs::caview1d<T, TIndexer>& arr)
 	{
 		return arr.nelems();
 	}
 
 	template<typename T, class TIndexer>
-	inline const T& get(const bcs::aview1d<T, TIndexer>& arr, index_t i)
+	inline const T& get(const bcs::caview1d<T, TIndexer>& arr, index_t i)
 	{
 		return arr(i);
 	}
@@ -537,13 +662,13 @@ namespace bcs
 	}
 
 	template<typename T, class TIndexer>
-	inline typename bcs::aview1d<T, TIndexer>::const_iterator begin(const bcs::aview1d<T, TIndexer>& arr)
+	inline typename bcs::aview1d<T, TIndexer>::const_iterator begin(const bcs::caview1d<T, TIndexer>& arr)
 	{
 		return arr.begin();
 	}
 
 	template<typename T, class TIndexer>
-	inline typename bcs::aview1d<T, TIndexer>::const_iterator end(const bcs::aview1d<T, TIndexer>& arr)
+	inline typename bcs::aview1d<T, TIndexer>::const_iterator end(const bcs::caview1d<T, TIndexer>& arr)
 	{
 		return arr.end();
 	}
@@ -561,7 +686,7 @@ namespace bcs
 	}
 
 	template<typename T, class TIndexer>
-	inline const T* ptr_base(const bcs::aview1d<T, TIndexer>& arr)
+	inline const T* ptr_base(const bcs::caview1d<T, TIndexer>& arr)
 	{
 		return arr.pbase();
 	}
@@ -573,13 +698,13 @@ namespace bcs
 	}
 
 	template<typename T, class TIndexer>
-	inline bool is_dense_view(const aview1d<T, TIndexer>& a)
+	inline bool is_dense_view(const caview1d<T, TIndexer>& a)
 	{
 		return array_indexer_traits<TIndexer>::is_continuous(a.get_indexer());
 	}
 
 	template<typename T, class TIndexer>
-	inline array1d<T> clone_array(const aview1d<T, TIndexer>& view)
+	inline array1d<T> clone_array(const caview1d<T, TIndexer>& view)
 	{
 		array1d<T> arr(view.nelems());
 		if (is_dense_view(view))
@@ -603,13 +728,13 @@ namespace bcs
 	// element-wise comparison
 
 	template<typename T, class LIndexer, class RIndexer>
-	inline bool operator == (const aview1d<T, LIndexer>& lhs, const aview1d<T, RIndexer>& rhs)
+	inline bool operator == (const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
 		return equal_array(lhs, rhs);
 	}
 
 	template<typename T, class LIndexer, class RIndexer>
-	inline bool operator != (const aview1d<T, LIndexer>& lhs, const aview1d<T, RIndexer>& rhs)
+	inline bool operator != (const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
 		return !(lhs == rhs);
 	}
@@ -617,8 +742,8 @@ namespace bcs
 	// export & import
 
 	template<typename T, class LIndexer, class RIndexer>
-	inline const aview1d<T, LIndexer>&
-	operator >> (const aview1d<T, LIndexer>& a, aview1d<T, RIndexer>& b)
+	inline const caview1d<T, LIndexer>&
+	operator >> (const caview1d<T, LIndexer>& a, aview1d<T, RIndexer>& b)
 	{
 		if (get_num_elems(a) != get_num_elems(b))
 		{
@@ -638,7 +763,7 @@ namespace bcs
 
 	template<typename T, class LIndexer, class RIndexer>
 	inline aview1d<T, LIndexer>&
-	operator << (aview1d<T, LIndexer>& a, const aview1d<T, RIndexer>& b)
+	operator << (aview1d<T, LIndexer>& a, const caview1d<T, RIndexer>& b)
 	{
 		if (get_num_elems(a) != get_num_elems(b))
 		{
@@ -714,10 +839,10 @@ namespace bcs
 
 	namespace _detail
 	{
-		template<typename T, dim_num_t D, typename TOrd> struct _array_creater;
+		template<typename T, dim_num_t D, typename TOrd> struct _array_creater_base;
 
 		template<typename T, typename TOrd>
-		struct _array_creater<T, 1, TOrd>
+		struct _array_creater_base<T, 1, TOrd>
 		{
 			typedef array1d<T> result_type;
 			typedef std::array<index_t, 1> shape_type;
@@ -726,20 +851,24 @@ namespace bcs
 			{
 				return result_type(static_cast<size_t>(shape[0]));
 			}
+
+			template<typename U=T>
+			struct remap
+			{
+				typedef _detail::_array_creater_base<U, 1, layout_1d_t> type;
+			};
 		};
 	}
 
-	template<typename T, class TIndexer>
-	struct array_creater<aview1d<T, TIndexer> > : public _detail::_array_creater<T, 1, layout_1d_t>
-	{
-		typedef array1d<T> result_type;
 
-		template<typename U=T>
-		struct remap
-		{
-			typedef _detail::_array_creater<U, 1, layout_1d_t> type;
-		};
-	};
+	template<typename T, class TIndexer>
+	struct array_creater<caview1d<T, TIndexer> > : public _detail::_array_creater_base<T, 1, layout_1d_t> { };
+
+	template<typename T, class TIndexer>
+	struct array_creater<aview1d<T, TIndexer> > : public _detail::_array_creater_base<T, 1, layout_1d_t> { };
+
+	template<typename T, class Alloc>
+	struct array_creater<array1d<T, Alloc> > : public _detail::_array_creater_base<T, 1, layout_1d_t> { };
 
 }
 

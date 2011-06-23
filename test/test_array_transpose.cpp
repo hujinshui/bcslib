@@ -32,7 +32,7 @@ bool verify_blkwise_transpose(const T *src, T *dst, T *r, size_t bdim, size_t m,
 
 
 template<typename T, typename TOrd, typename TIndexer0, typename TIndexer1>
-bool verify_array2d_transpose(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+bool verify_array2d_transpose(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 {
 	size_t m = a.nrows();
 	size_t n = a.ncolumns();

@@ -21,7 +21,7 @@ BOOST_WARNING_FLAGS = -Wall -Wextra -Wno-unused-variable -Wno-unused-parameter
 ifeq ($(CXX), clang++)
 	CFLAGS = -std=c++0x -stdlib=libc++ -pedantic -U__STRICT_ANSI__ $(WARNING_FLAGS) -I. 
 else
-	CFLAGS = -std=c++0x -pedantic $(WARNING_FLAGS) -I. 
+	CFLAGS = -std=c++0x -fmax-errors=50 -pedantic $(WARNING_FLAGS) -I. 
 endif
 
 BOOST_CFLAGS = -ansi $(BOOST_WARNING_FLAGS) -I$(BOOST_HOME) -I. 
