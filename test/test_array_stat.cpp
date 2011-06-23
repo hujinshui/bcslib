@@ -81,7 +81,6 @@ struct dmean
 };
 
 
-
 BCS_TEST_CASE( test_sum_dot_and_mean )
 {
 	const size_t Nmax = 36;
