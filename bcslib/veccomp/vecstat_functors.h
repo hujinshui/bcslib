@@ -111,24 +111,24 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_index_min_ftor
+	struct vec_min_index_ftor
 	{
 		typedef size_t result_type;
 
 		result_type operator() (size_t n, const T *x) const
 		{
-			return vec_index_min(n, x);
+			return vec_min_index(n, x);
 		}
 	};
 
 	template<typename T>
-	struct vec_index_max_ftor
+	struct vec_max_index_ftor
 	{
 		typedef size_t result_type;
 
 		result_type operator() (size_t n, const T *x) const
 		{
-			return vec_index_max(n, x);
+			return vec_max_index(n, x);
 		}
 	};
 

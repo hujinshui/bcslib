@@ -30,6 +30,56 @@ namespace bcs
 	struct row_major_t { };
 	struct column_major_t { };
 
+	template<typename TOrd> struct layout_aux2d;
+
+	template<>
+	struct layout_aux2d<row_major_t>
+	{
+		static index_t offset(index_t d0, index_t d1, index_t i, index_t j)
+		{
+			return i * d1 + j;
+		}
+
+		static void pass_by_end(index_t d0, index_t d1, index_t& i, index_t& j)
+		{
+			i = d0;
+			j = 0;
+		}
+
+		static std::array<index_t, 2> ind2dub(index_t d0, index_t d1, index_t idx)
+		{
+			std::array<index_t, 2> sub;
+			sub[0] = idx / d1;
+			sub[1] = idx - sub[0] * d1;
+			return sub;
+		}
+	};
+
+
+	template<>
+	struct layout_aux2d<column_major_t>
+	{
+		static index_t offset(index_t d0, index_t d1, index_t i, index_t j)
+		{
+			return i + j * d0;
+		}
+
+		static void pass_by_end(index_t d0, index_t d1, index_t& i, index_t& j)
+		{
+			i = 0;
+			j = d1;
+		}
+
+		static std::array<index_t, 2> ind2dub(index_t d0, index_t d1, index_t idx)
+		{
+			std::array<index_t, 2> sub;
+			sub[1] = idx / d0;
+			sub[0] = idx - sub[1] * d0;
+			return sub;
+		}
+	};
+
+
 	/*********
 	 *
 	 * The concept of an array class
@@ -155,10 +205,33 @@ namespace bcs
 	};
 
 
+	namespace _detail
+	{
+
+		template<typename T>
+		struct _is_valid_arrelem_type
+		{
+			static const bool value = std::is_pod<T>::value;
+		};
+
+		template<typename T1, typename T2>
+		struct _is_valid_arrelem_type<std::pair<T1, T2> >
+		{
+			static const bool value = _is_valid_arrelem_type<T1>::value && _is_valid_arrelem_type<T2>::value;
+		};
+
+		template<typename T, size_t D>
+		struct _is_valid_arrelem_type<std::array<T, D> >
+		{
+			static const bool value = _is_valid_arrelem_type<T>::value;
+		};
+	}
+
 	template<typename T>
 	struct is_valid_array_element
 	{
-		static const bool value = std::is_pod<T>::value && std::is_same<T, typename std::remove_const<T>::type>::value;
+		static const bool value = !std::is_const<T>::value && !std::is_reference<T>::value &&
+				_detail::_is_valid_arrelem_type<T>::value;
 	};
 
 	template<class Arr1, class Arr2>

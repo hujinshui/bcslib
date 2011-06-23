@@ -121,9 +121,9 @@ namespace bcs
 	}
 
 	template<typename T>
-	inline size_t vec_index_min(size_t n, const T *x)
+	inline size_t vec_min_index(size_t n, const T *x)
 	{
-		check_arg(n > 0, "n must be positive for vec_index_min.");
+		check_arg(n > 0, "n must be positive for vec_min_index.");
 
 		size_t p = 0;
 		T v(x[0]);
@@ -142,9 +142,9 @@ namespace bcs
 
 
 	template<typename T>
-	inline size_t vec_index_max(size_t n, const T *x)
+	inline size_t vec_max_index(size_t n, const T *x)
 	{
-		check_arg(n > 0, "n must be positive for vec_index_min.");
+		check_arg(n > 0, "n must be positive for vec_max_index.");
 
 		size_t p = 0;
 		T v(x[0]);

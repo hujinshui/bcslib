@@ -120,6 +120,69 @@ namespace bcs
 		return evaluate_arr_slice_stats(vec_mean_ftor<value_type>(), a, Slicing());
 	}
 
+
+	// min, max & median
+
+	// min
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	array_stats_resultT<vec_min_ftor, Arr> >::type
+	min_arr(const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_stats(vec_min_ftor<value_type>(), a);
+	}
+
+	template<class Arr, typename Slicing>
+	inline typename lazy_enable_if<is_array_view_ndim<Arr, 2>::value,
+	array_slice_stats_resultT<vec_min_ftor, Slicing, Arr> >::type
+	min_arr(const Arr& a, Slicing)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_slice_stats(vec_min_ftor<value_type>(), a, Slicing());
+	}
+
+	// max
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	array_stats_resultT<vec_max_ftor, Arr> >::type
+	max_arr(const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_stats(vec_max_ftor<value_type>(), a);
+	}
+
+	template<class Arr, typename Slicing>
+	inline typename lazy_enable_if<is_array_view_ndim<Arr, 2>::value,
+	array_slice_stats_resultT<vec_max_ftor, Slicing, Arr> >::type
+	max_arr(const Arr& a, Slicing)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_slice_stats(vec_max_ftor<value_type>(), a, Slicing());
+	}
+
+	// minmax
+
+	template<class Arr>
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	array_stats_resultT<vec_minmax_ftor, Arr> >::type
+	minmax_arr(const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_stats(vec_minmax_ftor<value_type>(), a);
+	}
+
+	template<class Arr, typename Slicing>
+	inline typename lazy_enable_if<is_array_view_ndim<Arr, 2>::value,
+	array_slice_stats_resultT<vec_minmax_ftor, Slicing, Arr> >::type
+	minmax_arr(const Arr& a, Slicing)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return evaluate_arr_slice_stats(vec_minmax_ftor<value_type>(), a, Slicing());
+	}
+
 }
 
 

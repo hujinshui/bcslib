@@ -24,39 +24,6 @@ namespace bcs
 
 	namespace _detail
 	{
-		template<typename TOrd> struct layout_aux2d;
-
-		template<>
-		struct layout_aux2d<row_major_t>
-		{
-			static index_t offset(index_t d0, index_t d1, index_t i, index_t j)
-			{
-				return i * d1 + j;
-			}
-
-			static void pass_by_end(index_t d0, index_t d1, index_t& i, index_t& j)
-			{
-				i = d0;
-				j = 0;
-			}
-		};
-
-
-		template<>
-		struct layout_aux2d<column_major_t>
-		{
-			static index_t offset(index_t d0, index_t d1, index_t i, index_t j)
-			{
-				return i + j * d0;
-			}
-
-			static void pass_by_end(index_t d0, index_t d1, index_t& i, index_t& j)
-			{
-				i = 0;
-				j = d1;
-			}
-		};
-
 
 		template<typename TOrd, class TIndexer0, class TIndexer1> struct array2d_slices;
 

@@ -124,6 +124,68 @@ namespace bcs
 	}
 
 
+	// min
+
+	template<typename T, class TIndexer>
+	T min(const aview1d<T, TIndexer>& a)
+	{
+		return min_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T min(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return min_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename Slicing>
+	array1d<T> min(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a, Slicing)
+	{
+		return min_arr(a, Slicing());
+	}
+
+
+	// max
+
+	template<typename T, class TIndexer>
+	T max(const aview1d<T, TIndexer>& a)
+	{
+		return max_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T max(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return max_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename Slicing>
+	array1d<T> max(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a, Slicing)
+	{
+		return max_arr(a, Slicing());
+	}
+
+
+	// minmax
+
+	template<typename T, class TIndexer>
+	std::pair<T, T> minmax(const aview1d<T, TIndexer>& a)
+	{
+		return minmax_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	std::pair<T, T> minmax(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return minmax_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename Slicing>
+	array1d<std::pair<T, T> > minmax(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a, Slicing)
+	{
+		return minmax_arr(a, Slicing());
+	}
+
 }
 
 #endif 
