@@ -147,6 +147,18 @@ namespace bcs
 	};
 
 	template<typename T>
+	struct vec_diff_norm_L0_ftor
+	{
+		typedef T result_type;
+
+		result_type operator() (size_t n, const T *x, const T *y) const
+		{
+			return vec_diff_norm_L0(n, x, y);
+		}
+	};
+
+
+	template<typename T>
 	struct vec_norm_L1_ftor
 	{
 		typedef T result_type;
@@ -158,15 +170,39 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_sum_sqr_ftor
+	struct vec_diff_norm_L1_ftor
+	{
+		typedef T result_type;
+
+		result_type operator() (size_t n, const T *x, const T *y) const
+		{
+			return vec_diff_norm_L1(n, x, y);
+		}
+	};
+
+
+	template<typename T>
+	struct vec_sqrsum_ftor
 	{
 		typedef T result_type;
 
 		result_type operator() (size_t n, const T *x) const
 		{
-			return vec_sum_sqr(n, x);
+			return vec_sqrsum(n, x);
 		}
 	};
+
+	template<typename T>
+	struct vec_diff_sqrsum_ftor
+	{
+		typedef T result_type;
+
+		result_type operator() (size_t n, const T *x, const T *y) const
+		{
+			return vec_diff_sqrsum(n, x, y);
+		}
+	};
+
 
 	template<typename T>
 	struct vec_norm_L2_ftor
@@ -180,6 +216,18 @@ namespace bcs
 	};
 
 	template<typename T>
+	struct vec_diff_norm_L2_ftor
+	{
+		typedef T result_type;
+
+		result_type operator() (size_t n, const T *x, const T *y) const
+		{
+			return vec_diff_norm_L2(n, x, y);
+		}
+	};
+
+
+	template<typename T>
 	struct vec_norm_Linf_ftor
 	{
 		typedef T result_type;
@@ -190,6 +238,16 @@ namespace bcs
 		}
 	};
 
+	template<typename T>
+	struct vec_diff_norm_Linf_ftor
+	{
+		typedef T result_type;
+
+		result_type operator() (size_t n, const T *x, const T *y) const
+		{
+			return vec_diff_norm_Linf(n, x, y);
+		}
+	};
 
 }
 

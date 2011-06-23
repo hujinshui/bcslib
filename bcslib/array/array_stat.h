@@ -228,6 +228,211 @@ namespace bcs
 		return max_index_arr(a, Slicing());
 	}
 
+
+	// norm_L0
+
+	template<typename T, class TIndexer>
+	T norm_L0(const caview1d<T, TIndexer>& a)
+	{
+		return norm_L0_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T norm_L0(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return norm_L0_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename Slicing>
+	array1d<T> norm_L0(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, Slicing)
+	{
+		return norm_L0_arr(a, Slicing());
+	}
+
+	// diff_norm_L0
+
+	template<typename T, class LIndexer, class RIndexer>
+	T diff_norm_L0(const caview1d<T, LIndexer>& a, const caview1d<T, RIndexer>& b)
+	{
+		return diff_norm_L0_arr(a, b);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	T diff_norm_L0(const caview2d<T, TOrd, LIndexer0, LIndexer1>& a, const caview2d<T, TOrd, RIndexer0, RIndexer1>& b)
+	{
+		return diff_norm_L0_arr(a, b);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1, typename Slicing>
+	array1d<T> diff_norm_L0(const caview2d<T, TOrd, LIndexer0, LIndexer1>& a, const caview2d<T, TOrd, RIndexer0, RIndexer1>& b, Slicing)
+	{
+		return diff_norm_L0_arr(a, b, Slicing());
+	}
+
+
+	// norm_L1
+
+	template<typename T, class TIndexer>
+	T norm_L1(const caview1d<T, TIndexer>& a)
+	{
+		return norm_L1_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T norm_L1(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return norm_L1_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename Slicing>
+	array1d<T> norm_L1(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, Slicing)
+	{
+		return norm_L1_arr(a, Slicing());
+	}
+
+	// diff_norm_L1
+
+	template<typename T, class LIndexer, class RIndexer>
+	T diff_norm_L1(const caview1d<T, LIndexer>& a, const caview1d<T, RIndexer>& b)
+	{
+		return diff_norm_L1_arr(a, b);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	T diff_norm_L1(const caview2d<T, TOrd, LIndexer0, LIndexer1>& a, const caview2d<T, TOrd, RIndexer0, RIndexer1>& b)
+	{
+		return diff_norm_L1_arr(a, b);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1, typename Slicing>
+	array1d<T> diff_norm_L1(const caview2d<T, TOrd, LIndexer0, LIndexer1>& a, const caview2d<T, TOrd, RIndexer0, RIndexer1>& b, Slicing)
+	{
+		return diff_norm_L1_arr(a, b, Slicing());
+	}
+
+
+	// sqrsum
+
+	template<typename T, class TIndexer>
+	T sqrsum(const caview1d<T, TIndexer>& a)
+	{
+		return sqrsum_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T sqrsum(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return sqrsum_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename Slicing>
+	array1d<T> sqrsum(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, Slicing)
+	{
+		return sqrsum_arr(a, Slicing());
+	}
+
+	// diff_sqrsum
+
+	template<typename T, class LIndexer, class RIndexer>
+	T diff_sqrsum(const caview1d<T, LIndexer>& a, const caview1d<T, RIndexer>& b)
+	{
+		return diff_sqrsum_arr(a, b);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	T diff_sqrsum(const caview2d<T, TOrd, LIndexer0, LIndexer1>& a, const caview2d<T, TOrd, RIndexer0, RIndexer1>& b)
+	{
+		return diff_sqrsum_arr(a, b);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1, typename Slicing>
+	array1d<T> diff_sqrsum(const caview2d<T, TOrd, LIndexer0, LIndexer1>& a, const caview2d<T, TOrd, RIndexer0, RIndexer1>& b, Slicing)
+	{
+		return diff_sqrsum_arr(a, b, Slicing());
+	}
+
+
+	// norm_L2
+
+	template<typename T, class TIndexer>
+	T norm_L2(const caview1d<T, TIndexer>& a)
+	{
+		return norm_L2_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T norm_L2(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return norm_L2_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename Slicing>
+	array1d<T> norm_L2(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, Slicing)
+	{
+		return norm_L2_arr(a, Slicing());
+	}
+
+	// diff_norm_L2
+
+	template<typename T, class LIndexer, class RIndexer>
+	T diff_norm_L2(const caview1d<T, LIndexer>& a, const caview1d<T, RIndexer>& b)
+	{
+		return diff_norm_L2_arr(a, b);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	T diff_norm_L2(const caview2d<T, TOrd, LIndexer0, LIndexer1>& a, const caview2d<T, TOrd, RIndexer0, RIndexer1>& b)
+	{
+		return diff_norm_L2_arr(a, b);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1, typename Slicing>
+	array1d<T> diff_norm_L2(const caview2d<T, TOrd, LIndexer0, LIndexer1>& a, const caview2d<T, TOrd, RIndexer0, RIndexer1>& b, Slicing)
+	{
+		return diff_norm_L2_arr(a, b, Slicing());
+	}
+
+
+	// norm_Linf
+
+	template<typename T, class TIndexer>
+	T norm_Linf(const caview1d<T, TIndexer>& a)
+	{
+		return norm_Linf_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	T norm_Linf(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return norm_Linf_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename Slicing>
+	array1d<T> norm_Linf(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, Slicing)
+	{
+		return norm_Linf_arr(a, Slicing());
+	}
+
+	// diff_norm_Linf
+
+	template<typename T, class LIndexer, class RIndexer>
+	T diff_norm_Linf(const caview1d<T, LIndexer>& a, const caview1d<T, RIndexer>& b)
+	{
+		return diff_norm_Linf_arr(a, b);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	T diff_norm_Linf(const caview2d<T, TOrd, LIndexer0, LIndexer1>& a, const caview2d<T, TOrd, RIndexer0, RIndexer1>& b)
+	{
+		return diff_norm_Linf_arr(a, b);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1, typename Slicing>
+	array1d<T> diff_norm_Linf(const caview2d<T, TOrd, LIndexer0, LIndexer1>& a, const caview2d<T, TOrd, RIndexer0, RIndexer1>& b, Slicing)
+	{
+		return diff_norm_Linf_arr(a, b, Slicing());
+	}
+
 }
 
 #endif 
