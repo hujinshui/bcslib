@@ -177,6 +177,172 @@ struct dmax_index
 };
 
 
+struct dnorm_L0
+{
+	typedef double result_type;
+
+	double s;
+
+	dnorm_L0() : s(0) { }
+
+	void put(double x)
+	{
+		s += (double)(x != 0);
+	}
+
+	result_type get() const { return s; }
+};
+
+struct ddiff_norm_L0
+{
+	typedef double result_type;
+
+	double s;
+
+	ddiff_norm_L0() : s(0) { }
+
+	void put(double x, double y)
+	{
+		s += (double)(x != y);
+	}
+
+	result_type get() const { return s; }
+};
+
+
+struct dnorm_L1
+{
+	typedef double result_type;
+
+	double s;
+
+	dnorm_L1() : s(0) { }
+
+	void put(double x)
+	{
+		s += std::abs(x);
+	}
+
+	result_type get() const { return s; }
+};
+
+struct ddiff_norm_L1
+{
+	typedef double result_type;
+
+	double s;
+
+	ddiff_norm_L1() : s(0) { }
+
+	void put(double x, double y)
+	{
+		s += std::abs(x - y);
+	}
+
+	result_type get() const { return s; }
+};
+
+
+struct dsqrsum
+{
+	typedef double result_type;
+
+	double s;
+
+	dsqrsum() : s(0) { }
+
+	void put(double x)
+	{
+		s += sqr(x);
+	}
+
+	result_type get() const { return s; }
+};
+
+struct ddiff_sqrsum
+{
+	typedef double result_type;
+
+	double s;
+
+	ddiff_sqrsum() : s(0) { }
+
+	void put(double x, double y)
+	{
+		s += sqr(x - y);
+	}
+
+	result_type get() const { return s; }
+};
+
+
+struct dnorm_L2
+{
+	typedef double result_type;
+
+	double s;
+
+	dnorm_L2() : s(0) { }
+
+	void put(double x)
+	{
+		s += sqr(x);
+	}
+
+	result_type get() const { return std::sqrt(s); }
+};
+
+struct ddiff_norm_L2
+{
+	typedef double result_type;
+
+	double s;
+
+	ddiff_norm_L2() : s(0) { }
+
+	void put(double x, double y)
+	{
+		s += sqr(x - y);
+	}
+
+	result_type get() const { return std::sqrt(s); }
+};
+
+
+struct dnorm_Linf
+{
+	typedef double result_type;
+
+	double s;
+
+	dnorm_Linf() : s(0) { }
+
+	void put(double x)
+	{
+		if (std::abs(x) > s) s = std::abs(x);
+	}
+
+	result_type get() const { return s; }
+};
+
+struct ddiff_norm_Linf
+{
+	typedef double result_type;
+
+	double s;
+
+	ddiff_norm_Linf() : s(0) { }
+
+	void put(double x, double y)
+	{
+		if (std::abs(x - y) > s) s = std::abs(x- y);
+	}
+
+	result_type get() const { return s; }
+};
+
+
+
 
 
 BCS_TEST_CASE( test_sum_dot_and_mean )
@@ -436,12 +602,243 @@ BCS_TEST_CASE( test_min_and_max )
 }
 
 
+BCS_TEST_CASE( test_norms_and_diff_norms )
+{
+	const size_t Nmax = 36;
+	double src[Nmax];
+	double src2[Nmax];
+	for (size_t i = 0; i < Nmax; ++i) src[i] = (double)(i+1);
+	for (size_t i = 0; i < Nmax; ++i) src2[i] = (double)(i * 2 + 1);
+
+	// prepare views
+
+	aview1d<double> v1d = get_aview1d(src, 6);
+	aview1d<double, step_ind> v1d_s = get_aview1d_ex(src, step_ind(6, 2));
+
+	aview2d<double, row_major_t>    v2d_rm = get_aview2d_rm(src, 2, 3);
+	aview2d<double, column_major_t> v2d_cm = get_aview2d_cm(src, 2, 3);
+
+	aview2d<double, row_major_t,    step_ind, step_ind> v2d_rm_s = get_aview2d_rm_ex(src, 4, 6, step_ind(2, 2), step_ind(3, 2));
+	aview2d<double, column_major_t, step_ind, step_ind> v2d_cm_s = get_aview2d_cm_ex(src, 4, 6, step_ind(2, 2), step_ind(3, 2));
+
+	aview1d<double> w1d = get_aview1d(src2, 6);
+	aview1d<double, step_ind> w1d_s = get_aview1d_ex(src2, step_ind(6, 2));
+
+	aview2d<double, row_major_t>    w2d_rm = get_aview2d_rm(src2, 2, 3);
+	aview2d<double, column_major_t> w2d_cm = get_aview2d_cm(src2, 2, 3);
+
+	aview2d<double, row_major_t,    step_ind, step_ind> w2d_rm_s = get_aview2d_rm_ex(src2, 4, 6, step_ind(2, 2), step_ind(3, 2));
+	aview2d<double, column_major_t, step_ind, step_ind> w2d_cm_s = get_aview2d_cm_ex(src2, 4, 6, step_ind(2, 2), step_ind(3, 2));
+
+	// norm_L0
+
+	BCS_CHECK_EQUAL( norm_L0(v1d), accum_all(v1d, dnorm_L0()) );
+	BCS_CHECK_EQUAL( norm_L0(v2d_rm), accum_all(v2d_rm, dnorm_L0()) );
+	BCS_CHECK_EQUAL( norm_L0(v2d_cm), accum_all(v2d_cm, dnorm_L0()) );
+
+	BCS_CHECK_EQUAL( norm_L0(v2d_rm, per_row()), accum_prow(v2d_rm, dnorm_L0()) );
+	BCS_CHECK_EQUAL( norm_L0(v2d_cm, per_row()), accum_prow(v2d_cm, dnorm_L0()) );
+	BCS_CHECK_EQUAL( norm_L0(v2d_rm, per_col()), accum_pcol(v2d_rm, dnorm_L0()) );
+	BCS_CHECK_EQUAL( norm_L0(v2d_cm, per_col()), accum_pcol(v2d_cm, dnorm_L0()) );
+
+	BCS_CHECK_EQUAL( norm_L0(v1d_s), accum_all(v1d_s, dnorm_L0()) );
+	BCS_CHECK_EQUAL( norm_L0(v2d_rm_s), accum_all(v2d_rm_s, dnorm_L0()) );
+	BCS_CHECK_EQUAL( norm_L0(v2d_cm_s), accum_all(v2d_cm_s, dnorm_L0()) );
+
+	BCS_CHECK_EQUAL( norm_L0(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dnorm_L0()) );
+	BCS_CHECK_EQUAL( norm_L0(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dnorm_L0()) );
+	BCS_CHECK_EQUAL( norm_L0(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dnorm_L0()) );
+	BCS_CHECK_EQUAL( norm_L0(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dnorm_L0()) );
+
+	// diff_norm_L0
+
+	BCS_CHECK_EQUAL( diff_norm_L0(v1d, w1d), accum_all(v1d, w1d, ddiff_norm_L0()) );
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_norm_L0()) );
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_norm_L0()) );
+
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_norm_L0()) );
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_norm_L0()) );
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_norm_L0()) );
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_norm_L0()) );
+
+	BCS_CHECK_EQUAL( diff_norm_L0(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_norm_L0()) );
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_norm_L0()) );
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_norm_L0()) );
+
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_norm_L0()) );
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_norm_L0()) );
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_norm_L0()) );
+	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_norm_L0()) );
+
+	// norm_L1
+
+	BCS_CHECK_EQUAL( norm_L1(v1d), accum_all(v1d, dnorm_L1()) );
+	BCS_CHECK_EQUAL( norm_L1(v2d_rm), accum_all(v2d_rm, dnorm_L1()) );
+	BCS_CHECK_EQUAL( norm_L1(v2d_cm), accum_all(v2d_cm, dnorm_L1()) );
+
+	BCS_CHECK_EQUAL( norm_L1(v2d_rm, per_row()), accum_prow(v2d_rm, dnorm_L1()) );
+	BCS_CHECK_EQUAL( norm_L1(v2d_cm, per_row()), accum_prow(v2d_cm, dnorm_L1()) );
+	BCS_CHECK_EQUAL( norm_L1(v2d_rm, per_col()), accum_pcol(v2d_rm, dnorm_L1()) );
+	BCS_CHECK_EQUAL( norm_L1(v2d_cm, per_col()), accum_pcol(v2d_cm, dnorm_L1()) );
+
+	BCS_CHECK_EQUAL( norm_L1(v1d_s), accum_all(v1d_s, dnorm_L1()) );
+	BCS_CHECK_EQUAL( norm_L1(v2d_rm_s), accum_all(v2d_rm_s, dnorm_L1()) );
+	BCS_CHECK_EQUAL( norm_L1(v2d_cm_s), accum_all(v2d_cm_s, dnorm_L1()) );
+
+	BCS_CHECK_EQUAL( norm_L1(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dnorm_L1()) );
+	BCS_CHECK_EQUAL( norm_L1(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dnorm_L1()) );
+	BCS_CHECK_EQUAL( norm_L1(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dnorm_L1()) );
+	BCS_CHECK_EQUAL( norm_L1(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dnorm_L1()) );
+
+	// diff_norm_L1
+
+	BCS_CHECK_EQUAL( diff_norm_L1(v1d, w1d), accum_all(v1d, w1d, ddiff_norm_L1()) );
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_norm_L1()) );
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_norm_L1()) );
+
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_norm_L1()) );
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_norm_L1()) );
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_norm_L1()) );
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_norm_L1()) );
+
+	BCS_CHECK_EQUAL( diff_norm_L1(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_norm_L1()) );
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_norm_L1()) );
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_norm_L1()) );
+
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_norm_L1()) );
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_norm_L1()) );
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_norm_L1()) );
+	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_norm_L1()) );
+
+	// sqrsum
+
+	BCS_CHECK_EQUAL( sqrsum(v1d), accum_all(v1d, dsqrsum()) );
+	BCS_CHECK_EQUAL( sqrsum(v2d_rm), accum_all(v2d_rm, dsqrsum()) );
+	BCS_CHECK_EQUAL( sqrsum(v2d_cm), accum_all(v2d_cm, dsqrsum()) );
+
+	BCS_CHECK_EQUAL( sqrsum(v2d_rm, per_row()), accum_prow(v2d_rm, dsqrsum()) );
+	BCS_CHECK_EQUAL( sqrsum(v2d_cm, per_row()), accum_prow(v2d_cm, dsqrsum()) );
+	BCS_CHECK_EQUAL( sqrsum(v2d_rm, per_col()), accum_pcol(v2d_rm, dsqrsum()) );
+	BCS_CHECK_EQUAL( sqrsum(v2d_cm, per_col()), accum_pcol(v2d_cm, dsqrsum()) );
+
+	BCS_CHECK_EQUAL( sqrsum(v1d_s), accum_all(v1d_s, dsqrsum()) );
+	BCS_CHECK_EQUAL( sqrsum(v2d_rm_s), accum_all(v2d_rm_s, dsqrsum()) );
+	BCS_CHECK_EQUAL( sqrsum(v2d_cm_s), accum_all(v2d_cm_s, dsqrsum()) );
+
+	BCS_CHECK_EQUAL( sqrsum(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dsqrsum()) );
+	BCS_CHECK_EQUAL( sqrsum(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dsqrsum()) );
+	BCS_CHECK_EQUAL( sqrsum(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dsqrsum()) );
+	BCS_CHECK_EQUAL( sqrsum(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dsqrsum()) );
+
+	// diff_sqrsum
+
+	BCS_CHECK_EQUAL( diff_sqrsum(v1d, w1d), accum_all(v1d, w1d, ddiff_sqrsum()) );
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_sqrsum()) );
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_sqrsum()) );
+
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_sqrsum()) );
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_sqrsum()) );
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_sqrsum()) );
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_sqrsum()) );
+
+	BCS_CHECK_EQUAL( diff_sqrsum(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_sqrsum()) );
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_sqrsum()) );
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_sqrsum()) );
+
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_sqrsum()) );
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_sqrsum()) );
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_sqrsum()) );
+	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_sqrsum()) );
+
+	// norm_L2
+
+	BCS_CHECK_EQUAL( norm_L2(v1d), accum_all(v1d, dnorm_L2()) );
+	BCS_CHECK_EQUAL( norm_L2(v2d_rm), accum_all(v2d_rm, dnorm_L2()) );
+	BCS_CHECK_EQUAL( norm_L2(v2d_cm), accum_all(v2d_cm, dnorm_L2()) );
+
+	BCS_CHECK_EQUAL( norm_L2(v2d_rm, per_row()), accum_prow(v2d_rm, dnorm_L2()) );
+	BCS_CHECK_EQUAL( norm_L2(v2d_cm, per_row()), accum_prow(v2d_cm, dnorm_L2()) );
+	BCS_CHECK_EQUAL( norm_L2(v2d_rm, per_col()), accum_pcol(v2d_rm, dnorm_L2()) );
+	BCS_CHECK_EQUAL( norm_L2(v2d_cm, per_col()), accum_pcol(v2d_cm, dnorm_L2()) );
+
+	BCS_CHECK_EQUAL( norm_L2(v1d_s), accum_all(v1d_s, dnorm_L2()) );
+	BCS_CHECK_EQUAL( norm_L2(v2d_rm_s), accum_all(v2d_rm_s, dnorm_L2()) );
+	BCS_CHECK_EQUAL( norm_L2(v2d_cm_s), accum_all(v2d_cm_s, dnorm_L2()) );
+
+	BCS_CHECK_EQUAL( norm_L2(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dnorm_L2()) );
+	BCS_CHECK_EQUAL( norm_L2(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dnorm_L2()) );
+	BCS_CHECK_EQUAL( norm_L2(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dnorm_L2()) );
+	BCS_CHECK_EQUAL( norm_L2(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dnorm_L2()) );
+
+	// diff_norm_L2
+
+	BCS_CHECK_EQUAL( diff_norm_L2(v1d, w1d), accum_all(v1d, w1d, ddiff_norm_L2()) );
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_norm_L2()) );
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_norm_L2()) );
+
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_norm_L2()) );
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_norm_L2()) );
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_norm_L2()) );
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_norm_L2()) );
+
+	BCS_CHECK_EQUAL( diff_norm_L2(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_norm_L2()) );
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_norm_L2()) );
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_norm_L2()) );
+
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_norm_L2()) );
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_norm_L2()) );
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_norm_L2()) );
+	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_norm_L2()) );
+
+	// norm_Linf
+
+	BCS_CHECK_EQUAL( norm_Linf(v1d), accum_all(v1d, dnorm_Linf()) );
+	BCS_CHECK_EQUAL( norm_Linf(v2d_rm), accum_all(v2d_rm, dnorm_Linf()) );
+	BCS_CHECK_EQUAL( norm_Linf(v2d_cm), accum_all(v2d_cm, dnorm_Linf()) );
+
+	BCS_CHECK_EQUAL( norm_Linf(v2d_rm, per_row()), accum_prow(v2d_rm, dnorm_Linf()) );
+	BCS_CHECK_EQUAL( norm_Linf(v2d_cm, per_row()), accum_prow(v2d_cm, dnorm_Linf()) );
+	BCS_CHECK_EQUAL( norm_Linf(v2d_rm, per_col()), accum_pcol(v2d_rm, dnorm_Linf()) );
+	BCS_CHECK_EQUAL( norm_Linf(v2d_cm, per_col()), accum_pcol(v2d_cm, dnorm_Linf()) );
+
+	BCS_CHECK_EQUAL( norm_Linf(v1d_s), accum_all(v1d_s, dnorm_Linf()) );
+	BCS_CHECK_EQUAL( norm_Linf(v2d_rm_s), accum_all(v2d_rm_s, dnorm_Linf()) );
+	BCS_CHECK_EQUAL( norm_Linf(v2d_cm_s), accum_all(v2d_cm_s, dnorm_Linf()) );
+
+	BCS_CHECK_EQUAL( norm_Linf(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dnorm_Linf()) );
+	BCS_CHECK_EQUAL( norm_Linf(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dnorm_Linf()) );
+	BCS_CHECK_EQUAL( norm_Linf(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dnorm_Linf()) );
+	BCS_CHECK_EQUAL( norm_Linf(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dnorm_Linf()) );
+
+	// diff_norm_Linf
+
+	BCS_CHECK_EQUAL( diff_norm_Linf(v1d, w1d), accum_all(v1d, w1d, ddiff_norm_Linf()) );
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_norm_Linf()) );
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_norm_Linf()) );
+
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_norm_Linf()) );
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_norm_Linf()) );
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_norm_Linf()) );
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_norm_Linf()) );
+
+	BCS_CHECK_EQUAL( diff_norm_Linf(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_norm_Linf()) );
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_norm_Linf()) );
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_norm_Linf()) );
+
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_norm_Linf()) );
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_norm_Linf()) );
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_norm_Linf()) );
+	BCS_CHECK_EQUAL( diff_norm_Linf(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_norm_Linf()) );
+}
+
+
 test_suite* test_array_stat_suite()
 {
 	test_suite* suite = new test_suite("test_array_stat");
 
 	suite->add( new test_sum_dot_and_mean() );
 	suite->add( new test_min_and_max() );
+	suite->add( new test_norms_and_diff_norms() );
 
 	return suite;
 }

@@ -212,6 +212,18 @@ namespace bcs
 	}
 
 	template<typename T>
+	inline T vec_diff_norm_L0(size_t n, const T *x, const T *y)
+	{
+		size_t c = 0;
+		for (size_t i = 0; i < n; ++i)
+		{
+			if (x[i] != y[i]) ++c;
+		}
+		return (T)c;
+	}
+
+
+	template<typename T>
 	inline T vec_norm_L1(size_t n, const T *x)
 	{
 		T s(0);
@@ -223,15 +235,45 @@ namespace bcs
 	}
 
 	template<typename T>
-	inline T vec_sum_sqr(size_t n, const T *x)
+	inline T vec_diff_norm_L1(size_t n, const T *x, const T *y)
+	{
+		T s(0);
+		for (size_t i = 0; i < n; ++i)
+		{
+			s += std::abs(x[i] - y[i]);
+		}
+		return s;
+	}
+
+
+	template<typename T>
+	inline T vec_sqrsum(size_t n, const T *x)
 	{
 		return vec_dot_prod(n, x, x);
 	}
 
 	template<typename T>
+	inline T vec_diff_sqrsum(size_t n, const T *x, const T *y)
+	{
+		T s(0);
+		for (size_t i = 0; i < n; ++i)
+		{
+			s += sqr(x[i] - y[i]);
+		}
+		return s;
+	}
+
+
+	template<typename T>
 	inline T vec_norm_L2(size_t n, const T *x)
 	{
-		return std::sqrt(vec_sum_sqr(n, x));
+		return std::sqrt(vec_sqrsum(n, x));
+	}
+
+	template<typename T>
+	inline T vec_diff_norm_L2(size_t n, const T *x, const T *y)
+	{
+		return std::sqrt(vec_diff_sqrsum(n, x, y));
 	}
 
 
@@ -242,6 +284,19 @@ namespace bcs
 		for (size_t i = 0; i < n; ++i)
 		{
 			T a = std::abs(x[i]);
+			if (a > s) s = a;
+		}
+
+		return s;
+	}
+
+	template<typename T>
+	inline T vec_diff_norm_Linf(size_t n, const T *x, const T* y)
+	{
+		T s(0);
+		for (size_t i = 0; i < n; ++i)
+		{
+			T a = std::abs(x[i] - y[i]);
 			if (a > s) s = a;
 		}
 
