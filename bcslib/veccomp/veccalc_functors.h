@@ -19,35 +19,43 @@ namespace bcs
 	template<typename T>
 	struct vec_vec_add_ftor
 	{
-		typedef T result_value_type;
-		void operator() (size_t n, const T *x1, const T *x2, T *y) const { vec_add(n, x1, x2, y); }
+		T operator() (const T& v1, const T& v2) const
+		{
+			return v1 + v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, T *y) const
+		{
+			vec_add(n, x1, x2, y);
+		}
+
+		void operator() (size_t n, T*y, const T*x1) const
+		{
+			vec_add_inplace(n, y, x1);
+		}
 	};
 
 	template<typename T>
 	struct vec_sca_add_ftor
 	{
 		T s;
-		vec_sca_add_ftor(const T& s_) : s(s_) { }
+		vec_sca_add_ftor(const T& s_)
+		: s(s_) { }
 
-		typedef T result_value_type;
-		void operator() (size_t n, const T *x1, T *y) const { vec_add(n, x1, s, y); }
-	};
+		T operator() (const T& v1) const
+		{
+			return v1 + s;
+		}
 
-	template<typename T>
-	struct vec_vec_add_ip_ftor
-	{
-		typedef T result_value_type;
-		void operator() (size_t n, T *y, const T *x) const { vec_add_inplace(n, y, x); }
-	};
+		void operator() (size_t n, const T *x1, T *y) const
+		{
+			vec_add(n, x1, s, y);
+		}
 
-	template<typename T>
-	struct vec_sca_add_ip_ftor
-	{
-		T s;
-		vec_sca_add_ip_ftor(const T& s_) : s(s_) { }
-
-		typedef T result_value_type;
-		void operator() (size_t n, T *y) const { vec_add_inplace(n, y, s); }
+		void operator() (size_t n, T* y) const
+		{
+			return vec_add_inplace(n, y, s);
+		}
 	};
 
 
@@ -56,45 +64,66 @@ namespace bcs
 	template<typename T>
 	struct vec_vec_sub_ftor
 	{
-		typedef T result_value_type;
-		void operator() (size_t n, const T *x1, const T *x2, T *y) const { vec_sub(n, x1, x2, y); }
+		T operator() (const T& v1, const T& v2) const
+		{
+			return v1 - v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, T *y) const
+		{
+			vec_sub(n, x1, x2, y);
+		}
+
+		void operator() (size_t n, T *y, const T *x1) const
+		{
+			vec_sub_inplace(n, y, x1);
+		}
 	};
 
 	template<typename T>
 	struct vec_sca_sub_ftor
 	{
 		T s;
-		vec_sca_sub_ftor(const T& s_) : s(s_) { }
+		vec_sca_sub_ftor(const T& s_)
+		: s(s_) { }
 
-		typedef T result_value_type;
-		void operator() (size_t n, const T *x1, T *y) const { vec_sub(n, x1, s, y); }
+		T operator() (const T& v1) const
+		{
+			return v1 - s;
+		}
+
+		void operator() (size_t n, const T *x1, T *y) const
+		{
+			vec_sub(n, x1, s, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			vec_sub_inplace(n, y, s);
+		}
 	};
 
 	template<typename T>
 	struct sca_vec_sub_ftor
 	{
 		T s;
-		sca_vec_sub_ftor(const T& s_) : s(s_) { }
+		sca_vec_sub_ftor(const T& s_)
+		: s(s_) { }
 
-		typedef T result_value_type;
-		void operator() (size_t n, const T *x2, T *y) const { vec_sub(n, s, x2, y); }
-	};
+		T operator() (const T& v2) const
+		{
+			return s - v2;
+		}
 
-	template<typename T>
-	struct vec_vec_sub_ip_ftor
-	{
-		typedef T result_value_type;
-		void operator() (size_t n, T *y, const T *x) const { vec_sub_inplace(n, y, x); }
-	};
+		void operator() (size_t n, const T *x2, T *y) const
+		{
+			vec_sub(n, s, x2, y);
+		}
 
-	template<typename T>
-	struct vec_sca_sub_ip_ftor
-	{
-		T s;
-		vec_sca_sub_ip_ftor(const T& s_) : s(s_) { }
-
-		typedef T result_value_type;
-		void operator() (size_t n, T *y) const { vec_sub_inplace(n, y, s); }
+		void operator() (size_t n, T *y) const
+		{
+			vec_sub_inplace(n, s, y);
+		}
 	};
 
 
@@ -103,35 +132,43 @@ namespace bcs
 	template<typename T>
 	struct vec_vec_mul_ftor
 	{
-		typedef T result_value_type;
-		void operator() (size_t n, const T *x1, const T *x2, T *y) const { vec_mul(n, x1, x2, y); }
+		T operator() (const T& v1, const T& v2) const
+		{
+			return v1 * v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, T *y) const
+		{
+			vec_mul(n, x1, x2, y);
+		}
+
+		void operator() (size_t n, T*y, const T*x1) const
+		{
+			vec_mul_inplace(n, y, x1);
+		}
 	};
 
 	template<typename T>
 	struct vec_sca_mul_ftor
 	{
 		T s;
-		vec_sca_mul_ftor(const T& s_) : s(s_) { }
+		vec_sca_mul_ftor(const T& s_)
+		: s(s_) { }
 
-		typedef T result_value_type;
-		void operator() (size_t n, const T *x1, T *y) const { vec_mul(n, x1, s, y); }
-	};
+		T operator() (const T& v1) const
+		{
+			return v1 * s;
+		}
 
-	template<typename T>
-	struct vec_vec_mul_ip_ftor
-	{
-		typedef T result_value_type;
-		void operator() (size_t n, T *y, const T *x) const { vec_mul_inplace(n, y, x); }
-	};
+		void operator() (size_t n, const T *x1, T *y) const
+		{
+			vec_mul(n, x1, s, y);
+		}
 
-	template<typename T>
-	struct vec_sca_mul_ip_ftor
-	{
-		T s;
-		vec_sca_mul_ip_ftor(const T& s_) : s(s_) { }
-
-		typedef T result_value_type;
-		void operator() (size_t n, T *y) const { vec_mul_inplace(n, y, s); }
+		void operator() (size_t n, T* y) const
+		{
+			return vec_mul_inplace(n, y, s);
+		}
 	};
 
 
@@ -140,46 +177,68 @@ namespace bcs
 	template<typename T>
 	struct vec_vec_div_ftor
 	{
-		typedef T result_value_type;
-		void operator() (size_t n, const T *x1, const T *x2, T *y) const { vec_div(n, x1, x2, y); }
+		T operator() (const T& v1, const T& v2) const
+		{
+			return v1 / v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, T *y) const
+		{
+			vec_div(n, x1, x2, y);
+		}
+
+		void operator() (size_t n, T *y, const T *x1) const
+		{
+			vec_div_inplace(n, y, x1);
+		}
 	};
 
 	template<typename T>
 	struct vec_sca_div_ftor
 	{
 		T s;
-		vec_sca_div_ftor(const T& s_) : s(s_) { }
+		vec_sca_div_ftor(const T& s_)
+		: s(s_) { }
 
-		typedef T result_value_type;
-		void operator() (size_t n, const T *x1, T *y) const { vec_div(n, x1, s, y); }
+		T operator() (const T& v1) const
+		{
+			return v1 / s;
+		}
+
+		void operator() (size_t n, const T *x1, T *y) const
+		{
+			vec_div(n, x1, s, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			vec_div_inplace(n, y, s);
+		}
 	};
 
 	template<typename T>
 	struct sca_vec_div_ftor
 	{
 		T s;
-		sca_vec_div_ftor(const T& s_) : s(s_) { }
+		sca_vec_div_ftor(const T& s_)
+		: s(s_) { }
 
-		typedef T result_value_type;
-		void operator() (size_t n, const T *x2, T *y) const { vec_div(n, s, x2, y); }
+		T operator() (const T& v2) const
+		{
+			return s / v2;
+		}
+
+		void operator() (size_t n, const T *x2, T *y) const
+		{
+			vec_div(n, s, x2, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			vec_div_inplace(n, s, y);
+		}
 	};
 
-	template<typename T>
-	struct vec_vec_div_ip_ftor
-	{
-		typedef T result_value_type;
-		void operator() (size_t n, T *y, const T *x) const { vec_div_inplace(n, y, x); }
-	};
-
-	template<typename T>
-	struct vec_sca_div_ip_ftor
-	{
-		T s;
-		vec_sca_div_ip_ftor(const T& s_) : s(s_) { }
-
-		typedef T result_value_type;
-		void operator() (size_t n, T *y) const { vec_div_inplace(n, y, s); }
-	};
 
 
 	// negation
@@ -187,18 +246,20 @@ namespace bcs
 	template<typename T>
 	struct vec_neg_ftor
 	{
-		typedef T result_value_type;
-		void operator() (size_t n, const T *x, T *y) const { vec_negate(n, x, y); }
+		T operator() (const T& v) const
+		{
+			return -v;
+		}
 
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			vec_negate(n, x, y);
+		}
 
-	};
-
-
-	template<typename T>
-	struct vec_neg_ip_ftor
-	{
-		typedef T result_value_type;
-		void operator() (size_t n, T *y) const { vec_negate(n, y); }
+		void operator() (size_t n, T *y) const
+		{
+			vec_negate(n, y);
+		}
 	};
 
 
@@ -207,10 +268,20 @@ namespace bcs
 	template<typename T>
 	struct vec_abs_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::abs(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_abs(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_abs(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_abs(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_abs(n, y, y);
+		}
 	};
 
 
@@ -221,21 +292,42 @@ namespace bcs
 	template<typename T>
 	struct vec_sqr_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return sqr(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_sqr(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_sqr(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_sqr(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_sqr(n, y, y);
+		}
 	};
+
 
 	// sqrt
 
 	template<typename T>
 	struct vec_sqrt_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::sqrt(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_sqrt(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_sqrt(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_sqrt(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_sqrt(n, y, y);
+		}
 	};
 
 
@@ -244,10 +336,20 @@ namespace bcs
 	template<typename T>
 	struct vec_rcp_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return T(1) / v;
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_rcp(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_rcp(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_rcp(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_rcp(n, y, y);
+		}
 	};
 
 
@@ -256,10 +358,20 @@ namespace bcs
 	template<typename T>
 	struct vec_rsqrt_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return T(1) / std::sqrt(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_rsqrt(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_rsqrt(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_rsqrt(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_rsqrt(n, y, y);
+		}
 	};
 
 
@@ -268,10 +380,20 @@ namespace bcs
 	template<typename T>
 	struct vec_pow_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v, const T& e) const
+		{
+			return std::pow(v, e);
+		}
 
-		void operator() (size_t n, const T *x, const T *e, T *y) const { return vec_pow(n, x, e, y); }
-		void operator() (size_t n, T *y, const T* e) const { return vec_pow(n, y, e, y); }
+		void operator() (size_t n, const T *x, const T *e, T *y) const
+		{
+			return vec_pow(n, x, e, y);
+		}
+
+		void operator() (size_t n, T *y, const T* e) const
+		{
+			return vec_pow(n, y, e, y);
+		}
 	};
 
 
@@ -280,13 +402,24 @@ namespace bcs
 	template<typename T>
 	struct vec_sca_pow_ftor
 	{
-		typedef T result_value_type;
-
 		T e;
-		vec_sca_pow_ftor(const T& e_) : e(e_) { }
+		vec_sca_pow_ftor(const T& e_)
+		: e(e_) { }
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_pow(n, x, e, y); }
-		void operator() (size_t n, T *y) const { return vec_pow(n, y, e, y); }
+		T operator() (const T& v) const
+		{
+			return std::pow(v, e);
+		}
+
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_pow(n, x, e, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_pow(n, y, e, y);
+		}
 	};
 
 
@@ -298,10 +431,20 @@ namespace bcs
 	template<typename T>
 	struct vec_exp_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::exp(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_exp(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_exp(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_exp(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_exp(n, y, y);
+		}
 	};
 
 	// log
@@ -309,10 +452,20 @@ namespace bcs
 	template<typename T>
 	struct vec_log_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::log(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_log(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_log(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_log(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_log(n, y, y);
+		}
 	};
 
 	// log10
@@ -320,10 +473,20 @@ namespace bcs
 	template<typename T>
 	struct vec_log10_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::log10(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_log10(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_log10(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_log10(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_log10(n, y, y);
+		}
 	};
 
 
@@ -334,10 +497,20 @@ namespace bcs
 	template<typename T>
 	struct vec_floor_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::floor(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_floor(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_floor(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_floor(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_floor(n, y, y);
+		}
 	};
 
 	// ceil
@@ -345,10 +518,20 @@ namespace bcs
 	template<typename T>
 	struct vec_ceil_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::ceil(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_ceil(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_ceil(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_ceil(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_ceil(n, y, y);
+		}
 	};
 
 
@@ -359,10 +542,20 @@ namespace bcs
 	template<typename T>
 	struct vec_sin_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::sin(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_sin(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_sin(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_sin(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_sin(n, y, y);
+		}
 	};
 
 	// cos
@@ -370,10 +563,20 @@ namespace bcs
 	template<typename T>
 	struct vec_cos_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::cos(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_cos(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_cos(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_cos(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_cos(n, y, y);
+		}
 	};
 
 	// tan
@@ -381,10 +584,20 @@ namespace bcs
 	template<typename T>
 	struct vec_tan_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::tan(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_tan(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_tan(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_tan(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_tan(n, y, y);
+		}
 	};
 
 	// asin
@@ -392,10 +605,20 @@ namespace bcs
 	template<typename T>
 	struct vec_asin_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::asin(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_asin(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_asin(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_asin(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_asin(n, y, y);
+		}
 	};
 
 	// acos
@@ -403,10 +626,20 @@ namespace bcs
 	template<typename T>
 	struct vec_acos_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::acos(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_acos(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_acos(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_acos(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_acos(n, y, y);
+		}
 	};
 
 	// atan
@@ -414,10 +647,20 @@ namespace bcs
 	template<typename T>
 	struct vec_atan_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::atan(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_atan(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_atan(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_atan(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_atan(n, y, y);
+		}
 	};
 
 	// atan2
@@ -425,9 +668,15 @@ namespace bcs
 	template<typename T>
 	struct vec_atan2_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v1, const T& v2) const
+		{
+			return std::atan2(v1, v2);
+		}
 
-		void operator() (size_t n, const T *a, const T *b, T *y) const { return vec_atan2(n, a, b, y); }
+		void operator() (size_t n, const T *x1, const T* x2, T *y) const
+		{
+			return vec_atan2(n, x1, x2, y);
+		}
 	};
 
 
@@ -438,10 +687,20 @@ namespace bcs
 	template<typename T>
 	struct vec_sinh_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::sinh(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_sinh(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_sinh(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_sinh(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_sinh(n, y, y);
+		}
 	};
 
 	// cosh
@@ -449,10 +708,20 @@ namespace bcs
 	template<typename T>
 	struct vec_cosh_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::cosh(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_cosh(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_cosh(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_cosh(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_cosh(n, y, y);
+		}
 	};
 
 	// tanh
@@ -460,10 +729,20 @@ namespace bcs
 	template<typename T>
 	struct vec_tanh_ftor
 	{
-		typedef T result_value_type;
+		T operator() (const T& v) const
+		{
+			return std::tanh(v);
+		}
 
-		void operator() (size_t n, const T *x, T *y) const { return vec_tanh(n, x, y); }
-		void operator() (size_t n, T *y) const { return vec_tanh(n, y, y); }
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_tanh(n, x, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			return vec_tanh(n, y, y);
+		}
 	};
 
 }

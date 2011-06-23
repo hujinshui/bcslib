@@ -54,7 +54,8 @@ VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h \
 	bcslib/veccomp/vecstat.h \
 	bcslib/veccomp/vecstat_functors.h
 
-ARRAY_COMP_HEADERS = bcslib/array/array_expr_base.h \
+ARRAY_COMP_HEADERS = bcslib/array/generic_array_eval.h \
+	bcslib/array/array_expr_base.h \
 	bcslib/array/generic_array_calc.h bcslib/array/array_calc.h \
 	bcslib/array/generic_array_stat.h bcslib/array/array_stat.h 
 	
