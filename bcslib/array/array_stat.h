@@ -186,6 +186,48 @@ namespace bcs
 		return minmax_arr(a, Slicing());
 	}
 
+
+	// min_index
+
+	template<typename T, class TIndexer>
+	index_t min_index(const aview1d<T, TIndexer>& a)
+	{
+		return min_index_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	std::array<index_t, 2> min_index2d(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return min_index_arr2d(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename Slicing>
+	array1d<index_t> min_index(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a, Slicing)
+	{
+		return min_index_arr(a, Slicing());
+	}
+
+
+	// max_index
+
+	template<typename T, class TIndexer>
+	index_t max_index(const aview1d<T, TIndexer>& a)
+	{
+		return max_index_arr(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	std::array<index_t, 2> max_index2d(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	{
+		return max_index_arr2d(a);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename Slicing>
+	array1d<index_t> max_index(const aview2d<T, TOrd, TIndexer0, TIndexer1>& a, Slicing)
+	{
+		return max_index_arr(a, Slicing());
+	}
+
 }
 
 #endif 

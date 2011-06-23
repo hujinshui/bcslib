@@ -113,7 +113,7 @@ namespace bcs
 	template<typename T>
 	struct vec_min_index_ftor
 	{
-		typedef size_t result_type;
+		typedef index_t result_type;
 
 		result_type operator() (size_t n, const T *x) const
 		{
@@ -124,7 +124,7 @@ namespace bcs
 	template<typename T>
 	struct vec_max_index_ftor
 	{
-		typedef size_t result_type;
+		typedef index_t result_type;
 
 		result_type operator() (size_t n, const T *x) const
 		{

@@ -46,7 +46,7 @@ namespace bcs
 			j = 0;
 		}
 
-		static std::array<index_t, 2> ind2dub(index_t d0, index_t d1, index_t idx)
+		static std::array<index_t, 2> ind2sub(index_t d0, index_t d1, index_t idx)
 		{
 			std::array<index_t, 2> sub;
 			sub[0] = idx / d1;
@@ -70,7 +70,7 @@ namespace bcs
 			j = d1;
 		}
 
-		static std::array<index_t, 2> ind2dub(index_t d0, index_t d1, index_t idx)
+		static std::array<index_t, 2> ind2sub(index_t d0, index_t d1, index_t idx)
 		{
 			std::array<index_t, 2> sub;
 			sub[1] = idx / d0;
