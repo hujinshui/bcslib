@@ -18,6 +18,340 @@
 
 namespace bcs
 {
+	/********************************************
+	 *
+	 *  Comparison
+	 *
+	 *******************************************/
+
+	// eq
+
+	template<typename T, class LIndexer, class RIndexer>
+	inline array1d<bool> eq(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return eq_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, class LIndexer>
+	inline array1d<bool> eq(const caview1d<T, LIndexer>& lhs, const T& rhs)
+	{
+		return eq_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, class RIndexer>
+	inline array1d<bool> eq(const T& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return eq_arr_sca(rhs, lhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> eq(
+			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return eq_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline array2d<bool, TOrd> eq(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+	{
+		return eq_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> eq(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return eq_arr_sca(rhs, lhs);
+	}
+
+
+	// ne
+
+	template<typename T, class LIndexer, class RIndexer>
+	inline array1d<bool> ne(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return ne_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, class LIndexer>
+	inline array1d<bool> ne(const caview1d<T, LIndexer>& lhs, const T& rhs)
+	{
+		return ne_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, class RIndexer>
+	inline array1d<bool> ne(const T& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return ne_arr_sca(rhs, lhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> ne(
+			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return ne_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline array2d<bool, TOrd> ne(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+	{
+		return ne_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> ne(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return ne_arr_sca(rhs, lhs);
+	}
+
+
+	// gt
+
+	template<typename T, class LIndexer, class RIndexer>
+	inline array1d<bool> gt(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return gt_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, class LIndexer>
+	inline array1d<bool> gt(const caview1d<T, LIndexer>& lhs, const T& rhs)
+	{
+		return gt_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, class RIndexer>
+	inline array1d<bool> gt(const T& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return gt_arr_sca(rhs, lhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> gt(
+			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return gt_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline array2d<bool, TOrd> gt(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+	{
+		return gt_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> gt(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return gt_arr_sca(rhs, lhs);
+	}
+
+
+	// ge
+
+	template<typename T, class LIndexer, class RIndexer>
+	inline array1d<bool> ge(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return ge_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, class LIndexer>
+	inline array1d<bool> ge(const caview1d<T, LIndexer>& lhs, const T& rhs)
+	{
+		return ge_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, class RIndexer>
+	inline array1d<bool> ge(const T& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return ge_arr_sca(rhs, lhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> ge(
+			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return ge_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline array2d<bool, TOrd> ge(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+	{
+		return ge_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> ge(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return ge_arr_sca(rhs, lhs);
+	}
+
+
+	// lt
+
+	template<typename T, class LIndexer, class RIndexer>
+	inline array1d<bool> lt(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return lt_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, class LIndexer>
+	inline array1d<bool> lt(const caview1d<T, LIndexer>& lhs, const T& rhs)
+	{
+		return lt_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, class RIndexer>
+	inline array1d<bool> lt(const T& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return lt_arr_sca(rhs, lhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> lt(
+			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return lt_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline array2d<bool, TOrd> lt(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+	{
+		return lt_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> lt(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return lt_arr_sca(rhs, lhs);
+	}
+
+
+	// le
+
+	template<typename T, class LIndexer, class RIndexer>
+	inline array1d<bool> le(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return le_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, class LIndexer>
+	inline array1d<bool> le(const caview1d<T, LIndexer>& lhs, const T& rhs)
+	{
+		return le_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, class RIndexer>
+	inline array1d<bool> le(const T& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return le_arr_sca(rhs, lhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> le(
+			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return le_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline array2d<bool, TOrd> le(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+	{
+		return le_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline array2d<bool, TOrd> le(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return le_arr_sca(rhs, lhs);
+	}
+
+
+	// max_each
+
+	template<typename T, class LIndexer, class RIndexer>
+	inline array1d<T> max_each(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return max_each_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, class LIndexer>
+	inline array1d<T> max_each(const caview1d<T, LIndexer>& lhs, const T& rhs)
+	{
+		return max_each_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, class RIndexer>
+	inline array1d<T> max_each(const T& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return max_each_arr_sca(rhs, lhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline array2d<T, TOrd> max_each(
+			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return max_each_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline array2d<T, TOrd> max_each(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+	{
+		return max_each_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline array2d<T, TOrd> max_each(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return max_each_arr_sca(rhs, lhs);
+	}
+
+
+	// min_each
+
+	template<typename T, class LIndexer, class RIndexer>
+	inline array1d<T> min_each(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return min_each_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, class LIndexer>
+	inline array1d<T> min_each(const caview1d<T, LIndexer>& lhs, const T& rhs)
+	{
+		return min_each_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, class RIndexer>
+	inline array1d<T> min_each(const T& lhs, const caview1d<T, RIndexer>& rhs)
+	{
+		return min_each_arr_sca(rhs, lhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+	inline array2d<T, TOrd> min_each(
+			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
+			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return min_each_arr_arr(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
+	inline array2d<T, TOrd> min_each(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+	{
+		return min_each_arr_sca(lhs, rhs);
+	}
+
+	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
+	inline array2d<T, TOrd> min_each(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	{
+		return min_each_arr_sca(rhs, lhs);
+	}
+
+
 
 	/******************************************************
 	 *

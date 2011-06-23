@@ -13,6 +13,384 @@
 
 namespace bcs
 {
+	/********************************************
+	 *
+	 *  Order comparison
+	 *
+	 *******************************************/
+
+	// equal to
+
+	template<typename T>
+	struct vec_vec_eq_ftor
+	{
+		bool operator() (const T& v1, const T& v2) const
+		{
+			return v1 == v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, bool *y) const
+		{
+			vec_eq(n, x1, x2, y);
+		}
+	};
+
+	template<typename T>
+	struct vec_sca_eq_ftor
+	{
+		T r;
+		vec_sca_eq_ftor(const T& r_)
+		: r(r_) { }
+
+		bool operator() (const T& v1) const
+		{
+			return v1 == r;
+		}
+
+		void operator() (size_t n, const T *x1, bool *y) const
+		{
+			vec_eq(n, x1, r, y);
+		}
+	};
+
+
+	// not equal
+
+	template<typename T>
+	struct vec_vec_ne_ftor
+	{
+		bool operator() (const T& v1, const T& v2) const
+		{
+			return v1 != v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, bool *y) const
+		{
+			vec_ne(n, x1, x2, y);
+		}
+	};
+
+	template<typename T>
+	struct vec_sca_ne_ftor
+	{
+		T r;
+		vec_sca_ne_ftor(const T& r_)
+		: r(r_) { }
+
+		bool operator() (const T& v1) const
+		{
+			return v1 != r;
+		}
+
+		void operator() (size_t n, const T *x1, bool *y) const
+		{
+			vec_ne(n, x1, r, y);
+		}
+	};
+
+	// greater than
+
+	template<typename T>
+	struct vec_vec_gt_ftor
+	{
+		bool operator() (const T& v1, const T& v2) const
+		{
+			return v1 > v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, bool *y) const
+		{
+			vec_gt(n, x1, x2, y);
+		}
+	};
+
+	template<typename T>
+	struct vec_sca_gt_ftor
+	{
+		T r;
+		vec_sca_gt_ftor(const T& r_)
+		: r(r_) { }
+
+		bool operator() (const T& v1) const
+		{
+			return v1 > r;
+		}
+
+		void operator() (size_t n, const T *x1, bool *y) const
+		{
+			vec_gt(n, x1, r, y);
+		}
+	};
+
+
+	template<typename T>
+	struct sca_vec_gt_ftor
+	{
+		T r;
+		sca_vec_gt_ftor(const T& r_)
+		: r(r_) { }
+
+		bool operator() (const T& v1) const
+		{
+			return r > v1;
+		}
+
+		void operator() (size_t n, const T *x1, bool *y) const
+		{
+			vec_lt(n, x1, r, y);
+		}
+	};
+
+
+	// greater than or equal to
+
+	template<typename T>
+	struct vec_vec_ge_ftor
+	{
+		bool operator() (const T& v1, const T& v2) const
+		{
+			return v1 >= v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, bool *y) const
+		{
+			vec_ge(n, x1, x2, y);
+		}
+	};
+
+	template<typename T>
+	struct vec_sca_ge_ftor
+	{
+		T r;
+		vec_sca_ge_ftor(const T& r_)
+		: r(r_) { }
+
+		bool operator() (const T& v1) const
+		{
+			return v1 >= r;
+		}
+
+		void operator() (size_t n, const T *x1, bool *y) const
+		{
+			vec_ge(n, x1, r, y);
+		}
+	};
+
+
+	template<typename T>
+	struct sca_vec_ge_ftor
+	{
+		T r;
+		sca_vec_ge_ftor(const T& r_)
+		: r(r_) { }
+
+		bool operator() (const T& v1) const
+		{
+			return r >= v1;
+		}
+
+		void operator() (size_t n, const T *x1, bool *y) const
+		{
+			vec_le(n, x1, r, y);
+		}
+	};
+
+
+	// less than
+
+	template<typename T>
+	struct vec_vec_lt_ftor
+	{
+		bool operator() (const T& v1, const T& v2) const
+		{
+			return v1 < v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, bool *y) const
+		{
+			vec_lt(n, x1, x2, y);
+		}
+	};
+
+	template<typename T>
+	struct vec_sca_lt_ftor
+	{
+		T r;
+		vec_sca_lt_ftor(const T& r_)
+		: r(r_) { }
+
+		bool operator() (const T& v1) const
+		{
+			return v1 < r;
+		}
+
+		void operator() (size_t n, const T *x1, bool *y) const
+		{
+			vec_lt(n, x1, r, y);
+		}
+	};
+
+
+	template<typename T>
+	struct sca_vec_lt_ftor
+	{
+		T r;
+		sca_vec_lt_ftor(const T& r_)
+		: r(r_) { }
+
+		bool operator() (const T& v1) const
+		{
+			return r < v1;
+		}
+
+		void operator() (size_t n, const T *x1, bool *y) const
+		{
+			vec_gt(n, x1, r, y);
+		}
+	};
+
+
+	// less than or equal to
+
+	template<typename T>
+	struct vec_vec_le_ftor
+	{
+		bool operator() (const T& v1, const T& v2) const
+		{
+			return v1 <= v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, bool *y) const
+		{
+			vec_le(n, x1, x2, y);
+		}
+	};
+
+	template<typename T>
+	struct vec_sca_le_ftor
+	{
+		T r;
+		vec_sca_le_ftor(const T& r_)
+		: r(r_) { }
+
+		bool operator() (const T& v1) const
+		{
+			return v1 <= r;
+		}
+
+		void operator() (size_t n, const T *x1, bool *y) const
+		{
+			vec_le(n, x1, r, y);
+		}
+	};
+
+
+	template<typename T>
+	struct sca_vec_le_ftor
+	{
+		T r;
+		sca_vec_le_ftor(const T& r_)
+		: r(r_) { }
+
+		bool operator() (const T& v1) const
+		{
+			return r <= v1;
+		}
+
+		void operator() (size_t n, const T *x1, bool *y) const
+		{
+			vec_ge(n, x1, r, y);
+		}
+	};
+
+
+	// max_each
+
+	template<typename T>
+	struct vec_vec_max_each_ftor
+	{
+		T operator() (const T& v1, const T& v2) const
+		{
+			return v1 + v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, T *y) const
+		{
+			vec_max_each(n, x1, x2, y);
+		}
+
+		void operator() (size_t n, T*y, const T*x1) const
+		{
+			vec_max_each(n, y, x1);
+		}
+	};
+
+	template<typename T>
+	struct vec_sca_max_each_ftor
+	{
+		T s;
+		vec_sca_max_each_ftor(const T& s_)
+		: s(s_) { }
+
+		T operator() (const T& v1) const
+		{
+			return v1 + s;
+		}
+
+		void operator() (size_t n, const T *x1, T *y) const
+		{
+			vec_max_each(n, x1, s, y);
+		}
+	};
+
+
+	// min_each
+
+	template<typename T>
+	struct vec_vec_min_each_ftor
+	{
+		T operator() (const T& v1, const T& v2) const
+		{
+			return v1 + v2;
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, T *y) const
+		{
+			vec_min_each(n, x1, x2, y);
+		}
+
+		void operator() (size_t n, T*y, const T*x1) const
+		{
+			vec_min_each(n, y, x1);
+		}
+	};
+
+	template<typename T>
+	struct vec_sca_min_each_ftor
+	{
+		T s;
+		vec_sca_min_each_ftor(const T& s_)
+		: s(s_) { }
+
+		T operator() (const T& v1) const
+		{
+			return v1 + s;
+		}
+
+		void operator() (size_t n, const T *x1, T *y) const
+		{
+			vec_min_each(n, x1, s, y);
+		}
+	};
+
+
+
+
+	/********************************************
+	 *
+	 *  Arithmetic Calculation
+	 *
+	 *******************************************/
 
 	// addition
 
@@ -284,6 +662,12 @@ namespace bcs
 		}
 	};
 
+
+	/********************************************
+	 *
+	 *  Elementary Function Evaluation
+	 *
+	 *******************************************/
 
 	// power and root functions
 

@@ -18,6 +18,212 @@ namespace bcs
 {
 	/********************************************
 	 *
+	 *  Comparison
+	 *
+	 *******************************************/
+
+	// eq
+
+	template<class Arr1, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
+	array_transform_resultT<vec_vec_eq_ftor, Arr1, Arr2>>::type
+	eq_arr_arr(const Arr1& a1, const Arr2& a2)
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return transform_arr(vec_vec_eq_ftor<value_type>(), a1, a2);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<vec_sca_eq_ftor, Arr>>::type
+	eq_arr_sca(const Arr& a, const T& x)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(vec_sca_eq_ftor<value_type>(x), a);
+	}
+
+	// ne
+
+	template<class Arr1, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
+	array_transform_resultT<vec_vec_ne_ftor, Arr1, Arr2>>::type
+	ne_arr_arr(const Arr1& a1, const Arr2& a2)
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return transform_arr(vec_vec_ne_ftor<value_type>(), a1, a2);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<vec_sca_ne_ftor, Arr>>::type
+	ne_arr_sca(const Arr& a, const T& x)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(vec_sca_ne_ftor<value_type>(x), a);
+	}
+
+	// gt
+
+	template<class Arr1, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
+	array_transform_resultT<vec_vec_gt_ftor, Arr1, Arr2>>::type
+	gt_arr_arr(const Arr1& a1, const Arr2& a2)
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return transform_arr(vec_vec_gt_ftor<value_type>(), a1, a2);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<vec_sca_gt_ftor, Arr>>::type
+	gt_arr_sca(const Arr& a, const T& x)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(vec_sca_gt_ftor<value_type>(x), a);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<sca_vec_gt_ftor, Arr>>::type
+	gt_sca_arr(const T& x, const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(sca_vec_gt_ftor<value_type>(x), a);
+	}
+
+	// ge
+
+	template<class Arr1, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
+	array_transform_resultT<vec_vec_ge_ftor, Arr1, Arr2>>::type
+	ge_arr_arr(const Arr1& a1, const Arr2& a2)
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return transform_arr(vec_vec_ge_ftor<value_type>(), a1, a2);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<vec_sca_ge_ftor, Arr>>::type
+	ge_arr_sca(const Arr& a, const T& x)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(vec_sca_ge_ftor<value_type>(x), a);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<sca_vec_ge_ftor, Arr>>::type
+	ge_sca_arr(const T& x, const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(sca_vec_ge_ftor<value_type>(x), a);
+	}
+
+	// lt
+
+	template<class Arr1, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
+	array_transform_resultT<vec_vec_lt_ftor, Arr1, Arr2>>::type
+	lt_arr_arr(const Arr1& a1, const Arr2& a2)
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return transform_arr(vec_vec_lt_ftor<value_type>(), a1, a2);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<vec_sca_lt_ftor, Arr>>::type
+	lt_arr_sca(const Arr& a, const T& x)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(vec_sca_lt_ftor<value_type>(x), a);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<sca_vec_lt_ftor, Arr>>::type
+	lt_sca_arr(const T& x, const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(sca_vec_lt_ftor<value_type>(x), a);
+	}
+
+	// le
+
+	template<class Arr1, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
+	array_transform_resultT<vec_vec_le_ftor, Arr1, Arr2>>::type
+	le_arr_arr(const Arr1& a1, const Arr2& a2)
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return transform_arr(vec_vec_le_ftor<value_type>(), a1, a2);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<vec_sca_le_ftor, Arr>>::type
+	le_arr_sca(const Arr& a, const T& x)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(vec_sca_le_ftor<value_type>(x), a);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<sca_vec_le_ftor, Arr>>::type
+	le_sca_arr(const T& x, const Arr& a)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(sca_vec_le_ftor<value_type>(x), a);
+	}
+
+
+	// max_each
+
+	template<class Arr1, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
+	array_transform_resultT<vec_vec_max_each_ftor, Arr1, Arr2>>::type
+	max_each_arr_arr(const Arr1& a1, const Arr2& a2)
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return transform_arr(vec_vec_max_each_ftor<value_type>(), a1, a2);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<vec_sca_max_each_ftor, Arr>>::type
+	max_each_arr_sca(const Arr& a, const T& x)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(vec_sca_max_each_ftor<value_type>(x), a);
+	}
+
+
+	// min_each
+
+	template<class Arr1, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
+	array_transform_resultT<vec_vec_min_each_ftor, Arr1, Arr2>>::type
+	min_each_arr_arr(const Arr1& a1, const Arr2& a2)
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return transform_arr(vec_vec_min_each_ftor<value_type>(), a1, a2);
+	}
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<vec_sca_min_each_ftor, Arr>>::type
+	min_each_arr_sca(const Arr& a, const T& x)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(vec_sca_min_each_ftor<value_type>(x), a);
+	}
+
+
+
+	/********************************************
+	 *
 	 *  Arithmetic Calculation
 	 *
 	 *******************************************/
