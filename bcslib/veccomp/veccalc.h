@@ -12,6 +12,7 @@
 #include <bcslib/base/basic_defs.h>
 
 #include <cmath>
+#include <algorithm>
 
 namespace bcs
 {
@@ -110,13 +111,15 @@ namespace bcs
 	template<typename T>
 	inline void vec_max_each(size_t n, const T* x1, const T* x2, T *y)
 	{
-		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] < x2[i] ? x2[i] : x1[i]);
+		using std::max;
+		for (size_t i = 0; i < n; ++i) y[i] = max(x1[i], x2[i]);
 	}
 
 	template<typename T>
 	inline void vec_max_each(size_t n, const T* x1, const T& x2, T *y)
 	{
-		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] < x2 ? x2 : x1[i]);
+		using std::max;
+		for (size_t i = 0; i < n; ++i) y[i] = max(x1[i], x2);
 	}
 
 	// min_each
@@ -124,13 +127,15 @@ namespace bcs
 	template<typename T>
 	inline void vec_min_each(size_t n, const T* x1, const T* x2, T *y)
 	{
-		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] > x2[i] ? x2[i] : x1[i]);
+		using std::min;
+		for (size_t i = 0; i < n; ++i) y[i] = min(x1[i], x2[i]);
 	}
 
 	template<typename T>
 	inline void vec_min_each(size_t n, const T* x1, const T& x2, T *y)
 	{
-		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] > x2 ? x2 : x1[i]);
+		using std::min;
+		for (size_t i = 0; i < n; ++i) y[i] = min(x1[i], x2);
 	}
 
 

@@ -311,7 +311,8 @@ namespace bcs
 	{
 		T operator() (const T& v1, const T& v2) const
 		{
-			return v1 + v2;
+			using std::max;
+			return max(v1, v2);
 		}
 
 		void operator() (size_t n, const T *x1, const T *x2, T *y) const
@@ -334,7 +335,8 @@ namespace bcs
 
 		T operator() (const T& v1) const
 		{
-			return v1 + s;
+			using std::max;
+			return max(v1, s);
 		}
 
 		void operator() (size_t n, const T *x1, T *y) const
@@ -351,7 +353,8 @@ namespace bcs
 	{
 		T operator() (const T& v1, const T& v2) const
 		{
-			return v1 + v2;
+			using std::min;
+			return min(v1, v2);
 		}
 
 		void operator() (size_t n, const T *x1, const T *x2, T *y) const
@@ -374,7 +377,8 @@ namespace bcs
 
 		T operator() (const T& v1) const
 		{
-			return v1 + s;
+			using std::max;
+			return min(v1, s);
 		}
 
 		void operator() (size_t n, const T *x1, T *y) const
