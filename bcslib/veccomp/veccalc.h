@@ -449,9 +449,15 @@ namespace bcs
 
 
 
+/********************************************
+ *
+ *  Vendor-specific implementations
+ *
+ *******************************************/
 
-
-
+#ifdef BCS_ENABLE_INTEL_IPPS
+#include <bcslib/extern/ipps_select.h>
+#endif
 
 
 namespace bcs
