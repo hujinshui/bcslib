@@ -50,13 +50,13 @@ ARRAY_BASIC_HEADERS = bcslib/array/array_base.h \
 	bcslib/array/array2d.h 
 	 	
 VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h \
-	bcslib/veccomp/veccalc_functors.h \
 	bcslib/veccomp/vecstat.h \
-	bcslib/veccomp/vecstat_functors.h
+	bcslib/veccomp/logical_vecops.h
 
 ARRAY_COMP_HEADERS = bcslib/array/generic_array_eval.h \
 	bcslib/array/generic_array_calc.h bcslib/array/array_calc.h \
-	bcslib/array/generic_array_stat.h bcslib/array/array_stat.h 
+	bcslib/array/generic_array_stat.h bcslib/array/array_stat.h \
+	bcslib/array/logical_array_ops.h
 	
 
 ARRAY_SPARSE_HEADERS = bcslib/array/sparse_vector.h bcslib/array/dynamic_sparse_vector.h

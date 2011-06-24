@@ -12,7 +12,7 @@
 #include <bcslib/array/array_base.h>
 #include <bcslib/array/generic_array_eval.h>
 
-#include <bcslib/veccomp/vecstat_functors.h>
+#include <bcslib/veccomp/vecstat.h>
 
 
 namespace bcs
