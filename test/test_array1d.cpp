@@ -526,6 +526,43 @@ BCS_TEST_CASE( test_denseview_judge_1d )
 }
 
 
+BCS_TEST_CASE( test_subarr_selection )
+{
+	const size_t N = 10;
+	double src[N] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+	bool msk[N] = {false, false, true, false, true, false, false, true, false, true};
+	const size_t n = 4;
+
+	caview1d<double> a0 = get_aview1d(src, N);
+	caview1d<bool> b0 = get_aview1d(msk, N);
+
+	index_t I0r[n] = {2, 4, 7, 9};
+	array1d<index_t> I0 = find(b0);
+
+	BCS_CHECK( array_view_equal(I0, I0r, n) );
+
+	double sr[n] = {30, 50, 80, 100};
+	array1d<double> s = select_elems(a0, I0);
+	BCS_CHECK( array_view_equal(s, sr, n) );
+	BCS_CHECK( array_view_equal(select_elems(a0, find(b0)), sr, n));
+
+	bool msk1[] = {false, false, false, false, false, false, false, false, false, false};
+	caview1d<bool> b1 = get_aview1d(msk1, N);
+
+	array1d<index_t> I1 = find(b1);
+	array1d<double> s1 = select_elems(a0, I1);
+
+	BCS_CHECK( array_integrity_test(I1) );
+	BCS_CHECK( I1.nelems() == 0 );
+	BCS_CHECK( array_iteration_test(I1) );
+
+	BCS_CHECK( array_integrity_test(s1) );
+	BCS_CHECK( s1.nelems() == 0 );
+	BCS_CHECK( array_iteration_test(s1) );
+}
+
+
+
 test_suite *test_array1d_suite()
 {
 	test_suite *suite = new test_suite( "test_array1d" );
@@ -538,6 +575,7 @@ test_suite *test_array1d_suite()
 	suite->add( new test_arrind_subview() );
 	suite->add( new test_aview1d_clone() );
 	suite->add( new test_denseview_judge_1d() );
+	suite->add( new test_subarr_selection() );
 
 	return suite;
 }

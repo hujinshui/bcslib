@@ -821,14 +821,50 @@ namespace bcs
 			typedef typename index_selector_traits<TIndexer>::input_type input_t;
 			array1d<index_t> a(sel.size());
 			input_t n = static_cast<input_t>(sel.size());
+			index_t *ap = a.pbase();
 
 			for (input_t i = 0; i < n; ++i)
 			{
-				a[i] = base_indexer[sel[i]];
+				ap[i] = base_indexer[sel[i]];
 			}
 			return a;
 		}
 	};
+
+
+	/******************************************************
+	 *
+	 *  get indices from bool array
+	 *
+	 ******************************************************/
+
+	template<class TIndexer>
+	inline array1d<index_t> find(const caview1d<bool, TIndexer>& B)
+	{
+		index_t n = B.dim0();
+
+		// count
+
+		index_t c = 0;
+		for (index_t i = 0; i < n; ++i)
+		{
+			c += (index_t)B[i];
+		}
+		array1d<index_t> r((size_t)c);
+
+		// extract
+
+		index_t k = 0;
+		for(index_t i = 0; k < c; ++i)
+		{
+			if (B[i])
+			{
+				r[k++] = i;
+			}
+		}
+
+		return r;
+	}
 
 
 	/******************************************************

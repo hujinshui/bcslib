@@ -269,6 +269,20 @@ namespace bcs
 
 	template<typename Arr> struct array_creater; // a helper class for constructing arrays
 
+	template<typename Arr, dim_num_t D>
+	struct dim_changed_array
+	{
+		typedef typename array_creater<Arr>::template remap<
+				typename array_view_traits<Arr>::value_type, D>::type _rcreater;
+
+		typedef typename _rcreater::result_type type;
+
+		static type create(const std::array<index_t, D>& shape)
+		{
+			return _rcreater::create(shape);
+		}
+	};
+
 }
 
 
