@@ -106,12 +106,12 @@ namespace bcs
 		{
 			static void copy(const T *src, T *dst, size_t n)
 			{
-				std::memcpy(dst, src, sizeof(T) * n);
+				if (n > 0) std::memcpy(dst, src, sizeof(T) * n);
 			}
 
 			static void copy_construct(const T *src, T *dst, size_t n)
 			{
-				std::memcpy(dst, src, sizeof(T) * n);
+				if (n > 0) std::memcpy(dst, src, sizeof(T) * n);
 			}
 
 			static void copy_construct(const T& v, T *dst, size_t n)
@@ -180,7 +180,7 @@ namespace bcs
 		{
 			static bool all_equal(const T *a, const T *b, size_t n)
 			{
-				return std::memcmp(a, b, sizeof(T) * n) == 0;
+				return n == 0 || std::memcmp(a, b, sizeof(T) * n) == 0;
 			}
 		};
 
@@ -245,7 +245,7 @@ namespace bcs
     inline void set_zeros_to_elements(T *dst, size_t n)
     {
     	BCS_STATIC_ASSERT_V(std::is_pod<T>);
-    	std::memset(dst, 0, sizeof(T) * n);
+    	if (n > 0) std::memset(dst, 0, sizeof(T) * n);
     }
 
     template<typename T>

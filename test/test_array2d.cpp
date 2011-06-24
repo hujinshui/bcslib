@@ -10,7 +10,7 @@
 #include <bcslib/test/test_units.h>
 #include <bcslib/test/test_array_aux.h>
 #include <bcslib/array/array2d.h>
-
+#include <vector>
 
 using namespace bcs;
 using namespace bcs::test;
@@ -1168,6 +1168,84 @@ BCS_TEST_CASE( test_aview2d_clone )
 }
 
 
+BCS_TEST_CASE( test_subarr_selection2d )
+{
+	const size_t m0 = 6;
+	const size_t n0 = 6;
+	double src[m0 * n0];
+	for (size_t i = 0; i < m0 * n0; ++i) src[i] = i + 1;
+
+	caview2d<double, row_major_t>    Arm = get_aview2d_rm(src, m0, n0);
+	caview2d<double, column_major_t> Acm = get_aview2d_cm(src, m0, n0);
+
+	// select_elems
+
+	const size_t sn0 = 6;
+	index_t Is[sn0] = {1, 3, 4, 5, 2, 0};
+	index_t Js[sn0] = {2, 2, 4, 5, 0, 0};
+	std::vector<index_t> vIs(Is, Is+sn0);
+	std::vector<index_t> vJs(Js, Js+sn0);
+
+	array1d<double> s0_rm = select_elems(Arm, vIs, vJs);
+	array1d<double> s0_cm = select_elems(Acm, vIs, vJs);
+
+	double s0_rm_r[sn0] = {9, 21, 29, 36, 13, 1};
+	double s0_cm_r[sn0] = {14, 16, 29, 36, 3, 1};
+
+	BCS_CHECK( array_view_equal(s0_rm, s0_rm_r, sn0) );
+	BCS_CHECK( array_view_equal(s0_cm, s0_cm_r, sn0) );
+
+	// select_rows
+
+	const size_t sn1 = 3;
+	index_t rs[sn1] = {1, 4, 5};
+
+	std::vector<index_t> rows(rs, rs+sn1);
+
+	array2d<double, row_major_t>    s1_rm = select_rows(Arm, rows);
+	array2d<double, column_major_t> s1_cm = select_rows(Acm, rows);
+
+	double s1_rm_r[sn1 * n0] = {7, 8, 9, 10, 11, 12, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
+	double s1_cm_r[sn1 * n0] = {2, 5, 6, 8, 11, 12, 14, 17, 18, 20, 23, 24, 26, 29, 30, 32, 35, 36};
+
+	BCS_CHECK( array_view_equal(s1_rm, s1_rm_r, sn1, n0) );
+	BCS_CHECK( array_view_equal(s1_cm, s1_cm_r, sn1, n0) );
+
+	// select_columns
+
+	const size_t sn2 = 3;
+	index_t cs[sn2] = {2, 3, 5};
+
+	std::vector<index_t> cols(cs, cs+sn2);
+
+	array2d<double, row_major_t>    s2_rm = select_columns(Arm, cols);
+	array2d<double, column_major_t> s2_cm = select_columns(Acm, cols);
+
+	double s2_rm_r[m0 * sn2] = {3, 4, 6, 9, 10, 12, 15, 16, 18, 21, 22, 24, 27, 28, 30, 33, 34, 36};
+	double s2_cm_r[m0 * sn2] = {13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 31, 32, 33, 34, 35, 36};
+
+	BCS_CHECK( array_view_equal(s2_rm, s2_rm_r, m0, sn2) );
+	BCS_CHECK( array_view_equal(s2_cm, s2_cm_r, m0, sn2) );
+
+	// select_rows_and_cols
+
+	const size_t sm3 = 2;  index_t rs3[sm3] = {2, 4};
+	const size_t sn3 = 3;  index_t cs3[sn3] = {1, 3, 5};
+
+	std::vector<index_t> rows3(rs3, rs3+sm3);
+	std::vector<index_t> cols3(cs3, cs3+sn3);
+
+	array2d<double, row_major_t>    s3_rm = select_rows_and_cols(Arm, rows3, cols3);
+	array2d<double, column_major_t> s3_cm = select_rows_and_cols(Acm, rows3, cols3);
+
+	double s3_rm_r[sm3 * sn3] = {14, 16, 18, 26, 28, 30};
+	double s3_cm_r[sm3 * sn3] = {9, 11, 21, 23, 33, 35};
+
+	BCS_CHECK( array_view_equal(s3_rm, s3_rm_r, sm3, sn3) );
+	BCS_CHECK( array_view_equal(s3_cm, s3_cm_r, sm3, sn3) );
+
+}
+
 
 test_suite *test_array2d_suite()
 {
@@ -1179,6 +1257,7 @@ test_suite *test_array2d_suite()
 	suite->add( new test_array2d_subviews() );
 	suite->add( new test_denseview_judge_2d() );
 	suite->add( new test_aview2d_clone() );
+	suite->add( new test_subarr_selection2d() );
 
 	return suite;
 }
