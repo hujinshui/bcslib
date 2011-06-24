@@ -1173,7 +1173,7 @@ BCS_TEST_CASE( test_subarr_selection2d )
 	const size_t m0 = 6;
 	const size_t n0 = 6;
 	double src[m0 * n0];
-	for (size_t i = 0; i < m0 * n0; ++i) src[i] = i + 1;
+	for (size_t i = 0; i < m0 * n0; ++i) src[i] = (double)(i + 1);
 
 	caview2d<double, row_major_t>    Arm = get_aview2d_rm(src, m0, n0);
 	caview2d<double, column_major_t> Acm = get_aview2d_cm(src, m0, n0);

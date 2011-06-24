@@ -277,18 +277,6 @@ namespace bcs
 		return max_each_arr_arr(lhs, rhs);
 	}
 
-	template<typename T, class LIndexer>
-	inline array1d<T> max_each(const caview1d<T, LIndexer>& lhs, const T& rhs)
-	{
-		return max_each_arr_sca(lhs, rhs);
-	}
-
-	template<typename T, class RIndexer>
-	inline array1d<T> max_each(const T& lhs, const caview1d<T, RIndexer>& rhs)
-	{
-		return max_each_arr_sca(rhs, lhs);
-	}
-
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
 	inline array2d<T, TOrd> max_each(
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
@@ -297,37 +285,12 @@ namespace bcs
 		return max_each_arr_arr(lhs, rhs);
 	}
 
-	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
-	inline array2d<T, TOrd> max_each(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
-	{
-		return max_each_arr_sca(lhs, rhs);
-	}
-
-	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
-	inline array2d<T, TOrd> max_each(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
-	{
-		return max_each_arr_sca(rhs, lhs);
-	}
-
-
 	// min_each
 
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<T> min_each(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
 		return min_each_arr_arr(lhs, rhs);
-	}
-
-	template<typename T, class LIndexer>
-	inline array1d<T> min_each(const caview1d<T, LIndexer>& lhs, const T& rhs)
-	{
-		return min_each_arr_sca(lhs, rhs);
-	}
-
-	template<typename T, class RIndexer>
-	inline array1d<T> min_each(const T& lhs, const caview1d<T, RIndexer>& rhs)
-	{
-		return min_each_arr_sca(rhs, lhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -338,18 +301,127 @@ namespace bcs
 		return min_each_arr_arr(lhs, rhs);
 	}
 
-	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
-	inline array2d<T, TOrd> min_each(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
+
+	/********************************************
+	 *
+	 *  Bounding
+	 *
+	 ********************************************/
+
+	// lbound
+
+	template<typename T, class TIndexer>
+	inline array1d<T> lbound(const caview1d<T, TIndexer>& a, const T& lb)
 	{
-		return min_each_arr_sca(lhs, rhs);
+		return lbound_arr(a, lb);
 	}
 
-	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
-	inline array2d<T, TOrd> min_each(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> lbound(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb)
 	{
-		return min_each_arr_sca(rhs, lhs);
+		return lbound_arr(a, lb);
 	}
 
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& lbound_ip(aview1d<T, TIndexer>& a, const T& lb)
+	{
+		lbound_arr_inplace(a, lb);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& lbound_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb)
+	{
+		lbound_arr_inplace(a, lb);
+		return a;
+	}
+
+
+	// ubound
+
+	template<typename T, class TIndexer>
+	inline array1d<T> ubound(const caview1d<T, TIndexer>& a, const T& ub)
+	{
+		return ubound_arr(a, ub);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> ubound(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& ub)
+	{
+		return ubound_arr(a, ub);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& ubound_ip(aview1d<T, TIndexer>& a, const T& ub)
+	{
+		ubound_arr_inplace(a, ub);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& ubound_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& ub)
+	{
+		ubound_arr_inplace(a, ub);
+		return a;
+	}
+
+
+	// rgn_bound
+
+	template<typename T, class TIndexer>
+	inline array1d<T> rgn_bound(const caview1d<T, TIndexer>& a, const T& lb, const T& ub)
+	{
+		return rgn_bound_arr(a, lb, ub);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> rgn_bound(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb, const T& ub)
+	{
+		return rgn_bound_arr(a, lb, ub);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& rgn_bound_ip(aview1d<T, TIndexer>& a, const T& lb, const T& ub)
+	{
+		rgn_bound_arr_inplace(a, lb, ub);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& rgn_bound_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb, const T& ub)
+	{
+		rgn_bound_arr_inplace(a, lb, ub);
+		return a;
+	}
+
+
+	// abound
+
+	template<typename T, class TIndexer>
+	inline array1d<T> abound(const caview1d<T, TIndexer>& a, const T& ab)
+	{
+		return abound_arr(a, ab);
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline array2d<T, TOrd> abound(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& ab)
+	{
+		return abound_arr(a, ab);
+	}
+
+	template<typename T, class TIndexer>
+	inline aview1d<T, TIndexer>& abound_ip(aview1d<T, TIndexer>& a, const T& ab)
+	{
+		abound_arr_inplace(a, ab);
+		return a;
+	}
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& abound_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& ab)
+	{
+		abound_arr_inplace(a, ab);
+		return a;
+	}
 
 
 	/******************************************************

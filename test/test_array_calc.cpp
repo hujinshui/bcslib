@@ -120,7 +120,6 @@ BCS_TEST_CASE( test_array_max_min_each )
 	const size_t N = 6;
 	const size_t m = 2;
 	const size_t n = 3;
-	double sv = 3;
 
 	// prepare views
 
@@ -139,22 +138,91 @@ BCS_TEST_CASE( test_array_max_min_each )
 	BCS_CHECK( array_view_equal(max_each(X1_rm, X2_rm), max_vv, m, n));
 	BCS_CHECK( array_view_equal(max_each(X1_cm, X2_cm), max_vv, m, n));
 
-	double max_vs[N] = {3, 3, 3, 4, 5, 6};
-	BCS_CHECK( array_view_equal(max_each(x1, sv), max_vs, N) );
-	BCS_CHECK( array_view_equal(max_each(X1_rm, sv), max_vs, m, n));
-	BCS_CHECK( array_view_equal(max_each(X1_cm, sv), max_vs, m, n));
-
 	// min_each
 
 	double min_vv[N] = {1, 2, 3, 4, 2, 1};
 	BCS_CHECK( array_view_equal(min_each(x1, x2), min_vv, N) );
 	BCS_CHECK( array_view_equal(min_each(X1_rm, X2_rm), min_vv, m, n));
 	BCS_CHECK( array_view_equal(min_each(X1_cm, X2_cm), min_vv, m, n));
+}
 
-	double min_vs[N] = {1, 2, 3, 3, 3, 3};
-	BCS_CHECK( array_view_equal(min_each(x1, sv), min_vs, N) );
-	BCS_CHECK( array_view_equal(min_each(X1_rm, sv), min_vs, m, n));
-	BCS_CHECK( array_view_equal(min_each(X1_cm, sv), min_vs, m, n));
+
+BCS_TEST_CASE( test_bounding )
+{
+	double src1[] = {1, 2, 3, 4, 5, 6};
+
+	const size_t N = 6;
+	const size_t m = 2;
+	const size_t n = 3;
+
+	caview1d<double> x1 = get_aview1d(src1, N);
+	caview2d<double, row_major_t>    X1_rm = get_aview2d_rm(src1, m, n);
+	caview2d<double, column_major_t> X1_cm = get_aview2d_cm(src1, m, n);
+
+	array1d<double> y1(N);
+	array2d<double, row_major_t> Y1_rm(m, n);
+	array2d<double, column_major_t> Y1_cm(m, n);
+
+	// lbound
+
+	double lb_r[N] = {3, 3, 3, 4, 5, 6};
+	BCS_CHECK( array_view_equal(lbound(x1, 3.0), lb_r, N) );
+	BCS_CHECK( array_view_equal(lbound(X1_rm, 3.0), lb_r, m, n));
+	BCS_CHECK( array_view_equal(lbound(X1_cm, 3.0), lb_r, m, n));
+
+	y1 << x1; Y1_rm << X1_rm; Y1_cm << X1_cm;
+	lbound_ip(y1, 3.0);
+	lbound_ip(Y1_rm, 3.0);
+	lbound_ip(Y1_cm, 3.0);
+	BCS_CHECK( array_view_equal(y1, lb_r, N) );
+	BCS_CHECK( array_view_equal(Y1_rm, lb_r, m, n));
+	BCS_CHECK( array_view_equal(Y1_cm, lb_r, m, n));
+
+	// ubound
+
+	double ub_r[N] = {1, 2, 3, 4, 4, 4};
+	BCS_CHECK( array_view_equal(ubound(x1, 4.0), ub_r, N) );
+	BCS_CHECK( array_view_equal(ubound(X1_rm, 4.0), ub_r, m, n));
+	BCS_CHECK( array_view_equal(ubound(X1_cm, 4.0), ub_r, m, n));
+
+	y1 << x1; Y1_rm << X1_rm; Y1_cm << X1_cm;
+	ubound_ip(y1, 4.0);
+	ubound_ip(Y1_rm, 4.0);
+	ubound_ip(Y1_cm, 4.0);
+	BCS_CHECK( array_view_equal(y1, ub_r, N) );
+	BCS_CHECK( array_view_equal(Y1_rm, ub_r, m, n));
+	BCS_CHECK( array_view_equal(Y1_cm, ub_r, m, n));
+
+	// rgn_bound
+
+	double rb_r[N] = {2, 2, 3, 4, 5, 5};
+	BCS_CHECK( array_view_equal(rgn_bound(x1, 2.0, 5.0), rb_r, N) );
+	BCS_CHECK( array_view_equal(rgn_bound(X1_rm, 2.0, 5.0), rb_r, m, n));
+	BCS_CHECK( array_view_equal(rgn_bound(X1_cm, 2.0, 5.0), rb_r, m, n));
+
+	y1 << x1; Y1_rm << X1_rm; Y1_cm << X1_cm;
+	rgn_bound_ip(y1, 2.0, 5.0);
+	rgn_bound_ip(Y1_rm, 2.0, 5.0);
+	rgn_bound_ip(Y1_cm, 2.0, 5.0);
+	BCS_CHECK( array_view_equal(y1, rb_r, N) );
+	BCS_CHECK( array_view_equal(Y1_rm, rb_r, m, n));
+	BCS_CHECK( array_view_equal(Y1_cm, rb_r, m, n));
+
+	// abound
+
+	double ab_r[N] = {-1.5, -1.0, 0.0, 1.0, 1.5, 1.5};
+	BCS_CHECK( array_view_equal(abound(x1-3.0, 1.5), ab_r, N) );
+	BCS_CHECK( array_view_equal(abound(X1_rm-3.0, 1.5), ab_r, m, n));
+	BCS_CHECK( array_view_equal(abound(X1_cm-3.0, 1.5), ab_r, m, n));
+
+	y1 << (x1 - 3.0); Y1_rm << (X1_rm - 3.0); Y1_cm << (X1_cm - 3.0);
+	abound_ip(y1, 1.5);
+	abound_ip(Y1_rm, 1.5);
+	abound_ip(Y1_cm, 1.5);
+	BCS_CHECK( array_view_equal(y1, ab_r, N) );
+	BCS_CHECK( array_view_equal(Y1_rm, ab_r, m, n));
+	BCS_CHECK( array_view_equal(Y1_cm, ab_r, m, n));
+
 }
 
 
@@ -1175,6 +1243,7 @@ test_suite *test_array_calc_suite()
 
 	suite->add( new test_array_compare() );
 	suite->add( new test_array_max_min_each() );
+	suite->add( new test_bounding() );
 
 	suite->add( new test_array_add() );
 	suite->add( new test_array_sub() );

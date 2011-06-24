@@ -125,6 +125,12 @@ namespace bcs
 		return x * x * x;
 	}
 
+	template<typename T>
+	inline T rgn_bound(T x, T lb, T ub)
+	{
+		return x < lb ? lb : (x > ub ? ub : x);
+	}
+
 }
 
 #endif
