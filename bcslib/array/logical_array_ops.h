@@ -21,13 +21,13 @@ namespace bcs
 	// not
 
 	template<class TIndexer>
-	inline array1d<bool> operator ! (const caview1d<bool, TIndexer>& a)
+	inline array1d<bool> operator ~ (const caview1d<bool, TIndexer>& a)
 	{
 		return transform_arr(vec_not_ftor(), a);
 	}
 
 	template<typename TOrd, class TIndexer0, class TIndexer1>
-	inline array2d<bool, TOrd> operator ! (const caview2d<bool, TOrd, TIndexer0, TIndexer1>& a)
+	inline array2d<bool, TOrd> operator ~ (const caview2d<bool, TOrd, TIndexer0, TIndexer1>& a)
 	{
 		return transform_arr(vec_not_ftor(), a);
 	}
