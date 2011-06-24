@@ -46,10 +46,18 @@
 #endif
 
 
-// Library switches
+#ifdef HAS_INTEL_IPP
+	#define BCS_ENABLE_INTEL_IPPS
+	#define BCS_ENABLE_INTEL_IPPI
+	#define BCS_ENABLE_INTEL_IPPM
+#endif
 
-#define BCS_USE_INTEL_IPPS
-#define BCS_USE_INTEL_MKL
+#ifdef HAS_INTEL_MKL
+	#define BCS_ENABLE_MKL_BLAS
+	#define BCS_ENABLE_MKL_LAPACK
+	#define BCS_ENABLE_MKL_VMS
+	#define BCS_ENABEL_MKL_RANDOM
+#endif
 
 
 #endif
