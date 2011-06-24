@@ -13,8 +13,7 @@
 
 #include <bcslib/array/array1d.h>
 #include <bcslib/array/array2d.h>
-#include <bcslib/base/arg_check.h>
-#include <type_traits>
+
 
 namespace bcs
 {
