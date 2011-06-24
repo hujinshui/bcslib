@@ -190,16 +190,6 @@ namespace bcs
 		return transform_arr(vec_vec_max_each_ftor<value_type>(), a1, a2);
 	}
 
-	template<class Arr, typename T>
-	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
-	array_transform_resultT<vec_sca_max_each_ftor, Arr>>::type
-	max_each_arr_sca(const Arr& a, const T& x)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		return transform_arr(vec_sca_max_each_ftor<value_type>(x), a);
-	}
-
-
 	// min_each
 
 	template<class Arr1, class Arr2>
@@ -211,15 +201,87 @@ namespace bcs
 		return transform_arr(vec_vec_min_each_ftor<value_type>(), a1, a2);
 	}
 
+	/********************************************
+	 *
+	 *  Bounding
+	 *
+	 *******************************************/
+
+	// lbound
+
 	template<class Arr, typename T>
 	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
-	array_transform_resultT<vec_sca_min_each_ftor, Arr>>::type
-	min_each_arr_sca(const Arr& a, const T& x)
+	array_transform_resultT<vec_lbound_ftor, Arr>>::type
+	lbound_arr(const Arr& a, const T& lb)
 	{
 		typedef typename array_view_traits<Arr>::value_type value_type;
-		return transform_arr(vec_sca_min_each_ftor<value_type>(x), a);
+		return transform_arr(vec_lbound_ftor<value_type>(lb), a);
 	}
 
+	template<class Arr, typename T>
+	inline typename std::enable_if<is_compatible_aview_v<Arr, T>::value, void>::type
+	lbound_arr_inplace(Arr& a, const T& lb)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		inplace_transform_arr(vec_lbound_ftor<value_type>(lb), a);
+	}
+
+	// ubound
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<vec_ubound_ftor, Arr>>::type
+	ubound_arr(const Arr& a, const T& ub)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(vec_ubound_ftor<value_type>(ub), a);
+	}
+
+	template<class Arr, typename T>
+	inline typename std::enable_if<is_compatible_aview_v<Arr, T>::value, void>::type
+	ubound_arr_inplace(Arr& a, const T& ub)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		inplace_transform_arr(vec_ubound_ftor<value_type>(ub), a);
+	}
+
+	// rgn_bound
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<vec_rgn_bound_ftor, Arr>>::type
+	rgn_bound_arr(const Arr& a, const T& lb, const T& ub)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(vec_rgn_bound_ftor<value_type>(lb, ub), a);
+	}
+
+	template<class Arr, typename T>
+	inline typename std::enable_if<is_compatible_aview_v<Arr, T>::value, void>::type
+	rgn_bound_arr_inplace(Arr& a, const T& lb, const T& ub)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		inplace_transform_arr(vec_rgn_bound_ftor<value_type>(lb, ub), a);
+	}
+
+	// abound
+
+	template<class Arr, typename T>
+	inline typename lazy_enable_if<is_compatible_aview_v<Arr, T>::value,
+	array_transform_resultT<vec_abound_ftor, Arr>>::type
+	abound_arr(const Arr& a, const T& ab)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		return transform_arr(vec_abound_ftor<value_type>(ab), a);
+	}
+
+	template<class Arr, typename T>
+	inline typename std::enable_if<is_compatible_aview_v<Arr, T>::value, void>::type
+	abound_arr_inplace(Arr& a, const T& ab)
+	{
+		typedef typename array_view_traits<Arr>::value_type value_type;
+		inplace_transform_arr(vec_abound_ftor<value_type>(ab), a);
+	}
 
 
 	/********************************************

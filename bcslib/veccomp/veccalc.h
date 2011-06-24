@@ -106,7 +106,7 @@ namespace bcs
 		for (size_t i = 0; i < n; ++i) y[i] = (x1[i] <= x2);
 	}
 
-	// max_each
+	// max_each and min_each
 
 	template<typename T>
 	inline void vec_max_each(size_t n, const T* x1, const T* x2, T *y)
@@ -116,26 +116,81 @@ namespace bcs
 	}
 
 	template<typename T>
-	inline void vec_max_each(size_t n, const T* x1, const T& x2, T *y)
-	{
-		using std::max;
-		for (size_t i = 0; i < n; ++i) y[i] = max(x1[i], x2);
-	}
-
-	// min_each
-
-	template<typename T>
 	inline void vec_min_each(size_t n, const T* x1, const T* x2, T *y)
 	{
 		using std::min;
 		for (size_t i = 0; i < n; ++i) y[i] = min(x1[i], x2[i]);
 	}
 
+
+	/********************************************
+	 *
+	 *  Bounding (Thresholding)
+	 *
+	 *******************************************/
+
 	template<typename T>
-	inline void vec_min_each(size_t n, const T* x1, const T& x2, T *y)
+	inline void vec_lbound(size_t n, const T* x, const T& lb, T *y)
+	{
+		using std::max;
+		for (size_t i = 0; i < n; ++i) y[i] = max(x[i], lb);
+	}
+
+	template<typename T>
+	inline void vec_lbound_inplace(size_t n, T* y, const T& lb)
+	{
+		for (size_t i = 0; i < n; ++i)
+		{
+			if (y[i] < lb) y[i] = lb;
+		}
+	}
+
+	template<typename T>
+	inline void vec_ubound(size_t n, const T* x, const T& ub, T *y)
 	{
 		using std::min;
-		for (size_t i = 0; i < n; ++i) y[i] = min(x1[i], x2);
+		for (size_t i = 0; i < n; ++i) y[i] = min(x[i], ub);
+	}
+
+	template<typename T>
+	inline void vec_ubound_inplace(size_t n, T* y, const T& ub)
+	{
+		for (size_t i = 0; i < n; ++i)
+		{
+			if (y[i] > ub) y[i] = ub;
+		}
+	}
+
+	template<typename T>
+	inline void vec_rgn_bound(size_t n, const T* x, const T& lb, const T& ub, T *y)
+	{
+		for (size_t i = 0; i < n; ++i)
+		{
+			y[i] = rgn_bound(x[i], lb, ub);
+		}
+	}
+
+	template<typename T>
+	inline void vec_rgn_bound_inplace(size_t n, T* y, const T& lb, const T& ub)
+	{
+		for (size_t i = 0; i < n; ++i)
+		{
+			T v = y[i];
+			if (v < lb) y[i] = lb;
+			else if (v > ub) y[i] = ub;
+		}
+	}
+
+	template<typename T>
+	inline void vec_abound(size_t n, const T* x, const T& ab, T *y)
+	{
+		vec_rgn_bound(n, x, -ab, ab, y);
+	}
+
+	template<typename T>
+	inline void vec_abound_inplace(size_t n, T* y, const T& ab)
+	{
+		vec_rgn_bound_inplace(n, y, -ab, ab);
 	}
 
 
@@ -768,30 +823,6 @@ namespace bcs
 		{
 			vec_max_each(n, x1, x2, y);
 		}
-
-		void operator() (size_t n, T*y, const T*x1) const
-		{
-			vec_max_each(n, y, x1);
-		}
-	};
-
-	template<typename T>
-	struct vec_sca_max_each_ftor
-	{
-		T s;
-		vec_sca_max_each_ftor(const T& s_)
-		: s(s_) { }
-
-		T operator() (const T& v1) const
-		{
-			using std::max;
-			return max(v1, s);
-		}
-
-		void operator() (size_t n, const T *x1, T *y) const
-		{
-			vec_max_each(n, x1, s, y);
-		}
 	};
 
 
@@ -810,33 +841,107 @@ namespace bcs
 		{
 			vec_min_each(n, x1, x2, y);
 		}
-
-		void operator() (size_t n, T*y, const T*x1) const
-		{
-			vec_min_each(n, y, x1);
-		}
 	};
+
+
+	/********************************************
+	 *
+	 *  Bounding
+	 *
+	 *******************************************/
 
 	template<typename T>
-	struct vec_sca_min_each_ftor
+	struct vec_lbound_ftor
 	{
-		T s;
-		vec_sca_min_each_ftor(const T& s_)
-		: s(s_) { }
+		T b;
+		vec_lbound_ftor(const T& b_) : b(b_) { }
 
-		T operator() (const T& v1) const
+		T operator() (const T& v) const
 		{
 			using std::max;
-			return min(v1, s);
+			return max(v, b);
 		}
 
-		void operator() (size_t n, const T *x1, T *y) const
+		void operator() (size_t n, const T *x, T *y) const
 		{
-			vec_min_each(n, x1, s, y);
+			vec_lbound(n, x, b, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			vec_lbound_inplace(n, y, b);
 		}
 	};
 
 
+	template<typename T>
+	struct vec_ubound_ftor
+	{
+		T b;
+		vec_ubound_ftor(const T& b_) : b(b_) { }
+
+		T operator() (const T& v) const
+		{
+			using std::min;
+			return min(v, b);
+		}
+
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			vec_ubound(n, x, b, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			vec_ubound_inplace(n, y, b);
+		}
+	};
+
+
+	template<typename T>
+	struct vec_rgn_bound_ftor
+	{
+		T lb, ub;
+		vec_rgn_bound_ftor(const T& lb_, const T& ub_) : lb(lb_), ub(ub_) { }
+
+		T operator() (const T& v) const
+		{
+			return rgn_bound(v, lb, ub);
+		}
+
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			vec_rgn_bound(n, x, lb, ub, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			vec_rgn_bound_inplace(n, y, lb, ub);
+		}
+	};
+
+
+	template<typename T>
+	struct vec_abound_ftor
+	{
+		T ab;
+		vec_abound_ftor(const T& ab_) : ab(ab_) { }
+
+		T operator() (const T& v) const
+		{
+			return rgn_bound(v, -ab, ab);
+		}
+
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			vec_abound(n, x, ab, y);
+		}
+
+		void operator() (size_t n, T *y) const
+		{
+			vec_abound_inplace(n, y, ab);
+		}
+	};
 
 
 	/********************************************
