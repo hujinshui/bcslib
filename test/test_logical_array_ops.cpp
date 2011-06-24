@@ -40,9 +40,9 @@ BCS_TEST_CASE( test_basic_logical_ops )
 	// not
 
 	bool r_not[N] = {true, true, false, false};
-	BCS_CHECK( array_view_equal(!x1, r_not, N) );
-	BCS_CHECK( array_view_equal(!X1_rm, r_not, m, n) );
-	BCS_CHECK( array_view_equal(!X1_cm, r_not, m, n) );
+	BCS_CHECK( array_view_equal(~x1, r_not, N) );
+	BCS_CHECK( array_view_equal(~X1_rm, r_not, m, n) );
+	BCS_CHECK( array_view_equal(~X1_cm, r_not, m, n) );
 
 	// and
 
