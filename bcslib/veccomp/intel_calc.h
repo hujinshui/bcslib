@@ -152,6 +152,191 @@ namespace bcs
 	}
 
 
+	// subtraction
+
+	inline void vec_sub(size_t n, const double *x1, const double *x2, double *y)
+	{
+		BCS_IPPS_CALL( ippsSub_64f(x2, x1, y, (int)n) )
+	}
+
+	inline void vec_sub(size_t n, const float *x1, const float *x2, float *y)
+	{
+		BCS_IPPS_CALL( ippsSub_32f(x2, x1, y, (int)n) )
+	}
+
+	inline void vec_sub(size_t n, const double* x1, const double& x2, double *y)
+	{
+		BCS_IPPS_CALL( ippsSubC_64f(x1, x2, y, (int)n) )
+	}
+
+	inline void vec_sub(size_t n, const float* x1, const float& x2, float *y)
+	{
+		BCS_IPPS_CALL( ippsSubC_32f(x1, x2, y, (int)n) )
+	}
+
+	inline void vec_sub(size_t n, const double& x1, const double* x2, double *y)
+	{
+		BCS_IPPS_CALL( ippsSubCRev_64f(x2, x1, y, (int)n) )
+	}
+
+	inline void vec_sub(size_t n, const float& x1, const float* x2, float *y)
+	{
+		BCS_IPPS_CALL( ippsSubCRev_32f(x2, x1, y, (int)n) )
+	}
+
+	inline void vec_sub_inplace(size_t n, double *y, const double *x)
+	{
+		BCS_IPPS_CALL( ippsSub_64f_I(x, y, (int)n) )
+	}
+
+	inline void vec_sub_inplace(size_t n, float *y, const float *x)
+	{
+		BCS_IPPS_CALL( ippsSub_32f_I(x, y, (int)n) )
+	}
+
+	inline void vec_sub_inplace(size_t n, double *y, const double& x)
+	{
+		BCS_IPPS_CALL( ippsSubC_64f_I(x, y, (int)n) )
+	}
+
+	inline void vec_sub_inplace(size_t n, float *y, const float& x)
+	{
+		BCS_IPPS_CALL( ippsSubC_32f_I(x, y, (int)n) )
+	}
+
+	inline void vec_sub_inplace(size_t n, const double& x, double *y)
+	{
+		BCS_IPPS_CALL( ippsSubCRev_64f_I(x, y, (int)n) )
+	}
+
+	inline void vec_sub_inplace(size_t n, const float& x, float *y)
+	{
+		BCS_IPPS_CALL( ippsSubCRev_32f_I(x, y, (int)n) )
+	}
+
+
+	// multiplication
+
+	inline void vec_mul(size_t n, const double *x1, const double *x2, double *y)
+	{
+		BCS_IPPS_CALL( ippsMul_64f(x1, x2, y, (int)n) )
+	}
+
+	inline void vec_mul(size_t n, const float *x1, const float *x2, float *y)
+	{
+		BCS_IPPS_CALL( ippsMul_32f(x1, x2, y, (int)n) )
+	}
+
+	inline void vec_mul(size_t n, const double* x1, const double& x2, double *y)
+	{
+		BCS_IPPS_CALL( ippsMulC_64f(x1, x2, y, (int)n) )
+	}
+
+	inline void vec_mul(size_t n, const float* x1, const float& x2, float *y)
+	{
+		BCS_IPPS_CALL( ippsMulC_32f(x1, x2, y, (int)n) )
+	}
+
+	inline void vec_mul_inplace(size_t n, double *y, const double *x)
+	{
+		BCS_IPPS_CALL( ippsMul_64f_I(x, y, (int)n) )
+	}
+
+	inline void vec_mul_inplace(size_t n, float *y, const float *x)
+	{
+		BCS_IPPS_CALL( ippsMul_32f_I(x, y, (int)n) )
+	}
+
+	inline void vec_mul_inplace(size_t n, double *y, const double& x)
+	{
+		BCS_IPPS_CALL( ippsMulC_64f_I(x, y, (int)n) )
+	}
+
+	inline void vec_mul_inplace(size_t n, float *y, const float& x)
+	{
+		BCS_IPPS_CALL( ippsMulC_32f_I(x, y, (int)n) )
+	}
+
+
+	// division
+
+	inline void vec_div(size_t n, const double *x1, const double *x2, double *y)
+	{
+		BCS_IPPS_CALL( ippsDiv_64f(x2, x1, y, (int)n) )
+	}
+
+	inline void vec_div(size_t n, const float *x1, const float *x2, float *y)
+	{
+		BCS_IPPS_CALL( ippsDiv_32f(x2, x1, y, (int)n) )
+	}
+
+	inline void vec_div(size_t n, const double* x1, const double& x2, double *y)
+	{
+		BCS_IPPS_CALL( ippsDivC_64f(x1, x2, y, (int)n) )
+	}
+
+	inline void vec_div(size_t n, const float* x1, const float& x2, float *y)
+	{
+		BCS_IPPS_CALL( ippsDivC_32f(x1, x2, y, (int)n) )
+	}
+
+	inline void vec_div_inplace(size_t n, double *y, const double *x)
+	{
+		BCS_IPPS_CALL( ippsDiv_64f_I(x, y, (int)n) )
+	}
+
+	inline void vec_div_inplace(size_t n, float *y, const float *x)
+	{
+		BCS_IPPS_CALL( ippsDiv_32f_I(x, y, (int)n) )
+	}
+
+	inline void vec_div_inplace(size_t n, double *y, const double& x)
+	{
+		BCS_IPPS_CALL( ippsDivC_64f_I(x, y, (int)n) )
+	}
+
+	inline void vec_div_inplace(size_t n, float *y, const float& x)
+	{
+		BCS_IPPS_CALL( ippsDivC_32f_I(x, y, (int)n) )
+	}
+
+
+	// negate
+
+	inline void vec_negate(size_t n, const double *x, double *y)
+	{
+		BCS_IPPS_CALL( ippsSubCRev_64f(x, 0.0, y, (int)n));
+	}
+
+	inline void vec_negate(size_t n, const float *x, float *y)
+	{
+		BCS_IPPS_CALL( ippsSubCRev_32f(x, 0.0f, y, (int)n));
+	}
+
+	inline void vec_negate(size_t n, double *y)
+	{
+		BCS_IPPS_CALL( ippsSubCRev_64f(y, 0.0, y, (int)n));
+	}
+
+	inline void vec_negate(size_t n, float *y)
+	{
+		BCS_IPPS_CALL( ippsSubCRev_32f(y, 0.0f, y, (int)n));
+	}
+
+
+	// absolute value
+
+	inline void vec_abs(size_t n, const double *x, double *y)
+	{
+		BCS_IPPS_CALL( ippsAbs_64f(x, y, (int)n) )
+	}
+
+	inline void vec_abs(size_t n, const float *x, float *y)
+	{
+		BCS_IPPS_CALL( ippsAbs_32f(x, y, (int)n) )
+	}
+
+
 
 #endif // BCS_ENABLE_INTEL_IPPS
 
