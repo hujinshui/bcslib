@@ -228,24 +228,23 @@ extern "C" {
 
 	// ippsThreshold
 
+	IPPAPI(IppStatus,ippsThreshold_LT_32f, (const Ipp32f* pSrc, Ipp32f* pDst, int len, Ipp32f level))
+	IPPAPI(IppStatus,ippsThreshold_LT_64f, (const Ipp64f* pSrc, Ipp64f* pDst, int len, Ipp64f level))
 	IPPAPI(IppStatus,ippsThreshold_LT_32f_I, (Ipp32f* pSrcDst, int len, Ipp32f level))
 	IPPAPI(IppStatus,ippsThreshold_LT_64f_I, (Ipp64f* pSrcDst, int len, Ipp64f level))
 
-	IPPAPI(IppStatus,ippsThreshold_LT_32f, (const Ipp32f* pSrc, Ipp32f* pDst, int len, Ipp32f level))
-	IPPAPI(IppStatus,ippsThreshold_LT_64f, (const Ipp64f* pSrc, Ipp64f* pDst, int len, Ipp64f level))
-
+	IPPAPI(IppStatus,ippsThreshold_GT_32f, (const Ipp32f* pSrc, Ipp32f* pDst, int len, Ipp32f level))
+	IPPAPI(IppStatus,ippsThreshold_GT_64f, (const Ipp64f* pSrc, Ipp64f* pDst, int len, Ipp64f level))
 	IPPAPI(IppStatus,ippsThreshold_GT_32f_I, (Ipp32f* pSrcDst, int len, Ipp32f level))
 	IPPAPI(IppStatus,ippsThreshold_GT_64f_I, (Ipp64f* pSrcDst, int len, Ipp64f level))
 
 	IPPAPI(IppStatus,ippsThreshold_LTAbs_32f, (const Ipp32f* pSrc, Ipp32f *pDst, int len, Ipp32f level))
 	IPPAPI(IppStatus,ippsThreshold_LTAbs_64f, (const Ipp64f* pSrc, Ipp64f *pDst, int len, Ipp64f level))
-
 	IPPAPI(IppStatus,ippsThreshold_LTAbs_32f_I, (Ipp32f *pSrcDst, int len, Ipp32f level))
 	IPPAPI(IppStatus,ippsThreshold_LTAbs_64f_I, (Ipp64f *pSrcDst, int len, Ipp64f level))
 
 	IPPAPI(IppStatus,ippsThreshold_GTAbs_32f, (const Ipp32f* pSrc, Ipp32f *pDst, int len, Ipp32f level))
 	IPPAPI(IppStatus,ippsThreshold_GTAbs_64f, (const Ipp64f* pSrc, Ipp64f *pDst, int len, Ipp64f level))
-
 	IPPAPI(IppStatus,ippsThreshold_GTAbs_32f_I, (Ipp32f *pSrcDst, int len, Ipp32f level))
 	IPPAPI(IppStatus,ippsThreshold_GTAbs_64f_I, (Ipp64f *pSrcDst, int len, Ipp64f level))
 

@@ -10,10 +10,6 @@ ifndef CXX
 CXX=g++
 endif
 
-# ifndef BOOST_HOME
-# $(error "The environment variable BOOST_HOME is not defined")
-# endif
-
 
 WARNING_FLAGS = -Wall -Wextra -Wconversion -Wformat -Wno-unused-parameter
 BOOST_WARNING_FLAGS = -Wall -Wextra -Wno-unused-variable -Wno-unused-parameter
@@ -24,7 +20,35 @@ else
 	CFLAGS = -std=c++0x -fmax-errors=50 -pedantic $(WARNING_FLAGS) -I. 
 endif
 
-BOOST_CFLAGS = -ansi $(BOOST_WARNING_FLAGS) -I$(BOOST_HOME) -I. 
+
+#------ Intel-specific part (begin) ----------
+
+ifdef MACOSX_VERSION
+ifeq ($(INTEL_TARGET_ARCH), ia32)
+INTEL_LINKS=-lmkl_intel -lmkl_intel_thread -lmkl_core -lipps -liomp5 -lpthread
+else
+INTEL_LINKS=-lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lipps -liomp5 -lpthread
+endif
+else
+ifeq ($(INTEL_TARGET_ARCH), ia32)
+INTEL_LINKS=-Wl,--start-group -lmkl_intel -lmkl_intel_thread -lmkl_core -Wl,--end-group -lipps -liomp5 -lpthread
+else
+INTEL_LINKS=-Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -lipps -liomp5 -lpthread
+endif
+endif
+
+ifdef MACOSX_VERSION
+INTEL_PATHS=-I$(MKLROOT)/include -L$(MKLROOT)/lib -I$(IPPROOT)/include -L$(IPPROOT)/lib
+else
+INTEL_PATHS=-I$(MKLROOT)/include -L$(MKLROOT)/lib/$(INTEL_ARCH) -I$(IPPROOT)/include -L$(IPPROOT)/lib/$(INTEL_ARCH) 
+endif
+
+INTEL_FLAGS=-DHAS_INTEL_MKL -DHAS_INTEL_IPP $(INTEL_PATHS) $(INTEL_LINKS)
+
+
+#------ Intel-specific part (end) ----------
+
+
 
 BASE_HEADERS = bcslib/base/config.h \
 	bcslib/base/basic_defs.h \
@@ -51,7 +75,8 @@ ARRAY_BASIC_HEADERS = bcslib/array/array_base.h \
 	 	
 VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h \
 	bcslib/veccomp/vecstat.h \
-	bcslib/veccomp/logical_vecops.h
+	bcslib/veccomp/logical_vecops.h \
+	bcslib/veccomp/intel_calc.h
 
 ARRAY_COMP_HEADERS = bcslib/array/generic_array_eval.h \
 	bcslib/array/generic_array_calc.h bcslib/array/array_calc.h \
@@ -98,7 +123,11 @@ bin/test_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(BASICS_TESTS)
 #------ Array tests -----------
 
 # test_array : bin/test_array_basics bin/test_array_comp bin/test_array_sparse  
-test_array: bin/test_array_basics bin/test_array_comp bin/test_access_performance
+test_array: bin/test_array_basics \
+	bin/test_array_comp \
+	bin/test_access_performance \
+	bin/test_calc_performance \
+	bin/test_calc_performance_intel
 
 ARRAY_TEST_HEADERS = $(TEST_HEADERS) bcslib/test/test_array_aux.h
 
@@ -110,7 +139,9 @@ ARRAY_BASIC_TESTS = test/test_array_basics.cpp \
 bin/test_array_basics: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_BASIC_TESTS) 
 	$(CXX) $(CFLAGS) $(ARRAY_BASIC_TESTS) -o bin/test_array_basics
 	
-	
+bin/test_access_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) test/test_access_performance.cpp
+	$(CXX) $(CFLAGS) -O3 test/test_access_performance.cpp -o bin/test_access_performance	
+		
 ARRAY_COMP_TESTS = test/test_array_comp.cpp \
 	test/test_array_calc.cpp \
 	test/test_array_stat.cpp \
@@ -119,19 +150,15 @@ ARRAY_COMP_TESTS = test/test_array_comp.cpp \
 bin/test_array_comp: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
 	$(CXX) $(CFLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp
 
-
+bin/test_calc_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) test/test_calc_performance.cpp
+	$(CXX) $(CFLAGS) -O3 test/test_calc_performance.cpp -o bin/test_calc_performance
 	
+bin/test_calc_performance_intel: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) test/test_calc_performance.cpp
+	$(CXX) $(CFLAGS) $(INTEL_FLAGS) -O3 test/test_calc_performance.cpp -o bin/test_calc_performance_intel	
+
 ARRAY_SPARSE_TESTS = test/test_array_sparse.cpp test/test_spvec.cpp test/test_dynamic_spvec.cpp
 bin/test_array_sparse: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_SPARSE_HEADERS) $(ARRAY_SPARSE_TESTS)
 	$(CXX) $(CFLAGS) $(ARRAY_SPARSE_TESTS) -o bin/test_array_sparse	
-
-
-bin/test_access_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) test/test_access_performance.cpp
-	$(CXX) $(CFLAGS) -O3 test/test_access_performance.cpp -o bin/test_access_performance
-
-
-
-
 
 
 GEOMETRY_BASIC_TESTS = test/test_geometry_basics.cpp test/test_geometry_primitives.cpp test/test_poly_scan.cpp
