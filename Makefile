@@ -38,7 +38,7 @@ endif
 endif
 
 ifdef MACOSX_VERSION
-INTEL_PATHS=-I$(MKLROOT)/include -L$(MKLROOT)/lib -I$(IPPROOT)/include -L$(IPPROOT)/lib
+INTEL_PATHS=-I$(MKLROOT)/include -L$(MKLROOT)/lib -I$(IPPROOT)/include -L$(IPPROOT)/lib -L$(ICCROOT)/lib
 else
 INTEL_PATHS=-I$(MKLROOT)/include -L$(MKLROOT)/lib/$(INTEL_ARCH) -I$(IPPROOT)/include -L$(IPPROOT)/lib/$(INTEL_ARCH) 
 endif

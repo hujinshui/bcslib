@@ -13,7 +13,7 @@
 #ifndef BCSLIB_MATH_FUNCTORS_H
 #define BCSLIB_MATH_FUNCTORS_H
 
-#include <bcslib/base/config.h>
+#include <bcslib/base/basic_defs.h>
 
 #include <type_traits>
 #include <functional>
@@ -21,21 +21,6 @@
 
 namespace bcs
 {
-
-	// more calculation functions
-
-	template<typename T>
-	inline enable_if<is_arithmetic<T>>::type sqr(const T& x)
-	{
-		return x * x;
-	}
-
-	template<typename T>
-	inline enable_if<is_arithmetic<T>>::type cube(const T& x)
-	{
-		return x * x * x;
-	}
-
 
 	// calculation functors
 
