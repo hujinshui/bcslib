@@ -602,26 +602,26 @@ BCS_TEST_CASE( test_array_div )
 	aview1d<double, step_ind> xs2(src2, step_ind(5, 2));
 
 	double ra1[] = {1.0/5, 3.0/6, 5.0/2, 9.0/4, 2.0/8};
-	BCS_CHECK( array_view_equal(x1 / x2, ra1, 5) );
+	BCS_CHECK( array_view_approx(x1 / x2, ra1, 5) );
 
 	double ra2[] = {1.0/5, 3.0/2, 5.0/8, 9.0/9, 2.0/3};
-	BCS_CHECK( array_view_equal(x1 / xs2, ra2, 5) );
+	BCS_CHECK( array_view_approx(x1 / xs2, ra2, 5) );
 
 	double ra3[] = {1.0/5, 5.0/6, 2.0/2, 8.0/4, 1.0/8};
-	BCS_CHECK( array_view_equal(xs1 / x2, ra3, 5) );
+	BCS_CHECK( array_view_approx(xs1 / x2, ra3, 5) );
 
 	double ra4[] = {1.0/5, 5.0/2, 2.0/8, 8.0/9, 1.0/3};
-	BCS_CHECK( array_view_equal(xs1 / xs2, ra4, 5) );
+	BCS_CHECK( array_view_approx(xs1 / xs2, ra4, 5) );
 
 	double ra5l[] = {1.0/2, 3.0/2, 5.0/2, 9.0/2, 2.0/2};
 	double ra5r[] = {2.0/1, 2.0/3, 2.0/5, 2.0/9, 2.0/2};
-	BCS_CHECK( array_view_equal(x1 / 2.0, ra5l, 5) );
-	BCS_CHECK( array_view_equal(2.0 / x1, ra5r, 5) );
+	BCS_CHECK( array_view_approx(x1 / 2.0, ra5l, 5) );
+	BCS_CHECK( array_view_approx(2.0 / x1, ra5r, 5) );
 
 	double ra6l[] = {1.0/2, 5.0/2, 2.0/2, 8.0/2, 1.0/2};
 	double ra6r[] = {2.0/1, 2.0/5, 2.0/2, 2.0/8, 2.0/1};
-	BCS_CHECK( array_view_equal(xs1 / 2.0, ra6l, 5) );
-	BCS_CHECK( array_view_equal(2.0 / xs1, ra6r, 5) );
+	BCS_CHECK( array_view_approx(xs1 / 2.0, ra6l, 5) );
+	BCS_CHECK( array_view_approx(2.0 / xs1, ra6r, 5) );
 
 	array1d<double> y1(5);
 	double y2_buf[10];
@@ -629,27 +629,27 @@ BCS_TEST_CASE( test_array_div )
 
 	y1 << x1;
 	y1 /= x2;
-	BCS_CHECK( array_view_equal(y1, ra1, 5) );
+	BCS_CHECK( array_view_approx(y1, ra1, 5) );
 
 	y1 << x1;
 	y1 /= xs2;
-	BCS_CHECK( array_view_equal(y1, ra2, 5) );
+	BCS_CHECK( array_view_approx(y1, ra2, 5) );
 
 	y1 << x1;
 	y1 /= 2.0;
-	BCS_CHECK( array_view_equal(y1, ra5l, 5) );
+	BCS_CHECK( array_view_approx(y1, ra5l, 5) );
 
 	y2 << x1;
 	y2 /= x2;
-	BCS_CHECK( array_view_equal(y2, ra1, 5) );
+	BCS_CHECK( array_view_approx(y2, ra1, 5) );
 
 	y2 << x1;
 	y2 /= xs2;
-	BCS_CHECK( array_view_equal(y2, ra2, 5) );
+	BCS_CHECK( array_view_approx(y2, ra2, 5) );
 
 	y2 << x1;
 	y2 /= 2.0;
-	BCS_CHECK( array_view_equal(y2, ra5l, 5) );
+	BCS_CHECK( array_view_approx(y2, ra5l, 5) );
 
 	// 2D
 
@@ -659,26 +659,26 @@ BCS_TEST_CASE( test_array_div )
 	aview2d<double, row_major_t, step_ind, id_ind> X2s(src2, 3, 3, step_ind(2, 2), id_ind(3));
 
 	double rb1[] = {1.0/5, 3.0/6, 5.0/2, 9.0/4, 2.0/8, 7.0/1};
-	BCS_CHECK( array_view_equal(X1 / X2, rb1, 2, 3) );
+	BCS_CHECK( array_view_approx(X1 / X2, rb1, 2, 3) );
 
 	double rb2[] = {1.0/5, 3.0/6, 5.0/2, 9.0/9, 2.0/10, 7.0/3};
-	BCS_CHECK( array_view_equal(X1 / X2s, rb2, 2, 3) );
+	BCS_CHECK( array_view_approx(X1 / X2s, rb2, 2, 3) );
 
 	double rb3[] = {1.0/5, 3.0/6, 5.0/2, 8.0/4, 5.0/8, 1.0/1};
-	BCS_CHECK( array_view_equal(X1s / X2, rb3, 2, 3) );
+	BCS_CHECK( array_view_approx(X1s / X2, rb3, 2, 3) );
 
 	double rb4[] = {1.0/5, 3.0/6, 5.0/2, 8.0/9, 5.0/10, 1.0/3};
-	BCS_CHECK( array_view_equal(X1s / X2s, rb4, 2, 3) );
+	BCS_CHECK( array_view_approx(X1s / X2s, rb4, 2, 3) );
 
 	double rb5l[] = {1.0/2, 3.0/2, 5.0/2, 9.0/2, 2.0/2, 7.0/2};
 	double rb5r[] = {2.0/1, 2.0/3, 2.0/5, 2.0/9, 2.0/2, 2.0/7};
-	BCS_CHECK( array_view_equal(X1 / 2.0, rb5l, 2, 3) );
-	BCS_CHECK( array_view_equal(2.0 / X1, rb5r, 2, 3) );
+	BCS_CHECK( array_view_approx(X1 / 2.0, rb5l, 2, 3) );
+	BCS_CHECK( array_view_approx(2.0 / X1, rb5r, 2, 3) );
 
 	double rb6l[] = {1.0/2, 3.0/2, 5.0/2, 8.0/2, 5.0/2, 1.0/2};
 	double rb6r[] = {2.0/1, 2.0/3, 2.0/5, 2.0/8, 2.0/5, 2.0/1};
-	BCS_CHECK( array_view_equal(X1s / 2.0, rb6l, 2, 3) );
-	BCS_CHECK( array_view_equal(2.0 / X1s, rb6r, 2, 3) );
+	BCS_CHECK( array_view_approx(X1s / 2.0, rb6l, 2, 3) );
+	BCS_CHECK( array_view_approx(2.0 / X1s, rb6r, 2, 3) );
 
 	array2d<double, row_major_t> Y1(2, 3);
 	double Y2_buf[20];
@@ -686,27 +686,27 @@ BCS_TEST_CASE( test_array_div )
 
 	Y1 << X1;
 	Y1 /= X2;
-	BCS_CHECK( array_view_equal(Y1, rb1, 2, 3) );
+	BCS_CHECK( array_view_approx(Y1, rb1, 2, 3) );
 
 	Y1 << X1;
 	Y1 /= X2s;
-	BCS_CHECK( array_view_equal(Y1, rb2, 2, 3) );
+	BCS_CHECK( array_view_approx(Y1, rb2, 2, 3) );
 
 	Y1 << X1;
 	Y1 /= 2.0;
-	BCS_CHECK( array_view_equal(Y1, rb5l, 2, 3) );
+	BCS_CHECK( array_view_approx(Y1, rb5l, 2, 3) );
 
 	Y2 << X1;
 	Y2 /= X2;
-	BCS_CHECK( array_view_equal(Y2, rb1, 2, 3) );
+	BCS_CHECK( array_view_approx(Y2, rb1, 2, 3) );
 
 	Y2 << X1;
 	Y2 /= X2s;
-	BCS_CHECK( array_view_equal(Y2, rb2, 2, 3) );
+	BCS_CHECK( array_view_approx(Y2, rb2, 2, 3) );
 
 	Y2 << X1;
 	Y2 /= 2.0;
-	BCS_CHECK( array_view_equal(Y2, rb5l, 2, 3) );
+	BCS_CHECK( array_view_approx(Y2, rb5l, 2, 3) );
 
 }
 
@@ -786,7 +786,7 @@ BCS_TEST_CASE( test_array_abs )
 
 	array2d<double, column_major_t> Xc(2, 3, src);
 	array2d<double, column_major_t> Xcc = clone_array(Xc);
-	BCS_CHECK( array_view_approx( abs(Xc), res, 2, 3) );
+	BCS_CHECK( array_view_equal( abs(Xc), res, 2, 3) );
 	abs_ip(Xcc);
 	BCS_CHECK( array_view_equal( Xcc, res, 2, 3) );
 }
@@ -806,10 +806,6 @@ BCS_TEST_CASE( test_array_power_and_root_funs )
 	array2d<double, row_major_t> Xr(nr, nc, src);
 	array2d<double, column_major_t> Xc(nr, nc, src);
 
-	array1d<double> x2(N);
-	array2d<double, row_major_t> Xr2(nr, nc);
-	array2d<double, column_major_t> Xc2(nr, nc);
-
 	array1d<double> e(N, es);
 	array2d<double, row_major_t> Er(nr, nc, es);
 	array2d<double, column_major_t> Ec(nr, nc, es);
@@ -819,82 +815,41 @@ BCS_TEST_CASE( test_array_power_and_root_funs )
 	for (int i = 0; i < N; ++i) res[i] = src[i] * src[i];
 
 	BCS_CHECK( array_view_equal( sqr(x), res, N ) );
-	x2 << x; sqr_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
 	BCS_CHECK( array_view_equal( sqr(Xr), res, nr, nc) );
-	Xr2 << Xr; sqr_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
 	BCS_CHECK( array_view_equal( sqr(Xc), res, nr, nc) );
-	Xc2 << Xc; sqr_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
 
 	// sqrt
 
 	for (int i = 0; i < N; ++i) res[i] = std::sqrt(src[i]);
 
-	BCS_CHECK( array_view_equal( sqrt(x), res, N ) );
-	x2 << x; sqrt_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( sqrt(Xr), res, nr, nc) );
-	Xr2 << Xr; sqrt_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( sqrt(Xc), res, nr, nc) );
-	Xc2 << Xc; sqrt_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
-
+	BCS_CHECK( array_view_approx( sqrt(x), res, N ) );
+	BCS_CHECK( array_view_approx( sqrt(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( sqrt(Xc), res, nr, nc) );
 
 	// rcp
 
 	for (int i = 0; i < N; ++i) res[i] = 1.0 / src[i];
 
-	BCS_CHECK( array_view_equal( rcp(x), res, N ) );
-	x2 << x; rcp_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( rcp(Xr), res, nr, nc) );
-	Xr2 << Xr; rcp_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( rcp(Xc), res, nr, nc) );
-	Xc2 << Xc; rcp_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
-
+	BCS_CHECK( array_view_approx( rcp(x), res, N ) );
+	BCS_CHECK( array_view_approx( rcp(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( rcp(Xc), res, nr, nc) );
 
 	// rsqrt
 
 	for (int i = 0; i < N; ++i) res[i] = 1.0 / std::sqrt(src[i]);
 
-	BCS_CHECK( array_view_equal( rsqrt(x), res, N ) );
-	x2 << x; rsqrt_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( rsqrt(Xr), res, nr, nc) );
-	Xr2 << Xr; rsqrt_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( rsqrt(Xc), res, nr, nc) );
-	Xc2 << Xc; rsqrt_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+	BCS_CHECK( array_view_approx( rsqrt(x), res, N ) );
+	BCS_CHECK( array_view_approx( rsqrt(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( rsqrt(Xc), res, nr, nc) );
 
 	// pow
 
 	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], es[i]);
 
-	BCS_CHECK( array_view_equal( pow(x, e), res, N ) );
-	x2 << x; pow_ip(x2, e);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( pow(Xr, Er), res, nr, nc) );
-	Xr2 << Xr; pow_ip(Xr2, Er);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( pow(Xc, Ec), res, nr, nc) );
-	Xc2 << Xc; pow_ip(Xc2, Ec);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+	BCS_CHECK( array_view_approx( pow(x, e), res, N ) );
+	BCS_CHECK( array_view_approx( pow(Xr, Er), res, nr, nc) );
+	BCS_CHECK( array_view_approx( pow(Xc, Ec), res, nr, nc) );
 
 	// pow with constant exponent
 
@@ -902,18 +857,9 @@ BCS_TEST_CASE( test_array_power_and_root_funs )
 
 	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], q);
 
-	BCS_CHECK( array_view_equal( pow(x, q), res, N ) );
-	x2 << x; pow_ip(x2, q);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( pow(Xr, q), res, nr, nc) );
-	Xr2 << Xr; pow_ip(Xr2, q);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( pow(Xc, q), res, nr, nc) );
-	Xc2 << Xc; pow_ip(Xc2, q);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
-
+	BCS_CHECK( array_view_approx( pow(x, q), res, N ) );
+	BCS_CHECK( array_view_approx( pow(Xr, q), res, nr, nc) );
+	BCS_CHECK( array_view_approx( pow(Xc, q), res, nr, nc) );
 }
 
 
@@ -930,59 +876,29 @@ BCS_TEST_CASE( test_array_exp_and_log_funs )
 	array2d<double, row_major_t> Xr(nr, nc, src);
 	array2d<double, column_major_t> Xc(nr, nc, src);
 
-	array1d<double> x2(N);
-	array2d<double, row_major_t> Xr2(nr, nc);
-	array2d<double, column_major_t> Xc2(nr, nc);
-
 	// exp
 
 	for (int i = 0; i < N; ++i) res[i] = std::exp(src[i]);
 
-	BCS_CHECK( array_view_equal( exp(x), res, N ) );
-	x2 << x; exp_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( exp(Xr), res, nr, nc) );
-	Xr2 << Xr; exp_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( exp(Xc), res, nr, nc) );
-	Xc2 << Xc; exp_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+	BCS_CHECK( array_view_approx( exp(x), res, N ) );
+	BCS_CHECK( array_view_approx( exp(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( exp(Xc), res, nr, nc) );
 
 	// log
 
 	for (int i = 0; i < N; ++i) res[i] = std::log(src[i]);
 
-	BCS_CHECK( array_view_equal( log(x), res, N ) );
-	x2 << x; log_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( log(Xr), res, nr, nc) );
-	Xr2 << Xr; log_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( log(Xc), res, nr, nc) );
-	Xc2 << Xc; log_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
-
+	BCS_CHECK( array_view_approx( log(x), res, N ) );
+	BCS_CHECK( array_view_approx( log(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( log(Xc), res, nr, nc) );
 
 	// log10
 
 	for (int i = 0; i < N; ++i) res[i] = std::log10(src[i]);
 
-	BCS_CHECK( array_view_equal( log10(x), res, N ) );
-	x2 << x; log10_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( log10(Xr), res, nr, nc) );
-	Xr2 << Xr; log10_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( log10(Xc), res, nr, nc) );
-	Xc2 << Xc; log10_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
-
+	BCS_CHECK( array_view_approx( log10(x), res, N ) );
+	BCS_CHECK( array_view_approx( log10(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( log10(Xc), res, nr, nc) );
 }
 
 
@@ -999,41 +915,29 @@ BCS_TEST_CASE( test_array_floor_and_ceil )
 	array2d<double, row_major_t> Xr(nr, nc, src);
 	array2d<double, column_major_t> Xc(nr, nc, src);
 
-	array1d<double> x2(N);
-	array2d<double, row_major_t> Xr2(nr, nc);
-	array2d<double, column_major_t> Xc2(nr, nc);
-
 	// floor
 
 	for (int i = 0; i < N; ++i) res[i] = std::floor(src[i]);
 
 	BCS_CHECK( array_view_equal( floor(x), res, N ) );
-	x2 << x; floor_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
 	BCS_CHECK( array_view_equal( floor(Xr), res, nr, nc) );
-	Xr2 << Xr; floor_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
 	BCS_CHECK( array_view_equal( floor(Xc), res, nr, nc) );
-	Xc2 << Xc; floor_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
 
 	// ceil
 
 	for (int i = 0; i < N; ++i) res[i] = std::ceil(src[i]);
 
 	BCS_CHECK( array_view_equal( ceil(x), res, N ) );
-	x2 << x; ceil_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
 	BCS_CHECK( array_view_equal( ceil(Xr), res, nr, nc) );
-	Xr2 << Xr; ceil_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
 	BCS_CHECK( array_view_equal( ceil(Xc), res, nr, nc) );
-	Xc2 << Xc; ceil_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+
+	// round
+
+	for (int i = 0; i < N; ++i) res[i] = std::round(src[i]);
+
+	BCS_CHECK( array_view_equal( round(x), res, N ) );
+	BCS_CHECK( array_view_equal( round(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_equal( round(Xc), res, nr, nc) );
 }
 
 
@@ -1055,115 +959,62 @@ BCS_TEST_CASE( test_array_trigonometric_funs )
 	array2d<double, row_major_t> Er(nr, nc, src_e);
 	array2d<double, column_major_t> Ec(nr, nc, src_e);
 
-	array1d<double> x2(N);
-	array2d<double, row_major_t> Xr2(nr, nc);
-	array2d<double, column_major_t> Xc2(nr, nc);
 
 	// sin
 
 	for (int i = 0; i < N; ++i) res[i] = std::sin(src[i]);
 
-	BCS_CHECK( array_view_equal( sin(x), res, N ) );
-	x2 << x; sin_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( sin(Xr), res, nr, nc) );
-	Xr2 << Xr; sin_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( sin(Xc), res, nr, nc) );
-	Xc2 << Xc; sin_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+	BCS_CHECK( array_view_approx( sin(x), res, N ) );
+	BCS_CHECK( array_view_approx( sin(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( sin(Xc), res, nr, nc) );
 
 	// cos
 
 	for (int i = 0; i < N; ++i) res[i] = std::cos(src[i]);
 
-	BCS_CHECK( array_view_equal( cos(x), res, N ) );
-	x2 << x; cos_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( cos(Xr), res, nr, nc) );
-	Xr2 << Xr; cos_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( cos(Xc), res, nr, nc) );
-	Xc2 << Xc; cos_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+	BCS_CHECK( array_view_approx( cos(x), res, N ) );
+	BCS_CHECK( array_view_approx( cos(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( cos(Xc), res, nr, nc) );
 
 	// tan
 
 	for (int i = 0; i < N; ++i) res[i] = std::tan(src[i]);
 
-	BCS_CHECK( array_view_equal( tan(x), res, N ) );
-	x2 << x; tan_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( tan(Xr), res, nr, nc) );
-	Xr2 << Xr; tan_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( tan(Xc), res, nr, nc) );
-	Xc2 << Xc; tan_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+	BCS_CHECK( array_view_approx( tan(x), res, N ) );
+	BCS_CHECK( array_view_approx( tan(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( tan(Xc), res, nr, nc) );
 
 	// asin
 
 	for (int i = 0; i < N; ++i) res[i] = std::asin(src[i]);
 
-	BCS_CHECK( array_view_equal( asin(x), res, N ) );
-	x2 << x; asin_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( asin(Xr), res, nr, nc) );
-	Xr2 << Xr; asin_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( asin(Xc), res, nr, nc) );
-	Xc2 << Xc; asin_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+	BCS_CHECK( array_view_approx( asin(x), res, N ) );
+	BCS_CHECK( array_view_approx( asin(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( asin(Xc), res, nr, nc) );
 
 	// acos
 
 	for (int i = 0; i < N; ++i) res[i] = std::acos(src[i]);
 
-	BCS_CHECK( array_view_equal( acos(x), res, N ) );
-	x2 << x; acos_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( acos(Xr), res, nr, nc) );
-	Xr2 << Xr; acos_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( acos(Xc), res, nr, nc) );
-	Xc2 << Xc; acos_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+	BCS_CHECK( array_view_approx( acos(x), res, N ) );
+	BCS_CHECK( array_view_approx( acos(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( acos(Xc), res, nr, nc) );
 
 	// atan
 
 	for (int i = 0; i < N; ++i) res[i] = std::atan(src[i]);
 
-	BCS_CHECK( array_view_equal( atan(x), res, N ) );
-	x2 << x; atan_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( atan(Xr), res, nr, nc) );
-	Xr2 << Xr; atan_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( atan(Xc), res, nr, nc) );
-	Xc2 << Xc; atan_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+	BCS_CHECK( array_view_approx( atan(x), res, N ) );
+	BCS_CHECK( array_view_approx( atan(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( atan(Xc), res, nr, nc) );
 
 	// atan2
 
 	for (int i = 0; i < N; ++i) res[i] = std::atan2(src[i], src_e[i]);
 
-	BCS_CHECK( array_view_equal( atan2(x, e), res, N ) );
-
-	BCS_CHECK( array_view_equal( atan2(Xr, Er), res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( atan2(Xc, Ec), res, nr, nc) );
+	BCS_CHECK( array_view_approx( atan2(x, e), res, N ) );
+	BCS_CHECK( array_view_approx( atan2(Xr, Er), res, nr, nc) );
+	BCS_CHECK( array_view_approx( atan2(Xc, Ec), res, nr, nc) );
 
 }
 
@@ -1181,60 +1032,59 @@ BCS_TEST_CASE( test_array_hyperbolic_funs )
 	array2d<double, row_major_t> Xr(nr, nc, src);
 	array2d<double, column_major_t> Xc(nr, nc, src);
 
-	array1d<double> x2(N);
-	array2d<double, row_major_t> Xr2(nr, nc);
-	array2d<double, column_major_t> Xc2(nr, nc);
-
 	// sinh
 
 	for (int i = 0; i < N; ++i) res[i] = std::sinh(src[i]);
 
-	BCS_CHECK( array_view_equal( sinh(x), res, N ) );
-	x2 << x; sinh_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( sinh(Xr), res, nr, nc) );
-	Xr2 << Xr; sinh_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( sinh(Xc), res, nr, nc) );
-	Xc2 << Xc; sinh_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+	BCS_CHECK( array_view_approx( sinh(x), res, N ) );
+	BCS_CHECK( array_view_approx( sinh(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( sinh(Xc), res, nr, nc) );
 
 	// cosh
 
 	for (int i = 0; i < N; ++i) res[i] = std::cosh(src[i]);
 
-	BCS_CHECK( array_view_equal( cosh(x), res, N ) );
-	x2 << x; cosh_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
-
-	BCS_CHECK( array_view_equal( cosh(Xr), res, nr, nc) );
-	Xr2 << Xr; cosh_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( cosh(Xc), res, nr, nc) );
-	Xc2 << Xc; cosh_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
+	BCS_CHECK( array_view_approx( cosh(x), res, N ) );
+	BCS_CHECK( array_view_approx( cosh(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( cosh(Xc), res, nr, nc) );
 
 	// tanh
 
 	for (int i = 0; i < N; ++i) res[i] = std::tanh(src[i]);
 
-	BCS_CHECK( array_view_equal( tanh(x), res, N ) );
-	x2 << x; tanh_ip(x2);
-	BCS_CHECK( array_view_equal( x2, res, N) );
+	BCS_CHECK( array_view_approx( tanh(x), res, N ) );
+	BCS_CHECK( array_view_approx( tanh(Xr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( tanh(Xc), res, nr, nc) );
 
-	BCS_CHECK( array_view_equal( tanh(Xr), res, nr, nc) );
-	Xr2 << Xr; tanh_ip(Xr2);
-	BCS_CHECK( array_view_equal( Xr2, res, nr, nc) );
-
-	BCS_CHECK( array_view_equal( tanh(Xc), res, nr, nc) );
-	Xc2 << Xc; tanh_ip(Xc2);
-	BCS_CHECK( array_view_equal( Xc2, res, nr, nc) );
 }
 
 
+BCS_TEST_CASE( test_hypot )
+{
+	const int N = 6;
+	double src_x[N] = {-0.9, -0.5, -0.2, 0.1, 0.4, 0.8};
+	double src_y[N] = {0.8, 0.5, 0.3, -0.2, -0.5, -0.6};
+	double res[N];
+
+	const int nr = 2;
+	const int nc = 3;
+
+	array1d<double> x(N, src_x);
+	array2d<double, row_major_t> Xr(nr, nc, src_x);
+	array2d<double, column_major_t> Xc(nr, nc, src_x);
+
+	array1d<double> y(N, src_y);
+	array2d<double, row_major_t> Yr(nr, nc, src_y);
+	array2d<double, column_major_t> Yc(nr, nc, src_y);
+
+
+	for (int i = 0; i < N; ++i) res[i] = std::sqrt( sqr(src_x[i]) + sqr(src_y[i]) );
+
+	BCS_CHECK( array_view_approx( hypot(x, y), res, N ) );
+	BCS_CHECK( array_view_approx( hypot(Xr, Yr), res, nr, nc) );
+	BCS_CHECK( array_view_approx( hypot(Xc, Yc), res, nr, nc) );
+
+}
 
 
 test_suite *test_array_calc_suite()
@@ -1257,6 +1107,7 @@ test_suite *test_array_calc_suite()
 	suite->add( new test_array_floor_and_ceil() );
 	suite->add( new test_array_trigonometric_funs() );
 	suite->add( new test_array_hyperbolic_funs() );
+	suite->add( new test_hypot() );
 
 	return suite;
 }

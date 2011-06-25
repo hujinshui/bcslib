@@ -812,21 +812,6 @@ namespace bcs
 		return sqr_arr(a);
 	}
 
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& sqr_ip(aview1d<T, TIndexer>& a)
-	{
-		sqr_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& sqr_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		sqr_arr_inplace(a);
-		return a;
-	}
-
-
 	// sqrt
 
 	template<typename T, class TIndexer>
@@ -840,21 +825,6 @@ namespace bcs
 	{
 		return sqrt_arr(a);
 	}
-
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& sqrt_ip(aview1d<T, TIndexer>& a)
-	{
-		sqrt_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& sqrt_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		sqrt_arr_inplace(a);
-		return a;
-	}
-
 
 	// rcp
 
@@ -870,21 +840,6 @@ namespace bcs
 		return rcp_arr(a);
 	}
 
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& rcp_ip(aview1d<T, TIndexer>& a)
-	{
-		rcp_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& rcp_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		rcp_arr_inplace(a);
-		return a;
-	}
-
-
 	// rsqrt
 
 	template<typename T, class TIndexer>
@@ -898,21 +853,6 @@ namespace bcs
 	{
 		return rsqrt_arr(a);
 	}
-
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& rsqrt_ip(aview1d<T, TIndexer>& a)
-	{
-		rsqrt_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& rsqrt_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		rsqrt_arr_inplace(a);
-		return a;
-	}
-
 
 	// pow
 
@@ -930,24 +870,6 @@ namespace bcs
 		return pow_arr(a, e);
 	}
 
-
-	template<typename T, class LIndexer, class RIndexer>
-	inline aview1d<T, LIndexer>& pow_ip(aview1d<T, LIndexer>& a, const caview1d<T, RIndexer>& e)
-	{
-		pow_arr_inplace(a, e);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
-	inline aview2d<T, TOrd, LIndexer0, LIndexer1>& pow_ip(
-			aview2d<T, TOrd, LIndexer0, LIndexer1>& a,
-			const caview2d<T, TOrd, RIndexer0, RIndexer1>& e)
-	{
-		pow_arr_inplace(a, e);
-		return a;
-	}
-
-
 	// pow with constant
 
 	template<typename T, class LIndexer>
@@ -961,21 +883,6 @@ namespace bcs
 	{
 		return pow_arr_sca(a, e);
 	}
-
-	template<typename T, class LIndexer>
-	inline aview1d<T, LIndexer>& pow_ip(aview1d<T, LIndexer>& a, const T& e)
-	{
-		pow_arr_sca_inplace(a, e);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
-	inline aview2d<T, TOrd, LIndexer0, LIndexer1>& pow_ip(aview2d<T, TOrd, LIndexer0, LIndexer1>& a, const T& e)
-	{
-		pow_arr_sca_inplace(a, e);
-		return a;
-	}
-
 
 	// exponential and logarithm functions
 
@@ -993,19 +900,6 @@ namespace bcs
 		return exp_arr(a);
 	}
 
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& exp_ip(aview1d<T, TIndexer>& a)
-	{
-		exp_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& exp_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		exp_arr_inplace(a);
-		return a;
-	}
 
 	// log
 
@@ -1021,20 +915,6 @@ namespace bcs
 		return log_arr(a);
 	}
 
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& log_ip(aview1d<T, TIndexer>& a)
-	{
-		log_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& log_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		log_arr_inplace(a);
-		return a;
-	}
-
 	// log10
 
 	template<typename T, class TIndexer>
@@ -1047,20 +927,6 @@ namespace bcs
 	inline array2d<T, TOrd> log10(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
 		return log10_arr(a);
-	}
-
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& log10_ip(aview1d<T, TIndexer>& a)
-	{
-		log10_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& log10_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		log10_arr_inplace(a);
-		return a;
 	}
 
 
@@ -1080,20 +946,6 @@ namespace bcs
 		return floor_arr(a);
 	}
 
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& floor_ip(aview1d<T, TIndexer>& a)
-	{
-		floor_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& floor_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		floor_arr_inplace(a);
-		return a;
-	}
-
 	// ceil
 
 	template<typename T, class TIndexer>
@@ -1108,18 +960,18 @@ namespace bcs
 		return ceil_arr(a);
 	}
 
+	// round
+
 	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& ceil_ip(aview1d<T, TIndexer>& a)
+	inline array1d<T> round(const caview1d<T, TIndexer>& a)
 	{
-		ceil_arr_inplace(a);
-		return a;
+		return round_arr(a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& ceil_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	inline array2d<T, TOrd> round(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		ceil_arr_inplace(a);
-		return a;
+		return round_arr(a);
 	}
 
 
@@ -1139,20 +991,6 @@ namespace bcs
 		return sin_arr(a);
 	}
 
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& sin_ip(aview1d<T, TIndexer>& a)
-	{
-		sin_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& sin_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		sin_arr_inplace(a);
-		return a;
-	}
-
 	// cos
 
 	template<typename T, class TIndexer>
@@ -1165,20 +1003,6 @@ namespace bcs
 	inline array2d<T, TOrd> cos(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
 		return cos_arr(a);
-	}
-
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& cos_ip(aview1d<T, TIndexer>& a)
-	{
-		cos_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& cos_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		cos_arr_inplace(a);
-		return a;
 	}
 
 	// tan
@@ -1195,20 +1019,6 @@ namespace bcs
 		return tan_arr(a);
 	}
 
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& tan_ip(aview1d<T, TIndexer>& a)
-	{
-		tan_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& tan_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		tan_arr_inplace(a);
-		return a;
-	}
-
 	// asin
 
 	template<typename T, class TIndexer>
@@ -1221,20 +1031,6 @@ namespace bcs
 	inline array2d<T, TOrd> asin(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
 		return asin_arr(a);
-	}
-
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& asin_ip(aview1d<T, TIndexer>& a)
-	{
-		asin_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& asin_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		asin_arr_inplace(a);
-		return a;
 	}
 
 	// acos
@@ -1251,21 +1047,6 @@ namespace bcs
 		return acos_arr(a);
 	}
 
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& acos_ip(aview1d<T, TIndexer>& a)
-	{
-		acos_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& acos_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		acos_arr_inplace(a);
-		return a;
-	}
-
-
 	// atan
 
 	template<typename T, class TIndexer>
@@ -1279,21 +1060,6 @@ namespace bcs
 	{
 		return atan_arr(a);
 	}
-
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& atan_ip(aview1d<T, TIndexer>& a)
-	{
-		atan_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& atan_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		atan_arr_inplace(a);
-		return a;
-	}
-
 
 	// atan2
 
@@ -1328,20 +1094,6 @@ namespace bcs
 		return sinh_arr(a);
 	}
 
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& sinh_ip(aview1d<T, TIndexer>& a)
-	{
-		sinh_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& sinh_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		sinh_arr_inplace(a);
-		return a;
-	}
-
 	// cosh
 
 	template<typename T, class TIndexer>
@@ -1354,20 +1106,6 @@ namespace bcs
 	inline array2d<T, TOrd> cosh(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
 		return cosh_arr(a);
-	}
-
-	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& cosh_ip(aview1d<T, TIndexer>& a)
-	{
-		cosh_arr_inplace(a);
-		return a;
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& cosh_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
-	{
-		cosh_arr_inplace(a);
-		return a;
 	}
 
 	// tanh
@@ -1384,18 +1122,23 @@ namespace bcs
 		return tanh_arr(a);
 	}
 
+
+	// accuracy-preserving functions
+
+	// hypot
+
 	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& tanh_ip(aview1d<T, TIndexer>& a)
+	inline array1d<T> hypot(const caview1d<T, TIndexer>& a, const caview1d<T, TIndexer>& b)
 	{
-		tanh_arr_inplace(a);
-		return a;
+		return hypot_arr(a, b);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& tanh_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+	inline array2d<T, TOrd> hypot(
+			const caview2d<T, TOrd, TIndexer0, TIndexer1>& a,
+			const caview2d<T, TOrd, TIndexer0, TIndexer1>& b)
 	{
-		tanh_arr_inplace(a);
-		return a;
+		return hypot_arr(a, b);
 	}
 
 }

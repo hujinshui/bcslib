@@ -7,7 +7,7 @@
  */
 
 
-#include <bcslib/base/math_functors.h>
+#include <bcslib/base/mathfun.h>
 #include <bcslib/base/basic_mem.h>
 
 #include <bcslib/veccomp/veccalc.h>
@@ -468,6 +468,192 @@ void test_arithmetic(size_t n, size_t nr,
 }
 
 
+void test_power_funs(size_t n, size_t nr,
+		const double *x1d, const double *x2d, double *y0d, double *y1d,
+		const float  *x1f, const float  *x2f, float  *y0f, float  *y1f)
+{
+
+	using std::bind2nd;
+
+	std::printf("Testing Power Functions:\n");
+	std::printf("---------------------------\n");
+
+	double td = 1e-14;
+	float tf = 3e-7f;
+
+	// sqr
+
+	timed_test("sqr-vec (64f)", mk_task(sqr_fun<double>(), vec_sqr_ftor<double>(), n, x1d, y0d, y1d, 0), nr);
+	timed_test("sqr-vec (32f)", mk_task(sqr_fun<float>(),  vec_sqr_ftor<float>(),  n, x1f, y0f, y1f, 0), nr);
+
+	// sqrt
+
+	timed_test("sqrt-vec (64f)", mk_task(sqrt_fun<double>(), vec_sqrt_ftor<double>(), n, x2d, y0d, y1d, td), nr);
+	timed_test("sqrt-vec (32f)", mk_task(sqrt_fun<float>(),  vec_sqrt_ftor<float>(),  n, x2f, y0f, y1f, tf), nr);
+
+	// rcp
+
+	timed_test("rcp-vec (64f)", mk_task(rcp_fun<double>(), vec_rcp_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("rcp-vec (32f)", mk_task(rcp_fun<float>(),  vec_rcp_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	// rsqrt
+
+	timed_test("rsqrt-vec (64f)", mk_task(rsqrt_fun<double>(), vec_rsqrt_ftor<double>(), n, x2d, y0d, y1d, td), nr);
+	timed_test("rsqrt-vec (32f)", mk_task(rsqrt_fun<float>(),  vec_rsqrt_ftor<float>(),  n, x2f, y0f, y1f, tf), nr);
+
+	// pow
+
+	double ed = 2.4;
+	float ef = 2.4f;
+
+	timed_test("pow-vec-vec (64f)", mk_task(pow_fun<double>(), vec_pow_ftor<double>(), n, x2d, x1d, y0d, y1d, td), nr);
+	timed_test("pow-vec-vec (32f)", mk_task(pow_fun<float>(),  vec_pow_ftor<float>(),  n, x2f, x1f, y0f, y1f, tf), nr);
+
+	timed_test("pow-vec-sca (64f)", mk_task(bind2nd(pow_fun<double>(), ed), vec_sca_pow_ftor<double>(ed), n, x2d, y0d, y1d, td), nr);
+	timed_test("pow-vec-sca (32f)", mk_task(bind2nd(pow_fun<float>(),  ef), vec_sca_pow_ftor<float>(ef),  n, x2f, y0f, y1f, tf), nr);
+
+	std::printf("\n");
+}
+
+
+void test_exp_and_log_funs(size_t n, size_t nr,
+		const double *x1d, const double *x2d, double *y0d, double *y1d,
+		const float  *x1f, const float  *x2f, float  *y0f, float  *y1f)
+{
+	std::printf("Testing Exp and Log Functions:\n");
+	std::printf("----------------------------------\n");
+
+	double td = 1e-14;
+	float tf = 3e-7f;
+
+	// exp
+
+	timed_test("exp-vec (64f)", mk_task(exp_fun<double>(), vec_exp_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("exp-vec (32f)", mk_task(exp_fun<float>(),  vec_exp_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	// log
+
+	timed_test("log-vec (64f)", mk_task(log_fun<double>(), vec_log_ftor<double>(), n, x2d, y0d, y1d, td), nr);
+	timed_test("log-vec (32f)", mk_task(log_fun<float>(),  vec_log_ftor<float>(),  n, x2f, y0f, y1f, tf), nr);
+
+	// log10
+
+	timed_test("log10-vec (64f)", mk_task(log10_fun<double>(), vec_log10_ftor<double>(), n, x2d, y0d, y1d, td), nr);
+	timed_test("log10-vec (32f)", mk_task(log10_fun<float>(),  vec_log10_ftor<float>(),  n, x2f, y0f, y1f, tf), nr);
+
+	std::printf("\n");
+}
+
+
+void test_rounding_funs(size_t n, size_t nr,
+		const double *x1d, const double *x2d, double *y0d, double *y1d,
+		const float  *x1f, const float  *x2f, float  *y0f, float  *y1f)
+{
+	std::printf("Testing Rounding Functions:\n");
+	std::printf("----------------------------------\n");
+
+	double td = 1e-14;
+	float tf = 3e-7f;
+
+	// floor
+
+	timed_test("floor-vec (64f)", mk_task(floor_fun<double>(), vec_floor_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("floor-vec (32f)", mk_task(floor_fun<float>(),  vec_floor_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	// ceil
+
+	timed_test("ceil-vec (64f)", mk_task(ceil_fun<double>(), vec_ceil_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("ceil-vec (32f)", mk_task(ceil_fun<float>(),  vec_ceil_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	// round
+
+	timed_test("round-vec (64f)", mk_task(round_fun<double>(), vec_round_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("round-vec (32f)", mk_task(round_fun<float>(),  vec_round_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	std::printf("\n");
+}
+
+
+void test_trigonometric_funs(size_t n, size_t nr,
+		const double *x1d, const double *x2d, double *y0d, double *y1d,
+		const float  *x1f, const float  *x2f, float  *y0f, float  *y1f)
+{
+
+	std::printf("Testing Trigonometric Functions:\n");
+	std::printf("--------------------------------------\n");
+
+	double td = 1e-14;
+	float tf = 3e-7f;
+
+	// sin
+
+	timed_test("sin-vec (64f)", mk_task(sin_fun<double>(), vec_sin_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("sin-vec (32f)", mk_task(sin_fun<float>(),  vec_sin_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	// cos
+
+	timed_test("cos-vec (64f)", mk_task(cos_fun<double>(), vec_cos_ftor<double>(), n, x2d, y0d, y1d, td), nr);
+	timed_test("cos-vec (32f)", mk_task(cos_fun<float>(),  vec_cos_ftor<float>(),  n, x2f, y0f, y1f, tf), nr);
+
+	// tan
+
+	timed_test("tan-vec (64f)", mk_task(tan_fun<double>(), vec_tan_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("tan-vec (32f)", mk_task(tan_fun<float>(),  vec_tan_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	// asin
+
+	timed_test("asin-vec (64f)", mk_task(asin_fun<double>(), vec_asin_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("asin-vec (32f)", mk_task(asin_fun<float>(),  vec_asin_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	// acos
+
+	timed_test("acos-vec (64f)", mk_task(acos_fun<double>(), vec_acos_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("acos-vec (32f)", mk_task(acos_fun<float>(),  vec_acos_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	// atan
+
+	timed_test("atan-vec (64f)", mk_task(atan_fun<double>(), vec_atan_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("atan-vec (32f)", mk_task(atan_fun<float>(),  vec_atan_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	// atan2
+
+	timed_test("atan2-vec (64f)", mk_task(atan2_fun<double>(), vec_atan2_ftor<double>(), n, x2d, x1d, y0d, y1d, td), nr);
+	timed_test("atan2-vec (32f)", mk_task(atan2_fun<float>(),  vec_atan2_ftor<float>(),  n, x2f, x1f, y0f, y1f, tf), nr);
+
+	std::printf("\n");
+}
+
+
+void test_hyperbolic_funs(size_t n, size_t nr,
+		const double *x1d, const double *x2d, double *y0d, double *y1d,
+		const float  *x1f, const float  *x2f, float  *y0f, float  *y1f)
+{
+
+	std::printf("Testing Hyperbolic Functions:\n");
+	std::printf("--------------------------------------\n");
+
+	double td = 1e-14;
+	float tf = 3e-7f;
+
+	// sinh
+
+	timed_test("sinh-vec (64f)", mk_task(sinh_fun<double>(), vec_sinh_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("sinh-vec (32f)", mk_task(sinh_fun<float>(),  vec_sinh_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	// cosh
+
+	timed_test("cosh-vec (64f)", mk_task(cosh_fun<double>(), vec_cosh_ftor<double>(), n, x2d, y0d, y1d, td), nr);
+	timed_test("cosh-vec (32f)", mk_task(cosh_fun<float>(),  vec_cosh_ftor<float>(),  n, x2f, y0f, y1f, tf), nr);
+
+	// tanh
+
+	timed_test("tanh-vec (64f)", mk_task(tanh_fun<double>(), vec_tanh_ftor<double>(), n, x1d, y0d, y1d, td), nr);
+	timed_test("tanh-vec (32f)", mk_task(tanh_fun<float>(),  vec_tanh_ftor<float>(),  n, x1f, y0f, y1f, tf), nr);
+
+	std::printf("\n");
+}
+
+
 int main(int argc, char *argv[])
 {
 	// prepare storage and data
@@ -517,7 +703,12 @@ int main(int argc, char *argv[])
 	std::printf("Start testing ...\n\n");
 
 	test_comparison(n, 10, x1d, x2d, y0d, y1d, x1f, x2f, y0f, y1f);
-	// test_arithmetic(n, 10, x1d, x2d, y0d, y1d, x1f, x2f, y0f, y1f);
+	test_arithmetic(n, 10, x1d, x2d, y0d, y1d, x1f, x2f, y0f, y1f);
+	test_rounding_funs(n, 10, x1d, x2d, y0d, y1d, x1f, x2f, y0f, y1f);
+	test_power_funs(n, 3, x1d, x2d, y0d, y1d, x1f, x2f, y0f, y1f);
+	test_exp_and_log_funs(n, 5, x1d, x2d, y0d, y1d, x1f, x2f, y0f, y1f);
+	test_trigonometric_funs(n, 3, x1d, x2d, y0d, y1d, x1f, x2f, y0f, y1f);
+	test_hyperbolic_funs(n, 3, x1d, x2d, y0d, y1d, x1f, x2f, y0f, y1f);
 
 	std::printf("\n");
 

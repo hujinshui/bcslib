@@ -47,11 +47,7 @@ namespace bcs
 	template<typename T, size_t N>
 	struct aligned_array
 	{
-#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
-		__declspec(align(BCS_DEFAULT_ALIGNMENT)) T data[N];
-#elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
-		T data[N] __attribute__((aligned(BCS_DEFAULT_ALIGNMENT)));
-#endif
+		BCS_ALIGN(BCS_DEFAULT_ALIGNMENT) T data[N];
 
 		const T& operator[] (size_t i) const
 		{

@@ -10,8 +10,8 @@
 #define BCSLIB_VECCALC_H
 
 #include <bcslib/base/basic_defs.h>
+#include <bcslib/base/mathfun.h>
 
-#include <cmath>
 #include <algorithm>
 
 namespace bcs
@@ -424,15 +424,21 @@ namespace bcs
 	// rounding functions
 
 	template<typename T>
+	inline void vec_floor(size_t n, const T *x, T *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = std::floor(x[i]);
+	}
+
+	template<typename T>
 	inline void vec_ceil(size_t n, const T *x, T *y)
 	{
 		for (size_t i = 0; i < n; ++i) y[i] = std::ceil(x[i]);
 	}
 
 	template<typename T>
-	inline void vec_floor(size_t n, const T *x, T *y)
+	inline void vec_round(size_t n, const T *x, T *y)
 	{
-		for (size_t i = 0; i < n; ++i) y[i] = std::floor(x[i]);
+		for (size_t i = 0; i < n; ++i) y[i] = round(x[i]);
 	}
 
 
@@ -500,6 +506,17 @@ namespace bcs
 	{
 		for (size_t i = 0; i < n; ++i) y[i] = std::tanh(x[i]);
 	}
+
+
+	// accuracy-preserving functions
+
+	template<typename T>
+	inline void vec_hypot(size_t n, const T *x1, const T *x2, T *y)
+	{
+		for (size_t i = 0; i < n; ++i) y[i] = hypot(x1[i], x2[i]);
+	}
+
+
 }
 
 
@@ -1243,11 +1260,6 @@ namespace bcs
 		{
 			return vec_sqr(n, x, y);
 		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_sqr(n, y, y);
-		}
 	};
 
 
@@ -1264,11 +1276,6 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y) const
 		{
 			return vec_sqrt(n, x, y);
-		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_sqrt(n, y, y);
 		}
 	};
 
@@ -1287,11 +1294,6 @@ namespace bcs
 		{
 			return vec_rcp(n, x, y);
 		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_rcp(n, y, y);
-		}
 	};
 
 
@@ -1309,11 +1311,6 @@ namespace bcs
 		{
 			return vec_rsqrt(n, x, y);
 		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_rsqrt(n, y, y);
-		}
 	};
 
 
@@ -1330,11 +1327,6 @@ namespace bcs
 		void operator() (size_t n, const T *x, const T *e, T *y) const
 		{
 			return vec_pow(n, x, e, y);
-		}
-
-		void operator() (size_t n, T *y, const T* e) const
-		{
-			return vec_pow(n, y, e, y);
 		}
 	};
 
@@ -1357,11 +1349,6 @@ namespace bcs
 		{
 			return vec_pow(n, x, e, y);
 		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_pow(n, y, e, y);
-		}
 	};
 
 
@@ -1382,11 +1369,6 @@ namespace bcs
 		{
 			return vec_exp(n, x, y);
 		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_exp(n, y, y);
-		}
 	};
 
 	// log
@@ -1403,11 +1385,6 @@ namespace bcs
 		{
 			return vec_log(n, x, y);
 		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_log(n, y, y);
-		}
 	};
 
 	// log10
@@ -1423,11 +1400,6 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y) const
 		{
 			return vec_log10(n, x, y);
-		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_log10(n, y, y);
 		}
 	};
 
@@ -1448,11 +1420,6 @@ namespace bcs
 		{
 			return vec_floor(n, x, y);
 		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_floor(n, y, y);
-		}
 	};
 
 	// ceil
@@ -1469,10 +1436,21 @@ namespace bcs
 		{
 			return vec_ceil(n, x, y);
 		}
+	};
 
-		void operator() (size_t n, T *y) const
+	// round
+
+	template<typename T>
+	struct vec_round_ftor
+	{
+		T operator() (const T& v) const
 		{
-			return vec_ceil(n, y, y);
+			return round(v);
+		}
+
+		void operator() (size_t n, const T *x, T *y) const
+		{
+			return vec_round(n, x, y);
 		}
 	};
 
@@ -1493,11 +1471,6 @@ namespace bcs
 		{
 			return vec_sin(n, x, y);
 		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_sin(n, y, y);
-		}
 	};
 
 	// cos
@@ -1513,11 +1486,6 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y) const
 		{
 			return vec_cos(n, x, y);
-		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_cos(n, y, y);
 		}
 	};
 
@@ -1535,11 +1503,6 @@ namespace bcs
 		{
 			return vec_tan(n, x, y);
 		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_tan(n, y, y);
-		}
 	};
 
 	// asin
@@ -1555,11 +1518,6 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y) const
 		{
 			return vec_asin(n, x, y);
-		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_asin(n, y, y);
 		}
 	};
 
@@ -1577,11 +1535,6 @@ namespace bcs
 		{
 			return vec_acos(n, x, y);
 		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_acos(n, y, y);
-		}
 	};
 
 	// atan
@@ -1597,11 +1550,6 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y) const
 		{
 			return vec_atan(n, x, y);
-		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_atan(n, y, y);
 		}
 	};
 
@@ -1638,11 +1586,6 @@ namespace bcs
 		{
 			return vec_sinh(n, x, y);
 		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_sinh(n, y, y);
-		}
 	};
 
 	// cosh
@@ -1658,11 +1601,6 @@ namespace bcs
 		void operator() (size_t n, const T *x, T *y) const
 		{
 			return vec_cosh(n, x, y);
-		}
-
-		void operator() (size_t n, T *y) const
-		{
-			return vec_cosh(n, y, y);
 		}
 	};
 
@@ -1680,12 +1618,25 @@ namespace bcs
 		{
 			return vec_tanh(n, x, y);
 		}
+	};
 
-		void operator() (size_t n, T *y) const
+
+	// accuracy-preserving functions
+
+	template<typename T>
+	struct vec_hypot_ftor
+	{
+		T operator() (const T& v1, const T& v2) const
 		{
-			return vec_tanh(n, y, y);
+			return hypot(v1, v2);
+		}
+
+		void operator() (size_t n, const T *x1, const T *x2, T *y) const
+		{
+			return vec_hypot(n, x1, x2, y);
 		}
 	};
+
 }
 
 

@@ -516,14 +516,6 @@ namespace bcs
 		return transform_arr(vec_sqr_ftor<value_type>(), a);
 	}
 
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	sqr_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_sqr_ftor<value_type>(), a);
-	}
-
 	// sqrt
 
 	template<class Arr>
@@ -535,15 +527,6 @@ namespace bcs
 		return transform_arr(vec_sqrt_ftor<value_type>(), a);
 	}
 
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	sqrt_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_sqrt_ftor<value_type>(), a);
-	}
-
-
 	// rcp
 
 	template<class Arr>
@@ -553,14 +536,6 @@ namespace bcs
 	{
 		typedef typename array_view_traits<Arr>::value_type value_type;
 		return transform_arr(vec_rcp_ftor<value_type>(), a);
-	}
-
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	rcp_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_rcp_ftor<value_type>(), a);
 	}
 
 	// rsqrt
@@ -574,15 +549,6 @@ namespace bcs
 		return transform_arr(vec_rsqrt_ftor<value_type>(), a);
 	}
 
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	rsqrt_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_rsqrt_ftor<value_type>(), a);
-	}
-
-
 	// pow
 
 	template<class Arr, class Arr2>
@@ -594,15 +560,6 @@ namespace bcs
 		return transform_arr(vec_pow_ftor<value_type>(), a, e);
 	}
 
-	template<class Arr, class Arr2>
-	inline typename std::enable_if<is_compatible_aviews<Arr, Arr2>::value, void>::type
-	pow_arr_inplace(Arr& a, const Arr2& e)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_pow_ftor<value_type>(), a, e);
-	}
-
-
 	// pow with constant exponent
 
 	template<class Arr, typename T>
@@ -613,16 +570,6 @@ namespace bcs
 		typedef typename array_view_traits<Arr>::value_type value_type;
 		return transform_arr(vec_sca_pow_ftor<value_type>(e), a);
 	}
-
-
-	template<class Arr, typename T>
-	inline typename std::enable_if<is_compatible_aview_v<Arr, T>::value, void>::type
-	pow_arr_sca_inplace(Arr& a, const T& e)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_sca_pow_ftor<value_type>(e), a);
-	}
-
 
 	// exponential and logarithm functions
 
@@ -637,14 +584,6 @@ namespace bcs
 		return transform_arr(vec_exp_ftor<value_type>(), a);
 	}
 
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	exp_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_exp_ftor<value_type>(), a);
-	}
-
 	// log
 
 	template<class Arr>
@@ -656,14 +595,6 @@ namespace bcs
 		return transform_arr(vec_log_ftor<value_type>(), a);
 	}
 
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	log_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_log_ftor<value_type>(), a);
-	}
-
 	// log10
 
 	template<class Arr>
@@ -673,14 +604,6 @@ namespace bcs
 	{
 		typedef typename array_view_traits<Arr>::value_type value_type;
 		return transform_arr(vec_log10_ftor<value_type>(), a);
-	}
-
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	log10_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_log10_ftor<value_type>(), a);
 	}
 
 
@@ -697,15 +620,6 @@ namespace bcs
 		return transform_arr(vec_floor_ftor<value_type>(), a);
 	}
 
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	floor_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_floor_ftor<value_type>(), a);
-	}
-
-
 	// ceil
 
 	template<class Arr>
@@ -717,12 +631,15 @@ namespace bcs
 		return transform_arr(vec_ceil_ftor<value_type>(), a);
 	}
 
+	// round
+
 	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	ceil_arr_inplace(Arr& a)
+	inline typename lazy_enable_if<is_array_view<Arr>::value,
+	array_transform_resultT<vec_round_ftor, Arr>>::type
+	round_arr(const Arr& a)
 	{
 		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_ceil_ftor<value_type>(), a);
+		return transform_arr(vec_round_ftor<value_type>(), a);
 	}
 
 
@@ -739,14 +656,6 @@ namespace bcs
 		return transform_arr(vec_sin_ftor<value_type>(), a);
 	}
 
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	sin_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_sin_ftor<value_type>(), a);
-	}
-
 	// cos
 
 	template<class Arr>
@@ -756,14 +665,6 @@ namespace bcs
 	{
 		typedef typename array_view_traits<Arr>::value_type value_type;
 		return transform_arr(vec_cos_ftor<value_type>(), a);
-	}
-
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	cos_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_cos_ftor<value_type>(), a);
 	}
 
 	// tan
@@ -777,14 +678,6 @@ namespace bcs
 		return transform_arr(vec_tan_ftor<value_type>(), a);
 	}
 
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	tan_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_tan_ftor<value_type>(), a);
-	}
-
 	// asin
 
 	template<class Arr>
@@ -794,14 +687,6 @@ namespace bcs
 	{
 		typedef typename array_view_traits<Arr>::value_type value_type;
 		return transform_arr(vec_asin_ftor<value_type>(), a);
-	}
-
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	asin_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_asin_ftor<value_type>(), a);
 	}
 
 	// acos
@@ -815,14 +700,6 @@ namespace bcs
 		return transform_arr(vec_acos_ftor<value_type>(), a);
 	}
 
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	acos_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_acos_ftor<value_type>(), a);
-	}
-
 	// atan
 
 	template<class Arr>
@@ -832,14 +709,6 @@ namespace bcs
 	{
 		typedef typename array_view_traits<Arr>::value_type value_type;
 		return transform_arr(vec_atan_ftor<value_type>(), a);
-	}
-
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	atan_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_atan_ftor<value_type>(), a);
 	}
 
 	// atan2
@@ -865,14 +734,6 @@ namespace bcs
 		return transform_arr(vec_sinh_ftor<value_type>(), a);
 	}
 
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	sinh_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_sinh_ftor<value_type>(), a);
-	}
-
 	// cosh
 
 	template<class Arr>
@@ -882,14 +743,6 @@ namespace bcs
 	{
 		typedef typename array_view_traits<Arr>::value_type value_type;
 		return transform_arr(vec_cosh_ftor<value_type>(), a);
-	}
-
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	cosh_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_cosh_ftor<value_type>(), a);
 	}
 
 	// tanh
@@ -903,14 +756,19 @@ namespace bcs
 		return transform_arr(vec_tanh_ftor<value_type>(), a);
 	}
 
-	template<class Arr>
-	inline typename std::enable_if<is_array_view<Arr>::value, void>::type
-	tanh_arr_inplace(Arr& a)
-	{
-		typedef typename array_view_traits<Arr>::value_type value_type;
-		inplace_transform_arr(vec_tanh_ftor<value_type>(), a);
-	}
 
+	// others
+
+	// hypot
+
+	template<class Arr1, class Arr2>
+	inline typename lazy_enable_if<is_compatible_aviews<Arr1, Arr2>::value,
+	array_transform_resultT<vec_hypot_ftor, Arr1, Arr2>>::type
+	hypot_arr(const Arr1& a1, const Arr2& a2)
+	{
+		typedef typename array_view_traits<Arr1>::value_type value_type;
+		return transform_arr(vec_hypot_ftor<value_type>(), a1, a2);
+	}
 }
 
 #endif 

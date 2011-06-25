@@ -15,12 +15,80 @@
 
 #include <bcslib/base/basic_defs.h>
 
+#include <cmath>
 #include <type_traits>
 #include <functional>
-#include <cmath>
+
 
 namespace bcs
 {
+	/******************************************************
+	 *
+	 *  Additional math functions
+	 *  (including workarounds)
+	 *
+	 ******************************************************/
+
+	template<typename T>
+	BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+	sqr(T x)
+	{
+		return x * x;
+	}
+
+	template<typename T>
+	BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+	cube(T x)
+	{
+		return x * x * x;
+	}
+
+	template<typename T>
+	BCS_FORCE_INLINE T rgn_bound(T x, T lb, T ub)
+	{
+		return x < lb ? lb : (x > ub ? ub : x);
+	}
+
+#if BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
+	using std::round;
+	using std::hypot;
+#else
+	template<typename T>
+	BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+	hypot(T x, T y)
+	{
+		T ax = std::abs(x);
+		T ay = std::abs(y);
+
+		T amin, amax;
+		if (ax < ay)
+		{
+			amin = ax;
+			amax = ay;
+		}
+		else
+		{
+			amin = ay;
+			amax = ax;
+		}
+
+		return amax > 0 ? amax * std::sqrt(1 + sqr(amin / amax)) : 0;
+	}
+
+	template<typename T>
+	BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+	round(T x)
+	{
+		return std::floor(x + (T)(0.5));
+	}
+#endif
+
+
+	/******************************************************
+	 *
+	 *  Functors
+	 *
+	 ******************************************************/
 
 	// max, min, and bounding
 
@@ -78,10 +146,7 @@ namespace bcs
 		}
 	};
 
-
-
 	// calculation functors
-
 
 	template<typename T>
 	struct abs_fun : public std::unary_function<T, T>
@@ -127,6 +192,29 @@ namespace bcs
 			return std::sqrt(x);
 		}
 	};
+
+	template<typename T>
+	struct rcp_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
+
+		T operator() (const T& x) const
+		{
+			return T(1) / x;
+		}
+	};
+
+	template<typename T>
+	struct rsqrt_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
+
+		T operator() (const T& x) const
+		{
+			return T(1) / std::sqrt(x);
+		}
+	};
+
 
 	template<typename T>
 	struct pow_fun : public std::binary_function<T, T, T>
@@ -183,6 +271,18 @@ namespace bcs
 		}
 	};
 
+
+	template<typename T>
+	struct floor_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return std::floor(x);
+		}
+	};
+
 	template<typename T>
 	struct ceil_fun : public std::unary_function<T, T>
 	{
@@ -194,15 +294,14 @@ namespace bcs
 		}
 	};
 
-
 	template<typename T>
-	struct floor_fun : public std::unary_function<T, T>
+	struct round_fun : public std::unary_function<T, T>
 	{
 		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
 
 		T operator() (const T& x) const
 		{
-			return std::floor(x);
+			return round(x);
 		}
 	};
 
