@@ -634,6 +634,21 @@ namespace bcs
 	}
 
 
+	// others
+
+	// hypot
+
+	inline void vec_hypot(size_t n, const double *x1, const double *x2, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdHypot((int)n, x1, x2, y) )
+	}
+
+	inline void vec_hypot(size_t n, const float *x1, const float *x2, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsHypot((int)n, x1, x2, y) )
+	}
+
+
 
 #endif
 

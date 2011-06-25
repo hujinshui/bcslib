@@ -512,6 +512,11 @@ void test_power_funs(size_t n, size_t nr,
 	timed_test("pow-vec-sca (64f)", mk_task(bind2nd(pow_fun<double>(), ed), vec_sca_pow_ftor<double>(ed), n, x2d, y0d, y1d, td), nr);
 	timed_test("pow-vec-sca (32f)", mk_task(bind2nd(pow_fun<float>(),  ef), vec_sca_pow_ftor<float>(ef),  n, x2f, y0f, y1f, tf), nr);
 
+	// hypot
+
+	timed_test("hypot-vec (64f)", mk_task(hypot_fun<double>(), vec_hypot_ftor<double>(), n, x2d, x1d, y0d, y1d, td), nr);
+	timed_test("hypot-vec (32f)", mk_task(hypot_fun<float>(),  vec_hypot_ftor<float>(),  n, x2f, x1f, y0f, y1f, tf), nr);
+
 	std::printf("\n");
 }
 

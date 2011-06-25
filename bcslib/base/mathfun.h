@@ -416,7 +416,16 @@ namespace bcs
 		}
 	};
 
+	template<typename T>
+	struct hypot_fun : public std::binary_function<T, T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
 
+		T operator() (const T& x1, const T& x2) const
+		{
+			return hypot(x1, x2);
+		}
+	};
 
 }
 
