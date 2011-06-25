@@ -45,25 +45,37 @@ inline double maxdev(size_t n, const T *a, const T *b)
 }
 
 
-void report_perf(const char *name, size_t n, size_t nrepeat, double etime)
+inline void report_perf(const char *name, size_t n, size_t nrepeat, double etime)
 {
 	std::printf("\tspeed of %s = %.4f MOPS\n", name, calc_mops(n, nrepeat, etime));
 }
 
-void raise_largedev_warning(double dev)
+inline void raise_largedev_warning(double dev)
 {
 	std::printf("\tWARNING: Large deviation: %.4g\n", dev);
+}
+
+template<typename T>
+inline void print_samples(const char *title, const T *x, size_t n)
+{
+	std::printf("%s: ", title);
+	for (size_t i = 0; i < n; ++i)
+	{
+		std::printf("%.3f ", (double)x[i]);
+	}
+	std::printf("...\n");
 }
 
 
 template<typename T>
 void random_fill(T *x, size_t n, double lb, double ub)
 {
-	std::srand( (unsigned int)(std::time(0)) );
-
-	double u = (double)(std::rand()) / RAND_MAX;
 	double s = ub - lb;
-	for (size_t i = 0; i < n; ++i) x[i] = (T)(lb + u * s);
+	for (size_t i = 0; i < n; ++i)
+	{
+		double u = (double)(std::rand()) / RAND_MAX;
+		x[i] = (T)(lb + u * s);
+	}
 }
 
 
@@ -296,6 +308,61 @@ void timed_test(const char* title, Task task, size_t nrepeat)
 }
 
 
+// main test scripts
+
+
+void test_comparison(size_t n, size_t nr,
+		const double *x1d, const double *x2d, double *y0d, double *y1d,
+		const float  *x1f, const float  *x2f, float  *y0f, float  *y1f)
+{
+	std::printf("Testing Comparison and Bounding:\n");
+	std::printf("------------------------------------\n");
+
+	// max_each
+
+	timed_test("max-each (64f)", mk_task(max_fun<double>(), vec_vec_max_each_ftor<double>(), n, x1d, x2d, y0d, y1d, 0), nr);
+	timed_test("max-each (32f)", mk_task(max_fun<float>(),  vec_vec_max_each_ftor<float>(),  n, x1f, x2f, y0f, y1f, 0), nr);
+
+	// min_each
+
+	timed_test("max-each (64f)", mk_task(min_fun<double>(), vec_vec_min_each_ftor<double>(), n, x1d, x2d, y0d, y1d, 0), nr);
+	timed_test("max-each (32f)", mk_task(min_fun<float>(),  vec_vec_min_each_ftor<float>(),  n, x1f, x2f, y0f, y1f, 0), nr);
+
+	// lbound
+
+	timed_test("lbound (64f)", mk_task(lbound_fun<double>(0.2), vec_lbound_ftor<double>(0.2), n, x1d, y0d, y1d, 0), nr);
+	timed_test("lbound (32f)", mk_task(lbound_fun<float>(0.2f), vec_lbound_ftor<float>(0.2f), n, x1f, y0f, y1f, 0), nr);
+
+	timed_test("lbound-ip (64f)", mk_ip_task(lbound_fun<double>(0.2), vec_lbound_ftor<double>(0.2), n, x1d, y0d, y1d, 0), nr);
+	timed_test("lbound-ip (32f)", mk_ip_task(lbound_fun<float>(0.2f), vec_lbound_ftor<float>(0.2f), n, x1f, y0f, y1f, 0), nr);
+
+	// ubound
+
+	timed_test("ubound (64f)", mk_task(ubound_fun<double>(-0.2), vec_ubound_ftor<double>(-0.2), n, x1d, y0d, y1d, 0), nr);
+	timed_test("ubound (32f)", mk_task(ubound_fun<float>(-0.2f), vec_ubound_ftor<float>(-0.2f), n, x1f, y0f, y1f, 0), nr);
+
+	timed_test("ubound-ip (64f)", mk_ip_task(ubound_fun<double>(-0.2), vec_ubound_ftor<double>(-0.2), n, x1d, y0d, y1d, 0), nr);
+	timed_test("ubound-ip (32f)", mk_ip_task(ubound_fun<float>(-0.2f), vec_ubound_ftor<float>(-0.2f), n, x1f, y0f, y1f, 0), nr);
+
+	// rgn_bound
+
+	timed_test("rgn_bound (64f)", mk_task(rgn_bound_fun<double>(-0.5, 0.5),  vec_rgn_bound_ftor<double>(-0.5, 0.5),  n, x1d, y0d, y1d, 0), nr);
+	timed_test("rgn_bound (32f)", mk_task(rgn_bound_fun<float>(-0.5f, 0.5f), vec_rgn_bound_ftor<float>(-0.5f, 0.5f), n, x1f, y0f, y1f, 0), nr);
+
+	timed_test("rgn_bound-ip (64f)", mk_ip_task(rgn_bound_fun<double>(-0.5, 0.5),  vec_rgn_bound_ftor<double>(-0.5, 0.5),  n, x1d, y0d, y1d, 0), nr);
+	timed_test("rgn_bound-ip (32f)", mk_ip_task(rgn_bound_fun<float>(-0.5f, 0.5f), vec_rgn_bound_ftor<float>(-0.5f, 0.5f), n, x1f, y0f, y1f, 0), nr);
+
+	// abound
+
+	timed_test("abound (64f)", mk_task(rgn_bound_fun<double>(-0.6, 0.6),  vec_abound_ftor<double>(0.6), n, x1d, y0d, y1d, 0), nr);
+	timed_test("abound (32f)", mk_task(rgn_bound_fun<float>(-0.6f, 0.6f), vec_abound_ftor<float>(0.6f), n, x1f, y0f, y1f, 0), nr);
+
+	timed_test("abound-ip (64f)", mk_ip_task(rgn_bound_fun<double>(-0.6, 0.6),  vec_abound_ftor<double>(0.6), n, x1d, y0d, y1d, 0), nr);
+	timed_test("abound-ip (32f)", mk_ip_task(rgn_bound_fun<float>(-0.6f, 0.6f), vec_abound_ftor<float>(0.6f), n, x1f, y0f, y1f, 0), nr);
+
+	std::printf("\n");
+}
+
 
 void test_arithmetic(size_t n, size_t nr,
 		const double *x1d, const double *x2d, double *y0d, double *y1d,
@@ -359,8 +426,8 @@ void test_arithmetic(size_t n, size_t nr,
 
 	// div
 
-	double div_td = 1e-15;
-	float div_tf = 1e-7f;
+	double div_td = 1e-14;
+	float div_tf = 1e-6f;
 
 	timed_test("div-vec-vec (64f)", mk_task(divides<double>(), vec_vec_div_ftor<double>(), n, x1d, x2d, y0d, y1d, div_td), nr);
 	timed_test("div-vec-vec (32f)", mk_task(divides<float>(),  vec_vec_div_ftor<float>(),  n, x1f, x2f, y0f, y1f, div_tf), nr);
@@ -419,11 +486,13 @@ int main(int argc, char *argv[])
 	scoped_buffer<float> y0f_buf(n);
 	scoped_buffer<float> y1f_buf(n);
 
+	std::srand( 0 );
+
 	random_fill(x1d_buf.pbase(), n, -1.0, 1.0);
-	random_fill(x2d_buf.pbase(), n, 0.1, 1.0);
+	random_fill(x2d_buf.pbase(), n, 0.5, 1.0);
 
 	random_fill(x1f_buf.pbase(), n, -1.0f, 1.0f);
-	random_fill(x2f_buf.pbase(), n, 0.1f, 1.0f);
+	random_fill(x2f_buf.pbase(), n, 0.5f, 1.0f);
 
 	const double *x1d = x1d_buf.pbase();
 	const double *x2d = x2d_buf.pbase();
@@ -435,13 +504,20 @@ int main(int argc, char *argv[])
 	float  *y0f = y0f_buf.pbase();
 	float  *y1f = y1f_buf.pbase();
 
+	std::printf("data samples:\n");
+	size_t ns0 = 6;
+	print_samples("x1d", x1d, ns0);
+	print_samples("x2d", x2d, ns0);
+	print_samples("x1f", x1f, ns0);
+	print_samples("x2f", x2f, ns0);
 	std::printf("\n");
 
 	// testing
 
 	std::printf("Start testing ...\n\n");
 
-	test_arithmetic(n, 10, x1d, x2d, y0d, y1d, x1f, x2f, y0f, y1f);
+	test_comparison(n, 10, x1d, x2d, y0d, y1d, x1f, x2f, y0f, y1f);
+	// test_arithmetic(n, 10, x1d, x2d, y0d, y1d, x1f, x2f, y0f, y1f);
 
 	std::printf("\n");
 

@@ -22,6 +22,64 @@
 namespace bcs
 {
 
+	// max, min, and bounding
+
+	template<typename T>
+	struct max_fun : public std::binary_function<T, T, T>
+	{
+		T operator() (const T& x, const T& y) const
+		{
+			return x > y ? x : y;
+		}
+	};
+
+	template<typename T>
+	struct min_fun : public std::binary_function<T, T, T>
+	{
+		T operator() (const T& x, const T& y) const
+		{
+			return x < y ? x : y;
+		}
+	};
+
+	template<typename T>
+	struct ubound_fun : public std::unary_function<T, T>
+	{
+		T ub;
+		ubound_fun(const T& b) : ub(b) { }
+
+		T operator() (const T& x) const
+		{
+			return x < ub ? x : ub;
+		}
+	};
+
+	template<typename T>
+	struct lbound_fun : public std::unary_function<T, T>
+	{
+		T lb;
+		lbound_fun(const T& b) : lb(b) { }
+
+		T operator() (const T& x) const
+		{
+			return x > lb ? x : lb;
+		}
+	};
+
+	template<typename T>
+	struct rgn_bound_fun : public std::unary_function<T, T>
+	{
+		T lb, ub;
+		rgn_bound_fun(const T& lb_, const T& ub_) : lb(lb_), ub(ub_) { }
+
+		T operator() (const T& x) const
+		{
+			return rgn_bound(x, lb, ub);
+		}
+	};
+
+
+
 	// calculation functors
 
 

@@ -72,35 +72,58 @@ namespace bcs
 
 	inline void vec_lbound_inplace(size_t n, double* y, const double& lb)
 	{
-		BCS_IPPS_CALL( ippsThreshold_LTAbs_64f_I(y, (int)n, lb) )
+		BCS_IPPS_CALL( ippsThreshold_LT_64f_I(y, (int)n, lb) )
 	}
 
 	inline void vec_lbound_inplace(size_t n, float* y, const float& lb)
 	{
-		BCS_IPPS_CALL( ippsThreshold_LTAbs_32f_I(y, (int)n, lb) )
+		BCS_IPPS_CALL( ippsThreshold_LT_32f_I(y, (int)n, lb) )
 	}
 
 	// ubound
 
-	inline void vec_ubound(size_t n, const double* x, const double& lb, double *y)
+	inline void vec_ubound(size_t n, const double* x, const double& ub, double *y)
 	{
-		BCS_IPPS_CALL( ippsThreshold_GT_64f(x, y, (int)n, lb) )
+		BCS_IPPS_CALL( ippsThreshold_GT_64f(x, y, (int)n, ub) )
 	}
 
-	inline void vec_ubound(size_t n, const float* x, const float& lb, float *y)
+	inline void vec_ubound(size_t n, const float* x, const float& ub, float *y)
 	{
-		BCS_IPPS_CALL( ippsThreshold_GT_32f(x, y, (int)n, lb) )
+		BCS_IPPS_CALL( ippsThreshold_GT_32f(x, y, (int)n, ub) )
 	}
 
-	inline void vec_ubound_inplace(size_t n, double* y, const double& lb)
+	inline void vec_ubound_inplace(size_t n, double* y, const double& ub)
 	{
-		BCS_IPPS_CALL( ippsThreshold_GT_64f_I(y, (int)n, lb) )
+		BCS_IPPS_CALL( ippsThreshold_GT_64f_I(y, (int)n, ub) )
 	}
 
-	inline void vec_ubound_inplace(size_t n, float* y, const float& lb)
+	inline void vec_ubound_inplace(size_t n, float* y, const float& ub)
 	{
-		BCS_IPPS_CALL( ippsThreshold_GT_32f_I(y, (int)n, lb) )
+		BCS_IPPS_CALL( ippsThreshold_GT_32f_I(y, (int)n, ub) )
 	}
+
+	// abound
+
+	inline void vec_abound(size_t n, const double* x, const double& ab, double *y)
+	{
+		BCS_IPPS_CALL( ippsThreshold_GTAbs_64f(x, y, (int)n, ab) )
+	}
+
+	inline void vec_abound(size_t n, const float* x, const float& ab, float *y)
+	{
+		BCS_IPPS_CALL( ippsThreshold_GTAbs_32f(x, y, (int)n, ab) )
+	}
+
+	inline void vec_abound_inplace(size_t n, double *y, const double& ab)
+	{
+		BCS_IPPS_CALL( ippsThreshold_GTAbs_64f_I(y, (int)n, ab) )
+	}
+
+	inline void vec_abound_inplace(size_t n, float *y, const float& ab)
+	{
+		BCS_IPPS_CALL( ippsThreshold_GTAbs_32f_I(y, (int)n, ab) )
+	}
+
 
 
 	/********************************************
