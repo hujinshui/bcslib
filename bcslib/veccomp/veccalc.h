@@ -511,7 +511,7 @@ namespace bcs
  *******************************************/
 
 #ifdef BCS_ENABLE_INTEL_IPPS
-#include <bcslib/extern/ipps_select.h>
+#include <bcslib/veccomp/intel_calc.h>
 #endif
 
 
