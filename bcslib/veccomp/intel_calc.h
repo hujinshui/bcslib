@@ -16,6 +16,11 @@
 #define BCS_IPPS_CALL( statement ) if (n > 0) { ::statement; }
 #endif
 
+#ifdef BCS_ENABLE_MKL_VMS
+#include <bcslib/extern/mkl_vml_select.h>
+#define BCS_MKL_VMS_CALL( statement ) if (n > 0) { ::statement; }
+#endif
+
 namespace bcs
 {
 
@@ -359,9 +364,278 @@ namespace bcs
 		BCS_IPPS_CALL( ippsAbs_32f(x, y, (int)n) )
 	}
 
-
-
 #endif // BCS_ENABLE_INTEL_IPPS
+
+
+#ifdef BCS_ENABLE_MKL_VMS
+
+	// power functions
+
+	// sqr
+
+	inline void vec_sqr(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdSqr((int)n, x, y) )
+	}
+
+	inline void vec_sqr(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsSqr((int)n, x, y) )
+	}
+
+	// sqrt
+
+	inline void vec_sqrt(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdSqrt((int)n, x, y) )
+	}
+
+	inline void vec_sqrt(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsSqrt((int)n, x, y) )
+	}
+
+	// rcp
+
+	inline void vec_rcp(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdInv((int)n, x, y) )
+	}
+
+	inline void vec_rcp(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsInv((int)n, x, y) )
+	}
+
+	// rsqrt
+
+	inline void vec_rsqrt(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdInvSqrt((int)n, x, y) )
+	}
+
+	inline void vec_rsqrt(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsInvSqrt((int)n, x, y) )
+	}
+
+	// pow
+
+	inline void vec_pow(size_t n, const double *x, const double *e, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdPow((int)n, x, e, y) )
+	}
+
+	inline void vec_pow(size_t n, const float *x, const float *e, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsPow((int)n, x, e, y) )
+	}
+
+	inline void vec_pow(size_t n, const double *x, const double& e, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdPowx((int)n, x, e, y) )
+	}
+
+	inline void vec_pow(size_t n, const float *x, const float& e, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsPowx((int)n, x, e, y) )
+	}
+
+
+	// exponential and logarithm functions
+
+	// exp
+
+	inline void vec_exp(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdExp((int)n, x, y) )
+	}
+
+	inline void vec_exp(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsExp((int)n, x, y) )
+	}
+
+	// log
+
+	inline void vec_log(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdLn((int)n, x, y) )
+	}
+
+	inline void vec_log(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsLn((int)n, x, y) )
+	}
+
+	// log10
+
+	inline void vec_log10(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdLog10((int)n, x, y) )
+	}
+
+	inline void vec_log10(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsLog10((int)n, x, y) )
+	}
+
+
+	// rounding functions
+
+	// floor
+
+	inline void vec_floor(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdFloor((int)n, x, y) )
+	}
+
+	inline void vec_floor(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsFloor((int)n, x, y) )
+	}
+
+	// ceil
+
+	inline void vec_ceil(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdCeil((int)n, x, y) )
+	}
+
+	inline void vec_ceil(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsCeil((int)n, x, y) )
+	}
+
+
+	// trigonometric functions
+
+	// sin
+
+	inline void vec_sin(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdSin((int)n, x, y) )
+	}
+
+	inline void vec_sin(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsSin((int)n, x, y) )
+	}
+
+	// cos
+
+	inline void vec_cos(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdCos((int)n, x, y) )
+	}
+
+	inline void vec_cos(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsCos((int)n, x, y) )
+	}
+
+	// tan
+
+	inline void vec_tan(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdTan((int)n, x, y) )
+	}
+
+	inline void vec_tan(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsTan((int)n, x, y) )
+	}
+
+	// asin
+
+	inline void vec_asin(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdAsin((int)n, x, y) )
+	}
+
+	inline void vec_asin(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsAsin((int)n, x, y) )
+	}
+
+	// acos
+
+	inline void vec_acos(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdAcos((int)n, x, y) )
+	}
+
+	inline void vec_acos(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsAcos((int)n, x, y) )
+	}
+
+	// atan
+
+	inline void vec_atan(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdAtan((int)n, x, y) )
+	}
+
+	inline void vec_atan(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsAtan((int)n, x, y) )
+	}
+
+	// atan2
+
+	inline void vec_atan2(size_t n, const double *x1, const double *x2, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdAtan2((int)n, x1, x2, y) )
+	}
+
+	inline void vec_atan2(size_t n, const float *x1, const float *x2, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsAtan2((int)n, x1, x2, y) )
+	}
+
+
+	// hyperbolic functions
+
+	// sinh
+
+	inline void vec_sinh(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdSinh((int)n, x, y) )
+	}
+
+	inline void vec_sinh(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsSinh((int)n, x, y) )
+	}
+
+	// cosh
+
+	inline void vec_cosh(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdCosh((int)n, x, y) )
+	}
+
+	inline void vec_cosh(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsCosh((int)n, x, y) )
+	}
+
+	// tanh
+
+	inline void vec_tanh(size_t n, const double *x, double *y)
+	{
+		BCS_MKL_VMS_CALL( vdTanh((int)n, x, y) )
+	}
+
+	inline void vec_tanh(size_t n, const float *x, float *y)
+	{
+		BCS_MKL_VMS_CALL( vsTanh((int)n, x, y) )
+	}
+
+
+
+#endif
 
 }
 

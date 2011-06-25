@@ -48,12 +48,10 @@ INTEL_FLAGS=-DHAS_INTEL_MKL -DHAS_INTEL_IPP $(INTEL_PATHS) $(INTEL_LINKS)
 
 #------ Intel-specific part (end) ----------
 
-
-
 BASE_HEADERS = bcslib/base/config.h \
 	bcslib/base/basic_defs.h \
 	bcslib/base/arg_check.h \
-	bcslib/base/math_functors.h \
+	bcslib/base/mathfun.h \
 	bcslib/base/basic_algorithms.h \
 	bcslib/base/iterator_wrappers.h \
 	bcslib/base/basic_mem.h \
@@ -125,6 +123,7 @@ bin/test_basics: $(BASE_HEADERS) $(TEST_HEADERS) $(BASICS_TESTS)
 # test_array : bin/test_array_basics bin/test_array_comp bin/test_array_sparse  
 test_array: bin/test_array_basics \
 	bin/test_array_comp \
+	bin/test_array_comp_intel \
 	bin/test_access_performance \
 	bin/test_calc_performance \
 	bin/test_calc_performance_intel
@@ -149,12 +148,19 @@ ARRAY_COMP_TESTS = test/test_array_comp.cpp \
 
 bin/test_array_comp: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
 	$(CXX) $(CFLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp
+	
+bin/test_array_comp_intel: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) $(ARRAY_COMP_HEADERS) $(ARRAY_COMP_TESTS) 
+	$(CXX) $(CFLAGS) $(INTEL_FLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp_intel
 
 bin/test_calc_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) test/test_calc_performance.cpp
 	$(CXX) $(CFLAGS) -O3 test/test_calc_performance.cpp -o bin/test_calc_performance
 	
 bin/test_calc_performance_intel: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) test/test_calc_performance.cpp
 	$(CXX) $(CFLAGS) $(INTEL_FLAGS) -O3 test/test_calc_performance.cpp -o bin/test_calc_performance_intel	
+
+
+
+#--- Pending -------------
 
 ARRAY_SPARSE_TESTS = test/test_array_sparse.cpp test/test_spvec.cpp test/test_dynamic_spvec.cpp
 bin/test_array_sparse: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(ARRAY_SPARSE_HEADERS) $(ARRAY_SPARSE_TESTS)

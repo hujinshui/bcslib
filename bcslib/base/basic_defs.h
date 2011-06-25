@@ -109,29 +109,22 @@ namespace bcs
 	{
 	};
 
-
-	/**
-	 * Some convenient functions
-	 */
-	template<typename T>
-	inline T sqr(T x)
-	{
-		return x * x;
-	}
-
-	template<typename T>
-	inline T cube(T x)
-	{
-		return x * x * x;
-	}
-
-	template<typename T>
-	inline T rgn_bound(T x, T lb, T ub)
-	{
-		return x < lb ? lb : (x > ub ? ub : x);
-	}
-
 }
+
+
+// useful macros
+
+#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
+#define BCS_ALIGN(a) __declspec(align(a))
+#elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
+#define BCS_ALIGN(a) __attribute__((aligned(a)))
+#endif
+
+#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
+#define BCS_FORCE_INLINE __forceline
+#elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
+#define BCS_FORCE_INLINE __attribute__((always_inline))
+#endif
 
 #endif
 

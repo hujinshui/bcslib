@@ -10,10 +10,10 @@
 #define BCSLIB_VECSTAT_H
 
 #include <bcslib/base/basic_defs.h>
+#include <bcslib/base/mathfun.h>
 #include <bcslib/base/arg_check.h>
 
 #include <algorithm>
-#include <cmath>
 
 namespace bcs
 {

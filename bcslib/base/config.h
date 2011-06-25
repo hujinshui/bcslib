@@ -56,7 +56,7 @@
 	#define BCS_ENABLE_MKL_BLAS
 	#define BCS_ENABLE_MKL_LAPACK
 	#define BCS_ENABLE_MKL_VMS
-	#define BCS_ENABEL_MKL_RANDOM
+	#define BCS_ENABLE_MKL_RANDOM
 #endif
 
 
