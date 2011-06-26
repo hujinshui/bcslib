@@ -9,11 +9,11 @@
 #ifndef BCSLIB_ARRAY_CALC_H
 #define BCSLIB_ARRAY_CALC_H
 
-#include <bcslib/array/generic_array_calc.h>
-
 #include <bcslib/array/array1d.h>
 #include <bcslib/array/array2d.h>
 
+#include <bcslib/array/generic_array_eval.h>
+#include <bcslib/veccomp/veccalc.h>
 
 namespace bcs
 {
@@ -28,19 +28,19 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<bool> eq(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return eq_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_eq_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<bool> eq(const caview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		return eq_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_eq_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, class RIndexer>
 	inline array1d<bool> eq(const T& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return eq_arr_sca(rhs, lhs);
+		return eq(rhs, lhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -48,19 +48,19 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return eq_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_eq_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline array2d<bool, TOrd> eq(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		return eq_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_eq_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline array2d<bool, TOrd> eq(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return eq_arr_sca(rhs, lhs);
+		return eq(rhs, lhs);
 	}
 
 
@@ -69,19 +69,19 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<bool> ne(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return ne_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_ne_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<bool> ne(const caview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		return ne_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_ne_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, class RIndexer>
 	inline array1d<bool> ne(const T& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return ne_arr_sca(rhs, lhs);
+		return ne(rhs, lhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -89,19 +89,19 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return ne_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_ne_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline array2d<bool, TOrd> ne(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		return ne_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_ne_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline array2d<bool, TOrd> ne(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return ne_arr_sca(rhs, lhs);
+		return ne(rhs, lhs);
 	}
 
 
@@ -110,19 +110,19 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<bool> gt(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return gt_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_gt_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<bool> gt(const caview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		return gt_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_gt_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, class RIndexer>
 	inline array1d<bool> gt(const T& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return gt_arr_sca(rhs, lhs);
+		return transform_arr(sca_vec_gt_ftor<T>(lhs), rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -130,19 +130,19 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return gt_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_gt_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline array2d<bool, TOrd> gt(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		return gt_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_gt_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline array2d<bool, TOrd> gt(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return gt_arr_sca(rhs, lhs);
+		return transform_arr(sca_vec_gt_ftor<T>(lhs), rhs);
 	}
 
 
@@ -151,19 +151,19 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<bool> ge(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return ge_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_ge_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<bool> ge(const caview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		return ge_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_ge_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, class RIndexer>
 	inline array1d<bool> ge(const T& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return ge_arr_sca(rhs, lhs);
+		return transform_arr(sca_vec_ge_ftor<T>(lhs), rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -171,19 +171,19 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return ge_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_ge_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline array2d<bool, TOrd> ge(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		return ge_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_ge_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline array2d<bool, TOrd> ge(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return ge_arr_sca(rhs, lhs);
+		return transform_arr(sca_vec_ge_ftor<T>(lhs), rhs);
 	}
 
 
@@ -192,19 +192,19 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<bool> lt(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return lt_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_lt_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<bool> lt(const caview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		return lt_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_lt_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, class RIndexer>
 	inline array1d<bool> lt(const T& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return lt_arr_sca(rhs, lhs);
+		return transform_arr(sca_vec_lt_ftor<T>(lhs), rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -212,19 +212,19 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return lt_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_lt_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline array2d<bool, TOrd> lt(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		return lt_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_lt_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline array2d<bool, TOrd> lt(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return lt_arr_sca(rhs, lhs);
+		return transform_arr(sca_vec_lt_ftor<T>(lhs), rhs);
 	}
 
 
@@ -233,19 +233,19 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<bool> le(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return le_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_le_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<bool> le(const caview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		return le_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_le_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, class RIndexer>
 	inline array1d<bool> le(const T& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return le_arr_sca(rhs, lhs);
+		return transform_arr(sca_vec_le_ftor<T>(lhs), rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -253,19 +253,19 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return le_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_le_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline array2d<bool, TOrd> le(const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		return le_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_le_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline array2d<bool, TOrd> le(const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return le_arr_sca(rhs, lhs);
+		return transform_arr(sca_vec_le_ftor<T>(lhs), rhs);
 	}
 
 
@@ -274,7 +274,7 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<T> max_each(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return max_each_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_max_each_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -282,7 +282,7 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return max_each_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_max_each_ftor<T>(), lhs, rhs);
 	}
 
 	// min_each
@@ -290,7 +290,7 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<T> min_each(const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return min_each_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_min_each_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -298,7 +298,7 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return min_each_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_min_each_ftor<T>(), lhs, rhs);
 	}
 
 
@@ -313,26 +313,26 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> lbound(const caview1d<T, TIndexer>& a, const T& lb)
 	{
-		return lbound_arr(a, lb);
+		return transform_arr(vec_lbound_ftor<T>(lb), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> lbound(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb)
 	{
-		return lbound_arr(a, lb);
+		return transform_arr(vec_lbound_ftor<T>(lb), a);
 	}
 
 	template<typename T, class TIndexer>
 	inline aview1d<T, TIndexer>& lbound_ip(aview1d<T, TIndexer>& a, const T& lb)
 	{
-		lbound_arr_inplace(a, lb);
+		inplace_transform_arr(vec_lbound_ftor<T>(lb), a);
 		return a;
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& lbound_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb)
 	{
-		lbound_arr_inplace(a, lb);
+		inplace_transform_arr(vec_lbound_ftor<T>(lb), a);
 		return a;
 	}
 
@@ -340,28 +340,28 @@ namespace bcs
 	// ubound
 
 	template<typename T, class TIndexer>
-	inline array1d<T> ubound(const caview1d<T, TIndexer>& a, const T& ub)
+	inline array1d<T> ubound(const caview1d<T, TIndexer>& a, const T& lb)
 	{
-		return ubound_arr(a, ub);
+		return transform_arr(vec_ubound_ftor<T>(lb), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline array2d<T, TOrd> ubound(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& ub)
+	inline array2d<T, TOrd> ubound(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb)
 	{
-		return ubound_arr(a, ub);
+		return transform_arr(vec_ubound_ftor<T>(lb), a);
 	}
 
 	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& ubound_ip(aview1d<T, TIndexer>& a, const T& ub)
+	inline aview1d<T, TIndexer>& ubound_ip(aview1d<T, TIndexer>& a, const T& lb)
 	{
-		ubound_arr_inplace(a, ub);
+		inplace_transform_arr(vec_ubound_ftor<T>(lb), a);
 		return a;
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& ubound_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& ub)
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& ubound_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb)
 	{
-		ubound_arr_inplace(a, ub);
+		inplace_transform_arr(vec_ubound_ftor<T>(lb), a);
 		return a;
 	}
 
@@ -371,26 +371,26 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> rgn_bound(const caview1d<T, TIndexer>& a, const T& lb, const T& ub)
 	{
-		return rgn_bound_arr(a, lb, ub);
+		return transform_arr(vec_rgn_bound_ftor<T>(lb, ub), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> rgn_bound(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb, const T& ub)
 	{
-		return rgn_bound_arr(a, lb, ub);
+		return transform_arr(vec_rgn_bound_ftor<T>(lb, ub), a);
 	}
 
 	template<typename T, class TIndexer>
 	inline aview1d<T, TIndexer>& rgn_bound_ip(aview1d<T, TIndexer>& a, const T& lb, const T& ub)
 	{
-		rgn_bound_arr_inplace(a, lb, ub);
+		inplace_transform_arr(vec_rgn_bound_ftor<T>(lb, ub), a);
 		return a;
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& rgn_bound_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb, const T& ub)
 	{
-		rgn_bound_arr_inplace(a, lb, ub);
+		inplace_transform_arr(vec_rgn_bound_ftor<T>(lb, ub), a);
 		return a;
 	}
 
@@ -398,28 +398,28 @@ namespace bcs
 	// abound
 
 	template<typename T, class TIndexer>
-	inline array1d<T> abound(const caview1d<T, TIndexer>& a, const T& ab)
+	inline array1d<T> abound(const caview1d<T, TIndexer>& a, const T& lb)
 	{
-		return abound_arr(a, ab);
+		return transform_arr(vec_abound_ftor<T>(lb), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline array2d<T, TOrd> abound(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& ab)
+	inline array2d<T, TOrd> abound(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb)
 	{
-		return abound_arr(a, ab);
+		return transform_arr(vec_abound_ftor<T>(lb), a);
 	}
 
 	template<typename T, class TIndexer>
-	inline aview1d<T, TIndexer>& abound_ip(aview1d<T, TIndexer>& a, const T& ab)
+	inline aview1d<T, TIndexer>& abound_ip(aview1d<T, TIndexer>& a, const T& lb)
 	{
-		abound_arr_inplace(a, ab);
+		inplace_transform_arr(vec_abound_ftor<T>(lb), a);
 		return a;
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& abound_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& ab)
+	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& abound_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a, const T& lb)
 	{
-		abound_arr_inplace(a, ab);
+		inplace_transform_arr(vec_abound_ftor<T>(lb), a);
 		return a;
 	}
 
@@ -437,32 +437,32 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<T> operator + (const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return add_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_add_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<T> operator + (const caview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		return add_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_add_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, class RIndexer>
 	inline array1d<T> operator + (const T& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return add_arr_sca(rhs, lhs);
+		return rhs + lhs;
 	}
 
 	template<typename T, class LIndexer, class RIndexer>
 	inline aview1d<T, LIndexer>& operator += (aview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		add_arr_arr_inplace(lhs, rhs);
+		inplace_transform_arr(vec_vec_add_ftor<T>(), lhs, rhs);
 		return lhs;
 	}
 
 	template<typename T, class LIndexer>
 	inline aview1d<T, LIndexer>& operator += (aview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		add_arr_sca_inplace(lhs, rhs);
+		inplace_transform_arr(vec_sca_add_ftor<T>(rhs), lhs);
 		return lhs;
 	}
 
@@ -473,19 +473,19 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return add_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_add_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline array2d<T, TOrd> operator + (const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		return add_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_add_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline array2d<T, TOrd> operator + (const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return add_arr_sca(rhs, lhs);
+		return rhs + lhs;
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -493,14 +493,14 @@ namespace bcs
 			aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		add_arr_arr_inplace(lhs, rhs);
+		inplace_transform_arr(vec_vec_add_ftor<T>(), lhs, rhs);
 		return lhs;
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline aview2d<T, TOrd, LIndexer0, LIndexer1>& operator += (aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		add_arr_sca_inplace(lhs, rhs);
+		inplace_transform_arr(vec_sca_add_ftor<T>(rhs), lhs);
 		return lhs;
 	}
 
@@ -513,32 +513,32 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<T> operator - (const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return sub_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_sub_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<T> operator - (const caview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		return sub_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_sub_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<T> operator - (const T& lhs, const caview1d<T, LIndexer>& rhs)
 	{
-		return sub_sca_arr(lhs, rhs);
+		return transform_arr(sca_vec_sub_ftor<T>(lhs), rhs);
 	}
 
 	template<typename T, class LIndexer, class RIndexer>
 	inline aview1d<T, LIndexer>& operator -= (aview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		sub_arr_arr_inplace(lhs, rhs);
+		inplace_transform_arr(vec_vec_sub_ftor<T>(), lhs, rhs);
 		return lhs;
 	}
 
 	template<typename T, class LIndexer>
 	inline aview1d<T, LIndexer>& operator -= (aview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		sub_arr_sca_inplace(lhs, rhs);
+		inplace_transform_arr(vec_sca_sub_ftor<T>(rhs), lhs);
 		return lhs;
 	}
 
@@ -549,19 +549,19 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return sub_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_sub_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline array2d<T, TOrd> operator - (const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		return sub_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_sub_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline array2d<T, TOrd> operator - (const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return sub_sca_arr(lhs, rhs);
+		return transform_arr(sca_vec_sub_ftor<T>(lhs), rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -569,14 +569,14 @@ namespace bcs
 			aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		sub_arr_arr_inplace(lhs, rhs);
+		inplace_transform_arr(vec_vec_sub_ftor<T>(), lhs, rhs);
 		return lhs;
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline aview2d<T, TOrd, LIndexer0, LIndexer1>& operator -= (aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		sub_arr_sca_inplace(lhs, rhs);
+		inplace_transform_arr(vec_sca_sub_ftor<T>(rhs), lhs);
 		return lhs;
 	}
 
@@ -589,32 +589,32 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<T> operator * (const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return mul_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_mul_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<T> operator * (const caview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		return mul_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_mul_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, class RIndexer>
 	inline array1d<T> operator * (const T& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return mul_arr_sca(rhs, lhs);
+		return rhs * lhs;
 	}
 
 	template<typename T, class LIndexer, class RIndexer>
 	inline aview1d<T, LIndexer>& operator *= (aview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		mul_arr_arr_inplace(lhs, rhs);
+		inplace_transform_arr(vec_vec_mul_ftor<T>(), lhs, rhs);
 		return lhs;
 	}
 
 	template<typename T, class LIndexer>
 	inline aview1d<T, LIndexer>& operator *= (aview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		mul_arr_sca_inplace(lhs, rhs);
+		inplace_transform_arr(vec_sca_mul_ftor<T>(rhs), lhs);
 		return lhs;
 	}
 
@@ -625,19 +625,19 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return mul_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_mul_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline array2d<T, TOrd> operator * (const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		return mul_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_mul_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline array2d<T, TOrd> operator * (const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return mul_arr_sca(rhs, lhs);
+		return rhs * lhs;
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -645,16 +645,17 @@ namespace bcs
 			aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		mul_arr_arr_inplace(lhs, rhs);
+		inplace_transform_arr(vec_vec_mul_ftor<T>(), lhs, rhs);
 		return lhs;
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline aview2d<T, TOrd, LIndexer0, LIndexer1>& operator *= (aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		mul_arr_sca_inplace(lhs, rhs);
+		inplace_transform_arr(vec_sca_mul_ftor<T>(rhs), lhs);
 		return lhs;
 	}
+
 
 
 	// division
@@ -664,32 +665,32 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<T> operator / (const caview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		return div_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_div_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<T> operator / (const caview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		return div_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_div_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, class LIndexer>
 	inline array1d<T> operator / (const T& lhs, const caview1d<T, LIndexer>& rhs)
 	{
-		return div_sca_arr(lhs, rhs);
+		return transform_arr(sca_vec_div_ftor<T>(lhs), rhs);
 	}
 
 	template<typename T, class LIndexer, class RIndexer>
 	inline aview1d<T, LIndexer>& operator /= (aview1d<T, LIndexer>& lhs, const caview1d<T, RIndexer>& rhs)
 	{
-		div_arr_arr_inplace(lhs, rhs);
+		inplace_transform_arr(vec_vec_div_ftor<T>(), lhs, rhs);
 		return lhs;
 	}
 
 	template<typename T, class LIndexer>
 	inline aview1d<T, LIndexer>& operator /= (aview1d<T, LIndexer>& lhs, const T& rhs)
 	{
-		div_arr_sca_inplace(lhs, rhs);
+		inplace_transform_arr(vec_sca_div_ftor<T>(rhs), lhs);
 		return lhs;
 	}
 
@@ -700,19 +701,19 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return div_arr_arr(lhs, rhs);
+		return transform_arr(vec_vec_div_ftor<T>(), lhs, rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline array2d<T, TOrd> operator / (const caview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		return div_arr_sca(lhs, rhs);
+		return transform_arr(vec_sca_div_ftor<T>(rhs), lhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline array2d<T, TOrd> operator / (const T& lhs, const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return div_sca_arr(lhs, rhs);
+		return transform_arr(sca_vec_div_ftor<T>(lhs), rhs);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -720,14 +721,14 @@ namespace bcs
 			aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		div_arr_arr_inplace(lhs, rhs);
+		inplace_transform_arr(vec_vec_div_ftor<T>(), lhs, rhs);
 		return lhs;
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline aview2d<T, TOrd, LIndexer0, LIndexer1>& operator /= (aview2d<T, TOrd, LIndexer0, LIndexer1>& lhs, const T& rhs)
 	{
-		div_arr_sca_inplace(lhs, rhs);
+		inplace_transform_arr(vec_sca_div_ftor<T>(rhs), lhs);
 		return lhs;
 	}
 
@@ -737,26 +738,26 @@ namespace bcs
 	template<typename T, class RIndexer>
 	inline array1d<T> operator - (const caview1d<T, RIndexer>& rhs)
 	{
-		return neg_arr(rhs);
+		return transform_arr(vec_neg_ftor<T>(), rhs);
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline array2d<T, TOrd> operator - (const caview2d<T, TOrd, RIndexer0, RIndexer1>& rhs)
 	{
-		return neg_arr(rhs);
+		return transform_arr(vec_neg_ftor<T>(), rhs);
 	}
 
 	template<typename T, class RIndexer>
 	inline aview1d<T, RIndexer>& neg_ip(aview1d<T, RIndexer>& a)
 	{
-		neg_arr_inplace(a);
+		inplace_transform_arr(vec_neg_ftor<T>(), a);
 		return a;
 	}
 
 	template<typename T, typename TOrd, class RIndexer0, class RIndexer1>
 	inline aview2d<T, TOrd, RIndexer0, RIndexer1>& neg_ip(aview2d<T, TOrd, RIndexer0, RIndexer1>& a)
 	{
-		neg_arr_inplace(a);
+		inplace_transform_arr(vec_neg_ftor<T>(), a);
 		return a;
 	}
 
@@ -766,26 +767,26 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> abs(const caview1d<T, TIndexer>& a)
 	{
-		return abs_arr(a);
+		return transform_arr(vec_abs_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> abs(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return abs_arr(a);
+		return transform_arr(vec_abs_ftor<T>(), a);
 	}
 
 	template<typename T, class TIndexer>
 	inline aview1d<T, TIndexer>& abs_ip(aview1d<T, TIndexer>& a)
 	{
-		abs_arr_inplace(a);
+		inplace_transform_arr(vec_abs_ftor<T>(), a);
 		return a;
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline aview2d<T, TOrd, TIndexer0, TIndexer1>& abs_ip(aview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		abs_arr_inplace(a);
+		inplace_transform_arr(vec_abs_ftor<T>(), a);
 		return a;
 	}
 
@@ -803,13 +804,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> sqr(const caview1d<T, TIndexer>& a)
 	{
-		return sqr_arr(a);
+		return transform_arr(vec_sqr_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> sqr(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return sqr_arr(a);
+		return transform_arr(vec_sqr_ftor<T>(), a);
 	}
 
 	// sqrt
@@ -817,13 +818,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> sqrt(const caview1d<T, TIndexer>& a)
 	{
-		return sqrt_arr(a);
+		return transform_arr(vec_sqrt_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> sqrt(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return sqrt_arr(a);
+		return transform_arr(vec_sqrt_ftor<T>(), a);
 	}
 
 	// rcp
@@ -831,13 +832,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> rcp(const caview1d<T, TIndexer>& a)
 	{
-		return rcp_arr(a);
+		return transform_arr(vec_rcp_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> rcp(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return rcp_arr(a);
+		return transform_arr(vec_rcp_ftor<T>(), a);
 	}
 
 	// rsqrt
@@ -845,13 +846,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> rsqrt(const caview1d<T, TIndexer>& a)
 	{
-		return rsqrt_arr(a);
+		return transform_arr(vec_rsqrt_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> rsqrt(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return rsqrt_arr(a);
+		return transform_arr(vec_rsqrt_ftor<T>(), a);
 	}
 
 	// pow
@@ -859,7 +860,7 @@ namespace bcs
 	template<typename T, class LIndexer, class RIndexer>
 	inline array1d<T> pow(const caview1d<T, LIndexer>& a, const caview1d<T, RIndexer>& e)
 	{
-		return pow_arr(a, e);
+		return transform_arr(vec_pow_ftor<T>(), a, e);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
@@ -867,7 +868,7 @@ namespace bcs
 			const caview2d<T, TOrd, LIndexer0, LIndexer1>& a,
 			const caview2d<T, TOrd, RIndexer0, RIndexer1>& e)
 	{
-		return pow_arr(a, e);
+		return transform_arr(vec_pow_ftor<T>(), a, e);
 	}
 
 	// pow with constant
@@ -875,13 +876,13 @@ namespace bcs
 	template<typename T, class LIndexer>
 	inline array1d<T> pow(const caview1d<T, LIndexer>& a, const T& e)
 	{
-		return pow_arr_sca(a, e);
+		return transform_arr(vec_sca_pow_ftor<T>(e), a);
 	}
 
 	template<typename T, typename TOrd, class LIndexer0, class LIndexer1>
 	inline array2d<T, TOrd> pow(const caview2d<T, TOrd, LIndexer0, LIndexer1>& a, const T& e)
 	{
-		return pow_arr_sca(a, e);
+		return transform_arr(vec_sca_pow_ftor<T>(e), a);
 	}
 
 	// exponential and logarithm functions
@@ -891,13 +892,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> exp(const caview1d<T, TIndexer>& a)
 	{
-		return exp_arr(a);
+		return transform_arr(vec_exp_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> exp(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return exp_arr(a);
+		return transform_arr(vec_exp_ftor<T>(), a);
 	}
 
 
@@ -906,13 +907,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> log(const caview1d<T, TIndexer>& a)
 	{
-		return log_arr(a);
+		return transform_arr(vec_log_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> log(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return log_arr(a);
+		return transform_arr(vec_log_ftor<T>(), a);
 	}
 
 	// log10
@@ -920,13 +921,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> log10(const caview1d<T, TIndexer>& a)
 	{
-		return log10_arr(a);
+		return transform_arr(vec_log10_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> log10(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return log10_arr(a);
+		return transform_arr(vec_log10_ftor<T>(), a);
 	}
 
 
@@ -937,13 +938,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> floor(const caview1d<T, TIndexer>& a)
 	{
-		return floor_arr(a);
+		return transform_arr(vec_floor_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> floor(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return floor_arr(a);
+		return transform_arr(vec_floor_ftor<T>(), a);
 	}
 
 	// ceil
@@ -951,13 +952,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> ceil(const caview1d<T, TIndexer>& a)
 	{
-		return ceil_arr(a);
+		return transform_arr(vec_ceil_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> ceil(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return ceil_arr(a);
+		return transform_arr(vec_ceil_ftor<T>(), a);
 	}
 
 	// round
@@ -965,13 +966,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> round(const caview1d<T, TIndexer>& a)
 	{
-		return round_arr(a);
+		return transform_arr(vec_round_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> round(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return round_arr(a);
+		return transform_arr(vec_round_ftor<T>(), a);
 	}
 
 
@@ -982,13 +983,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> sin(const caview1d<T, TIndexer>& a)
 	{
-		return sin_arr(a);
+		return transform_arr(vec_sin_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> sin(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return sin_arr(a);
+		return transform_arr(vec_sin_ftor<T>(), a);
 	}
 
 	// cos
@@ -996,13 +997,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> cos(const caview1d<T, TIndexer>& a)
 	{
-		return cos_arr(a);
+		return transform_arr(vec_cos_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> cos(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return cos_arr(a);
+		return transform_arr(vec_cos_ftor<T>(), a);
 	}
 
 	// tan
@@ -1010,13 +1011,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> tan(const caview1d<T, TIndexer>& a)
 	{
-		return tan_arr(a);
+		return transform_arr(vec_tan_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> tan(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return tan_arr(a);
+		return transform_arr(vec_tan_ftor<T>(), a);
 	}
 
 	// asin
@@ -1024,13 +1025,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> asin(const caview1d<T, TIndexer>& a)
 	{
-		return asin_arr(a);
+		return transform_arr(vec_asin_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> asin(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return asin_arr(a);
+		return transform_arr(vec_asin_ftor<T>(), a);
 	}
 
 	// acos
@@ -1038,13 +1039,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> acos(const caview1d<T, TIndexer>& a)
 	{
-		return acos_arr(a);
+		return transform_arr(vec_acos_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> acos(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return acos_arr(a);
+		return transform_arr(vec_acos_ftor<T>(), a);
 	}
 
 	// atan
@@ -1052,13 +1053,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> atan(const caview1d<T, TIndexer>& a)
 	{
-		return atan_arr(a);
+		return transform_arr(vec_atan_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> atan(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return atan_arr(a);
+		return transform_arr(vec_atan_ftor<T>(), a);
 	}
 
 	// atan2
@@ -1066,7 +1067,7 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> atan2(const caview1d<T, TIndexer>& a, const caview1d<T, TIndexer>& b)
 	{
-		return atan2_arr(a, b);
+		return transform_arr(vec_atan2_ftor<T>(), a, b);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
@@ -1074,7 +1075,7 @@ namespace bcs
 			const caview2d<T, TOrd, TIndexer0, TIndexer1>& a,
 			const caview2d<T, TOrd, TIndexer0, TIndexer1>& b)
 	{
-		return atan2_arr(a, b);
+		return transform_arr(vec_atan2_ftor<T>(), a, b);
 	}
 
 
@@ -1085,13 +1086,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> sinh(const caview1d<T, TIndexer>& a)
 	{
-		return sinh_arr(a);
+		return transform_arr(vec_sinh_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> sinh(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return sinh_arr(a);
+		return transform_arr(vec_sinh_ftor<T>(), a);
 	}
 
 	// cosh
@@ -1099,13 +1100,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> cosh(const caview1d<T, TIndexer>& a)
 	{
-		return cosh_arr(a);
+		return transform_arr(vec_cosh_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> cosh(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return cosh_arr(a);
+		return transform_arr(vec_cosh_ftor<T>(), a);
 	}
 
 	// tanh
@@ -1113,13 +1114,13 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> tanh(const caview1d<T, TIndexer>& a)
 	{
-		return tanh_arr(a);
+		return transform_arr(vec_tanh_ftor<T>(), a);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	inline array2d<T, TOrd> tanh(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 	{
-		return tanh_arr(a);
+		return transform_arr(vec_tanh_ftor<T>(), a);
 	}
 
 
@@ -1130,7 +1131,7 @@ namespace bcs
 	template<typename T, class TIndexer>
 	inline array1d<T> hypot(const caview1d<T, TIndexer>& a, const caview1d<T, TIndexer>& b)
 	{
-		return hypot_arr(a, b);
+		return transform_arr(vec_hypot_ftor<T>(), a, b);
 	}
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
@@ -1138,7 +1139,7 @@ namespace bcs
 			const caview2d<T, TOrd, TIndexer0, TIndexer1>& a,
 			const caview2d<T, TOrd, TIndexer0, TIndexer1>& b)
 	{
-		return hypot_arr(a, b);
+		return transform_arr(vec_hypot_ftor<T>(), a, b);
 	}
 
 }
