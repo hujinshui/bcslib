@@ -93,29 +93,29 @@ extern "C"
 
 	// BLAS Level 3
 
-	void BCS_SGEMM(const char *transa, const char *transb, const MKL_INT *m, const MKL_INT *n, const MKL_INT *k,
-	           	   const float *alpha, const float *a, const MKL_INT *lda, const float *b, const MKL_INT *ldb,
-	           	   const float *beta, float *c, const MKL_INT *ldc);
+	void BCS_SGEMM(const char *transa, const char *transb, const int *m, const int *n, const int *k,
+	           	   const float *alpha, const float *a, const int *lda, const float *b, const int *ldb,
+	           	   const float *beta, float *c, const int *ldc);
 
-	void BCS_SSYMM(const char *side, const char *uplo, const MKL_INT *m, const MKL_INT *n,
-	           	   const float *alpha, const float *a, const MKL_INT *lda, const float *b, const MKL_INT *ldb,
-	           	   const float *beta, float *c, const MKL_INT *ldc);
+	void BCS_SSYMM(const char *side, const char *uplo, const int *m, const int *n,
+	           	   const float *alpha, const float *a, const int *lda, const float *b, const int *ldb,
+	           	   const float *beta, float *c, const int *ldc);
 
-	void BCS_SSYRK(const char *uplo, const char *trans, const MKL_INT *n, const MKL_INT *k,
-	           	   const float *alpha, const float *a, const MKL_INT *lda, const float *beta,
-	           	   float *c, const MKL_INT *ldc);
+	void BCS_SSYRK(const char *uplo, const char *trans, const int *n, const int *k,
+	           	   const float *alpha, const float *a, const int *lda, const float *beta,
+	           	   float *c, const int *ldc);
 
-	void BCS_DGEMM(const char *transa, const char *transb, const MKL_INT *m, const MKL_INT *n, const MKL_INT *k,
-	           	   const double *alpha, const double *a, const MKL_INT *lda, const double *b, const MKL_INT *ldb,
-	           	   const double *beta, double *c, const MKL_INT *ldc);
+	void BCS_DGEMM(const char *transa, const char *transb, const int *m, const int *n, const int *k,
+	           	   const double *alpha, const double *a, const int *lda, const double *b, const int *ldb,
+	           	   const double *beta, double *c, const int *ldc);
 
-	void BCS_DSYMM(const char *side, const char *uplo, const MKL_INT *m, const MKL_INT *n,
-	           	   const double *alpha, const double *a, const MKL_INT *lda, const double *b, const MKL_INT *ldb,
-	           	   const double *beta, double *c, const MKL_INT *ldc);
+	void BCS_DSYMM(const char *side, const char *uplo, const int *m, const int *n,
+	           	   const double *alpha, const double *a, const int *lda, const double *b, const int *ldb,
+	           	   const double *beta, double *c, const int *ldc);
 
-	void BCS_DSYRK(const char *uplo, const char *trans, const MKL_INT *n, const MKL_INT *k,
-	           	   const double *alpha, const double *a, const MKL_INT *lda, const double *beta,
-	           	   double *c, const MKL_INT *ldc);
+	void BCS_DSYRK(const char *uplo, const char *trans, const int *n, const int *k,
+	           	   const double *alpha, const double *a, const int *lda, const double *beta,
+	           	   double *c, const int *ldc);
 }
 
 #endif 

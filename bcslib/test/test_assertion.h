@@ -19,6 +19,7 @@
 
 #include <cstdio>
 #include <string>
+#include <cmath>
 
 namespace bcs
 {
@@ -60,7 +61,7 @@ namespace bcs
 		template<typename T>
 		inline bool test_approx(const T& x1, const T& x2, const T& eps)
 		{
-			return x1 >= x2 ? x1 < x2 + eps : x1 > x2 - eps;
+			return std::abs(x1 - x2) < eps;
 		}
 
 
@@ -85,13 +86,6 @@ namespace bcs
 
 			return it == end;
 		}
-
-
-		// array comparison
-
-/*
-
-*/
 
 	}
 }
