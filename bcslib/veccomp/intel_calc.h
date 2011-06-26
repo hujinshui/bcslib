@@ -14,6 +14,7 @@
 #ifdef BCS_ENABLE_INTEL_IPPS
 #include <bcslib/extern/ipps_select.h>
 #define BCS_IPPS_CALL( statement ) if (n > 0) { ::statement; }
+#define BCS_IPPS_STAT_CALL( T, statement ) T s = 0; if (n > 0) { ::statement; } return s;
 #endif
 
 #ifdef BCS_ENABLE_MKL_VMS
@@ -369,6 +370,12 @@ namespace bcs
 
 #ifdef BCS_ENABLE_MKL_VMS
 
+	/********************************************
+	 *
+	 *  Elementary Functions
+	 *
+	 *******************************************/
+
 	// power functions
 
 	// sqr
@@ -648,9 +655,285 @@ namespace bcs
 		BCS_MKL_VMS_CALL( vsHypot((int)n, x1, x2, y) )
 	}
 
+#endif // BCS_ENABLE_MKL_VMS
 
 
-#endif
+
+#ifdef BCS_ENABLE_INTEL_IPPS
+
+	/********************************************
+	 *
+	 *  Vector Statistics
+	 *
+	 *******************************************/
+
+	// sum
+
+	inline double vec_sum(size_t n, const double *x)
+	{
+		BCS_IPPS_STAT_CALL( double, ippsSum_64f(x, (int)n, &s) )
+	}
+
+	inline float vec_sum(size_t n, const float *x)
+	{
+		BCS_IPPS_STAT_CALL( float, ippsSum_32f(x, (int)n, &s, ippAlgHintNone) )
+	}
+
+	// dot prod
+
+	inline double vec_dot_prod(size_t n, const double *x, const double *y)
+	{
+		BCS_IPPS_STAT_CALL( double, ippsDotProd_64f(x, y, (int)n, &s) )
+	}
+
+	inline float vec_dot_prod(size_t n, const float *x, const float *y)
+	{
+		BCS_IPPS_STAT_CALL( float, ippsDotProd_32f(x, y, (int)n, &s) )
+	}
+
+	// sum_log
+
+	inline double vec_sum_log(size_t n, const double *x)
+	{
+		BCS_IPPS_STAT_CALL( double, ippsSumLn_64f(x, (int)n, &s) )
+	}
+
+	inline float vec_sum_log(size_t n, const float *x)
+	{
+		BCS_IPPS_STAT_CALL( float, ippsSumLn_32f(x, (int)n, &s) )
+	}
+
+	// mean
+
+	inline double vec_mean(size_t n, const double *x)
+	{
+		BCS_IPPS_STAT_CALL( double, ippsMean_64f(x, (int)n, &s) )
+	}
+
+	inline float vec_mean(size_t n, const float *x)
+	{
+		BCS_IPPS_STAT_CALL( float, ippsMean_32f(x, (int)n, &s, ippAlgHintNone) )
+	}
+
+	// min
+
+	inline double vec_min(size_t n, const double *x)
+	{
+		check_arg(n > 0, "n must be positive for vec_min.");
+
+		double r;
+		ippsMin_64f(x, (int)n, &r);
+		return r;
+	}
+
+	inline float vec_min(size_t n, const float *x)
+	{
+		check_arg(n > 0, "n must be positive for vec_min.");
+
+		float r;
+		ippsMin_32f(x, (int)n, &r);
+		return r;
+	}
+
+	// max
+
+	inline double vec_max(size_t n, const double *x)
+	{
+		check_arg(n > 0, "n must be positive for vec_max.");
+
+		double r;
+		ippsMax_64f(x, (int)n, &r);
+		return r;
+	}
+
+	inline float vec_max(size_t n, const float *x)
+	{
+		check_arg(n > 0, "n must be positive for vec_max.");
+
+		float r;
+		ippsMax_32f(x, (int)n, &r);
+		return r;
+	}
+
+	// minmax
+
+	inline std::pair<double, double> vec_minmax(size_t n, const double *x)
+	{
+		check_arg(n > 0, "n must be positive for vec_max.");
+
+		std::pair<double, double> r;
+		ippsMinMax_64f(x, (int)n, &(r.first), &(r.second));
+		return r;
+	}
+
+	inline std::pair<float, float> vec_minmax(size_t n, const float *x)
+	{
+		check_arg(n > 0, "n must be positive for vec_max.");
+
+		std::pair<float, float> r;
+		ippsMinMax_32f(x, (int)n, &(r.first), &(r.second));
+		return r;
+	}
+
+	// min_index
+
+	inline index_t vec_min_index(size_t n, const double *x)
+	{
+		check_arg(n > 0, "n must be positive for vec_min.");
+
+		double v;
+		int p;
+		ippsMinIndx_64f(x, (int)n, &v, &p);
+		return p;
+	}
+
+	inline index_t vec_min_index(size_t n, const float *x)
+	{
+		check_arg(n > 0, "n must be positive for vec_min.");
+
+		float v;
+		int p;
+		ippsMinIndx_32f(x, (int)n, &v, &p);
+		return p;
+	}
+
+
+	// max_index
+
+	inline index_t vec_max_index(size_t n, const double *x)
+	{
+		check_arg(n > 0, "n must be positive for vec_max.");
+
+		double v;
+		int p;
+		ippsMaxIndx_64f(x, (int)n, &v, &p);
+		return p;
+	}
+
+	inline index_t vec_max_index(size_t n, const float *x)
+	{
+		check_arg(n > 0, "n must be positive for vec_max.");
+
+		float v;
+		int p;
+		ippsMaxIndx_32f(x, (int)n, &v, &p);
+		return p;
+	}
+
+
+	// norm L1
+
+	inline double vec_norm_L1(size_t n, const double *x)
+	{
+		BCS_IPPS_STAT_CALL( double, ippsNorm_L1_64f(x, (int)n, &s) )
+	}
+
+	inline float vec_norm_L1(size_t n, const float *x)
+	{
+		BCS_IPPS_STAT_CALL( float, ippsNorm_L1_32f(x, (int)n, &s) )
+	}
+
+	inline double vec_diff_norm_L1(size_t n, const double *x, const double *y)
+	{
+		BCS_IPPS_STAT_CALL( double, ippsNormDiff_L1_64f(x, y, (int)n, &s) )
+	}
+
+	inline float vec_diff_norm_L1(size_t n, const float *x, const float *y)
+	{
+		BCS_IPPS_STAT_CALL( float, ippsNormDiff_L1_32f(x, y, (int)n, &s) )
+	}
+
+	// norm L2
+
+	inline double vec_norm_L2(size_t n, const double *x)
+	{
+		BCS_IPPS_STAT_CALL( double, ippsNorm_L2_64f(x, (int)n, &s) )
+	}
+
+	inline float vec_norm_L2(size_t n, const float *x)
+	{
+		BCS_IPPS_STAT_CALL( float, ippsNorm_L2_32f(x, (int)n, &s) )
+	}
+
+	inline double vec_diff_norm_L2(size_t n, const double *x, const double *y)
+	{
+		BCS_IPPS_STAT_CALL( double, ippsNormDiff_L2_64f(x, y, (int)n, &s) )
+	}
+
+	inline float vec_diff_norm_L2(size_t n, const float *x, const float *y)
+	{
+		BCS_IPPS_STAT_CALL( float, ippsNormDiff_L2_32f(x, y, (int)n, &s) )
+	}
+
+
+	// sqrsum
+
+	inline double vec_sqrsum(size_t n, const double *x)
+	{
+		double s = 0;
+		if (n > 0)
+		{
+			ippsNorm_L2_64f(x, (int)n, &s);
+		}
+		return sqr(s);
+	}
+
+	inline float vec_sqrsum(size_t n, const float *x)
+	{
+		float s = 0;
+		if (n > 0)
+		{
+			ippsNorm_L2_32f(x, (int)n, &s);
+		}
+		return sqr(s);
+	}
+
+	inline double vec_diff_sqrsum(size_t n, const double *x, const double *y)
+	{
+		double s = 0;
+		if (n > 0)
+		{
+			ippsNormDiff_L2_64f(x, y, (int)n, &s);
+		}
+		return sqr(s);
+	}
+
+	inline float vec_diff_sqrsum(size_t n, const float *x, const float *y)
+	{
+		float s = 0;
+		if (n > 0)
+		{
+			ippsNormDiff_L2_32f(x, y, (int)n, &s);
+		}
+		return sqr(s);
+	}
+
+
+	// norm Linf
+
+	inline double vec_norm_Linf(size_t n, const double *x)
+	{
+		BCS_IPPS_STAT_CALL( double, ippsNorm_Inf_64f(x, (int)n, &s) )
+	}
+
+	inline float vec_norm_Linf(size_t n, const float *x)
+	{
+		BCS_IPPS_STAT_CALL( float, ippsNorm_Inf_32f(x, (int)n, &s) )
+	}
+
+	inline double vec_diff_norm_Linf(size_t n, const double *x, const double *y)
+	{
+		BCS_IPPS_STAT_CALL( double, ippsNormDiff_Inf_64f(x, y, (int)n, &s) )
+	}
+
+	inline float vec_diff_norm_Linf(size_t n, const float *x, const float *y)
+	{
+		BCS_IPPS_STAT_CALL( float, ippsNormDiff_Inf_32f(x, y, (int)n, &s) )
+	}
+
+
+#endif // BCS_ENABLE_INTEL_IPPS
+
 
 }
 

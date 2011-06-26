@@ -415,63 +415,63 @@ BCS_TEST_CASE( test_sum_dot_and_mean )
 
 	// sum_log
 
-	BCS_CHECK_EQUAL( sum_log(v1d), accum_all(v1d, dsum_log()) );
-	BCS_CHECK_EQUAL( sum_log(v2d_rm), accum_all(v2d_rm, dsum_log()) );
-	BCS_CHECK_EQUAL( sum_log(v2d_cm), accum_all(v2d_cm, dsum_log()) );
+	BCS_CHECK_APPROX( sum_log(v1d), accum_all(v1d, dsum_log()) );
+	BCS_CHECK_APPROX( sum_log(v2d_rm), accum_all(v2d_rm, dsum_log()) );
+	BCS_CHECK_APPROX( sum_log(v2d_cm), accum_all(v2d_cm, dsum_log()) );
 
-	BCS_CHECK_EQUAL( sum_log(v2d_rm, per_row()), accum_prow(v2d_rm, dsum_log()) );
-	BCS_CHECK_EQUAL( sum_log(v2d_cm, per_row()), accum_prow(v2d_cm, dsum_log()) );
-	BCS_CHECK_EQUAL( sum_log(v2d_rm, per_col()), accum_pcol(v2d_rm, dsum_log()) );
-	BCS_CHECK_EQUAL( sum_log(v2d_cm, per_col()), accum_pcol(v2d_cm, dsum_log()) );
+	BCS_CHECK( array_view_approx( sum_log(v2d_rm, per_row()), accum_prow(v2d_rm, dsum_log()) ) );
+	BCS_CHECK( array_view_approx( sum_log(v2d_cm, per_row()), accum_prow(v2d_cm, dsum_log()) ) );
+	BCS_CHECK( array_view_approx( sum_log(v2d_rm, per_col()), accum_pcol(v2d_rm, dsum_log()) ) );
+	BCS_CHECK( array_view_approx( sum_log(v2d_cm, per_col()), accum_pcol(v2d_cm, dsum_log()) ) );
 
-	BCS_CHECK_EQUAL( sum_log(v1d_s), accum_all(v1d_s, dsum_log()) );
-	BCS_CHECK_EQUAL( sum_log(v2d_rm_s), accum_all(v2d_rm_s, dsum_log()) );
-	BCS_CHECK_EQUAL( sum_log(v2d_cm_s), accum_all(v2d_cm_s, dsum_log()) );
+	BCS_CHECK_APPROX( sum_log(v1d_s), accum_all(v1d_s, dsum_log()) );
+	BCS_CHECK_APPROX( sum_log(v2d_rm_s), accum_all(v2d_rm_s, dsum_log()) );
+	BCS_CHECK_APPROX( sum_log(v2d_cm_s), accum_all(v2d_cm_s, dsum_log()) );
 
-	BCS_CHECK_EQUAL( sum_log(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dsum_log()) );
-	BCS_CHECK_EQUAL( sum_log(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dsum_log()) );
-	BCS_CHECK_EQUAL( sum_log(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dsum_log()) );
-	BCS_CHECK_EQUAL( sum_log(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dsum_log()) );
+	BCS_CHECK( array_view_approx( sum_log(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dsum_log()) ) );
+	BCS_CHECK( array_view_approx( sum_log(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dsum_log()) ) );
+	BCS_CHECK( array_view_approx( sum_log(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dsum_log()) ) );
+	BCS_CHECK( array_view_approx( sum_log(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dsum_log()) ) );
 
 	// sum_xlogy
 
-	BCS_CHECK_EQUAL( sum_xlogy(v1d, w1d), accum_all(v1d, w1d, dsum_xlogy()) );
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, dsum_xlogy()) );
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, dsum_xlogy()) );
+	BCS_CHECK_APPROX( sum_xlogy(v1d, w1d), accum_all(v1d, w1d, dsum_xlogy()) );
+	BCS_CHECK_APPROX( sum_xlogy(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, dsum_xlogy()) );
+	BCS_CHECK_APPROX( sum_xlogy(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, dsum_xlogy()) );
 
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, dsum_xlogy()) );
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, dsum_xlogy()) );
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, dsum_xlogy()) );
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, dsum_xlogy()) );
+	BCS_CHECK( array_view_approx( sum_xlogy(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, dsum_xlogy()) ) );
+	BCS_CHECK( array_view_approx( sum_xlogy(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, dsum_xlogy()) ) );
+	BCS_CHECK( array_view_approx( sum_xlogy(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, dsum_xlogy()) ) );
+	BCS_CHECK( array_view_approx( sum_xlogy(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, dsum_xlogy()) ) );
 
-	BCS_CHECK_EQUAL( sum_xlogy(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, dsum_xlogy()) );
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, dsum_xlogy()) );
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, dsum_xlogy()) );
+	BCS_CHECK_APPROX( sum_xlogy(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, dsum_xlogy()) );
+	BCS_CHECK_APPROX( sum_xlogy(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, dsum_xlogy()) );
+	BCS_CHECK_APPROX( sum_xlogy(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, dsum_xlogy()) );
 
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, dsum_xlogy()) );
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, dsum_xlogy()) );
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, dsum_xlogy()) );
-	BCS_CHECK_EQUAL( sum_xlogy(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, dsum_xlogy()) );
+	BCS_CHECK( array_view_approx( sum_xlogy(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, dsum_xlogy()) ) );
+	BCS_CHECK( array_view_approx( sum_xlogy(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, dsum_xlogy()) ) );
+	BCS_CHECK( array_view_approx( sum_xlogy(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, dsum_xlogy()) ) );
+	BCS_CHECK( array_view_approx( sum_xlogy(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, dsum_xlogy()) ) );
 
 	// mean
 
-	BCS_CHECK_EQUAL( mean(v1d), accum_all(v1d, dmean()) );
-	BCS_CHECK_EQUAL( mean(v2d_rm), accum_all(v2d_rm, dmean()) );
-	BCS_CHECK_EQUAL( mean(v2d_cm), accum_all(v2d_cm, dmean()) );
+	BCS_CHECK_APPROX( mean(v1d), accum_all(v1d, dmean()) );
+	BCS_CHECK_APPROX( mean(v2d_rm), accum_all(v2d_rm, dmean()) );
+	BCS_CHECK_APPROX( mean(v2d_cm), accum_all(v2d_cm, dmean()) );
 
-	BCS_CHECK_EQUAL( mean(v2d_rm, per_row()), accum_prow(v2d_rm, dmean()) );
-	BCS_CHECK_EQUAL( mean(v2d_cm, per_row()), accum_prow(v2d_cm, dmean()) );
-	BCS_CHECK_EQUAL( mean(v2d_rm, per_col()), accum_pcol(v2d_rm, dmean()) );
-	BCS_CHECK_EQUAL( mean(v2d_cm, per_col()), accum_pcol(v2d_cm, dmean()) );
+	BCS_CHECK( array_view_approx( mean(v2d_rm, per_row()), accum_prow(v2d_rm, dmean()) ) );
+	BCS_CHECK( array_view_approx( mean(v2d_cm, per_row()), accum_prow(v2d_cm, dmean()) ) );
+	BCS_CHECK( array_view_approx( mean(v2d_rm, per_col()), accum_pcol(v2d_rm, dmean()) ) );
+	BCS_CHECK( array_view_approx( mean(v2d_cm, per_col()), accum_pcol(v2d_cm, dmean()) ) );
 
-	BCS_CHECK_EQUAL( mean(v1d_s), accum_all(v1d_s, dmean()) );
-	BCS_CHECK_EQUAL( mean(v2d_rm_s), accum_all(v2d_rm_s, dmean()) );
-	BCS_CHECK_EQUAL( mean(v2d_cm_s), accum_all(v2d_cm_s, dmean()) );
+	BCS_CHECK_APPROX( mean(v1d_s), accum_all(v1d_s, dmean()) );
+	BCS_CHECK_APPROX( mean(v2d_rm_s), accum_all(v2d_rm_s, dmean()) );
+	BCS_CHECK_APPROX( mean(v2d_cm_s), accum_all(v2d_cm_s, dmean()) );
 
-	BCS_CHECK_EQUAL( mean(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dmean()) );
-	BCS_CHECK_EQUAL( mean(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dmean()) );
-	BCS_CHECK_EQUAL( mean(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dmean()) );
-	BCS_CHECK_EQUAL( mean(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dmean()) );
+	BCS_CHECK( array_view_approx( mean(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dmean()) ) );
+	BCS_CHECK( array_view_approx( mean(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dmean()) ) );
+	BCS_CHECK( array_view_approx( mean(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dmean()) ) );
+	BCS_CHECK( array_view_approx( mean(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dmean()) ) );
 
 }
 
@@ -632,163 +632,163 @@ BCS_TEST_CASE( test_norms_and_diff_norms )
 
 	// norm_L0
 
-	BCS_CHECK_EQUAL( norm_L0(v1d), accum_all(v1d, dnorm_L0()) );
-	BCS_CHECK_EQUAL( norm_L0(v2d_rm), accum_all(v2d_rm, dnorm_L0()) );
-	BCS_CHECK_EQUAL( norm_L0(v2d_cm), accum_all(v2d_cm, dnorm_L0()) );
+	BCS_CHECK_APPROX( norm_L0(v1d), accum_all(v1d, dnorm_L0()) );
+	BCS_CHECK_APPROX( norm_L0(v2d_rm), accum_all(v2d_rm, dnorm_L0()) );
+	BCS_CHECK_APPROX( norm_L0(v2d_cm), accum_all(v2d_cm, dnorm_L0()) );
 
-	BCS_CHECK_EQUAL( norm_L0(v2d_rm, per_row()), accum_prow(v2d_rm, dnorm_L0()) );
-	BCS_CHECK_EQUAL( norm_L0(v2d_cm, per_row()), accum_prow(v2d_cm, dnorm_L0()) );
-	BCS_CHECK_EQUAL( norm_L0(v2d_rm, per_col()), accum_pcol(v2d_rm, dnorm_L0()) );
-	BCS_CHECK_EQUAL( norm_L0(v2d_cm, per_col()), accum_pcol(v2d_cm, dnorm_L0()) );
+	BCS_CHECK( array_view_approx( norm_L0(v2d_rm, per_row()), accum_prow(v2d_rm, dnorm_L0()) ) );
+	BCS_CHECK( array_view_approx( norm_L0(v2d_cm, per_row()), accum_prow(v2d_cm, dnorm_L0()) ) );
+	BCS_CHECK( array_view_approx( norm_L0(v2d_rm, per_col()), accum_pcol(v2d_rm, dnorm_L0()) ) );
+	BCS_CHECK( array_view_approx( norm_L0(v2d_cm, per_col()), accum_pcol(v2d_cm, dnorm_L0()) ) );
 
-	BCS_CHECK_EQUAL( norm_L0(v1d_s), accum_all(v1d_s, dnorm_L0()) );
-	BCS_CHECK_EQUAL( norm_L0(v2d_rm_s), accum_all(v2d_rm_s, dnorm_L0()) );
-	BCS_CHECK_EQUAL( norm_L0(v2d_cm_s), accum_all(v2d_cm_s, dnorm_L0()) );
+	BCS_CHECK_APPROX( norm_L0(v1d_s), accum_all(v1d_s, dnorm_L0()) );
+	BCS_CHECK_APPROX( norm_L0(v2d_rm_s), accum_all(v2d_rm_s, dnorm_L0()) );
+	BCS_CHECK_APPROX( norm_L0(v2d_cm_s), accum_all(v2d_cm_s, dnorm_L0()) );
 
-	BCS_CHECK_EQUAL( norm_L0(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dnorm_L0()) );
-	BCS_CHECK_EQUAL( norm_L0(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dnorm_L0()) );
-	BCS_CHECK_EQUAL( norm_L0(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dnorm_L0()) );
-	BCS_CHECK_EQUAL( norm_L0(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dnorm_L0()) );
+	BCS_CHECK( array_view_approx( norm_L0(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dnorm_L0()) ) );
+	BCS_CHECK( array_view_approx( norm_L0(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dnorm_L0()) ) );
+	BCS_CHECK( array_view_approx( norm_L0(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dnorm_L0()) ) );
+	BCS_CHECK( array_view_approx( norm_L0(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dnorm_L0()) ) );
 
 	// diff_norm_L0
 
-	BCS_CHECK_EQUAL( diff_norm_L0(v1d, w1d), accum_all(v1d, w1d, ddiff_norm_L0()) );
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_norm_L0()) );
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_norm_L0()) );
+	BCS_CHECK_APPROX( diff_norm_L0(v1d, w1d), accum_all(v1d, w1d, ddiff_norm_L0()) );
+	BCS_CHECK_APPROX( diff_norm_L0(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_norm_L0()) );
+	BCS_CHECK_APPROX( diff_norm_L0(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_norm_L0()) );
 
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_norm_L0()) );
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_norm_L0()) );
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_norm_L0()) );
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_norm_L0()) );
+	BCS_CHECK( array_view_approx( diff_norm_L0(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_norm_L0()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L0(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_norm_L0()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L0(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_norm_L0()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L0(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_norm_L0()) ) );
 
-	BCS_CHECK_EQUAL( diff_norm_L0(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_norm_L0()) );
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_norm_L0()) );
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_norm_L0()) );
+	BCS_CHECK_APPROX( diff_norm_L0(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_norm_L0()) );
+	BCS_CHECK_APPROX( diff_norm_L0(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_norm_L0()) );
+	BCS_CHECK_APPROX( diff_norm_L0(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_norm_L0()) );
 
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_norm_L0()) );
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_norm_L0()) );
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_norm_L0()) );
-	BCS_CHECK_EQUAL( diff_norm_L0(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_norm_L0()) );
+	BCS_CHECK( array_view_approx( diff_norm_L0(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_norm_L0()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L0(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_norm_L0()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L0(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_norm_L0()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L0(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_norm_L0()) ) );
 
 	// norm_L1
 
-	BCS_CHECK_EQUAL( norm_L1(v1d), accum_all(v1d, dnorm_L1()) );
-	BCS_CHECK_EQUAL( norm_L1(v2d_rm), accum_all(v2d_rm, dnorm_L1()) );
-	BCS_CHECK_EQUAL( norm_L1(v2d_cm), accum_all(v2d_cm, dnorm_L1()) );
+	BCS_CHECK_APPROX( norm_L1(v1d), accum_all(v1d, dnorm_L1()) );
+	BCS_CHECK_APPROX( norm_L1(v2d_rm), accum_all(v2d_rm, dnorm_L1()) );
+	BCS_CHECK_APPROX( norm_L1(v2d_cm), accum_all(v2d_cm, dnorm_L1()) );
 
-	BCS_CHECK_EQUAL( norm_L1(v2d_rm, per_row()), accum_prow(v2d_rm, dnorm_L1()) );
-	BCS_CHECK_EQUAL( norm_L1(v2d_cm, per_row()), accum_prow(v2d_cm, dnorm_L1()) );
-	BCS_CHECK_EQUAL( norm_L1(v2d_rm, per_col()), accum_pcol(v2d_rm, dnorm_L1()) );
-	BCS_CHECK_EQUAL( norm_L1(v2d_cm, per_col()), accum_pcol(v2d_cm, dnorm_L1()) );
+	BCS_CHECK( array_view_approx( norm_L1(v2d_rm, per_row()), accum_prow(v2d_rm, dnorm_L1()) ) );
+	BCS_CHECK( array_view_approx( norm_L1(v2d_cm, per_row()), accum_prow(v2d_cm, dnorm_L1()) ) );
+	BCS_CHECK( array_view_approx( norm_L1(v2d_rm, per_col()), accum_pcol(v2d_rm, dnorm_L1()) ) );
+	BCS_CHECK( array_view_approx( norm_L1(v2d_cm, per_col()), accum_pcol(v2d_cm, dnorm_L1()) ) );
 
-	BCS_CHECK_EQUAL( norm_L1(v1d_s), accum_all(v1d_s, dnorm_L1()) );
-	BCS_CHECK_EQUAL( norm_L1(v2d_rm_s), accum_all(v2d_rm_s, dnorm_L1()) );
-	BCS_CHECK_EQUAL( norm_L1(v2d_cm_s), accum_all(v2d_cm_s, dnorm_L1()) );
+	BCS_CHECK_APPROX( norm_L1(v1d_s), accum_all(v1d_s, dnorm_L1()) );
+	BCS_CHECK_APPROX( norm_L1(v2d_rm_s), accum_all(v2d_rm_s, dnorm_L1()) );
+	BCS_CHECK_APPROX( norm_L1(v2d_cm_s), accum_all(v2d_cm_s, dnorm_L1()) );
 
-	BCS_CHECK_EQUAL( norm_L1(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dnorm_L1()) );
-	BCS_CHECK_EQUAL( norm_L1(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dnorm_L1()) );
-	BCS_CHECK_EQUAL( norm_L1(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dnorm_L1()) );
-	BCS_CHECK_EQUAL( norm_L1(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dnorm_L1()) );
+	BCS_CHECK( array_view_approx( norm_L1(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dnorm_L1()) ) );
+	BCS_CHECK( array_view_approx( norm_L1(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dnorm_L1()) ) );
+	BCS_CHECK( array_view_approx( norm_L1(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dnorm_L1()) ) );
+	BCS_CHECK( array_view_approx( norm_L1(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dnorm_L1()) ) );
 
 	// diff_norm_L1
 
-	BCS_CHECK_EQUAL( diff_norm_L1(v1d, w1d), accum_all(v1d, w1d, ddiff_norm_L1()) );
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_norm_L1()) );
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_norm_L1()) );
+	BCS_CHECK_APPROX( diff_norm_L1(v1d, w1d), accum_all(v1d, w1d, ddiff_norm_L1()) );
+	BCS_CHECK_APPROX( diff_norm_L1(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_norm_L1()) );
+	BCS_CHECK_APPROX( diff_norm_L1(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_norm_L1()) );
 
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_norm_L1()) );
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_norm_L1()) );
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_norm_L1()) );
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_norm_L1()) );
+	BCS_CHECK( array_view_approx( diff_norm_L1(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_norm_L1()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L1(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_norm_L1()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L1(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_norm_L1()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L1(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_norm_L1()) ) );
 
-	BCS_CHECK_EQUAL( diff_norm_L1(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_norm_L1()) );
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_norm_L1()) );
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_norm_L1()) );
+	BCS_CHECK_APPROX( diff_norm_L1(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_norm_L1()) );
+	BCS_CHECK_APPROX( diff_norm_L1(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_norm_L1()) );
+	BCS_CHECK_APPROX( diff_norm_L1(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_norm_L1()) );
 
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_norm_L1()) );
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_norm_L1()) );
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_norm_L1()) );
-	BCS_CHECK_EQUAL( diff_norm_L1(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_norm_L1()) );
+	BCS_CHECK( array_view_approx( diff_norm_L1(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_norm_L1()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L1(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_norm_L1()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L1(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_norm_L1()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L1(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_norm_L1()) ) );
 
 	// sqrsum
 
-	BCS_CHECK_EQUAL( sqrsum(v1d), accum_all(v1d, dsqrsum()) );
-	BCS_CHECK_EQUAL( sqrsum(v2d_rm), accum_all(v2d_rm, dsqrsum()) );
-	BCS_CHECK_EQUAL( sqrsum(v2d_cm), accum_all(v2d_cm, dsqrsum()) );
+	BCS_CHECK_APPROX( sqrsum(v1d), accum_all(v1d, dsqrsum()) );
+	BCS_CHECK_APPROX( sqrsum(v2d_rm), accum_all(v2d_rm, dsqrsum()) );
+	BCS_CHECK_APPROX( sqrsum(v2d_cm), accum_all(v2d_cm, dsqrsum()) );
 
-	BCS_CHECK_EQUAL( sqrsum(v2d_rm, per_row()), accum_prow(v2d_rm, dsqrsum()) );
-	BCS_CHECK_EQUAL( sqrsum(v2d_cm, per_row()), accum_prow(v2d_cm, dsqrsum()) );
-	BCS_CHECK_EQUAL( sqrsum(v2d_rm, per_col()), accum_pcol(v2d_rm, dsqrsum()) );
-	BCS_CHECK_EQUAL( sqrsum(v2d_cm, per_col()), accum_pcol(v2d_cm, dsqrsum()) );
+	BCS_CHECK( array_view_approx( sqrsum(v2d_rm, per_row()), accum_prow(v2d_rm, dsqrsum()) ) );
+	BCS_CHECK( array_view_approx( sqrsum(v2d_cm, per_row()), accum_prow(v2d_cm, dsqrsum()) ) );
+	BCS_CHECK( array_view_approx( sqrsum(v2d_rm, per_col()), accum_pcol(v2d_rm, dsqrsum()) ) );
+	BCS_CHECK( array_view_approx( sqrsum(v2d_cm, per_col()), accum_pcol(v2d_cm, dsqrsum()) ) );
 
-	BCS_CHECK_EQUAL( sqrsum(v1d_s), accum_all(v1d_s, dsqrsum()) );
-	BCS_CHECK_EQUAL( sqrsum(v2d_rm_s), accum_all(v2d_rm_s, dsqrsum()) );
-	BCS_CHECK_EQUAL( sqrsum(v2d_cm_s), accum_all(v2d_cm_s, dsqrsum()) );
+	BCS_CHECK_APPROX( sqrsum(v1d_s), accum_all(v1d_s, dsqrsum()) );
+	BCS_CHECK_APPROX( sqrsum(v2d_rm_s), accum_all(v2d_rm_s, dsqrsum()) );
+	BCS_CHECK_APPROX( sqrsum(v2d_cm_s), accum_all(v2d_cm_s, dsqrsum()) );
 
-	BCS_CHECK_EQUAL( sqrsum(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dsqrsum()) );
-	BCS_CHECK_EQUAL( sqrsum(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dsqrsum()) );
-	BCS_CHECK_EQUAL( sqrsum(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dsqrsum()) );
-	BCS_CHECK_EQUAL( sqrsum(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dsqrsum()) );
+	BCS_CHECK( array_view_approx( sqrsum(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dsqrsum()) ) );
+	BCS_CHECK( array_view_approx( sqrsum(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dsqrsum()) ) );
+	BCS_CHECK( array_view_approx( sqrsum(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dsqrsum()) ) );
+	BCS_CHECK( array_view_approx( sqrsum(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dsqrsum()) ) );
 
 	// diff_sqrsum
 
-	BCS_CHECK_EQUAL( diff_sqrsum(v1d, w1d), accum_all(v1d, w1d, ddiff_sqrsum()) );
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_sqrsum()) );
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_sqrsum()) );
+	BCS_CHECK_APPROX( diff_sqrsum(v1d, w1d), accum_all(v1d, w1d, ddiff_sqrsum()) );
+	BCS_CHECK_APPROX( diff_sqrsum(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_sqrsum()) );
+	BCS_CHECK_APPROX( diff_sqrsum(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_sqrsum()) );
 
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_sqrsum()) );
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_sqrsum()) );
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_sqrsum()) );
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_sqrsum()) );
+	BCS_CHECK( array_view_approx( diff_sqrsum(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_sqrsum()) ) );
+	BCS_CHECK( array_view_approx( diff_sqrsum(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_sqrsum()) ) );
+	BCS_CHECK( array_view_approx( diff_sqrsum(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_sqrsum()) ) );
+	BCS_CHECK( array_view_approx( diff_sqrsum(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_sqrsum()) ) );
 
-	BCS_CHECK_EQUAL( diff_sqrsum(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_sqrsum()) );
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_sqrsum()) );
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_sqrsum()) );
+	BCS_CHECK_APPROX( diff_sqrsum(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_sqrsum()) );
+	BCS_CHECK_APPROX( diff_sqrsum(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_sqrsum()) );
+	BCS_CHECK_APPROX( diff_sqrsum(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_sqrsum()) );
 
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_sqrsum()) );
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_sqrsum()) );
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_sqrsum()) );
-	BCS_CHECK_EQUAL( diff_sqrsum(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_sqrsum()) );
+	BCS_CHECK( array_view_approx( diff_sqrsum(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_sqrsum()) ) );
+	BCS_CHECK( array_view_approx( diff_sqrsum(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_sqrsum()) ) );
+	BCS_CHECK( array_view_approx( diff_sqrsum(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_sqrsum()) ) );
+	BCS_CHECK( array_view_approx( diff_sqrsum(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_sqrsum()) ) );
 
 	// norm_L2
 
-	BCS_CHECK_EQUAL( norm_L2(v1d), accum_all(v1d, dnorm_L2()) );
-	BCS_CHECK_EQUAL( norm_L2(v2d_rm), accum_all(v2d_rm, dnorm_L2()) );
-	BCS_CHECK_EQUAL( norm_L2(v2d_cm), accum_all(v2d_cm, dnorm_L2()) );
+	BCS_CHECK_APPROX( norm_L2(v1d), accum_all(v1d, dnorm_L2()) );
+	BCS_CHECK_APPROX( norm_L2(v2d_rm), accum_all(v2d_rm, dnorm_L2()) );
+	BCS_CHECK_APPROX( norm_L2(v2d_cm), accum_all(v2d_cm, dnorm_L2()) );
 
-	BCS_CHECK_EQUAL( norm_L2(v2d_rm, per_row()), accum_prow(v2d_rm, dnorm_L2()) );
-	BCS_CHECK_EQUAL( norm_L2(v2d_cm, per_row()), accum_prow(v2d_cm, dnorm_L2()) );
-	BCS_CHECK_EQUAL( norm_L2(v2d_rm, per_col()), accum_pcol(v2d_rm, dnorm_L2()) );
-	BCS_CHECK_EQUAL( norm_L2(v2d_cm, per_col()), accum_pcol(v2d_cm, dnorm_L2()) );
+	BCS_CHECK( array_view_approx( norm_L2(v2d_rm, per_row()), accum_prow(v2d_rm, dnorm_L2()) ) );
+	BCS_CHECK( array_view_approx( norm_L2(v2d_cm, per_row()), accum_prow(v2d_cm, dnorm_L2()) ) );
+	BCS_CHECK( array_view_approx( norm_L2(v2d_rm, per_col()), accum_pcol(v2d_rm, dnorm_L2()) ) );
+	BCS_CHECK( array_view_approx( norm_L2(v2d_cm, per_col()), accum_pcol(v2d_cm, dnorm_L2()) ) );
 
-	BCS_CHECK_EQUAL( norm_L2(v1d_s), accum_all(v1d_s, dnorm_L2()) );
-	BCS_CHECK_EQUAL( norm_L2(v2d_rm_s), accum_all(v2d_rm_s, dnorm_L2()) );
-	BCS_CHECK_EQUAL( norm_L2(v2d_cm_s), accum_all(v2d_cm_s, dnorm_L2()) );
+	BCS_CHECK_APPROX( norm_L2(v1d_s), accum_all(v1d_s, dnorm_L2()) );
+	BCS_CHECK_APPROX( norm_L2(v2d_rm_s), accum_all(v2d_rm_s, dnorm_L2()) );
+	BCS_CHECK_APPROX( norm_L2(v2d_cm_s), accum_all(v2d_cm_s, dnorm_L2()) );
 
-	BCS_CHECK_EQUAL( norm_L2(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dnorm_L2()) );
-	BCS_CHECK_EQUAL( norm_L2(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dnorm_L2()) );
-	BCS_CHECK_EQUAL( norm_L2(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dnorm_L2()) );
-	BCS_CHECK_EQUAL( norm_L2(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dnorm_L2()) );
+	BCS_CHECK( array_view_approx( norm_L2(v2d_rm_s, per_row()), accum_prow(v2d_rm_s, dnorm_L2()) ) );
+	BCS_CHECK( array_view_approx( norm_L2(v2d_cm_s, per_row()), accum_prow(v2d_cm_s, dnorm_L2()) ) );
+	BCS_CHECK( array_view_approx( norm_L2(v2d_rm_s, per_col()), accum_pcol(v2d_rm_s, dnorm_L2()) ) );
+	BCS_CHECK( array_view_approx( norm_L2(v2d_cm_s, per_col()), accum_pcol(v2d_cm_s, dnorm_L2()) ) );
 
 	// diff_norm_L2
 
-	BCS_CHECK_EQUAL( diff_norm_L2(v1d, w1d), accum_all(v1d, w1d, ddiff_norm_L2()) );
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_norm_L2()) );
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_norm_L2()) );
+	BCS_CHECK_APPROX( diff_norm_L2(v1d, w1d), accum_all(v1d, w1d, ddiff_norm_L2()) );
+	BCS_CHECK_APPROX( diff_norm_L2(v2d_rm, w2d_rm), accum_all(v2d_rm, w2d_rm, ddiff_norm_L2()) );
+	BCS_CHECK_APPROX( diff_norm_L2(v2d_cm, w2d_cm), accum_all(v2d_cm, w2d_cm, ddiff_norm_L2()) );
 
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_norm_L2()) );
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_norm_L2()) );
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_norm_L2()) );
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_norm_L2()) );
+	BCS_CHECK( array_view_approx( diff_norm_L2(v2d_rm, w2d_rm, per_row()), accum_prow(v2d_rm, w2d_rm, ddiff_norm_L2()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L2(v2d_cm, w2d_cm, per_row()), accum_prow(v2d_cm, w2d_cm, ddiff_norm_L2()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L2(v2d_rm, w2d_rm, per_col()), accum_pcol(v2d_rm, w2d_rm, ddiff_norm_L2()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L2(v2d_cm, w2d_cm, per_col()), accum_pcol(v2d_cm, w2d_cm, ddiff_norm_L2()) ) );
 
-	BCS_CHECK_EQUAL( diff_norm_L2(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_norm_L2()) );
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_norm_L2()) );
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_norm_L2()) );
+	BCS_CHECK_APPROX( diff_norm_L2(v1d_s, w1d_s), accum_all(v1d_s, w1d_s, ddiff_norm_L2()) );
+	BCS_CHECK_APPROX( diff_norm_L2(v2d_rm_s, w2d_rm_s), accum_all(v2d_rm_s, w2d_rm_s, ddiff_norm_L2()) );
+	BCS_CHECK_APPROX( diff_norm_L2(v2d_cm_s, w2d_cm_s), accum_all(v2d_cm_s, w2d_cm_s, ddiff_norm_L2()) );
 
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_norm_L2()) );
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_norm_L2()) );
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_norm_L2()) );
-	BCS_CHECK_EQUAL( diff_norm_L2(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_norm_L2()) );
+	BCS_CHECK( array_view_approx( diff_norm_L2(v2d_rm_s, w2d_rm_s, per_row()), accum_prow(v2d_rm_s, w2d_rm_s, ddiff_norm_L2()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L2(v2d_cm_s, w2d_cm_s, per_row()), accum_prow(v2d_cm_s, w2d_cm_s, ddiff_norm_L2()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L2(v2d_rm_s, w2d_rm_s, per_col()), accum_pcol(v2d_rm_s, w2d_rm_s, ddiff_norm_L2()) ) );
+	BCS_CHECK( array_view_approx( diff_norm_L2(v2d_cm_s, w2d_cm_s, per_col()), accum_pcol(v2d_cm_s, w2d_cm_s, ddiff_norm_L2()) ) );
 
 	// norm_Linf
 
