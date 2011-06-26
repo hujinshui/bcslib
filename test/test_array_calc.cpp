@@ -726,13 +726,13 @@ BCS_TEST_CASE( test_array_neg )
 	BCS_CHECK( array_view_equal(-xs1, ra2, 5) );
 
 	array1d<double> y1(5, src1);
-	neg_arr_inplace(y1);
+	neg_ip(y1);
 	BCS_CHECK( array_view_equal(y1, ra1, 5) );
 
 	double y2_buf[10];
 	aview1d<double, step_ind> y2(y2_buf, step_ind(5, 2));
 	y2 << x1;
-	neg_arr_inplace(y2);
+	neg_ip(y2);
 	BCS_CHECK( array_view_equal(y2, ra1, 5) );
 
 	// 2D

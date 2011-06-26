@@ -77,8 +77,8 @@ VEC_COMP_HEADERS = bcslib/veccomp/veccalc.h \
 	bcslib/veccomp/intel_calc.h
 
 ARRAY_COMP_HEADERS = bcslib/array/generic_array_eval.h \
-	bcslib/array/generic_array_calc.h bcslib/array/array_calc.h \
-	bcslib/array/generic_array_stat.h bcslib/array/array_stat.h \
+	bcslib/array/array_calc.h \
+	bcslib/array/array_stat.h \
 	bcslib/array/logical_array_ops.h
 	
 
