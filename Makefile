@@ -81,6 +81,10 @@ ARRAY_COMP_HEADERS = bcslib/array/generic_array_eval.h \
 	bcslib/array/array_stat.h \
 	bcslib/array/logical_array_ops.h
 	
+LINALG_HEADERS = bcslib/extern/blas_select.h \
+	 bcslib/array/blas_base.h \
+	 bcslib/array/generic_blas.h 
+
 
 ARRAY_SPARSE_HEADERS = bcslib/array/sparse_vector.h bcslib/array/dynamic_sparse_vector.h
 
@@ -126,7 +130,8 @@ test_array: bin/test_array_basics \
 	bin/test_array_comp_intel \
 	bin/test_access_performance \
 	bin/test_calc_performance \
-	bin/test_calc_performance_intel
+	bin/test_calc_performance_intel \
+	bin/test_linalg_intel
 
 ARRAY_TEST_HEADERS = $(TEST_HEADERS) bcslib/test/test_array_aux.h
 
@@ -157,6 +162,12 @@ bin/test_calc_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEA
 	
 bin/test_calc_performance_intel: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) test/test_calc_performance.cpp
 	$(CXX) $(CFLAGS) $(INTEL_FLAGS) -O3 test/test_calc_performance.cpp -o bin/test_calc_performance_intel	
+	
+LINALG_TESTS = test/test_linalg.cpp \
+	test/test_array_blas.cpp
+
+bin/test_linalg_intel: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADERS) $(LINALG_HEADERS) $(LINALG_TESTS)
+	$(CXX) $(CFLAGS) $(INTEL_FLAGS) $(LINALG_TESTS) -o bin/test_linalg 
 
 
 
