@@ -13,6 +13,7 @@
 #include <bcslib/array/array1d.h>
 #include <bcslib/array/array2d.h>
 
+#include <cmath>
 #include <iostream>
 
 namespace bcs
@@ -127,6 +128,44 @@ namespace bcs
 
 			return true;
 		}
+
+
+		template<class LIndexer, class RIndexer>
+		bool array_view_approx(const aview1d<double, LIndexer>& a1, const aview1d<double, RIndexer>& a2, double eps = 1e-12)
+		{
+			if (a1.nelems() != a2.nelems()) return false;
+
+			index_t d0 = a1.dim0();
+			for (index_t i = 0; i < d0; ++i)
+			{
+				if (std::abs(a1(i) - a2(i)) > eps) return false;
+			}
+
+			return true;
+		}
+
+
+		template<typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+		bool array_view_approx(
+				const aview2d<double, TOrd, LIndexer0, LIndexer1>& a1,
+				const aview2d<double, TOrd, RIndexer0, RIndexer1>& a2, double eps = 1e-12)
+		{
+			if (a1.shape() != a2.shape()) return false;
+
+			index_t d0 = a1.dim0();
+			index_t d1 = a1.dim1();
+
+			for (index_t i = 0; i < d0; ++i)
+			{
+				for (index_t j = 0; j < d1; ++j)
+				{
+					if (std::abs(a1(i, j) - a2(i, j)) > eps) return false;
+				}
+			}
+
+			return true;
+		}
+
 
 		// printing
 
