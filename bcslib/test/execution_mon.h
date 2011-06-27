@@ -109,6 +109,10 @@ namespace bcs
 					std::printf("Assertion Failure at {%s (%d)}: %s\n",
 							exc.filename().c_str(), exc.line_number(), exc.message().c_str());
 				}
+				catch(std::exception& exc)
+				{
+					std::printf("Exception caught: %s\n", exc.what());
+				}
 
 				return false;
 			}

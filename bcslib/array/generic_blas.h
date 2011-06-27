@@ -20,7 +20,11 @@ namespace bcs
 	namespace blas
 	{
 
-		// BLAS Level 1
+		/**************************************************
+		 *
+		 *  BLAS Level 1
+		 *
+		 **************************************************/
 
 		// asum
 
@@ -41,7 +45,7 @@ namespace bcs
 		template<class ArrX, class ArrY>
 		inline typename std::enable_if<is_compatible_aviews<ArrX, ArrY>::value,
 		void>::type
-		axpy(const typename array_view_traits<ArrY>::value_type& alpha, const ArrX& x, ArrY& y)
+		axpy(const ArrX& x, ArrY& y, const typename array_view_traits<ArrY>::value_type& alpha)
 		{
 			typedef typename array_view_traits<ArrY>::value_type value_type;
 			BCS_STATIC_ASSERT_V(std::is_floating_point<value_type>);
@@ -49,9 +53,9 @@ namespace bcs
 			check_arg(is_dense_view(y), "blas::axpy: y must be a dense view.");
 
 			scoped_aview_read_proxy<ArrX> xp(x);
-			return _axpy(alpha,
+			return _axpy(
 					make_cvec((int)get_num_elems(x), xp.pbase()),
-					make_vec((int)get_num_elems(y), ptr_base(y)));
+					make_vec((int)get_num_elems(y), ptr_base(y)), alpha);
 		}
 
 		// dot
@@ -108,6 +112,112 @@ namespace bcs
 
 
 
+		/**************************************************
+		 *
+		 *  BLAS Level 2
+		 *
+		 **************************************************/
+
+		// gemv
+
+		template<class ArrA, class ArrX, class ArrY>
+		struct is_mv_compatible
+		{
+			typedef typename array_view_traits<ArrA>::value_type vtype_a;
+			typedef typename array_view_traits<ArrX>::value_type vtype_x;
+			typedef typename array_view_traits<ArrY>::value_type vtype_y;
+
+			static const bool value =
+					is_array_view_ndim<ArrA, 2>::value &&
+					is_array_view_ndim<ArrX, 1>::value &&
+					is_array_view_ndim<ArrY, 1>::value &&
+					std::is_same<vtype_a, vtype_x>::value &&
+					std::is_same<vtype_x, vtype_y>::value;
+		};
+
+		template<class ArrA, class ArrX, class ArrY>
+		inline typename std::enable_if<is_mv_compatible<ArrA, ArrX, ArrY>::value,
+		void>::type
+		gemv(const ArrA& a, const ArrX& x, ArrY& y,
+				const typename array_view_traits<ArrA>::value_type& alpha = 1,
+				const typename array_view_traits<ArrA>::value_type& beta = 0,
+				char trans = 'N')
+		{
+			typedef typename array_view_traits<ArrA>::value_type value_type;
+			typedef typename array_view_traits<ArrA>::layout_order layout_order;
+			BCS_STATIC_ASSERT_V(std::is_floating_point<value_type>);
+
+			check_arg(is_dense_view(y), "blas::gemv: y must be a dense view.");
+
+			scoped_aview_read_proxy<ArrA> ap(a);
+			scoped_aview_read_proxy<ArrX> xp(x);
+
+			auto shape = get_array_shape(a);
+			int m = (int)shape[0];
+			int n = (int)shape[1];
+
+			_gemv(
+					make_cmat(m, n, ap.pbase(), trans, layout_order()), // a
+					make_cvec((int)get_num_elems(x), xp.pbase()),		// x
+					make_vec((int)get_num_elems(y), ptr_base(y)), 		// y
+					alpha, beta ); 										// alpha, beta
+		}
+
+		// ger
+
+		template<class ArrA, class ArrX, class ArrY>
+		inline typename std::enable_if<is_mv_compatible<ArrA, ArrX, ArrY>::value,
+		void>::type
+		ger(ArrA& a, const ArrX& x, const ArrY& y, const typename array_view_traits<ArrA>::value_type& alpha = 1)
+		{
+			typedef typename array_view_traits<ArrA>::value_type value_type;
+			typedef typename array_view_traits<ArrA>::layout_order layout_order;
+			BCS_STATIC_ASSERT_V(std::is_floating_point<value_type>);
+
+			check_arg(is_dense_view(a), "blas::ger: a must be a dense view.");
+
+			scoped_aview_read_proxy<ArrX> xp(x);
+			scoped_aview_read_proxy<ArrY> yp(y);
+
+			auto shape = get_array_shape(a);
+			int m = (int)shape[0];
+			int n = (int)shape[1];
+
+			_ger(
+					make_mat(m, n, ptr_base(a), layout_order()), 	// a
+					make_cvec((int)get_num_elems(x), xp.pbase()), 	// x
+					make_cvec((int)get_num_elems(y), yp.pbase()), 	// y
+					alpha);											// alpha
+		}
+
+		// symv
+
+		template<class ArrA, class ArrX, class ArrY>
+		inline typename std::enable_if<is_mv_compatible<ArrA, ArrX, ArrY>::value,
+		void>::type
+		symv(const ArrA& a, const ArrX& x, ArrY& y,
+				const typename array_view_traits<ArrA>::value_type& alpha = 1,
+				const typename array_view_traits<ArrA>::value_type& beta = 0)
+		{
+			typedef typename array_view_traits<ArrA>::value_type value_type;
+			typedef typename array_view_traits<ArrA>::layout_order layout_order;
+			BCS_STATIC_ASSERT_V(std::is_floating_point<value_type>);
+
+			check_arg(is_dense_view(y), "blas::symv: y must be a dense view.");
+
+			scoped_aview_read_proxy<ArrA> ap(a);
+			scoped_aview_read_proxy<ArrX> xp(x);
+
+			auto shape = get_array_shape(a);
+			int m = (int)shape[0];
+			int n = (int)shape[1];
+
+			_symv(
+					make_cmat(m, n, ap.pbase(), 'N', layout_order()), 	// a
+					make_cvec((int)get_num_elems(x), xp.pbase()),		// x
+					make_vec((int)get_num_elems(y), ptr_base(y)), 		// y
+					alpha, beta ); 										// alpha, beta
+		}
 	}
 
 }

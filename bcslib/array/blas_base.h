@@ -66,12 +66,12 @@ namespace bcs
 			int m;
 			int n;
 			const T *data;
-			bool trans;
+			char trans;
 		};
 
 
 		template<typename T, typename TOrd>
-		inline cmat<T, TOrd> make_cmat(int m, int n, const T *data, bool trans, TOrd)
+		inline cmat<T, TOrd> make_cmat(int m, int n, const T *data, char trans, TOrd)
 		{
 			cmat<T, TOrd> a;
 			a.m = m;
@@ -136,27 +136,31 @@ namespace bcs
 
 		// axpy
 
-		inline void _axpy(double alpha, cvec<double> x, vec<double> y)
+		inline void _axpy(cvec<double> x, vec<double> y, double alpha)
 		{
 			check_arg(x.n == y.n, "blas::_axpy: inconsistent dimensions");
 
 			int n = x.n;
-			int incx = 1;
-			int incy = 1;
-
-			BCS_DAXPY(&n, &alpha, x.data, &incx, y.data, &incy);
+			if (n > 0)
+			{
+				int incx = 1;
+				int incy = 1;
+				BCS_DAXPY(&n, &alpha, x.data, &incx, y.data, &incy);
+			}
 		}
 
 
-		inline void _axpy(float alpha, cvec<float> x, vec<float> y)
+		inline void _axpy(cvec<float> x, vec<float> y, float alpha)
 		{
 			check_arg(x.n == y.n, "blas::_axpy: inconsistent dimensions");
 
 			int n = x.n;
-			int incx = 1;
-			int incy = 1;
-
-			BCS_SAXPY(&n, &alpha, x.data, &incx, y.data, &incy);
+			if (n > 0)
+			{
+				int incx = 1;
+				int incy = 1;
+				BCS_SAXPY(&n, &alpha, x.data, &incx, y.data, &incy);
+			}
 		}
 
 		// dot
@@ -165,22 +169,30 @@ namespace bcs
 		{
 			check_arg(x.n == y.n, "blas::_dot: inconsistent dimensions");
 
+			double s = 0;
 			int n = x.n;
-			int incx = 1;
-			int incy = 1;
-
-			return BCS_DDOT(&n, x.data, &incx, y.data, &incy);
+			if (n > 0)
+			{
+				int incx = 1;
+				int incy = 1;
+				s = BCS_DDOT(&n, x.data, &incx, y.data, &incy);
+			}
+			return s;
 		}
 
 		inline float _dot(cvec<float> x, cvec<float> y)
 		{
 			check_arg(x.n == y.n, "blas::_dot: inconsistent dimensions");
 
+			float s = 0;
 			int n = x.n;
-			int incx = 1;
-			int incy = 1;
-
-			return BCS_SDOT(&n, x.data, &incx, y.data, &incy);
+			if (n > 0)
+			{
+				int incx = 1;
+				int incy = 1;
+				s = BCS_SDOT(&n, x.data, &incx, y.data, &incy);
+			}
+			return s;
 		}
 
 		// nrm2
@@ -211,26 +223,193 @@ namespace bcs
 
 		inline void _rot(vec<double> x, vec<double> y, double c, double s)
 		{
-			check_arg(x.n == y.n, "blas::_dot: inconsistent dimensions");
+			check_arg(x.n == y.n, "blas::_rot: inconsistent dimensions");
 
 			int n = x.n;
-			int incx = 1;
-			int incy = 1;
-
-			BCS_DROT(&n, x.data, &incx, y.data, &incy, &c, &s);
+			if (n > 0)
+			{
+				int incx = 1;
+				int incy = 1;
+				BCS_DROT(&n, x.data, &incx, y.data, &incy, &c, &s);
+			}
 		}
 
 		inline void _rot(vec<float> x, vec<float> y, float c, float s)
 		{
-			check_arg(x.n == y.n, "blas::_dot: inconsistent dimensions");
+			check_arg(x.n == y.n, "blas::_rot: inconsistent dimensions");
 
 			int n = x.n;
-			int incx = 1;
-			int incy = 1;
-
-			BCS_SROT(&n, x.data, &incx, y.data, &incy, &c, &s);
+			if (n > 0)
+			{
+				int incx = 1;
+				int incy = 1;
+				BCS_SROT(&n, x.data, &incx, y.data, &incy, &c, &s);
+			}
 		}
 
+
+		// BLAS Level 2
+
+		namespace _detail
+		{
+			template<typename T>
+			inline cmat<T, column_major_t> fortranize(const cmat<T, row_major_t>& a)
+			{
+				cmat<T, column_major_t> t;
+				t.m = a.n;
+				t.n = a.m;
+				t.data = a.data;
+				t.trans = (a.trans == 'N' ? 'T' : 'N');
+				return t;
+			}
+
+			template<typename T>
+			inline cmat<T, column_major_t> fortranize_trans(const cmat<T, row_major_t>& a)
+			{
+				cmat<T, column_major_t> t;
+				t.m = a.n;
+				t.n = a.m;
+				t.data = a.data;
+				t.trans = a.trans;
+				return t;
+			}
+
+			template<typename T>
+			inline mat<T, column_major_t> fortranize(const mat<T, row_major_t>& a)
+			{
+				mat<T, column_major_t> t;
+				t.m = a.n;
+				t.n = a.m;
+				t.data = a.data;
+				return t;
+			}
+		}
+
+		inline char check_trans(char trans)
+		{
+			if (trans == 'N' || trans == 'n') return 'N';
+			else if (trans == 'T' || trans == 't') return 'T';
+			else throw std::invalid_argument("blas: invalid character for trans");
+		}
+
+		// gemv
+
+		inline void _gemv(cmat<double, column_major_t> a, cvec<double> x, vec<double> y, double alpha, double beta)
+		{
+			char trans = check_trans(a.trans);
+			int inner_dim = (a.trans == 'N' ? a.n : a.m);
+			check_arg(inner_dim == x.n, "blas::_gemv: inconsistent dimensions");
+
+			if (a.m > 0 && a.n > 0)
+			{
+				int incx = 1;
+				int incy = 1;
+				BCS_DGEMV(&trans, &(a.m), &(a.n), &alpha, a.data, &(a.m), x.data, &incx, &beta, y.data, &incy);
+			}
+		}
+
+		inline void _gemv(cmat<float, column_major_t> a, cvec<float> x, vec<float> y, float alpha, float beta)
+		{
+			char trans = check_trans(a.trans);
+			int inner_dim = (a.trans == 'N' ? a.n : a.m);
+			check_arg(inner_dim == x.n, "blas::_gemv: inconsistent dimensions");
+
+			if (a.m > 0 && a.n > 0)
+			{
+				int incx = 1;
+				int incy = 1;
+				BCS_SGEMV(&trans, &(a.m), &(a.n), &alpha, a.data, &(a.m), x.data, &incx, &beta, y.data, &incy);
+			}
+		}
+
+		inline void _gemv(cmat<double, row_major_t> a, cvec<double> x, vec<double> y, double alpha, double beta)
+		{
+			_gemv(_detail::fortranize(a), x, y, alpha, beta);
+		}
+
+		inline void _gemv(cmat<float, row_major_t> a, cvec<float> x, vec<float> y, float alpha, float beta)
+		{
+			_gemv(_detail::fortranize(a), x, y, alpha, beta);
+		}
+
+
+		// ger
+
+		inline void _ger(mat<double, column_major_t> a, cvec<double> x, cvec<double> y, double alpha)
+		{
+			check_arg(a.m == x.n && a.n == y.n, "blas::_ger: inconsistent dimensions");
+
+			if (a.m > 0 && a.n > 0)
+			{
+				int incx = 1;
+				int incy = 1;
+				BCS_DGER(&(a.m), &(a.n), &alpha, x.data, &incx, y.data, &incy, a.data, &(a.m));
+			}
+		}
+
+		inline void _ger(mat<float, column_major_t> a, cvec<float> x, cvec<float> y, float alpha)
+		{
+			check_arg(a.m == x.n && a.n == y.n, "blas::_ger: inconsistent dimensions");
+
+			if (a.m > 0 && a.n > 0)
+			{
+				int incx = 1;
+				int incy = 1;
+				BCS_SGER(&(a.m), &(a.n), &alpha, x.data, &incx, y.data, &incy, a.data, &(a.m));
+			}
+		}
+
+		inline void _ger(mat<double, row_major_t> a, cvec<double> x, cvec<double> y, double alpha)
+		{
+			_ger(_detail::fortranize(a), y, x, alpha);
+		}
+
+		inline void _ger(mat<float, row_major_t> a, cvec<float> x, cvec<float> y, float alpha)
+		{
+			_ger(_detail::fortranize(a), y, x, alpha);
+		}
+
+		// symv
+
+		inline void _symv(cmat<double, column_major_t> a, cvec<double> x, vec<double> y, double alpha, double beta)
+		{
+			int n = a.m;
+			check_arg(n == a.n, "blas::_symv: a must be a square matrix");
+			check_arg(n == x.n, "blas::_symv: inconsistent dimensions");
+
+			if (n > 0)
+			{
+				char uplo = 'U';
+				int incx = 1;
+				int incy = 1;
+				BCS_DSYMV(&uplo, &n, &alpha, a.data, &n, x.data, &incx, &beta, y.data, &incy);
+			}
+		}
+
+		inline void _symv(cmat<float, column_major_t> a, cvec<float> x, vec<float> y, float alpha, float beta)
+		{
+			int n = a.m;
+			check_arg(n == a.n, "blas::_symv: a must be a square matrix");
+			check_arg(n == x.n, "blas::_symv: inconsistent dimensions");
+
+			if (n > 0)
+			{
+				char uplo = 'U';
+				int incx = 1;
+				int incy = 1;
+				BCS_SSYMV(&uplo, &n, &alpha, a.data, &n, x.data, &incx, &beta, y.data, &incy);
+			}
+		}
+
+		inline void _symv(cmat<double, row_major_t> a, cvec<double> x, vec<double> y, double alpha, double beta)
+		{
+			_symv(_detail::fortranize(a), x, y, alpha, beta);
+		}
+
+		inline void _symv(cmat<float, row_major_t> a, cvec<float> x, vec<float> y, float alpha, float beta)
+		{
+			_symv(_detail::fortranize(a), x, y, alpha, beta);
+		}
 	}
 
 }
