@@ -30,22 +30,18 @@
 #define BCS_SGEMV	sgemv
 #define BCS_SGER	sger
 #define BCS_SSYMV	ssymv
-#define BCS_SSYR 	ssyr
 
 #define BCS_DGEMV	dgemv
 #define BCS_DGER	dger
 #define BCS_DSYMV	dsymv
-#define BCS_DSYR 	dsyr
 
 // BLAS Level 3
 
 #define BCS_SGEMM	sgemm
 #define BCS_SSYMM	ssymm
-#define BCS_SSYRK	ssyrk
 
 #define BCS_DGEMM	dgemm
 #define BCS_DSYMM	dsymm
-#define BCS_DSYRK	dsyrk
 
 extern "C"
 {
@@ -75,9 +71,6 @@ extern "C"
 	void BCS_SSYMV(const char *uplo, const int *n, const float *alpha, const float *a, const int *lda,
 	           	   const float *x, const int *incx, const float *beta, float *y, const int *incy);
 
-	void BCS_SSYR(const char *uplo, const int *n, const float *alpha, const float *x, const int *incx,
-	          	  float *a, const int *lda);
-
 	void BCS_DGEMV(const char *trans, const int *m, const int *n, const double *alpha,
 	           	   const double *a, const int *lda, const double *x, const int *incx,
 	           	   const double *beta, double *y, const int *incy);
@@ -88,8 +81,6 @@ extern "C"
 	void BCS_DSYMV(const char *uplo, const int *n, const double *alpha, const double *a, const int *lda,
 	           	   const double *x, const int *incx, const double *beta, double *y, const int *incy);
 
-	void BCS_DSYR(const char *uplo, const int *n, const double *alpha, const double *x, const int *incx,
-	          	  double *a, const int *lda);
 
 	// BLAS Level 3
 
@@ -101,10 +92,6 @@ extern "C"
 	           	   const float *alpha, const float *a, const int *lda, const float *b, const int *ldb,
 	           	   const float *beta, float *c, const int *ldc);
 
-	void BCS_SSYRK(const char *uplo, const char *trans, const int *n, const int *k,
-	           	   const float *alpha, const float *a, const int *lda, const float *beta,
-	           	   float *c, const int *ldc);
-
 	void BCS_DGEMM(const char *transa, const char *transb, const int *m, const int *n, const int *k,
 	           	   const double *alpha, const double *a, const int *lda, const double *b, const int *ldb,
 	           	   const double *beta, double *c, const int *ldc);
@@ -112,10 +99,6 @@ extern "C"
 	void BCS_DSYMM(const char *side, const char *uplo, const int *m, const int *n,
 	           	   const double *alpha, const double *a, const int *lda, const double *b, const int *ldb,
 	           	   const double *beta, double *c, const int *ldc);
-
-	void BCS_DSYRK(const char *uplo, const char *trans, const int *n, const int *k,
-	           	   const double *alpha, const double *a, const int *lda, const double *beta,
-	           	   double *c, const int *ldc);
 }
 
 #endif 

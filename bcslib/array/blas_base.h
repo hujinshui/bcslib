@@ -410,6 +410,54 @@ namespace bcs
 		{
 			_symv(_detail::fortranize(a), x, y, alpha, beta);
 		}
+
+
+		// BLAS Level 3
+
+		// gemm
+
+		inline void _gemm(cmat<double, column_major_t> a, cmat<double, column_major_t> b, mat<double, column_major_t> c,
+				double alpha, double beta)
+		{
+			char transa = check_trans(a.trans);
+			char transb = check_trans(b.trans);
+
+			int m, n, k, kb;
+			if (transa == 'N') { m = a.m; k = a.n; } else { m = a.n; k = a.m; }
+			if (transb == 'N') { n = b.n; kb = b.m; } else { n = b.m; kb = b.n; }
+			check_arg(k == kb, "blas::_gemm: inconsistent dimensions");
+			check_arg(m == c.m && n == c.n, "blas::_gemm: inconsistent dimensions");
+
+			BCS_DGEMM(&transa, &transb, &m, &n, &k, &alpha, a.data, &(a.m), b.data, &(b.m), &beta, c.data, &(c.m));
+		}
+
+		inline void _gemm(cmat<float, column_major_t> a, cmat<float, column_major_t> b, mat<float, column_major_t> c,
+				float alpha, float beta)
+		{
+			char transa = check_trans(a.trans);
+			char transb = check_trans(b.trans);
+
+			int m, n, k, kb;
+			if (transa == 'N') { m = a.m; k = a.n; } else { m = a.n; k = a.m; }
+			if (transb == 'N') { n = b.n; kb = b.m; } else { n = b.m; kb = b.n; }
+			check_arg(k == kb, "blas::_gemm: inconsistent dimensions");
+			check_arg(m == c.m && n == c.n, "blas::_gemm: inconsistent dimensions");
+
+			BCS_SGEMM(&transa, &transb, &m, &n, &k, &alpha, a.data, &(a.m), b.data, &(b.m), &beta, c.data, &(c.m));
+		}
+
+		inline void _gemm(cmat<double, row_major_t> a, cmat<double, row_major_t> b, mat<double, row_major_t> c,
+				double alpha, double beta)
+		{
+			_gemm(_detail::fortranize_trans(b), _detail::fortranize_trans(a), _detail::fortranize(c), alpha, beta);
+		}
+
+		inline void _gemm(cmat<float, row_major_t> a, cmat<float, row_major_t> b, mat<float, row_major_t> c,
+				float alpha, float beta)
+		{
+			_gemm(_detail::fortranize_trans(b), _detail::fortranize_trans(a), _detail::fortranize(c), alpha, beta);
+		}
+
 	}
 
 }

@@ -118,8 +118,6 @@ namespace bcs
 		 *
 		 **************************************************/
 
-		// gemv
-
 		template<class ArrA, class ArrX, class ArrY>
 		struct is_mv_compatible
 		{
@@ -134,6 +132,8 @@ namespace bcs
 					std::is_same<vtype_a, vtype_x>::value &&
 					std::is_same<vtype_x, vtype_y>::value;
 		};
+
+		// gemv
 
 		template<class ArrA, class ArrX, class ArrY>
 		inline typename std::enable_if<is_mv_compatible<ArrA, ArrX, ArrY>::value,
@@ -218,6 +218,69 @@ namespace bcs
 					make_vec((int)get_num_elems(y), ptr_base(y)), 		// y
 					alpha, beta ); 										// alpha, beta
 		}
+
+
+
+		/**************************************************
+		 *
+		 *  BLAS Level 3
+		 *
+		 **************************************************/
+
+		template<class ArrA, class ArrB, class ArrC>
+		struct is_mm_compatible
+		{
+			typedef typename array_view_traits<ArrA>::value_type vtype_a;
+			typedef typename array_view_traits<ArrB>::value_type vtype_b;
+			typedef typename array_view_traits<ArrC>::value_type vtype_c;
+
+			typedef typename array_view_traits<ArrA>::layout_order lord_a;
+			typedef typename array_view_traits<ArrB>::layout_order lord_b;
+			typedef typename array_view_traits<ArrC>::layout_order lord_c;
+
+			static const bool value =
+					is_array_view_ndim<ArrA, 2>::value &&
+					is_array_view_ndim<ArrB, 2>::value &&
+					is_array_view_ndim<ArrC, 2>::value &&
+					std::is_same<vtype_a, vtype_b>::value && std::is_same<vtype_b, vtype_c>::value &&
+					std::is_same<lord_a, lord_b>::value && std::is_same<lord_b, lord_c>::value;
+		};
+
+
+		// gemm
+
+		template<class ArrA, class ArrB, class ArrC>
+		inline typename std::enable_if<is_mm_compatible<ArrA, ArrB, ArrC>::value,
+		void>::type
+		gemm(const ArrA& a, const ArrB& b, ArrC& c, char transa, char transb,
+				const typename array_view_traits<ArrA>::value_type& alpha,
+				const typename array_view_traits<ArrA>::value_type& beta)
+		{
+			typedef typename array_view_traits<ArrA>::value_type value_type;
+			typedef typename array_view_traits<ArrA>::layout_order layout_order;
+			BCS_STATIC_ASSERT_V(std::is_floating_point<value_type>);
+
+			check_arg(is_dense_view(c), "blas::gemm: c must be a dense view.");
+
+			auto shape_a = get_array_shape(a);
+			auto shape_b = get_array_shape(b);
+			auto shape_c = get_array_shape(c);
+
+			int ma = (int)shape_a[0]; int na = (int)shape_a[1];
+			int mb = (int)shape_b[0]; int nb = (int)shape_b[1];
+			int mc = (int)shape_c[0]; int nc = (int)shape_c[1];
+
+			scoped_aview_read_proxy<ArrA> ap(a);
+			scoped_aview_read_proxy<ArrB> bp(b);
+
+			_gemm(
+					make_cmat(ma, na, ap.pbase(), transa, layout_order()), 	// a
+					make_cmat(mb, nb, bp.pbase(), transb, layout_order()), 	// b
+					make_mat(mc, nc, ptr_base(c), layout_order()), 			// c
+					alpha, beta);											// alpha, beta
+
+		}
+
 	}
 
 }
