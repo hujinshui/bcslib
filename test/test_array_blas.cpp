@@ -12,6 +12,7 @@
 #include <bcslib/array/array1d.h>
 #include <bcslib/array/array2d.h>
 #include <bcslib/array/generic_blas.h>
+#include <bcslib/array/mat_times.h>
 
 using namespace bcs;
 using namespace bcs::test;
@@ -227,7 +228,7 @@ bool verify_gemv(const caview2d<T, TOrd>& A, const caview1d<T>& x, const caview1
 	// use gemv to compute
 
 	array1d<T> y(y0.nelems(), y0.pbase());
-	blas::gemv(A, x, y, alpha, beta, trans);
+	blas::gemv(A, x, y, trans, alpha, beta);
 
 	// test
 
@@ -820,6 +821,308 @@ BCS_TEST_CASE( test_blas_level3 )
 }
 
 
+// Auxiliary functions for testing mat-vec
+
+template<typename T, typename TOrd>
+bool verify_mat_vec_times(TOrd, const T *src_a, const T *src_x, size_t m, size_t n, bool transa, bool switch_side)
+{
+	const caview2d<T, TOrd> a(src_a, (index_t)m, (index_t)n, m, n);
+
+	if (!switch_side)
+	{
+		if (!transa)
+		{
+			caview1d<T> x(src_x, n);
+			array1d<T> y = mtimes(a, x);
+			array1d<T> y0(m, T(0));
+			array1d<T> r = _compute_mv(a, x, y0, T(1), T(0), 'N');
+
+			return array_view_approx(y, r);
+		}
+		else
+		{
+			caview1d<T> x(src_x, m);
+			array1d<T> y = mtimes(a.Tp(), x);
+			array1d<T> y0(n, T(0));
+			array1d<T> r = _compute_mv(a, x, y0, T(1), T(0), 'T');
+
+			return array_view_approx(y, r);
+		}
+	}
+	else
+	{
+		if (!transa)
+		{
+			caview1d<T> x(src_x, m);
+			array1d<T> y = mtimes(x, a);
+			array1d<T> y0(n, T(0));
+			array1d<T> r = _compute_mv(a, x, y0, T(1), T(0), 'T');
+
+			return array_view_approx(y, r);
+		}
+		else
+		{
+			caview1d<T> x(src_x, n);
+			array1d<T> y = mtimes(x, a.Tp());
+			array1d<T> y0(m, T(0));
+			array1d<T> r = _compute_mv(a, x, y0, T(1), T(0), 'N');
+
+			return array_view_approx(y, r);
+		}
+	}
+}
+
+
+
+BCS_TEST_CASE( test_mat_vec_times )
+{
+	// prepare data
+
+	const size_t N = 12;
+	const size_t Nv = 4;
+
+	double asrc_d[N] = {12, 2, 5, 8, 7, 1, 3, 4, 6, 5, 3, 10};
+	double xsrc_d[Nv] = {2, 4, 3, 5};
+
+	float asrc_f[N] = {12, 2, 5, 8, 7, 1, 3, 4, 6, 5, 3, 10};
+	float xsrc_f[Nv] = {2, 4, 3, 5};
+
+	// test
+
+	// double
+
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 3, 4, false, false) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 3, 4, false, true) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 3, 4, true,  false) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 3, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 4, 3, false, false) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 4, 3, false, true) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 4, 3, true,  false) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 4, 3, true,  true) );
+
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 3, 4, false, false) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 3, 4, false, true) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 3, 4, true,  false) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 3, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 4, 3, false, false) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 4, 3, false, true) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 4, 3, true,  false) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 4, 3, true,  true) );
+
+	// float
+
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 3, 4, false, false) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 3, 4, false, true) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 3, 4, true,  false) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 3, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 4, 3, false, false) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 4, 3, false, true) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 4, 3, true,  false) );
+	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 4, 3, true,  true) );
+
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 3, 4, false, false) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 3, 4, false, true) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 3, 4, true,  false) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 3, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 4, 3, false, false) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 4, 3, false, true) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 4, 3, true,  false) );
+	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 4, 3, true,  true) );
+}
+
+
+// Auxiliary function for verifying mat-mat times
+
+template<typename T, typename TOrd>
+bool verify_mat_mat_times(TOrd, const T *src_a, const T *src_b, size_t m, size_t k, size_t n, bool transa, bool transb)
+{
+	size_t ma, na, mb, nb;
+	if (!transa) { ma = m; na = k; } else { ma = k; na = m; }
+	if (!transb) { mb = k; nb = n; } else { mb = n; nb = k; }
+
+	caview2d<T, TOrd> a(src_a, (index_t)ma, (index_t)na, ma, na);
+	caview2d<T, TOrd> b(src_b, (index_t)mb, (index_t)nb, mb, nb);
+
+	array2d<T, TOrd> z(m, n, T(0));
+
+	if (!transa)
+	{
+		if (!transb)
+		{
+			array2d<T, TOrd> c = mtimes(a, b);
+			array2d<T, TOrd> r = _compute_mm(a, b, z, T(1), T(0), 'N', 'N');
+			return array_view_approx(c, r);
+		}
+		else
+		{
+			array2d<T, TOrd> c = mtimes(a, b.Tp());
+			array2d<T, TOrd> r = _compute_mm(a, b, z, T(1), T(0), 'N', 'T');
+			return array_view_approx(c, r);
+		}
+	}
+	else
+	{
+		if (!transb)
+		{
+			array2d<T, TOrd> c = mtimes(a.Tp(), b);
+			array2d<T, TOrd> r = _compute_mm(a, b, z, T(1), T(0), 'T', 'N');
+			return array_view_approx(c, r);
+		}
+		else
+		{
+			array2d<T, TOrd> c = mtimes(a.Tp(), b.Tp());
+			array2d<T, TOrd> r = _compute_mm(a, b, z, T(1), T(0), 'T', 'T');
+			return array_view_approx(c, r);
+		}
+	}
+}
+
+
+BCS_TEST_CASE( test_mat_mat_times )
+{
+	// prepare data
+
+	const size_t N = 20;
+	double src_a_d[N] = {7, 4, 9, 3, 9, 3, 5, 8, 10, 1, 12, 10, 6, 5, 6, 4, 7, 7, 10, 9};
+	double src_b_d[N] = {8, 5, 10, 7, 5, 12, 11, 7, 8, 8, 3, 4, 6, 3, 11, 3, 3, 2, 3, 6};
+
+	float src_a_f[N] = {7, 4, 9, 3, 9, 3, 5, 8, 10, 1, 12, 10, 6, 5, 6, 4, 7, 7, 10, 9};
+	float src_b_f[N] = {8, 5, 10, 7, 5, 12, 11, 7, 8, 8, 3, 4, 6, 3, 11, 3, 3, 2, 3, 6};
+
+	// test
+
+	// double
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 4, 5, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 4, 5, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 4, 5, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 4, 5, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 5, 4, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 5, 4, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 5, 4, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 5, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 3, 5, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 3, 5, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 3, 5, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 3, 5, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 5, 3, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 5, 3, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 5, 3, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 5, 3, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 3, 4, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 3, 4, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 3, 4, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 3, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 4, 3, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 4, 3, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 4, 3, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 4, 3, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 4, 5, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 4, 5, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 4, 5, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 4, 5, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 5, 4, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 5, 4, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 5, 4, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 5, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 3, 5, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 3, 5, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 3, 5, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 3, 5, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 5, 3, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 5, 3, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 5, 3, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 5, 3, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 3, 4, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 3, 4, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 3, 4, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 3, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 4, 3, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 4, 3, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 4, 3, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 4, 3, true,  true) );
+
+
+	// float
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 4, 5, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 4, 5, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 4, 5, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 4, 5, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 5, 4, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 5, 4, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 5, 4, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 5, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 3, 5, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 3, 5, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 3, 5, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 3, 5, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 5, 3, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 5, 3, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 5, 3, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 5, 3, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 3, 4, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 3, 4, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 3, 4, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 3, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 4, 3, false, false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 4, 3, false, true) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 4, 3, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 4, 3, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 4, 5, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 4, 5, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 4, 5, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 4, 5, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 5, 4, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 5, 4, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 5, 4, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 5, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 3, 5, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 3, 5, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 3, 5, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 3, 5, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 5, 3, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 5, 3, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 5, 3, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 5, 3, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 3, 4, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 3, 4, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 3, 4, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 3, 4, true,  true) );
+
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 4, 3, false, false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 4, 3, false, true) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 4, 3, true,  false) );
+	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 4, 3, true,  true) );
+
+}
+
+
 test_suite* test_array_blas_suite()
 {
 	test_suite *tsuite = new test_suite( "test_array_blas" );
@@ -827,6 +1130,8 @@ test_suite* test_array_blas_suite()
 	tsuite->add( new test_blas_level1() );
 	tsuite->add( new test_blas_level2() );
 	tsuite->add( new test_blas_level3() );
+	tsuite->add( new test_mat_vec_times() );
+	tsuite->add( new test_mat_mat_times() );
 
 	return tsuite;
 }
