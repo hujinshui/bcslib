@@ -933,7 +933,7 @@ BCS_TEST_CASE( test_array_floor_and_ceil )
 
 	// round
 
-	for (int i = 0; i < N; ++i) res[i] = std::round(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = bcs::round(src[i]);
 
 	BCS_CHECK( array_view_equal( round(x), res, N ) );
 	BCS_CHECK( array_view_equal( round(Xr), res, nr, nc) );

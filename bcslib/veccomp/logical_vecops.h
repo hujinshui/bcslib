@@ -79,7 +79,7 @@ namespace bcs
 {
 	// functors
 
-	struct vec_not_ftor
+	struct vec_not_ftor : public std::unary_function<bool, bool>
 	{
 		bool operator() (bool v) const
 		{
@@ -92,7 +92,7 @@ namespace bcs
 		}
 	};
 
-	struct vec_and_ftor
+	struct vec_and_ftor : public std::binary_function<bool, bool, bool>
 	{
 		bool operator() (bool v1, bool v2) const
 		{
@@ -105,7 +105,7 @@ namespace bcs
 		}
 	};
 
-	struct vec_or_ftor
+	struct vec_or_ftor : public std::binary_function<bool, bool, bool>
 	{
 		bool operator() (bool v1, bool v2) const
 		{
@@ -118,7 +118,7 @@ namespace bcs
 		}
 	};
 
-	struct vec_xor_ftor
+	struct vec_xor_ftor : public std::binary_function<bool, bool, bool>
 	{
 		bool operator() (bool v1, bool v2) const
 		{

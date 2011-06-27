@@ -6,6 +6,10 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
 #ifndef BCSLIB_MAT_TIMES_H_
 #define BCSLIB_MAT_TIMES_H_
 

@@ -543,7 +543,7 @@ namespace bcs
 	// equal to
 
 	template<typename T>
-	struct vec_vec_eq_ftor
+	struct vec_vec_eq_ftor : public std::binary_function<T, T, bool>
 	{
 		bool operator() (const T& v1, const T& v2) const
 		{
@@ -557,7 +557,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_sca_eq_ftor
+	struct vec_sca_eq_ftor : public std::unary_function<T, bool>
 	{
 		T r;
 		vec_sca_eq_ftor(const T& r_)
@@ -578,7 +578,7 @@ namespace bcs
 	// not equal
 
 	template<typename T>
-	struct vec_vec_ne_ftor
+	struct vec_vec_ne_ftor : public std::binary_function<T, T, bool>
 	{
 		bool operator() (const T& v1, const T& v2) const
 		{
@@ -592,7 +592,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_sca_ne_ftor
+	struct vec_sca_ne_ftor : public std::unary_function<T, bool>
 	{
 		T r;
 		vec_sca_ne_ftor(const T& r_)
@@ -612,7 +612,7 @@ namespace bcs
 	// greater than
 
 	template<typename T>
-	struct vec_vec_gt_ftor
+	struct vec_vec_gt_ftor : public std::binary_function<T, T, bool>
 	{
 		bool operator() (const T& v1, const T& v2) const
 		{
@@ -626,7 +626,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_sca_gt_ftor
+	struct vec_sca_gt_ftor : public std::unary_function<T, bool>
 	{
 		T r;
 		vec_sca_gt_ftor(const T& r_)
@@ -645,7 +645,7 @@ namespace bcs
 
 
 	template<typename T>
-	struct sca_vec_gt_ftor
+	struct sca_vec_gt_ftor : public std::unary_function<T, bool>
 	{
 		T r;
 		sca_vec_gt_ftor(const T& r_)
@@ -666,7 +666,7 @@ namespace bcs
 	// greater than or equal to
 
 	template<typename T>
-	struct vec_vec_ge_ftor
+	struct vec_vec_ge_ftor : public std::binary_function<T, T, bool>
 	{
 		bool operator() (const T& v1, const T& v2) const
 		{
@@ -680,7 +680,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_sca_ge_ftor
+	struct vec_sca_ge_ftor : public std::unary_function<T, bool>
 	{
 		T r;
 		vec_sca_ge_ftor(const T& r_)
@@ -699,7 +699,7 @@ namespace bcs
 
 
 	template<typename T>
-	struct sca_vec_ge_ftor
+	struct sca_vec_ge_ftor : public std::unary_function<T, bool>
 	{
 		T r;
 		sca_vec_ge_ftor(const T& r_)
@@ -720,7 +720,7 @@ namespace bcs
 	// less than
 
 	template<typename T>
-	struct vec_vec_lt_ftor
+	struct vec_vec_lt_ftor : public std::binary_function<T, T, bool>
 	{
 		bool operator() (const T& v1, const T& v2) const
 		{
@@ -734,7 +734,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_sca_lt_ftor
+	struct vec_sca_lt_ftor : public std::unary_function<T, bool>
 	{
 		T r;
 		vec_sca_lt_ftor(const T& r_)
@@ -753,7 +753,7 @@ namespace bcs
 
 
 	template<typename T>
-	struct sca_vec_lt_ftor
+	struct sca_vec_lt_ftor : public std::unary_function<T, bool>
 	{
 		T r;
 		sca_vec_lt_ftor(const T& r_)
@@ -774,7 +774,7 @@ namespace bcs
 	// less than or equal to
 
 	template<typename T>
-	struct vec_vec_le_ftor
+	struct vec_vec_le_ftor : public std::binary_function<T, T, bool>
 	{
 		bool operator() (const T& v1, const T& v2) const
 		{
@@ -788,7 +788,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_sca_le_ftor
+	struct vec_sca_le_ftor : public std::unary_function<T, bool>
 	{
 		T r;
 		vec_sca_le_ftor(const T& r_)
@@ -807,7 +807,7 @@ namespace bcs
 
 
 	template<typename T>
-	struct sca_vec_le_ftor
+	struct sca_vec_le_ftor : public std::unary_function<T, bool>
 	{
 		T r;
 		sca_vec_le_ftor(const T& r_)
@@ -828,7 +828,7 @@ namespace bcs
 	// max_each
 
 	template<typename T>
-	struct vec_vec_max_each_ftor
+	struct vec_vec_max_each_ftor : public std::binary_function<T, T, T>
 	{
 		T operator() (const T& v1, const T& v2) const
 		{
@@ -846,7 +846,7 @@ namespace bcs
 	// min_each
 
 	template<typename T>
-	struct vec_vec_min_each_ftor
+	struct vec_vec_min_each_ftor : public std::binary_function<T, T, T>
 	{
 		T operator() (const T& v1, const T& v2) const
 		{
@@ -868,7 +868,7 @@ namespace bcs
 	 *******************************************/
 
 	template<typename T>
-	struct vec_lbound_ftor
+	struct vec_lbound_ftor : public std::unary_function<T, T>
 	{
 		T b;
 		vec_lbound_ftor(const T& b_) : b(b_) { }
@@ -892,7 +892,7 @@ namespace bcs
 
 
 	template<typename T>
-	struct vec_ubound_ftor
+	struct vec_ubound_ftor : public std::unary_function<T, T>
 	{
 		T b;
 		vec_ubound_ftor(const T& b_) : b(b_) { }
@@ -916,7 +916,7 @@ namespace bcs
 
 
 	template<typename T>
-	struct vec_rgn_bound_ftor
+	struct vec_rgn_bound_ftor : public std::unary_function<T, T>
 	{
 		T lb, ub;
 		vec_rgn_bound_ftor(const T& lb_, const T& ub_) : lb(lb_), ub(ub_) { }
@@ -939,7 +939,7 @@ namespace bcs
 
 
 	template<typename T>
-	struct vec_abound_ftor
+	struct vec_abound_ftor : public std::unary_function<T, T>
 	{
 		T ab;
 		vec_abound_ftor(const T& ab_) : ab(ab_) { }
@@ -970,7 +970,7 @@ namespace bcs
 	// addition
 
 	template<typename T>
-	struct vec_vec_add_ftor
+	struct vec_vec_add_ftor : public std::binary_function<T, T, T>
 	{
 		T operator() (const T& v1, const T& v2) const
 		{
@@ -989,7 +989,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_sca_add_ftor
+	struct vec_sca_add_ftor : public std::unary_function<T, T>
 	{
 		T s;
 		vec_sca_add_ftor(const T& s_)
@@ -1015,7 +1015,7 @@ namespace bcs
 	// subtraction
 
 	template<typename T>
-	struct vec_vec_sub_ftor
+	struct vec_vec_sub_ftor : public std::binary_function<T, T, T>
 	{
 		T operator() (const T& v1, const T& v2) const
 		{
@@ -1034,7 +1034,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_sca_sub_ftor
+	struct vec_sca_sub_ftor : public std::unary_function<T, T>
 	{
 		T s;
 		vec_sca_sub_ftor(const T& s_)
@@ -1057,7 +1057,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct sca_vec_sub_ftor
+	struct sca_vec_sub_ftor : public std::unary_function<T, T>
 	{
 		T s;
 		sca_vec_sub_ftor(const T& s_)
@@ -1083,7 +1083,7 @@ namespace bcs
 	// multiplication
 
 	template<typename T>
-	struct vec_vec_mul_ftor
+	struct vec_vec_mul_ftor : public std::binary_function<T, T, T>
 	{
 		T operator() (const T& v1, const T& v2) const
 		{
@@ -1102,7 +1102,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_sca_mul_ftor
+	struct vec_sca_mul_ftor : public std::unary_function<T, T>
 	{
 		T s;
 		vec_sca_mul_ftor(const T& s_)
@@ -1128,7 +1128,7 @@ namespace bcs
 	// division
 
 	template<typename T>
-	struct vec_vec_div_ftor
+	struct vec_vec_div_ftor : public std::binary_function<T, T, T>
 	{
 		T operator() (const T& v1, const T& v2) const
 		{
@@ -1147,7 +1147,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct vec_sca_div_ftor
+	struct vec_sca_div_ftor : public std::unary_function<T, T>
 	{
 		T s;
 		vec_sca_div_ftor(const T& s_)
@@ -1170,7 +1170,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct sca_vec_div_ftor
+	struct sca_vec_div_ftor : public std::unary_function<T, T>
 	{
 		T s;
 		sca_vec_div_ftor(const T& s_)
@@ -1197,7 +1197,7 @@ namespace bcs
 	// negation
 
 	template<typename T>
-	struct vec_neg_ftor
+	struct vec_neg_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1219,7 +1219,7 @@ namespace bcs
 	// absolute value
 
 	template<typename T>
-	struct vec_abs_ftor
+	struct vec_abs_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1249,7 +1249,7 @@ namespace bcs
 	// sqr
 
 	template<typename T>
-	struct vec_sqr_ftor
+	struct vec_sqr_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1266,7 +1266,7 @@ namespace bcs
 	// sqrt
 
 	template<typename T>
-	struct vec_sqrt_ftor
+	struct vec_sqrt_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1283,7 +1283,7 @@ namespace bcs
 	// rcp
 
 	template<typename T>
-	struct vec_rcp_ftor
+	struct vec_rcp_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1300,7 +1300,7 @@ namespace bcs
 	// rsqrt
 
 	template<typename T>
-	struct vec_rsqrt_ftor
+	struct vec_rsqrt_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1317,7 +1317,7 @@ namespace bcs
 	// pow (vec-vec)
 
 	template<typename T>
-	struct vec_pow_ftor
+	struct vec_pow_ftor : public std::binary_function<T, T, T>
 	{
 		T operator() (const T& v, const T& e) const
 		{
@@ -1334,7 +1334,7 @@ namespace bcs
 	// pow (vec-scalar)
 
 	template<typename T>
-	struct vec_sca_pow_ftor
+	struct vec_sca_pow_ftor : public std::unary_function<T, T>
 	{
 		T e;
 		vec_sca_pow_ftor(const T& e_)
@@ -1358,7 +1358,7 @@ namespace bcs
 	// exp
 
 	template<typename T>
-	struct vec_exp_ftor
+	struct vec_exp_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1374,7 +1374,7 @@ namespace bcs
 	// log
 
 	template<typename T>
-	struct vec_log_ftor
+	struct vec_log_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1390,7 +1390,7 @@ namespace bcs
 	// log10
 
 	template<typename T>
-	struct vec_log10_ftor
+	struct vec_log10_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1409,7 +1409,7 @@ namespace bcs
 	// floor
 
 	template<typename T>
-	struct vec_floor_ftor
+	struct vec_floor_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1425,7 +1425,7 @@ namespace bcs
 	// ceil
 
 	template<typename T>
-	struct vec_ceil_ftor
+	struct vec_ceil_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1441,7 +1441,7 @@ namespace bcs
 	// round
 
 	template<typename T>
-	struct vec_round_ftor
+	struct vec_round_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1460,7 +1460,7 @@ namespace bcs
 	// sin
 
 	template<typename T>
-	struct vec_sin_ftor
+	struct vec_sin_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1476,7 +1476,7 @@ namespace bcs
 	// cos
 
 	template<typename T>
-	struct vec_cos_ftor
+	struct vec_cos_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1492,7 +1492,7 @@ namespace bcs
 	// tan
 
 	template<typename T>
-	struct vec_tan_ftor
+	struct vec_tan_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1508,7 +1508,7 @@ namespace bcs
 	// asin
 
 	template<typename T>
-	struct vec_asin_ftor
+	struct vec_asin_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1524,7 +1524,7 @@ namespace bcs
 	// acos
 
 	template<typename T>
-	struct vec_acos_ftor
+	struct vec_acos_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1540,7 +1540,7 @@ namespace bcs
 	// atan
 
 	template<typename T>
-	struct vec_atan_ftor
+	struct vec_atan_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1556,7 +1556,7 @@ namespace bcs
 	// atan2
 
 	template<typename T>
-	struct vec_atan2_ftor
+	struct vec_atan2_ftor : public std::binary_function<T, T, T>
 	{
 		T operator() (const T& v1, const T& v2) const
 		{
@@ -1575,7 +1575,7 @@ namespace bcs
 	// sinh
 
 	template<typename T>
-	struct vec_sinh_ftor
+	struct vec_sinh_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1591,7 +1591,7 @@ namespace bcs
 	// cosh
 
 	template<typename T>
-	struct vec_cosh_ftor
+	struct vec_cosh_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1607,7 +1607,7 @@ namespace bcs
 	// tanh
 
 	template<typename T>
-	struct vec_tanh_ftor
+	struct vec_tanh_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v) const
 		{
@@ -1624,7 +1624,7 @@ namespace bcs
 	// accuracy-preserving functions
 
 	template<typename T>
-	struct vec_hypot_ftor
+	struct vec_hypot_ftor : public std::unary_function<T, T>
 	{
 		T operator() (const T& v1, const T& v2) const
 		{

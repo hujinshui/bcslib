@@ -9,6 +9,10 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
 #ifndef BCSLIB_IPPS_SELECT_H_
 #define BCSLIB_IPPS_SELECT_H_
 
