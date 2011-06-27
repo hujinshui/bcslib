@@ -6,9 +6,13 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
+
 #ifndef BCSLIB_LOGICAL_ARRAY_OPS_H_
 #define BCSLIB_LOGICAL_ARRAY_OPS_H_
-
 
 #include <bcslib/array/array1d.h>
 #include <bcslib/array/array2d.h>

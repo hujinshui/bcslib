@@ -6,6 +6,10 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
 #ifndef BCSLIB_ARRAY_STAT_H_
 #define BCSLIB_ARRAY_STAT_H_
 

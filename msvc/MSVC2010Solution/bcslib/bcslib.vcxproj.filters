@@ -18,6 +18,9 @@
     <Filter Include="Header Files\array">
       <UniqueIdentifier>{c8e0f768-62d8-4d7c-8f77-a37567ddc0de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\extern">
+      <UniqueIdentifier>{cc8e3c79-0084-4b2c-b5c4-ca2b4290f811}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\bcslib\base\arg_check.h">
@@ -36,9 +39,6 @@
       <Filter>Header Files\base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\bcslib\base\iterator_wrappers.h">
-      <Filter>Header Files\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\bcslib\base\math_functors.h">
       <Filter>Header Files\base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\bcslib\base\monitored_allocator.h">
@@ -73,6 +73,45 @@
     </ClInclude>
     <ClInclude Include="..\..\..\bcslib\array\generic_array_functions.h">
       <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\base\mathfun.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\base\sexpression.h">
+      <Filter>Header Files\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\generic_array_transpose.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\array_calc.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\array_stat.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\generic_array_eval.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\logical_array_ops.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\blas_base.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\generic_blas.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\array\mat_times.h">
+      <Filter>Header Files\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\extern\blas_select.h">
+      <Filter>Header Files\extern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\extern\ipps_select.h">
+      <Filter>Header Files\extern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\bcslib\extern\mkl_vml_select.h">
+      <Filter>Header Files\extern</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

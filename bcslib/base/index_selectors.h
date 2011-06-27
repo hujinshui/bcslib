@@ -7,6 +7,10 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
 #ifndef BCSLIB_INDEX_SELECTORS_H
 #define BCSLIB_INDEX_SELECTORS_H
 

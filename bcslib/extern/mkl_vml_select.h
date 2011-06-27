@@ -6,6 +6,10 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
 #ifndef BCSLIB_MKL_VML_SELECT_H_
 #define BCSLIB_MKL_VML_SELECT_H_
 

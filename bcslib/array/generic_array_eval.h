@@ -6,6 +6,10 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
 #ifndef GENERIC_ARRAY_EVAL_H_
 #define GENERIC_ARRAY_EVAL_H_
 
