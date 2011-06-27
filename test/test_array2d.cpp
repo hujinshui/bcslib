@@ -98,19 +98,6 @@ template class array_view2d_concept_check<bcs::array2d<double, column_major_t> >
 // Auxiliary test functions
 
 
-
-
-template<typename FwdIter>
-void print_collection(FwdIter first, FwdIter last)
-{
-	for (FwdIter it = first; it != last; ++it)
-	{
-		std::cout << *it << ' ';
-	}
-	std::cout << std::endl;
-}
-
-
 template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 bool array_integrity_test(const bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>& view)
 {

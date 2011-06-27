@@ -142,6 +142,7 @@ namespace bcs
 	class scoped_aview_read_proxy
 	{
 	public:
+		BCS_STATIC_ASSERT_V(is_array_view<Arr>);
 		typedef typename array_view_traits<Arr>::value_type value_type;
 
 		scoped_aview_read_proxy(const Arr& a)
@@ -171,6 +172,7 @@ namespace bcs
 	class scoped_aview_write_proxy
 	{
 	public:
+		BCS_STATIC_ASSERT_V(is_array_view<Arr>);
 		typedef typename array_view_traits<Arr>::value_type value_type;
 
 		scoped_aview_write_proxy(Arr& a, bool use_init_contents)

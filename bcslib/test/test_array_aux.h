@@ -14,7 +14,7 @@
 #include <bcslib/array/array2d.h>
 
 #include <cmath>
-#include <iostream>
+#include <cstdio>
 
 namespace bcs
 {
@@ -97,8 +97,22 @@ namespace bcs
 		}
 
 
+		template<typename T> struct default_approx_tol;
+
+		template<> struct default_approx_tol<double>
+		{
+			static double get() { return 1e-12; }
+		};
+
+		template<> struct default_approx_tol<float>
+		{
+			static double get() { return 1e-6f; }
+		};
+
+
 		template<typename T, class TIndexer0, class TIndexer1>
-		bool array_view_approx(const bcs::aview2d<T, row_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n, double eps = 1e-12)
+		bool array_view_approx(const bcs::aview2d<T, row_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n,
+				T eps = default_approx_tol<T>::get())
 		{
 			if (!(view.nrows() == m && view.ncolumns() == n)) return false;
 
@@ -114,7 +128,8 @@ namespace bcs
 		}
 
 		template<typename T, class TIndexer0, class TIndexer1>
-		bool array_view_approx(const bcs::aview2d<T, column_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n, double eps=1e-12)
+		bool array_view_approx(const bcs::aview2d<T, column_major_t, TIndexer0, TIndexer1>& view, const T* src, size_t m, size_t n,
+				T eps= default_approx_tol<T>::get())
 		{
 			if (!(view.nrows() == m && view.ncolumns() == n)) return false;
 
@@ -129,9 +144,9 @@ namespace bcs
 			return true;
 		}
 
-
-		template<class LIndexer, class RIndexer>
-		bool array_view_approx(const aview1d<double, LIndexer>& a1, const aview1d<double, RIndexer>& a2, double eps = 1e-12)
+		template<typename T, class LIndexer, class RIndexer>
+		bool array_view_approx(const aview1d<T, LIndexer>& a1, const aview1d<T, RIndexer>& a2,
+				T eps = default_approx_tol<T>::get())
 		{
 			if (a1.nelems() != a2.nelems()) return false;
 
@@ -145,10 +160,10 @@ namespace bcs
 		}
 
 
-		template<typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
+		template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
 		bool array_view_approx(
-				const aview2d<double, TOrd, LIndexer0, LIndexer1>& a1,
-				const aview2d<double, TOrd, RIndexer0, RIndexer1>& a2, double eps = 1e-12)
+				const aview2d<T, TOrd, LIndexer0, LIndexer1>& a1,
+				const aview2d<T, TOrd, RIndexer0, RIndexer1>& a2, T eps = default_approx_tol<T>::get())
 		{
 			if (a1.shape() != a2.shape()) return false;
 
@@ -170,22 +185,19 @@ namespace bcs
 		// printing
 
 		template<typename T, class TIndexer>
-		void print_array(const bcs::aview1d<T, TIndexer>& view, const char *title = 0)
+		void print_array(const bcs::caview1d<T, TIndexer>& view, const char *fmt = "%g ")
 		{
-			if (title != 0)
-				std::cout << title << ' ';
-
 			index_t n = (index_t)view.nelems();
 			for (index_t i = 0; i < n; ++i)
 			{
-				std::cout << view(i) << ' ';
+				std::printf(fmt, view(i));
 			}
-			std::cout << std::endl;
+			std::printf("\n");
 		}
 
 
 		template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-		void print_array(const bcs::aview2d<T, TOrd, TIndexer0, TIndexer1>& view)
+		void print_array(const bcs::caview2d<T, TOrd, TIndexer0, TIndexer1>& view, const char *fmt = "%g ")
 		{
 			index_t m = (index_t)view.nrows();
 			index_t n = (index_t)view.ncolumns();
@@ -194,9 +206,9 @@ namespace bcs
 			{
 				for (index_t j = 0; j < n; ++j)
 				{
-					std::cout << view(i, j) << ' ';
+					std::printf(fmt, view(i, j));
 				}
-				std::cout << std::endl;
+				std::printf("\n");
 			}
 		}
 
