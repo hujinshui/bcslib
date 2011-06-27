@@ -20,6 +20,8 @@ else
 	CFLAGS = -std=c++0x -fmax-errors=50 -pedantic $(WARNING_FLAGS) -I. 
 endif
 
+OFLAGS = -march=native -ffast-math -O3 
+
 
 #------ Intel-specific part (begin) ----------
 
@@ -40,7 +42,7 @@ endif
 ifdef MACOSX_VERSION
 INTEL_PATHS=-I$(MKLROOT)/include -L$(MKLROOT)/lib -I$(IPPROOT)/include -L$(IPPROOT)/lib -L$(ICCROOT)/lib
 else
-INTEL_PATHS=-I$(MKLROOT)/include -L$(MKLROOT)/lib/$(INTEL_ARCH) -I$(IPPROOT)/include -L$(IPPROOT)/lib/$(INTEL_ARCH) 
+INTEL_PATHS=-I$(MKLROOT)/include -I$(IPPROOT)/include
 endif
 
 INTEL_FLAGS=-DHAS_INTEL_MKL -DHAS_INTEL_IPP $(INTEL_PATHS) $(INTEL_LINKS)
@@ -145,7 +147,7 @@ bin/test_array_basics: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_HEADE
 	$(CXX) $(CFLAGS) $(ARRAY_BASIC_TESTS) -o bin/test_array_basics
 	
 bin/test_access_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) test/test_access_performance.cpp
-	$(CXX) $(CFLAGS) -O3 test/test_access_performance.cpp -o bin/test_access_performance	
+	$(CXX) $(CFLAGS) $(OFLAGS) test/test_access_performance.cpp -o bin/test_access_performance	
 		
 ARRAY_COMP_TESTS = test/test_array_comp.cpp \
 	test/test_array_calc.cpp \
@@ -159,10 +161,10 @@ bin/test_array_comp_intel: $(BASE_HEADERS) $(ARRAY_TEST_HEADERS) $(ARRAY_BASIC_H
 	$(CXX) $(CFLAGS) $(INTEL_FLAGS) $(ARRAY_COMP_TESTS) -o bin/test_array_comp_intel
 
 bin/test_calc_performance: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) test/test_calc_performance.cpp
-	$(CXX) $(CFLAGS) -O3 test/test_calc_performance.cpp -o bin/test_calc_performance
+	$(CXX) $(CFLAGS) $(OFLAGS) test/test_calc_performance.cpp -o bin/test_calc_performance
 	
 bin/test_calc_performance_intel: $(BASE_HEADERS) $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) test/test_calc_performance.cpp
-	$(CXX) $(CFLAGS) $(INTEL_FLAGS) -O3 test/test_calc_performance.cpp -o bin/test_calc_performance_intel	
+	$(CXX) $(CFLAGS) $(INTEL_FLAGS) $(OFLAGS) -limf test/test_calc_performance.cpp -o bin/test_calc_performance_intel	
 	
 LINALG_TESTS = test/test_linalg.cpp \
 	test/test_array_blas.cpp

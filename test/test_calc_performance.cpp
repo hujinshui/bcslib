@@ -478,8 +478,8 @@ void test_power_funs(size_t n, size_t nr,
 	std::printf("Testing Power Functions:\n");
 	std::printf("---------------------------\n");
 
-	double td = 1e-14;
-	float tf = 3e-7f;
+	double td = 1e-12;
+	float tf = 1e-6f;
 
 	// sqr
 
