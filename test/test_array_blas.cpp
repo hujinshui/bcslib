@@ -453,12 +453,380 @@ BCS_TEST_CASE( test_blas_level2 )
 }
 
 
+// Auxiliary functions for BLAS level 3
+
+template<typename T, typename TOrd>
+array2d<T, TOrd> _compute_mm(
+		const caview2d<T, TOrd>& A,
+		const caview2d<T, TOrd>& B,
+		const caview2d<T, TOrd>& C, T alpha, T beta, char transa, char transb)
+{
+
+	std::unique_ptr<array2d<T, TOrd> > pOpA( transa == 'N' || transa == 'n' ?
+			new array2d<T, TOrd>(clone_array(A)) : new array2d<T, TOrd>(transpose(A)) );
+
+	std::unique_ptr<array2d<T, TOrd> > pOpB( transb == 'N' || transb == 'n' ?
+			new array2d<T, TOrd>(clone_array(B)) : new array2d<T, TOrd>(transpose(B)) );
+
+	const array2d<T, TOrd>& OpA = *pOpA;
+	const array2d<T, TOrd>& OpB = *pOpB;
+
+	check_arg(OpA.dim1() == OpB.dim0() && OpA.dim0() == C.dim0() && OpB.dim1() == C.dim1(),
+			"_compute_mm: mismatched dimensions");
+
+	index_t m = OpA.dim0();
+	index_t k = OpA.dim1();
+	index_t n = OpB.dim1();
+
+	array2d<T, TOrd> R((size_t)m, (size_t)n);
+
+	for (index_t i = 0; i < m; ++i)
+	{
+		for (index_t j = 0; j < n; ++j)
+		{
+			T cv = 0;
+			for (index_t l = 0; l < k; ++l)
+			{
+				cv += OpA(i, l) * OpB(l, j);
+			}
+			R(i, j) = alpha * cv + beta * C(i, j);
+		}
+	}
+
+	return R;
+}
+
+
+template<typename T, typename TOrd>
+bool verify_gemm(
+		const caview2d<T, TOrd>& A,
+		const caview2d<T, TOrd>& B,
+		const caview2d<T, TOrd>& C0, T alpha, T beta, char transa, char transb)
+{
+	// compute ground-truth
+
+	array2d<T, TOrd> R = _compute_mm(A, B, C0, alpha, beta, transa, transb);
+
+	// use gemm to compute
+
+	array2d<T, TOrd> C = clone_array(C0);
+	blas::gemm(A, B, C, transa, transb, alpha, beta);
+
+	// test
+	return array_view_approx(C, R);
+}
+
+
+template<typename T, typename TOrd>
+bool verify_gemm_(TOrd, const T *src_a, const T *src_b, const T *src_c,
+		size_t m, size_t n, size_t k, T alpha, T beta, char transa, char transb)
+{
+	size_t ma, na, mb, nb;
+
+	if (transa == 'N' || transa == 'n') { ma = m; na = k; } else { ma = k; na = m; }
+	if (transb == 'N' || transb == 'n') { mb = k; nb = n; } else { mb = n; nb = k; }
+
+	caview2d<T, TOrd> A(src_a, (index_t)ma, (index_t)na, ma, na);
+	caview2d<T, TOrd> B(src_b, (index_t)mb, (index_t)nb, mb, nb);
+	caview2d<T, TOrd> C(src_c, (index_t)m, (index_t)n, m, n);
+
+	return verify_gemm(A, B, C, alpha, beta, transa, transb);
+}
+
+
+
+BCS_TEST_CASE( test_blas_level3 )
+{
+	// gemm
+
+	const size_t N = 20;
+	double src_a_d[N] = {7, 4, 9, 3, 9, 3, 5, 8, 10, 1, 12, 10, 6, 5, 6, 4, 7, 7, 10, 9};
+	double src_b_d[N] = {8, 5, 10, 7, 5, 12, 11, 7, 8, 8, 3, 4, 6, 3, 11, 3, 3, 2, 3, 6};
+	double src_c_d[N] = {2, 4, 10, 1, 12, 9, 6, 7, 3, 6, 12, 7, 7, 3, 6, 8, 9, 5, 5, 12};
+
+	float src_a_f[N] = {7, 4, 9, 3, 9, 3, 5, 8, 10, 1, 12, 10, 6, 5, 6, 4, 7, 7, 10, 9};
+	float src_b_f[N] = {8, 5, 10, 7, 5, 12, 11, 7, 8, 8, 3, 4, 6, 3, 11, 3, 3, 2, 3, 6};
+	float src_c_f[N] = {2, 4, 10, 1, 12, 9, 6, 7, 3, 6, 12, 7, 7, 3, 6, 8, 9, 5, 5, 12};
+
+	double alpha_d, beta_d;
+	float  alpha_f, beta_f;
+
+	// alpha = 1, beta = 0
+
+	alpha_d = 1; beta_d = 0;
+	alpha_f = 1; beta_f = 0;
+
+	// cm double
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T') );
+
+	// cm float
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T') );
+
+	// rm double
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T') );
+
+	// rm float
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T') );
+
+	// alpha = 2, beta = 0.5
+
+	alpha_d = 2.0;  beta_d = 0.5;
+	alpha_f = 2.0f; beta_f = 0.5f;
+
+	// cm double
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T') );
+
+	// cm float
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T') );
+
+	// rm double
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T') );
+
+	// rm float
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T') );
+
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N') );
+	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T') );
+
+}
+
+
 test_suite* test_array_blas_suite()
 {
 	test_suite *tsuite = new test_suite( "test_array_blas" );
 
 	tsuite->add( new test_blas_level1() );
 	tsuite->add( new test_blas_level2() );
+	tsuite->add( new test_blas_level3() );
 
 	return tsuite;
 }
