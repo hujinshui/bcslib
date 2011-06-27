@@ -106,7 +106,7 @@ namespace bcs
 
 		template<> struct default_approx_tol<float>
 		{
-			static double get() { return 1e-6f; }
+			static float get() { return 1e-6f; }
 		};
 
 

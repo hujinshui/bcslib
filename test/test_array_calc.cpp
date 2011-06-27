@@ -1077,7 +1077,6 @@ BCS_TEST_CASE( test_hypot )
 	array2d<double, row_major_t> Yr(nr, nc, src_y);
 	array2d<double, column_major_t> Yc(nr, nc, src_y);
 
-
 	for (int i = 0; i < N; ++i) res[i] = std::sqrt( sqr(src_x[i]) + sqr(src_y[i]) );
 
 	BCS_CHECK( array_view_approx( hypot(x, y), res, N ) );
