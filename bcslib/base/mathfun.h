@@ -50,8 +50,24 @@ namespace bcs
 	}
 
 #if BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
-	using std::round;
-	using std::hypot;
+
+	// unfortunately, in GCC 4.6, the std::hypot has an unguarded overload that would mess up with studff
+	// so cannot do direct using here ...
+
+	template<typename T>
+	BCS_FORCE_INLINE typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	round(T x)
+	{
+		return std::round(x);
+	}
+
+	template<typename T>
+	BCS_FORCE_INLINE typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	hypot(T x, T y)
+	{
+		return std::hypot(x, y);
+	}
+
 #else
 	template<typename T>
 	BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
