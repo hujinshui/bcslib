@@ -428,7 +428,10 @@ namespace bcs
 			check_arg(k == kb, "blas::_gemm: inconsistent dimensions");
 			check_arg(m == c.m && n == c.n, "blas::_gemm: inconsistent dimensions");
 
-			BCS_DGEMM(&transa, &transb, &m, &n, &k, &alpha, a.data, &(a.m), b.data, &(b.m), &beta, c.data, &(c.m));
+			if (m > 0 && n > 0 && k > 0)
+			{
+				BCS_DGEMM(&transa, &transb, &m, &n, &k, &alpha, a.data, &(a.m), b.data, &(b.m), &beta, c.data, &(c.m));
+			}
 		}
 
 		inline void _gemm(cmat<float, column_major_t> a, cmat<float, column_major_t> b, mat<float, column_major_t> c,
@@ -443,7 +446,10 @@ namespace bcs
 			check_arg(k == kb, "blas::_gemm: inconsistent dimensions");
 			check_arg(m == c.m && n == c.n, "blas::_gemm: inconsistent dimensions");
 
-			BCS_SGEMM(&transa, &transb, &m, &n, &k, &alpha, a.data, &(a.m), b.data, &(b.m), &beta, c.data, &(c.m));
+			if (m > 0 && n > 0 && k > 0)
+			{
+				BCS_SGEMM(&transa, &transb, &m, &n, &k, &alpha, a.data, &(a.m), b.data, &(b.m), &beta, c.data, &(c.m));
+			}
 		}
 
 		inline void _gemm(cmat<double, row_major_t> a, cmat<double, row_major_t> b, mat<double, row_major_t> c,

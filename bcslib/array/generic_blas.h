@@ -138,10 +138,9 @@ namespace bcs
 		template<class ArrA, class ArrX, class ArrY>
 		inline typename std::enable_if<is_mv_compatible<ArrA, ArrX, ArrY>::value,
 		void>::type
-		gemv(const ArrA& a, const ArrX& x, ArrY& y,
+		gemv(const ArrA& a, const ArrX& x, ArrY& y, char trans = 'N',
 				const typename array_view_traits<ArrA>::value_type& alpha = 1,
-				const typename array_view_traits<ArrA>::value_type& beta = 0,
-				char trans = 'N')
+				const typename array_view_traits<ArrA>::value_type& beta = 0)
 		{
 			typedef typename array_view_traits<ArrA>::value_type value_type;
 			typedef typename array_view_traits<ArrA>::layout_order layout_order;
@@ -252,9 +251,9 @@ namespace bcs
 		template<class ArrA, class ArrB, class ArrC>
 		inline typename std::enable_if<is_mm_compatible<ArrA, ArrB, ArrC>::value,
 		void>::type
-		gemm(const ArrA& a, const ArrB& b, ArrC& c, char transa, char transb,
-				const typename array_view_traits<ArrA>::value_type& alpha,
-				const typename array_view_traits<ArrA>::value_type& beta)
+		gemm(const ArrA& a, const ArrB& b, ArrC& c, char transa = 'N', char transb = 'N',
+				const typename array_view_traits<ArrA>::value_type& alpha = 1,
+				const typename array_view_traits<ArrA>::value_type& beta = 0)
 		{
 			typedef typename array_view_traits<ArrA>::value_type value_type;
 			typedef typename array_view_traits<ArrA>::layout_order layout_order;

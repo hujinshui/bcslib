@@ -83,7 +83,8 @@ ARRAY_COMP_HEADERS = bcslib/array/generic_array_eval.h \
 	
 LINALG_HEADERS = bcslib/extern/blas_select.h \
 	 bcslib/array/blas_base.h \
-	 bcslib/array/generic_blas.h 
+	 bcslib/array/generic_blas.h \
+	 bcslib/array/mat_times.h
 
 
 ARRAY_SPARSE_HEADERS = bcslib/array/sparse_vector.h bcslib/array/dynamic_sparse_vector.h
