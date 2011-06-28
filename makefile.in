@@ -9,6 +9,7 @@ CXX=@cxx@
 WARNING_FLAGS = @warning_flags@
 BOOST_WARNING_FLAGS = -Wall -Wextra -Wno-unused-variable -Wno-unused-parameter
 
+CPPFLAGS = @cppflags@
 CXXFLAGS = @cxxflags@
 OFLAGS = @oflags@ 
 

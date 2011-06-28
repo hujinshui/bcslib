@@ -86,64 +86,100 @@ def get_compiler_version(name):
 			
 # parse ini file
 
-def test_supports(supps, plf, compiler_name, compiler_ver):
-	"""test whether the current compiler is supported for a particular section"""
+def test_platform(platform_req, platform_spec):
+	"""test whether the input platform matches the requirement"""
 	
-	for s in supps:
-		parts = s.strip().split(':')
-		if len(parts) == 1:
-			a = parts[0]
-			cn = None
-			cv = None
-		elif len(parts) == 2:
-			a = parts[0]
-			cn = parts[1]
-			cv = None
-		elif len(parts) == 3:
-			a = parts[0]
-			cn = parts[1]
-			cv = ver2tuple(parts[2])
-		else:
-			report_err('The support string %s is invalid' % s.strip())
-			
-		if a.lower() == plf.lower(): # platform match
-			if cn == None:
-				return True 	# no specific requirement on compiler
+	platform_req = dequote(platform_req)
+	
+	if platform_req == None:
+		return True
+	else:
+		reqs = platform_req.split(';')
+		for req in reqs:
+			terms = req.strip().split('-')
+			if len(terms) == 1:
+				if terms[0].lower() == platform_spec[0].lower():
+					return True
+			elif len(terms) == 2:
+				if terms[0].lower() == platform_spec[0].lower() and terms[1].lower() == platform_spec[1].lower():
+					return True
 			else:
-				# check compiler
-				if cn.lower() == compiler_name.lower():
-					if cv == None:
+				report_err("Invalid platform requirement string: %s" % req.strip())
+				
+		return False
+			
+			
+def test_compiler(compiler_req, compiler_spec):
+	"""test whether the input compiler matches the requirement"""
+	
+	compiler_req = dequote(compiler_req)
+	
+	if compiler_req == None:
+		return True
+	else:
+		reqs = compiler_req.split(';')
+		for req in reqs:
+			terms = req.strip().split('-')
+			if len(terms) == 1:
+				if terms[0].lower() == compiler_spec[0].lower():
+					return True
+			elif len(terms) == 2:
+				if terms[0].lower() == compiler_spec[0].lower():
+					rver = ver2tuple(terms[1])
+					if rver <= compiler_spec[1]:
 						return True
-					else:
-						# check compiler version
-						if cv <= compiler_ver:
-							return True
-							
-	return False
+			
+		return False
+			
+	
+def add_valid_entries(vdict, indict):
+	"""Add valid entries from an input dict to vdict"""
+	
+	for name, val in indict.iteritems():
+		if len(name) > 0 and name[0] != '_':
+			vdict[name] = dequote(val.strip())
 			
 			
-def parse_cfg(filename, plf, compiler_name, compiler_ver):
+def parse_cfg(filename, platform_spec, compiler_spec):
 	"""parse init file and make a variable context for makefile generation"""
 	
 	cfg = cp.ConfigParser()
 	cfg.read(filename)
 	
-	vdict = cfg.defaults()
+	# check basic requirement
+	
+	dsec = cfg.defaults()
+
+	if '_platforms_' in dsec:
+		if not test_platform(dsec['_platforms_'], platform_spec):
+			report_err("The current system does not meet the platform requirement.")
+	else:
+		report_err("The option _platforms_ is missing from the default section.")
+		
+	if '_compilers_' in dsec:
+		if not test_compiler(dsec['_compilers_'], compiler_spec):
+			report_err("The current system does not meet the compiler requirement.")
+	else:
+		report_err("The option _compilers_ is missing from the default section.")
+	
+	# add matched sections
+	
+	print 'section DEFAULT included'
+	vdict = dict()
+	add_valid_entries(vdict, dsec)
 	
 	for sec in cfg.sections():
-		if not cfg.has_option(sec, '_supports'):
-			print 'WARNING: The section %s does not has a _supports option, ignored.'
-			continue
-			
-		supps = cfg.get(sec, '_supports')
-		supps = dequote(supps.strip()).split(';')
+		has_platforms_req = cfg.has_option(sec, '_platforms_')
+		has_compilers_req = cfg.has_option(sec, '_compilers_')
+					
+		platform_reqs = cfg.get(sec, '_platforms_') if has_platforms_req else None
+		compiler_reqs = cfg.get(sec, '_compilers_') if has_compilers_req else None
 		
-		if test_supports(supps, plf, compiler_name, compiler_ver):
-			print 'section %s included' % sec
+		if test_platform(platform_reqs, platform_spec) and test_compiler(compiler_reqs, compiler_spec):
 			
-			for name, val in cfg.items(sec):
-				if len(name) > 0 and name[0] != '_':
-					vdict[name] = dequote(val.strip())
+			# include all entries in this section (may override previous)
+			print 'section %s included' % sec
+			add_valid_entries(vdict, dict(cfg.items(sec)))
 					
 	return vdict
 	
@@ -195,9 +231,9 @@ if __name__ == '__main__':
 	os_name = platform.system()
 	arch = platform.architecture()
 	arch_bits = arch[0]
-	plf = "%s.%s" % (os_name, arch_bits)
+	platform_spec = (os_name, arch_bits)
 	
-	print "Detected platform:", plf
+	print "Detected platform: (%s, %s)" % platform_spec
 	
 	# detect compiler
 	
@@ -214,8 +250,9 @@ if __name__ == '__main__':
 	
 	ver = get_compiler_version(cxx)
 	vstr = '.'.join(str(x) for x in ver)
-			
-	print "Detected compiler: %s %s" % (cxx, vstr)
+	
+	compiler_spec = (cxx, ver)
+	print "Detected compiler: (%s, %s)" % (cxx, vstr)
 	
 	# parse ini file
 	
@@ -223,7 +260,7 @@ if __name__ == '__main__':
 	if not os.path.isfile(cfgfile):
 		report_err('The configuration file %s is not found.' % cfgfile)
 		
-	vdict = parse_cfg(cfgfile, plf, cxx, ver)
+	vdict = parse_cfg(cfgfile, platform_spec, compiler_spec)
 	
 	if len(vdict) > 0:
 		print "Applicable macros:"
