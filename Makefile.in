@@ -1,0 +1,208 @@
+# The make file for BCSLib
+
+# compiler configuration
+
+#------ platform-specific options -----------
+
+CXX=@cxx@
+
+WARNING_FLAGS = @warning_flags@
+BOOST_WARNING_FLAGS = @boost_warning_flags@
+CPPFLAGS = @cppflags@
+CXXFLAGS = @cxxflags@
+OFLAGS = @oflags@ 
+
+USE_INTEL = "yes"
+
+ifeq ($(USE_INTEL), "yes")
+    INTEL_PATHS = @intel_paths@
+    INTEL_LINKS = @intel_links@
+    INTEL_FLAGS = -DHAS_INTEL_MKL -DHAS_INTEL_IPP $(INTEL_PATHS) $(INTEL_LINKS)
+endif
+
+#------ Output directory ----------
+
+TEST_BIN_DIR = bin
+BENCH_BIN_DIR = bin
+
+#------ Header groups ----------
+
+BASE_HEADERS = \
+	bcslib/base/config.h \
+	bcslib/base/basic_defs.h \
+	bcslib/base/arg_check.h \
+	bcslib/base/mathfun.h \
+	bcslib/base/basic_algorithms.h \
+	bcslib/base/iterator_wrappers.h \
+	bcslib/base/basic_mem.h \
+	bcslib/base/monitored_allocator.h \
+	bcslib/base/index_selectors.h \
+	bcslib/base/sexpression.h
+
+BASE_TEST_HEADERS = \
+	bcslib/test/test_assertion.h \
+	bcslib/test/test_units.h \
+	bcslib/test/execution_mon.h \
+	bcslib/test/performance_timer.h
+
+ARRAY_TEST_HEADERS = $(TEST_HEADERS) bcslib/test/test_array_aux.h
+
+ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
+	bcslib/array/array_base.h \
+	bcslib/array/array_index.h \
+	bcslib/array/generic_array_functions.h \
+	bcslib/array/generic_array_transpose.h \
+	bcslib/array/array1d.h \
+	bcslib/array/array2d.h 
+	 	
+VEC_COMP_HEADERS = \
+	bcslib/veccomp/veccalc.h \
+	bcslib/veccomp/vecstat.h \
+	bcslib/veccomp/logical_vecops.h \
+	bcslib/veccomp/intel_calc.h
+
+ARRAY_COMP_HEADERS = $(ARRAY_BASIC_HEADERS) $(VEC_COMP_HEADERS) \
+	bcslib/array/generic_array_eval.h \
+	bcslib/array/array_calc.h \
+	bcslib/array/array_stat.h \
+	bcslib/array/logical_array_ops.h
+	
+LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
+	bcslib/extern/blas_select.h \
+	bcslib/array/blas_base.h \
+	bcslib/array/generic_blas.h \
+	bcslib/array/mat_times.h
+
+
+#---------- Target groups -------------------
+
+.PHONY: all
+all: test bench
+
+.PHONY: test
+test: test_c0x_support test_basics test_array
+
+.PHONY: bench
+bench: bench_array
+
+.PHONY: clean
+
+ifeq ($(TEST_BIN_DIR) $(BENCH_BIN_DIR))
+clean:
+	-rm $(TEST_BIN_DIR)/*
+else
+clean:
+	-rm $(TEST_BIN_DIR)/* $(BENCH_BIN_DIR)/*
+endif
+
+
+#------ Basic tests ----------
+
+.PHONY: test_c0x_support
+test_c0x_support: $(TEST_BIN_DIR)/test_c0x_support.out
+
+$(TEST_BIN_DIR)/test_c0x_support.out: test/test_c0x_support.cpp
+	$(CXX) $(CXXFLAGS) -c test/test_c0x_support.cpp -o $(TEST_BIN_DIR)/test_c0x_support.out
+
+
+.PHONY: test_basics
+test_basics: $(TEST_BIN_DIR)/test_basics
+
+TEST_BASICS_SOURCES = \
+	test/test_basics.cpp \
+	test/test_basic_algorithms.cpp \
+	test/test_basic_memory.cpp \
+	test/test_index_selection.cpp
+	
+$(TEST_BIN_DIR)/test_basics: $(BASE_HEADERS) $(BASE_TEST_HEADERS) $(TEST_BASICS_SOURCES)
+	$(CXX) $(CFLAGS) $(BASICS_TESTS) -o $(TEST_BIN_DIR)/test_basics 
+
+
+#------ Array tests (declaration) -----------
+
+.PHONY: test_array
+.PHONY: bench_array	
+
+ifeq ($(USE_INTEL), "yes")
+
+test_array: \
+	$(TEST_BIN_DIR)/test_array_basics \
+	$(TEST_BIN_DIR)/test_array_comp \
+	$(TEST_BIN_DIR)/test_array_comp_intel \
+	$(TEST_BIN_DIR)/test_linalg_intel
+
+bench_array: \
+	$(BENCH_BIN_DIR)/bench_array_access \
+	$(BENCH_BIN_DIR)/bench_array_calc \
+	$(BENCH_BIN_DIR)/bench_array_calc_intel
+
+else
+
+test_array: \
+	$(TEST_BIN_DIR)/test_array_basics \
+	$(TEST_BIN_DIR)/test_array_comp \
+	$(TEST_BIN_DIR)/test_access_performance \
+	$(TEST_BIN_DIR)/test_calc_performance
+
+bench_array: \
+	$(BENCH_BIN_DIR)/bench_array_access \
+	$(BENCH_BIN_DIR)/bench_array_calc
+
+endif
+
+
+
+#_________________________________________________________________________
+#
+#  BELOW ARE DETAILS!
+#
+
+#----------------------------------------------------------
+#
+#   Array test & bench (details)
+#
+#----------------------------------------------------------
+
+# array tests
+
+TEST_ARRAY_BASICS_SOURCES = \
+	test/test_array_basics.cpp \
+	test/test_array1d.cpp \
+	test/test_array2d.cpp \
+	test/test_array_transpose.cpp
+
+$(TEST_BIN_DIR)/test_array_basics: $(ARRAY_BASIC_HEADERS) $(ARRAY_TEST_HEADERS) $(TEST_ARRAY_BASICS_SOURCES) 
+	$(CXX) $(CXXFLAGS) $(TEST_ARRAY_BASICS_SOURCES) -o $(TEST_BIN_DIR)/test_array_basics
+	
+TEST_ARRAY_COMP_SOURCES = \
+	test/test_array_comp.cpp \
+	test/test_array_calc.cpp \
+	test/test_array_stat.cpp \
+	test/test_logical_array_ops.cpp
+
+$(TEST_BIN_DIR)/test_array_comp: $(ARRAY_COMP_HEADERS) $(ARRAY_TEST_HEADERS) $(TEST_ARRAY_COMP_SOURCES)
+	$(CXX) $(CXXFLAGS) $(TEST_ARRAY_COMP_SOURCES) -o $(TEST_BIN_DIR)/test_array_comp
+
+$(TEST_BIN_DIR)/test_array_comp_intel: $(ARRAY_COMP_HEADERS) $(ARRAY_TEST_HEADERS) $(TEST_ARRAY_COMP_SOURCES)
+	$(CXX) $(CXXFLAGS) $(INTEL_FLAGS) $(TEST_ARRAY_COMP_SOURCES) -o $(TEST_BIN_DIR)/test_array_comp_intel
+
+TEST_LINALG_SOURCES = \
+	test/test_linalg.cpp \
+	test/test_array_blas.cpp
+
+$(TEST_BIN_DIR)/test_linalg_intel: $(LINALG_HEADERS) $(ARRAY_TEST_HEADERS) $(TEST_LINALG_SOURCES)
+	$(CXX) $(CXXFLAGS) $(INTEL_FLAGS) $(TEST_LINALG_SOURCES) -o $(TEST_BIN_DIR)/test_linalg_intel
+
+# array bench
+
+$(BENCH_BIN_DIR)/bench_array_access: $(ARRAY_BASIC_HEADERS) bench/bench_array_access.cpp
+	$(CXX) $(CXXFLAGS) $(OFLAGS) bench/bench_array_access.cpp -o $(BENCH_BIN_DIR)/bench_array_access
+		
+$(BENCH_BIN_DIR)/bench_array_calc: $(ARRAY_COMP_HEADERS) bench/bench_array_calc.cpp
+	$(CXX) $(CXXFLAGS) $(OFLAGS) bench/bench_array_calc.cpp -o $(BENCH_BIN_DIR)/bench_array_calc
+	
+$(BENCH_BIN_DIR)/bench_array_calc_intel: $(ARRAY_COMP_HEADERS) bench/bench_array_calc.cpp
+	$(CXX) $(CXXFLAGS) $(INTEL_FLAGS) $(OFLAGS) bench/bench_array_calc.cpp -o $(BENCH_BIN_DIR)/bench_array_calc_intel
+
+	
+

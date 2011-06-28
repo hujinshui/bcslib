@@ -6,6 +6,7 @@ Debug/*
 temp/*
 bin/*
 
+*.swp
 *.suo
 *.ipch
 *.sdf
