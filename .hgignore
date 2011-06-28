@@ -1,5 +1,7 @@
 syntax: glob
 
+Makefile
+makefile
 .project
 .cproject
 Debug/*

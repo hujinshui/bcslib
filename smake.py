@@ -13,8 +13,8 @@ import os
 import os.path
 import sys
 import subprocess as sp
-import ConfigParser as cp
 import re
+
 
 # Auxiliary functions
 
@@ -26,10 +26,10 @@ def dequote(sval):
 	else:
 		return sval
 	
-
 def report_err(message):
 	sys.stderr.write(message + '\n')
 	sys.exit(1)
+
 
 
 def get_cmd_output(cmd):
@@ -45,7 +45,61 @@ def found_sys_command(name):
 	
 	rout, rerr = get_cmd_output('which ' + name)
 	return len(rout) > 0
+
+
+# INI file parser 
+# (the ConfigParser does not maintain the order of sections, and cannot be used here)
+
+def seq_ini_parse(filename):
+	"""Parse an INI file sequentially"""
+
+	with open(filename, 'r') as fin:
+		lines = fin.readlines()
 	
+	sections = []	
+	
+	op_pat = re.compile("^([\w\d_]+)\s*=\s*")
+	
+	i = 0
+	sec = None
+	for line in lines:
+		i = i + 1
+		
+		line = line.strip()
+		if len(line) == 0 or line[0] == ';':
+			continue
+			
+		if line[0] == '[':  # section head
+			if line[-1] != ']':
+				report_err("Invalid section head in %s(%d)" % (filename, i))
+		
+			sec_name = line[1:-1].strip()
+			
+			# add previous section (if any)
+			if sec != None:
+				sections.append(sec)
+			
+			# init current section
+			sec = (sec_name, dict())
+			
+		else:  # try to parse as an option
+			m = re.match(op_pat, line)
+			if m:
+				opname = m.group(1)
+				opval = line[m.end():].strip()
+				sec[1][opname] = dequote(opval)
+			else:
+				report_err("Invalid option line in %s(%d)" % (filename, i))
+		
+	# add last section
+	if sec != None:
+		sections.append(sec)
+		
+	return sections
+
+
+# compiler version retrieval	
+
 def ver2tuple(vstr):
 	"""Convert version string to tuple"""
 	
@@ -58,9 +112,8 @@ def ver2tuple(vstr):
 		vns = (vns[0], 0, 0)
 		
 	return vns
-	
-# compiler version retrieval	
-	
+
+		
 def get_compiler_version(name):
 	"""Get the tuple that represents the version of a compiler"""
 	
@@ -88,9 +141,7 @@ def get_compiler_version(name):
 
 def test_platform(platform_req, platform_spec):
 	"""test whether the input platform matches the requirement"""
-	
-	platform_req = dequote(platform_req)
-	
+		
 	if platform_req == None:
 		return True
 	else:
@@ -111,9 +162,7 @@ def test_platform(platform_req, platform_spec):
 			
 def test_compiler(compiler_req, compiler_spec):
 	"""test whether the input compiler matches the requirement"""
-	
-	compiler_req = dequote(compiler_req)
-	
+		
 	if compiler_req == None:
 		return True
 	else:
@@ -137,19 +186,22 @@ def add_valid_entries(vdict, indict):
 	
 	for name, val in indict.iteritems():
 		if len(name) > 0 and name[0] != '_':
-			vdict[name] = dequote(val.strip())
+			vdict[name] = val.strip()
 			
 			
 def parse_cfg(filename, platform_spec, compiler_spec):
 	"""parse init file and make a variable context for makefile generation"""
 	
-	cfg = cp.ConfigParser()
-	cfg.read(filename)
+	sections = seq_ini_parse(filename)
+	
+	if len(sections) == 0 or sections[0][0].lower() != "default":
+		report_err("the default section is missing.")
+	
+	dsec = sections[0][1]
+	sections = sections[1:]
 	
 	# check basic requirement
 	
-	dsec = cfg.defaults()
-
 	if '_platforms_' in dsec:
 		if not test_platform(dsec['_platforms_'], platform_spec):
 			report_err("The current system does not meet the platform requirement.")
@@ -164,22 +216,25 @@ def parse_cfg(filename, platform_spec, compiler_spec):
 	
 	# add matched sections
 	
-	print 'section DEFAULT included'
+	print 'default section included'
 	vdict = dict()
 	add_valid_entries(vdict, dsec)
 	
-	for sec in cfg.sections():
-		has_platforms_req = cfg.has_option(sec, '_platforms_')
-		has_compilers_req = cfg.has_option(sec, '_compilers_')
-					
-		platform_reqs = cfg.get(sec, '_platforms_') if has_platforms_req else None
-		compiler_reqs = cfg.get(sec, '_compilers_') if has_compilers_req else None
+	# process other sections
+	
+	for sec in sections:
 		
+		sec_name = sec[0]
+		sec_vals = sec[1]
+		
+		platform_reqs = sec_vals.get('_platforms_')
+		compiler_reqs = sec_vals.get('_compilers_')
+									
 		if test_platform(platform_reqs, platform_spec) and test_compiler(compiler_reqs, compiler_spec):
 			
 			# include all entries in this section (may override previous)
-			print 'section %s included' % sec
-			add_valid_entries(vdict, dict(cfg.items(sec)))
+			print 'section %s included' % sec_name
+			add_valid_entries(vdict, sec_vals)
 					
 	return vdict
 	
@@ -287,4 +342,6 @@ if __name__ == '__main__':
 		
 	print "%s is generated" % outfile	
 	print "smake done!\n"
+
+
 
