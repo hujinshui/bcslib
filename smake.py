@@ -262,19 +262,23 @@ if __name__ == '__main__':
 		
 	vdict = parse_cfg(cfgfile, platform_spec, compiler_spec)
 	
+	appm_count = 0
 	if len(vdict) > 0:
 		print "Applicable macros:"
 		for name, val in vdict.items():
-			print '    ', name, '=', val
-	else:
+			if name[-1] != '_':
+				appm_count = appm_count + 1
+				print '    ', name, '=', val
+	
+	if appm_count == 0:
 		print "No appliable macros"
 		
 	vdict['cxx'] = cxx
 		
 	# generate makefile
 		
-	infile = 'makefile.in'
-	outfile = 'makefile.out'
+	infile = vdict['input_file_'] or 'makefile.in'
+	outfile = vdict['output_file_'] or 'makefile'
 	
 	if not os.path.isfile(infile):
 		report_err('The input template %s is not found.' % infile)
