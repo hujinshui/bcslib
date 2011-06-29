@@ -33,28 +33,23 @@ namespace bcs
 	public:
 		generator_buffer(generator_type gen, size_t buf_size)
 		: _check_size(buf_size)
-		, m_n(buf_size / 2)
-		, m_blk(buf_size)
 		, m_gen(gen)
-		, m_iactive(0)
-		, m_p(m_blk.pbase())
-		, m_pend(m_p + m_n)
+		, m_blk(buf_size)
+		, m_p(m_blk.pbase() + buf_size) , m_pend(m_p) // make it initially empty
 		, m_tn(0)
 		{
-			m_gen(m_n, m_p);
-			m_tn += m_n;
 		}
 
 
 	public:
 		size_t buffer_capacity() const
 		{
-			return 2 * m_n;
+			return m_blk.nelems();
 		}
 
 		size_t num_buffered() const  // the actual number of values currently in buffer
 		{
-			return num_actives() + m_n;
+			return (size_t)(m_pend - m_p);
 		}
 
 		uint64_t total_generated() const	// the total number of values that have ever been generated
@@ -64,94 +59,63 @@ namespace bcs
 
 		void get_next(result_type *dst)
 		{
-			*dst = *(m_p++);
+			if (m_p == m_pend)
+			{
+				refill_buffer();
+			}
 
-			maintain();
+			return *(m_p++);
 		}
 
 		void get_next_n(size_t n, result_type *dst)
 		{
-			size_t na = num_actives();
-			if (n <= na)
+			if (n > 0)
 			{
-				copy_elements(m_p, dst, n);
-				m_p += n;
-				maintain();
-			}
-			else
-			{
-				flush_actives(na, dst);
-				n -= na;
-				dst += na;
+				size_t nb = num_buffered();
 
-				while (n >= m_n)
+				if (n <= nb)
 				{
-					flush_actives(m_n, dst);
-					n -= m_n;
-					dst += m_n;
+					// directly copy from buffer
+					export_buffer(n, dst);
 				}
-
-				if (n > 0)
+				else
 				{
-					copy_elements(m_p, dst, n);
-					m_p += n;
+					// flush the buffer to target first
+					if (nb > 0)
+						export_buffer(nb, dst);
+
+					// produce the remaining
+					size_t nr = n - nb;
+					if (nr < buffer_capacity())
+					{
+						refill_buffer();
+						export_buffer(nr, dst + nb);
+					}
+					else
+					{
+						generate_to(nr, dst + nb);
+					}
 				}
 			}
 		}
 
 	private:
-		result_type *buffer0_base()
+		void generate_to(size_t n, result_type *dst)
 		{
-			return m_blk.pbase();
+			m_gen(n, dst);
+			m_tn += n;
 		}
 
-		result_type *buffer1_base()
+		void refill_buffer()
 		{
-			return m_blk.pbase() + m_n;
+			generate_to(m_blk.nelems(), m_blk.pbase());
+			m_p = m_blk.pbase();
 		}
 
-		void switch_buffer()
+		void export_buffer(size_t n, result_type *dst)  // only call when n <= num_buffered()
 		{
-			if (m_iactive == 0)  // 0 --> 1
-			{
-				m_iactive = 1;
-				m_p = buffer1_base();
-				m_pend = m_p + m_n;
-			}
-			else  // 1 --> 0
-			{
-				m_iactive = 0;
-				m_p = buffer0_base();
-				m_pend = m_p + m_n;
-			}
-		}
-
-		void refill_backup_buffer()
-		{
-			result_type *pb = m_iactive == 1 ? buffer0_base() : buffer1_base();
-			m_gen(m_n, pb);
-			m_tn += m_n;
-		}
-
-		size_t num_actives() const
-		{
-			return static_cast<size_t>(m_pend - m_p);
-		}
-
-		void maintain()
-		{
-			if (m_p == m_pend)
-			{
-				switch_buffer();
-				refill_backup_buffer();
-			}
-		}
-
-		void flush_actives(size_t na, result_type* dst)
-		{
-			copy_elements(m_p, dst, na);
-			switch_buffer();
-			refill_backup_buffer();
+			copy_elements(m_p, dst, n);
+			m_p += n;
 		}
 
 	private:
@@ -160,23 +124,21 @@ namespace bcs
 		{
 			_check_size_t(size_t bufsize)
 			{
-				check_arg(bufsize >= 4 && bufsize % 2 == 0,
-					"generator_buffer: buffer size must be even and at least 4.");
+				check_arg(bufsize >= 8,
+					"generator_buffer: buffer size must be at least 8.");
 			}
 		};
 		_check_size_t _check_size;
 
-		size_t m_n;
-		block<result_type> m_blk; 	// it holds two buffers, each of length n
-
 		generator_type m_gen;	// the generator
 
-		int m_iactive;			// 0 or 1
-		result_type *m_p; 		// point to next
-		result_type *m_pend;	// the end of current buffer
+		block<result_type> m_blk; 	// it holds two buffers, each of length n
+		result_type *m_p;			// point to the next value
+		result_type *m_pend;		// point to the end of the buffer
 
 		uint64_t m_tn;			// the total number of values that have been generated
-	};
+
+	}; // end class generator_buffer
 
 
 }
