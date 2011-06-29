@@ -1,5 +1,5 @@
 /*
- * @file test_calc_performance.cpp
+ * @file bench_array_calc.cpp
  *
  * Test the performance (and correctness) of calculation implementation
  *
