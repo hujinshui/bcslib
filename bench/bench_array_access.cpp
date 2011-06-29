@@ -1,5 +1,5 @@
 /**
- * @file test_access_performance.cpp
+ * @file bench_array_access.cpp
  *
  * The program to test array's element access performance
  * 

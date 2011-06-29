@@ -9,7 +9,7 @@ CXX=@cxx@
 WARNING_FLAGS = @warning_flags@
 BOOST_WARNING_FLAGS = @boost_warning_flags@
 CPPFLAGS = @cppflags@
-CXXFLAGS = @cxxflags@
+CXXFLAGS = $(CPPFLAGS) @cxxflags@
 OFLAGS = @oflags@ 
 
 USE_INTEL = "yes"
@@ -87,7 +87,7 @@ bench: bench_array
 
 .PHONY: clean
 
-ifeq ($(TEST_BIN_DIR) $(BENCH_BIN_DIR))
+ifeq ($(TEST_BIN_DIR), $(BENCH_BIN_DIR))
 clean:
 	-rm $(TEST_BIN_DIR)/*
 else
@@ -115,7 +115,7 @@ TEST_BASICS_SOURCES = \
 	test/test_index_selection.cpp
 	
 $(TEST_BIN_DIR)/test_basics: $(BASE_HEADERS) $(BASE_TEST_HEADERS) $(TEST_BASICS_SOURCES)
-	$(CXX) $(CFLAGS) $(BASICS_TESTS) -o $(TEST_BIN_DIR)/test_basics 
+	$(CXX) $(CXXFLAGS) $(TEST_BASICS_SOURCES) -o $(TEST_BIN_DIR)/test_basics 
 
 
 #------ Array tests (declaration) -----------
