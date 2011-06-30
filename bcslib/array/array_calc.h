@@ -17,7 +17,7 @@
 #include <bcslib/array/array2d.h>
 
 #include <bcslib/array/generic_array_eval.h>
-#include <bcslib/veccomp/veccalc.h>
+#include <bcslib/veccomp/veccalc_functors.h>
 
 namespace bcs
 {

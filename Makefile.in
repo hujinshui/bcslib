@@ -31,6 +31,7 @@ BASE_HEADERS = \
 	bcslib/base/config.h \
 	bcslib/base/basic_defs.h \
 	bcslib/base/arg_check.h \
+	bcslib/base/basic_math.h \
 	bcslib/base/mathfun.h \
 	bcslib/base/basic_algorithms.h \
 	bcslib/base/iterator_wrappers.h \
@@ -57,6 +58,7 @@ ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	 	
 VEC_COMP_HEADERS = \
 	bcslib/veccomp/veccalc.h \
+	bcslib/veccomp/veccalc_functors.h \
 	bcslib/veccomp/vecstat.h \
 	bcslib/veccomp/logical_vecops.h \
 	bcslib/veccomp/intel_calc.h

@@ -875,7 +875,7 @@ namespace bcs
 		{
 			ippsNorm_L2_64f(x, (int)n, &s);
 		}
-		return sqr(s);
+		return math::sqr(s);
 	}
 
 	inline float vec_sqrsum(size_t n, const float *x)
@@ -885,7 +885,7 @@ namespace bcs
 		{
 			ippsNorm_L2_32f(x, (int)n, &s);
 		}
-		return sqr(s);
+		return math::sqr(s);
 	}
 
 	inline double vec_diff_sqrsum(size_t n, const double *x, const double *y)
@@ -895,7 +895,7 @@ namespace bcs
 		{
 			ippsNormDiff_L2_64f(x, y, (int)n, &s);
 		}
-		return sqr(s);
+		return math::sqr(s);
 	}
 
 	inline float vec_diff_sqrsum(size_t n, const float *x, const float *y)
@@ -905,7 +905,7 @@ namespace bcs
 		{
 			ippsNormDiff_L2_32f(x, y, (int)n, &s);
 		}
-		return sqr(s);
+		return math::sqr(s);
 	}
 
 
