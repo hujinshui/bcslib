@@ -90,6 +90,30 @@ namespace bcs
 	 *
 	 * 		The more advanced distributions:
 	 *
+	 *		- Binomial distribution with #trials = k, success rate = p. By default, p = 0.5
+	 *
+	 *			binomial_i32(k);
+	 *			binomial_u32(k);
+	 *			binomial_i32(k, p);
+	 *			binomial_u32(k, p);
+	 *
+	 *			binomial_i32(n, dst, k);
+	 *			binomial_u32(n, dst, k);
+	 *			binomial_i32(n, dst, k, p);
+	 *			binomial_u32(n, dst, k, p);
+	 *
+	 *		- Geometric distribution with Pr(x = k) = p * (1-p)^k. By default, p = 0.5
+	 *
+	 *			geometric_i32();
+	 *			geometric_u32();
+	 *			geometric_i32(p);
+	 *			geometric_u32(p);
+	 *
+	 *			geometric_i32(n, dst);
+	 *			geometric_u32(n, dst);
+	 *			geometric_i32(n, dst, p);
+	 *			geometric_u32(n, dst, p);
+	 *
 	 * 		- Lognormal distribution. By default mu = 0, sig = 1.
 	 *
 	 * 			lognormal_f64();
@@ -135,32 +159,95 @@ namespace bcs
 	 *
 	 *			weibull_f64(n, dst, alpha);
 	 *			weibull_f64(n, dst, alpha, beta);
-	 *
-	 *		- Geometric distribution with Pr(x = k) = p * (1-p)^k. By default, p = 0.5
-	 *
-	 *			geometric_i32();
-	 *			geometric_u32();
-	 *			geometric_i32(p);
-	 *			geometric_u32(p);
-	 *
-	 *			geometric_i32(n, dst);
-	 *			geometric_u32(n, dst);
-	 *			geometric_i32(n, dst, p);
-	 *			geometric_u32(n, dst, p);
-	 *
-	 *		- Binomial distribution with #trials = k, success rate = p. By default, p = 0.5
-	 *
-	 *			binomial_i32(k);
-	 *			binomial_u32(k);
-	 *			binomial_i32(k, p);
-	 *			binomial_u32(k, p);
-	 *
-	 *			binomial_i32(n, dst, k);
-	 *			binomial_u32(n, dst, k);
-	 *			binomial_i32(n, dst, k, p);
-	 *			binomial_u32(n, dst, k, p);
-	 *
 	 */
+
+
+	template<typename Eng>
+	class std_random_stream_base : private noncopyable
+	{
+	public:
+		BCS_STATIC_ASSERT( sizeof(typename Eng::result_type) == 4 );
+		typedef Eng engine_type;
+
+	public:
+		explicit std_random_stream_base(engine_type eng = engine_type())
+		: m_eng(eng)
+		{
+		}
+
+	public:
+		// Basic distributions
+
+		bool bernoulli()
+		{
+			return uniform_u32() < 0x80000000u;
+		}
+
+		bool bernoulli(double p)
+		{
+			return uniform_u32() <= uint32_t(p * double(0xFFFFFFFFu));
+		}
+
+		// discrete uniform
+
+		int32_t uniform_i32()
+		{
+			return int32_t(m_eng());
+		}
+
+		uint32_t uniform_u32()
+		{
+			return uint32_t(m_eng());
+		}
+
+		int32_t uniform_i32(int32_t a, int32_t b)
+		{
+			return (uniform_i32() % (b - a + 1)) + a;
+		}
+
+		int32_t uniform_u32(uint32_t a, uint32_t b)
+		{
+			return (uniform_u32() % (b - a + 1)) + a;
+		}
+
+		void uniform_i32_m(size_t n, int32_t *dst)
+		{
+			for (size_t i = 0; i < n; ++i) dst[i] = uniform_i32();
+		}
+
+		void uniform_u32_m(size_t n, uint32_t *dst)
+		{
+			for (size_t i = 0; i < n; ++i) dst[i] = uniform_u32();
+		}
+
+		void uniform_i32_m(size_t n, int32_t *dst, int32_t a, int32_t b)
+		{
+			for (size_t i = 0; i < n; ++i) dst[i] = uniform_i32(a, b);
+		}
+
+		void uniform_u32_m(size_t n, uint32_t *dst, uint32_t a, uint32_t b)
+		{
+			for (size_t i = 0; i < n; ++i) dst[i] = uniform_u32(a, b);
+		}
+
+		// real uniform
+
+		float uniform_f32()
+		{
+			return m_unifd_f32(m_eng);
+		}
+
+
+
+
+
+	private:
+		engine_type m_eng;
+
+	}; // end class std_random_stream
+
+
+
 
 
 }
