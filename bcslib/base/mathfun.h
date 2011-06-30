@@ -14,95 +14,17 @@
 #define BCSLIB_MATH_FUNCTORS_H
 
 #include <bcslib/base/basic_defs.h>
+#include <bcslib/base/basic_math.h>
 
-#include <cmath>
-#include <type_traits>
 #include <functional>
 
 
 namespace bcs
 {
-	/******************************************************
-	 *
-	 *  Additional math functions
-	 *  (including workarounds)
-	 *
-	 ******************************************************/
-
-	template<typename T>
-	BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-	sqr(T x)
-	{
-		return x * x;
-	}
-
-	template<typename T>
-	BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-	cube(T x)
-	{
-		return x * x * x;
-	}
-
-	template<typename T>
-	BCS_FORCE_INLINE T rgn_bound(T x, T lb, T ub)
-	{
-		return x < lb ? lb : (x > ub ? ub : x);
-	}
-
-#if BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
-
-	// unfortunately, in GCC 4.6, the std::hypot has an unguarded overload that would mess up with studff
-	// so cannot do direct using here ...
-
-	template<typename T>
-	BCS_FORCE_INLINE typename std::enable_if<std::is_floating_point<T>::value, T>::type
-	round(T x)
-	{
-		return std::round(x);
-	}
-
-	template<typename T>
-	BCS_FORCE_INLINE typename std::enable_if<std::is_floating_point<T>::value, T>::type
-	hypot(T x, T y)
-	{
-		return std::hypot(x, y);
-	}
-
-#else
-	template<typename T>
-	BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-	hypot(T x, T y)
-	{
-		T ax = std::abs(x);
-		T ay = std::abs(y);
-
-		T amin, amax;
-		if (ax < ay)
-		{
-			amin = ax;
-			amax = ay;
-		}
-		else
-		{
-			amin = ay;
-			amax = ax;
-		}
-
-		return amax > 0 ? amax * std::sqrt(1 + sqr(amin / amax)) : 0;
-	}
-
-	template<typename T>
-	BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-	round(T x)
-	{
-		return std::floor(x + (T)(0.5));
-	}
-#endif
-
 
 	/******************************************************
 	 *
-	 *  Functors
+	 *  Comparison functors
 	 *
 	 ******************************************************/
 
@@ -111,6 +33,8 @@ namespace bcs
 	template<typename T>
 	struct max_fun : public std::binary_function<T, T, T>
 	{
+		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
+
 		T operator() (const T& x, const T& y) const
 		{
 			return x > y ? x : y;
@@ -120,6 +44,8 @@ namespace bcs
 	template<typename T>
 	struct min_fun : public std::binary_function<T, T, T>
 	{
+		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
+
 		T operator() (const T& x, const T& y) const
 		{
 			return x < y ? x : y;
@@ -129,6 +55,8 @@ namespace bcs
 	template<typename T>
 	struct ubound_fun : public std::unary_function<T, T>
 	{
+		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
+
 		T ub;
 		ubound_fun(const T& b) : ub(b) { }
 
@@ -141,6 +69,8 @@ namespace bcs
 	template<typename T>
 	struct lbound_fun : public std::unary_function<T, T>
 	{
+		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
+
 		T lb;
 		lbound_fun(const T& b) : lb(b) { }
 
@@ -153,16 +83,23 @@ namespace bcs
 	template<typename T>
 	struct rgn_bound_fun : public std::unary_function<T, T>
 	{
+		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
+
 		T lb, ub;
 		rgn_bound_fun(const T& lb_, const T& ub_) : lb(lb_), ub(ub_) { }
 
 		T operator() (const T& x) const
 		{
-			return rgn_bound(x, lb, ub);
+			return math::rgn_bound(x, lb, ub);
 		}
 	};
 
-	// calculation functors
+
+	/******************************************************
+	 *
+	 *  Abs and Power functions
+	 *
+	 ******************************************************/
 
 	template<typename T>
 	struct abs_fun : public std::unary_function<T, T>
@@ -171,10 +108,20 @@ namespace bcs
 
 		T operator() (const T& x) const
 		{
-			return std::abs(x);
+			return math::abs(x);
 		}
 	};
 
+	template<typename T>
+	struct copy_sign_fun : public std::binary_function<T, T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
+
+		T operator() (const T& a, const T& b) const
+		{
+			return math::copysign(a, b);
+		}
+	};
 
 	template<typename T>
 	struct sqr_fun : public std::unary_function<T, T>
@@ -183,18 +130,7 @@ namespace bcs
 
 		T operator() (const T& x) const
 		{
-			return sqr(x);
-		}
-	};
-
-	template<typename T>
-	struct cube_fun: public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
-
-		T operator() (const T& x) const
-		{
-			return cube(x);
+			return math::sqr(x);
 		}
 	};
 
@@ -205,230 +141,51 @@ namespace bcs
 
 		T operator() (const T& x) const
 		{
-			return std::sqrt(x);
+			return math::sqrt(x);
+		}
+	};
+
+	template<typename T>
+	struct cube_fun: public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::cube(x);
+		}
+	};
+
+	template<typename T>
+	struct cbrt_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::cbrt(x);
 		}
 	};
 
 	template<typename T>
 	struct rcp_fun : public std::unary_function<T, T>
 	{
-		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
 
 		T operator() (const T& x) const
 		{
-			return T(1) / x;
+			return math::rcp(x);
 		}
 	};
 
 	template<typename T>
 	struct rsqrt_fun : public std::unary_function<T, T>
 	{
-		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
-
-		T operator() (const T& x) const
-		{
-			return T(1) / std::sqrt(x);
-		}
-	};
-
-
-	template<typename T>
-	struct pow_fun : public std::binary_function<T, T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x, const T& e) const
-		{
-			return std::pow(x, e);
-		}
-	};
-
-	template<typename T>
-	struct pow_n_fun : public std::binary_function<T, int, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x, int n)
-		{
-			return std::pow(x, n);
-		}
-	};
-
-	template<typename T>
-	struct exp_fun : public std::unary_function<T, T>
-	{
 		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
 
 		T operator() (const T& x) const
 		{
-			return std::exp(x);
-		}
-	};
-
-	template<typename T>
-	struct log_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::log(x);
-		}
-	};
-
-	template<typename T>
-	struct log10_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::log10(x);
-		}
-	};
-
-
-	template<typename T>
-	struct floor_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::floor(x);
-		}
-	};
-
-	template<typename T>
-	struct ceil_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::ceil(x);
-		}
-	};
-
-	template<typename T>
-	struct round_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return round(x);
-		}
-	};
-
-
-	template<typename T>
-	struct sin_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::sin(x);
-		}
-	};
-
-	template<typename T>
-	struct cos_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::cos(x);
-		}
-	};
-
-	template<typename T>
-	struct tan_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::tan(x);
-		}
-	};
-
-	template<typename T>
-	struct asin_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::asin(x);
-		}
-	};
-
-	template<typename T>
-	struct acos_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::acos(x);
-		}
-	};
-
-	template<typename T>
-	struct atan_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::atan(x);
-		}
-	};
-
-	template<typename T>
-	struct atan2_fun : public std::binary_function<T, T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& y, const T& x) const
-		{
-			return std::atan2(y, x);
-		}
-	};
-
-	template<typename T>
-	struct sinh_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::sinh(x);
-		}
-	};
-
-	template<typename T>
-	struct cosh_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::cosh(x);
-		}
-	};
-
-	template<typename T>
-	struct tanh_fun : public std::unary_function<T, T>
-	{
-		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
-
-		T operator() (const T& x) const
-		{
-			return std::tanh(x);
+			return math::rsqrt(x);
 		}
 	};
 
@@ -439,10 +196,438 @@ namespace bcs
 
 		T operator() (const T& x1, const T& x2) const
 		{
-			return hypot(x1, x2);
+			return math::hypot(x1, x2);
 		}
 	};
 
+	template<typename T>
+	struct pow_fun : public std::binary_function<T, T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x, const T& e) const
+		{
+			return math::pow(x, e);
+		}
+	};
+
+	template<typename T>
+	struct pow_n_fun : public std::binary_function<T, int, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x, int n)
+		{
+			return math::pow(x, n);
+		}
+	};
+
+
+	/******************************************************
+	 *
+	 *  Exponential and Power functions
+	 *
+	 ******************************************************/
+
+	template<typename T>
+	struct exp_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::exp(x);
+		}
+	};
+
+	template<typename T>
+	struct exp2_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::exp2(x);
+		}
+	};
+
+	template<typename T>
+	struct log_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::log(x);
+		}
+	};
+
+	template<typename T>
+	struct log10_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::log10(x);
+		}
+	};
+
+	template<typename T>
+	struct log2_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::log2(x);
+		}
+	};
+
+	template<typename T>
+	struct expm1_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::expm1(x);
+		}
+	};
+
+	template<typename T>
+	struct log1p_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::log1p(x);
+		}
+	};
+
+
+	/******************************************************
+	 *
+	 *  Rounding functions
+	 *
+	 ******************************************************/
+
+	template<typename T>
+	struct floor_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::floor(x);
+		}
+	};
+
+	template<typename T>
+	struct ceil_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::ceil(x);
+		}
+	};
+
+	template<typename T>
+	struct round_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::round(x);
+		}
+	};
+
+	template<typename T>
+	struct trunc_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::trunc(x);
+		}
+	};
+
+
+	/******************************************************
+	 *
+	 *  Trigonometric functions
+	 *
+	 ******************************************************/
+
+	template<typename T>
+	struct sin_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::sin(x);
+		}
+	};
+
+	template<typename T>
+	struct cos_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::cos(x);
+		}
+	};
+
+	template<typename T>
+	struct tan_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::tan(x);
+		}
+	};
+
+	template<typename T>
+	struct sincos_fun : public std::unary_function<T, std::pair<T, T> >
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		std::pair<T, T> operator() (const T& x) const
+		{
+			std::pair<T, T> r;
+			math::sincos(x, &(r.first), &(r.second));
+			return r;
+		}
+	};
+
+	template<typename T>
+	struct asin_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::asin(x);
+		}
+	};
+
+	template<typename T>
+	struct acos_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::acos(x);
+		}
+	};
+
+	template<typename T>
+	struct atan_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::atan(x);
+		}
+	};
+
+	template<typename T>
+	struct atan2_fun : public std::binary_function<T, T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& y, const T& x) const
+		{
+			return math::atan2(y, x);
+		}
+	};
+
+
+	/******************************************************
+	 *
+	 *  Hyperbolic functions
+	 *
+	 ******************************************************/
+
+	template<typename T>
+	struct sinh_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::sinh(x);
+		}
+	};
+
+	template<typename T>
+	struct cosh_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::cosh(x);
+		}
+	};
+
+	template<typename T>
+	struct tanh_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::tanh(x);
+		}
+	};
+
+	template<typename T>
+	struct asinh_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::asinh(x);
+		}
+	};
+
+	template<typename T>
+	struct acosh_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::acosh(x);
+		}
+	};
+
+	template<typename T>
+	struct atanh_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::atanh(x);
+		}
+	};
+
+
+	/******************************************************
+	 *
+	 *  Special functions
+	 *
+	 ******************************************************/
+
+	template<typename T>
+	struct erf_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::erf(x);
+		}
+	};
+
+	template<typename T>
+	struct erfc_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::erfc(x);
+		}
+	};
+
+	template<typename T>
+	struct lgamma_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::lgamma(x);
+		}
+	};
+
+	template<typename T>
+	struct tgamma_fun : public std::unary_function<T, T>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::tgamma(x);
+		}
+	};
+
+
+	/******************************************************
+	 *
+	 *  Number Classification functions
+	 *
+	 ******************************************************/
+
+	template<typename T>
+	struct isfinite_fun : public std::unary_function<T, bool>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::isfinite(x);
+		}
+	};
+
+	template<typename T>
+	struct isinf_fun : public std::unary_function<T, bool>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::isinf(x);
+		}
+	};
+
+	template<typename T>
+	struct isnan_fun : public std::unary_function<T, bool>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::isnan(x);
+		}
+	};
+
+	template<typename T>
+	struct signbit_fun : public std::unary_function<T, bool>
+	{
+		BCS_STATIC_ASSERT_V(std::is_floating_point<T>);
+
+		T operator() (const T& x) const
+		{
+			return math::signbit(x);
+		}
+	};
 }
 
 
