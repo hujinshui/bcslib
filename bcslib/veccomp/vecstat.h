@@ -48,7 +48,7 @@ namespace bcs
 		T s(0);
 		for (size_t i = 0; i < n; ++i)
 		{
-			s += std::log(x[i]);
+			s += math::log(x[i]);
 		}
 		return s;
 	}
@@ -61,7 +61,7 @@ namespace bcs
 		{
 			if (x[i] != 0)
 			{
-				s += x[i] * std::log(y[i]);
+				s += x[i] * math::log(y[i]);
  			}
 		}
 		return s;
@@ -229,7 +229,7 @@ namespace bcs
 		T s(0);
 		for (size_t i = 0; i < n; ++i)
 		{
-			s += std::abs(x[i]);
+			s += math::abs(x[i]);
 		}
 		return s;
 	}
@@ -240,7 +240,7 @@ namespace bcs
 		T s(0);
 		for (size_t i = 0; i < n; ++i)
 		{
-			s += std::abs(x[i] - y[i]);
+			s += math::abs(x[i] - y[i]);
 		}
 		return s;
 	}
@@ -258,7 +258,7 @@ namespace bcs
 		T s(0);
 		for (size_t i = 0; i < n; ++i)
 		{
-			s += sqr(x[i] - y[i]);
+			s += math::sqr(x[i] - y[i]);
 		}
 		return s;
 	}
@@ -267,13 +267,13 @@ namespace bcs
 	template<typename T>
 	inline T vec_norm_L2(size_t n, const T *x)
 	{
-		return std::sqrt(vec_sqrsum(n, x));
+		return math::sqrt(vec_sqrsum(n, x));
 	}
 
 	template<typename T>
 	inline T vec_diff_norm_L2(size_t n, const T *x, const T *y)
 	{
-		return std::sqrt(vec_diff_sqrsum(n, x, y));
+		return math::sqrt(vec_diff_sqrsum(n, x, y));
 	}
 
 
@@ -283,7 +283,7 @@ namespace bcs
 		T s(0);
 		for (size_t i = 0; i < n; ++i)
 		{
-			T a = std::abs(x[i]);
+			T a = math::abs(x[i]);
 			if (a > s) s = a;
 		}
 
@@ -296,7 +296,7 @@ namespace bcs
 		T s(0);
 		for (size_t i = 0; i < n; ++i)
 		{
-			T a = std::abs(x[i] - y[i]);
+			T a = math::abs(x[i] - y[i]);
 			if (a > s) s = a;
 		}
 

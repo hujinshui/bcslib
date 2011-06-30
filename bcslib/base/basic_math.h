@@ -80,7 +80,7 @@ namespace bcs
 		BCS_FORCE_INLINE typename std::enable_if<std::is_floating_point<T>::value, T>::type
 		rsqrt(T x)
 		{
-			return T(1) / (x * x);
+			return T(1) / sqrt(x);
 		}
 
 		template<typename T>
@@ -91,7 +91,7 @@ namespace bcs
 
 		// Part of the new stuff in C++0x (Unfortunately, many are not available for MSVC yet)
 
-#ifdef BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
+#if BCS_PLATFORM_INTERFACE==BCS_POSIX_INTERFACE
 
 		using std::cbrt;
 		using std::copysign;

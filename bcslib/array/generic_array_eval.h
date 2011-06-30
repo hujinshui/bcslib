@@ -66,7 +66,7 @@ namespace bcs
 		static_assert(is_array_view<Arr1>::value, "Arr1 should be an array view type");
 
 		typedef typename array_view_traits<Arr1>::value_type arg1_value_type;
-		typedef typename std::result_of<VecFunc(arg1_value_type)>::type result_value_type;
+		typedef typename VecFunc::result_value_type result_value_type;
 
 		typedef typename array_creater<Arr1>::template remap<result_value_type>::type _rcreater;
 		typedef typename _rcreater::result_type type;
@@ -87,7 +87,7 @@ namespace bcs
 
 		typedef typename array_view_traits<Arr1>::value_type arg1_value_type;
 		typedef typename array_view_traits<Arr2>::value_type arg2_value_type;
-		typedef typename std::result_of<VecFunc(arg1_value_type, arg2_value_type)>::type result_value_type;
+		typedef typename VecFunc::result_value_type result_value_type;
 
 		typedef typename array_creater<Arr1>::template remap<result_value_type>::type _rcreater;
 		typedef typename _rcreater::result_type type;

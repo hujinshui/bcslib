@@ -763,7 +763,7 @@ BCS_TEST_CASE( test_array_abs )
 	const int N = 6;
 	double src[N] = {1, -2, -3, 4, -5, 6};
 	double res[N];
-	for (int i = 0; i < N; ++i) res[i] = std::abs(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::abs(src[i]);
 
 	array1d<double> x(6, src);
 	array1d<double> xc = clone_array(x);
@@ -812,7 +812,7 @@ BCS_TEST_CASE( test_array_power_and_root_funs )
 
 	// sqr
 
-	for (int i = 0; i < N; ++i) res[i] = src[i] * src[i];
+	for (int i = 0; i < N; ++i) res[i] = math::sqr(src[i]);
 
 	BCS_CHECK( array_view_equal( sqr(x), res, N ) );
 	BCS_CHECK( array_view_equal( sqr(Xr), res, nr, nc) );
@@ -821,7 +821,7 @@ BCS_TEST_CASE( test_array_power_and_root_funs )
 
 	// sqrt
 
-	for (int i = 0; i < N; ++i) res[i] = std::sqrt(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::sqrt(src[i]);
 
 	BCS_CHECK( array_view_approx( sqrt(x), res, N ) );
 	BCS_CHECK( array_view_approx( sqrt(Xr), res, nr, nc) );
@@ -829,7 +829,7 @@ BCS_TEST_CASE( test_array_power_and_root_funs )
 
 	// rcp
 
-	for (int i = 0; i < N; ++i) res[i] = 1.0 / src[i];
+	for (int i = 0; i < N; ++i) res[i] = math::rcp(src[i]);
 
 	BCS_CHECK( array_view_approx( rcp(x), res, N ) );
 	BCS_CHECK( array_view_approx( rcp(Xr), res, nr, nc) );
@@ -837,7 +837,7 @@ BCS_TEST_CASE( test_array_power_and_root_funs )
 
 	// rsqrt
 
-	for (int i = 0; i < N; ++i) res[i] = 1.0 / std::sqrt(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::rsqrt(src[i]);
 
 	BCS_CHECK( array_view_approx( rsqrt(x), res, N ) );
 	BCS_CHECK( array_view_approx( rsqrt(Xr), res, nr, nc) );
@@ -845,7 +845,7 @@ BCS_TEST_CASE( test_array_power_and_root_funs )
 
 	// pow
 
-	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], es[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::pow(src[i], es[i]);
 
 	BCS_CHECK( array_view_approx( pow(x, e), res, N ) );
 	BCS_CHECK( array_view_approx( pow(Xr, Er), res, nr, nc) );
@@ -855,7 +855,7 @@ BCS_TEST_CASE( test_array_power_and_root_funs )
 
 	double q = 2.3;
 
-	for (int i = 0; i < N; ++i) res[i] = std::pow(src[i], q);
+	for (int i = 0; i < N; ++i) res[i] = math::pow(src[i], q);
 
 	BCS_CHECK( array_view_approx( pow(x, q), res, N ) );
 	BCS_CHECK( array_view_approx( pow(Xr, q), res, nr, nc) );
@@ -878,7 +878,7 @@ BCS_TEST_CASE( test_array_exp_and_log_funs )
 
 	// exp
 
-	for (int i = 0; i < N; ++i) res[i] = std::exp(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::exp(src[i]);
 
 	BCS_CHECK( array_view_approx( exp(x), res, N ) );
 	BCS_CHECK( array_view_approx( exp(Xr), res, nr, nc) );
@@ -886,7 +886,7 @@ BCS_TEST_CASE( test_array_exp_and_log_funs )
 
 	// log
 
-	for (int i = 0; i < N; ++i) res[i] = std::log(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::log(src[i]);
 
 	BCS_CHECK( array_view_approx( log(x), res, N ) );
 	BCS_CHECK( array_view_approx( log(Xr), res, nr, nc) );
@@ -894,7 +894,7 @@ BCS_TEST_CASE( test_array_exp_and_log_funs )
 
 	// log10
 
-	for (int i = 0; i < N; ++i) res[i] = std::log10(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::log10(src[i]);
 
 	BCS_CHECK( array_view_approx( log10(x), res, N ) );
 	BCS_CHECK( array_view_approx( log10(Xr), res, nr, nc) );
@@ -917,7 +917,7 @@ BCS_TEST_CASE( test_array_floor_and_ceil )
 
 	// floor
 
-	for (int i = 0; i < N; ++i) res[i] = std::floor(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::floor(src[i]);
 
 	BCS_CHECK( array_view_equal( floor(x), res, N ) );
 	BCS_CHECK( array_view_equal( floor(Xr), res, nr, nc) );
@@ -925,7 +925,7 @@ BCS_TEST_CASE( test_array_floor_and_ceil )
 
 	// ceil
 
-	for (int i = 0; i < N; ++i) res[i] = std::ceil(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::ceil(src[i]);
 
 	BCS_CHECK( array_view_equal( ceil(x), res, N ) );
 	BCS_CHECK( array_view_equal( ceil(Xr), res, nr, nc) );
@@ -933,7 +933,7 @@ BCS_TEST_CASE( test_array_floor_and_ceil )
 
 	// round
 
-	for (int i = 0; i < N; ++i) res[i] = bcs::round(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::round(src[i]);
 
 	BCS_CHECK( array_view_equal( round(x), res, N ) );
 	BCS_CHECK( array_view_equal( round(Xr), res, nr, nc) );
@@ -962,7 +962,7 @@ BCS_TEST_CASE( test_array_trigonometric_funs )
 
 	// sin
 
-	for (int i = 0; i < N; ++i) res[i] = std::sin(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::sin(src[i]);
 
 	BCS_CHECK( array_view_approx( sin(x), res, N ) );
 	BCS_CHECK( array_view_approx( sin(Xr), res, nr, nc) );
@@ -970,7 +970,7 @@ BCS_TEST_CASE( test_array_trigonometric_funs )
 
 	// cos
 
-	for (int i = 0; i < N; ++i) res[i] = std::cos(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::cos(src[i]);
 
 	BCS_CHECK( array_view_approx( cos(x), res, N ) );
 	BCS_CHECK( array_view_approx( cos(Xr), res, nr, nc) );
@@ -978,7 +978,7 @@ BCS_TEST_CASE( test_array_trigonometric_funs )
 
 	// tan
 
-	for (int i = 0; i < N; ++i) res[i] = std::tan(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::tan(src[i]);
 
 	BCS_CHECK( array_view_approx( tan(x), res, N ) );
 	BCS_CHECK( array_view_approx( tan(Xr), res, nr, nc) );
@@ -986,7 +986,7 @@ BCS_TEST_CASE( test_array_trigonometric_funs )
 
 	// asin
 
-	for (int i = 0; i < N; ++i) res[i] = std::asin(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::asin(src[i]);
 
 	BCS_CHECK( array_view_approx( asin(x), res, N ) );
 	BCS_CHECK( array_view_approx( asin(Xr), res, nr, nc) );
@@ -994,7 +994,7 @@ BCS_TEST_CASE( test_array_trigonometric_funs )
 
 	// acos
 
-	for (int i = 0; i < N; ++i) res[i] = std::acos(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::acos(src[i]);
 
 	BCS_CHECK( array_view_approx( acos(x), res, N ) );
 	BCS_CHECK( array_view_approx( acos(Xr), res, nr, nc) );
@@ -1002,7 +1002,7 @@ BCS_TEST_CASE( test_array_trigonometric_funs )
 
 	// atan
 
-	for (int i = 0; i < N; ++i) res[i] = std::atan(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::atan(src[i]);
 
 	BCS_CHECK( array_view_approx( atan(x), res, N ) );
 	BCS_CHECK( array_view_approx( atan(Xr), res, nr, nc) );
@@ -1010,7 +1010,7 @@ BCS_TEST_CASE( test_array_trigonometric_funs )
 
 	// atan2
 
-	for (int i = 0; i < N; ++i) res[i] = std::atan2(src[i], src_e[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::atan2(src[i], src_e[i]);
 
 	BCS_CHECK( array_view_approx( atan2(x, e), res, N ) );
 	BCS_CHECK( array_view_approx( atan2(Xr, Er), res, nr, nc) );
@@ -1034,7 +1034,7 @@ BCS_TEST_CASE( test_array_hyperbolic_funs )
 
 	// sinh
 
-	for (int i = 0; i < N; ++i) res[i] = std::sinh(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::sinh(src[i]);
 
 	BCS_CHECK( array_view_approx( sinh(x), res, N ) );
 	BCS_CHECK( array_view_approx( sinh(Xr), res, nr, nc) );
@@ -1042,7 +1042,7 @@ BCS_TEST_CASE( test_array_hyperbolic_funs )
 
 	// cosh
 
-	for (int i = 0; i < N; ++i) res[i] = std::cosh(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::cosh(src[i]);
 
 	BCS_CHECK( array_view_approx( cosh(x), res, N ) );
 	BCS_CHECK( array_view_approx( cosh(Xr), res, nr, nc) );
@@ -1050,7 +1050,7 @@ BCS_TEST_CASE( test_array_hyperbolic_funs )
 
 	// tanh
 
-	for (int i = 0; i < N; ++i) res[i] = std::tanh(src[i]);
+	for (int i = 0; i < N; ++i) res[i] = math::tanh(src[i]);
 
 	BCS_CHECK( array_view_approx( tanh(x), res, N ) );
 	BCS_CHECK( array_view_approx( tanh(Xr), res, nr, nc) );
@@ -1077,7 +1077,7 @@ BCS_TEST_CASE( test_hypot )
 	array2d<double, row_major_t> Yr(nr, nc, src_y);
 	array2d<double, column_major_t> Yc(nr, nc, src_y);
 
-	for (int i = 0; i < N; ++i) res[i] = std::sqrt( sqr(src_x[i]) + sqr(src_y[i]) );
+	for (int i = 0; i < N; ++i) res[i] = math::sqrt( math::sqr(src_x[i]) + math::sqr(src_y[i]) );
 
 	BCS_CHECK( array_view_approx( hypot(x, y), res, N ) );
 	BCS_CHECK( array_view_approx( hypot(Xr, Yr), res, nr, nc) );

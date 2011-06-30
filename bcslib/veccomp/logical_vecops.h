@@ -79,12 +79,9 @@ namespace bcs
 {
 	// functors
 
-	struct vec_not_ftor : public std::unary_function<bool, bool>
+	struct vec_not_ftor
 	{
-		bool operator() (bool v) const
-		{
-			return !v;
-		}
+		typedef bool result_value_type;
 
 		void operator() (size_t n, const bool *x, bool *y) const
 		{
@@ -92,12 +89,9 @@ namespace bcs
 		}
 	};
 
-	struct vec_and_ftor : public std::binary_function<bool, bool, bool>
+	struct vec_and_ftor
 	{
-		bool operator() (bool v1, bool v2) const
-		{
-			return v1 & v2;
-		}
+		typedef bool result_value_type;
 
 		void operator() (size_t n, const bool *x1, const bool *x2, bool *y) const
 		{
@@ -105,12 +99,9 @@ namespace bcs
 		}
 	};
 
-	struct vec_or_ftor : public std::binary_function<bool, bool, bool>
+	struct vec_or_ftor
 	{
-		bool operator() (bool v1, bool v2) const
-		{
-			return v1 | v2;
-		}
+		typedef bool result_value_type;
 
 		void operator() (size_t n, const bool *x1, const bool *x2, bool *y) const
 		{
@@ -118,12 +109,9 @@ namespace bcs
 		}
 	};
 
-	struct vec_xor_ftor : public std::binary_function<bool, bool, bool>
+	struct vec_xor_ftor
 	{
-		bool operator() (bool v1, bool v2) const
-		{
-			return v1 ^ v2;
-		}
+		typedef bool result_value_type;
 
 		void operator() (size_t n, const bool *x1, const bool *x2, bool *y) const
 		{

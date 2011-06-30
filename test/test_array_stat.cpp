@@ -52,7 +52,7 @@ struct dsum_log
 	double s;
 
 	dsum_log() : s(0) { }
-	void put(double x) { s += std::log(x); }
+	void put(double x) { s += math::log(x); }
 	double get() const { return s; }
 };
 
@@ -64,7 +64,7 @@ struct dsum_xlogy
 	double s;
 
 	dsum_xlogy() : s(0) { }
-	void put(double x, double y) { s += x * std::log(y); }
+	void put(double x, double y) { s += x * math::log(y); }
 	double get() const { return s; }
 };
 
@@ -220,7 +220,7 @@ struct dnorm_L1
 
 	void put(double x)
 	{
-		s += std::abs(x);
+		s += math::abs(x);
 	}
 
 	result_type get() const { return s; }
@@ -236,7 +236,7 @@ struct ddiff_norm_L1
 
 	void put(double x, double y)
 	{
-		s += std::abs(x - y);
+		s += math::abs(x - y);
 	}
 
 	result_type get() const { return s; }
@@ -253,7 +253,7 @@ struct dsqrsum
 
 	void put(double x)
 	{
-		s += sqr(x);
+		s += math::sqr(x);
 	}
 
 	result_type get() const { return s; }
@@ -269,7 +269,7 @@ struct ddiff_sqrsum
 
 	void put(double x, double y)
 	{
-		s += sqr(x - y);
+		s += math::sqr(x - y);
 	}
 
 	result_type get() const { return s; }
@@ -286,10 +286,10 @@ struct dnorm_L2
 
 	void put(double x)
 	{
-		s += sqr(x);
+		s += math::sqr(x);
 	}
 
-	result_type get() const { return std::sqrt(s); }
+	result_type get() const { return math::sqrt(s); }
 };
 
 struct ddiff_norm_L2
@@ -302,10 +302,10 @@ struct ddiff_norm_L2
 
 	void put(double x, double y)
 	{
-		s += sqr(x - y);
+		s += math::sqr(x - y);
 	}
 
-	result_type get() const { return std::sqrt(s); }
+	result_type get() const { return math::sqrt(s); }
 };
 
 
@@ -319,7 +319,7 @@ struct dnorm_Linf
 
 	void put(double x)
 	{
-		if (std::abs(x) > s) s = std::abs(x);
+		if (math::abs(x) > s) s = math::abs(x);
 	}
 
 	result_type get() const { return s; }
@@ -335,7 +335,7 @@ struct ddiff_norm_Linf
 
 	void put(double x, double y)
 	{
-		if (std::abs(x - y) > s) s = std::abs(x- y);
+		if (math::abs(x - y) > s) s = math::abs(x- y);
 	}
 
 	result_type get() const { return s; }

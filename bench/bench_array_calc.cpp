@@ -10,7 +10,7 @@
 #include <bcslib/base/mathfun.h>
 #include <bcslib/base/basic_mem.h>
 
-#include <bcslib/veccomp/veccalc.h>
+#include <bcslib/veccomp/veccalc_functors.h>
 #include <bcslib/test/performance_timer.h>
 
 #include <functional>
