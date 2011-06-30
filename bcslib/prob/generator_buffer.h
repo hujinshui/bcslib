@@ -6,6 +6,10 @@
  * @author Dahua Lin
  */
 
+#ifdef _MSC_VER
+#pragma once
+#endif
+
 #ifndef BCSLIB_GENERATOR_BUFFER_H
 #define BCSLIB_GENERATOR_BUFFER_H
 
@@ -64,7 +68,7 @@ namespace bcs
 				refill_buffer();
 			}
 
-			return *(m_p++);
+			*dst = *(m_p++);
 		}
 
 		void get_next_n(size_t n, result_type *dst)
