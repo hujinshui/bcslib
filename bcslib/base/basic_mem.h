@@ -75,16 +75,16 @@ namespace bcs
 
 	namespace _detail
 	{
-		template<typename T, bool IsTriviallyConstructible> struct __element_construct_helper;
+		template<typename T, bool IsTriviallyConstructible> struct _element_construct_helper;
 
 		template<typename T>
-		struct __element_construct_helper<T, true>
+		struct _element_construct_helper<T, true>
 		{
 			static void default_construct(T *, size_t) { }
 		};
 
 		template<typename T>
-		struct __element_construct_helper<T, false>
+		struct _element_construct_helper<T, false>
 		{
 			static void default_construct(T *p, size_t n)
 			{
@@ -95,10 +95,10 @@ namespace bcs
 			}
 		};
 
-		template<typename T, bool IsTriviallyCopyable> struct __element_copy_helper;
+		template<typename T, bool IsTriviallyCopyable> struct _element_copy_helper;
 
 		template<typename T>
-		struct __element_copy_helper<T, true>
+		struct _element_copy_helper<T, true>
 		{
 			static void copy(const T *src, T *dst, size_t n)
 			{
@@ -120,7 +120,7 @@ namespace bcs
 		};
 
 		template<typename T>
-		struct __element_copy_helper<T, false>
+		struct _element_copy_helper<T, false>
 		{
 			static void copy(const T *src, T *dst, size_t n)
 			{
@@ -148,16 +148,16 @@ namespace bcs
 		};
 
 
-		template<typename T, bool IsTriviallyDestructible> struct __element_destruct_helper;
+		template<typename T, bool IsTriviallyDestructible> struct _element_destruct_helper;
 
 		template<typename T>
-		struct __element_destruct_helper<T, true>
+		struct _element_destruct_helper<T, true>
 		{
 			static void destruct(T *, size_t) { }
 		};
 
 		template<typename T>
-		struct __element_destruct_helper<T, false>
+		struct _element_destruct_helper<T, false>
 		{
 			static void destruct(T *dst, size_t n)
 			{
@@ -169,10 +169,10 @@ namespace bcs
 		};
 
 
-		template<typename T, bool IsBitwiseComparable> struct __element_compare_helper;
+		template<typename T, bool IsBitwiseComparable> struct _element_compare_helper;
 
 		template<typename T>
-		struct __element_compare_helper<T, true>
+		struct _element_compare_helper<T, true>
 		{
 			static bool all_equal(const T *a, const T *b, size_t n)
 			{
@@ -181,7 +181,7 @@ namespace bcs
 		};
 
 		template<typename T>
-		struct __element_compare_helper<T, false>
+		struct _element_compare_helper<T, false>
 		{
 			static bool all_equal(const T *a, const T *b, size_t n)
 			{
@@ -199,32 +199,32 @@ namespace bcs
 	template<typename T>
 	inline void default_construct_elements(T *a, size_t n)
 	{
-		_detail::__element_construct_helper<T, std::is_pod<T>::value>::default_construct(a, n);
+		_detail::_element_construct_helper<T, std::is_pod<T>::value>::default_construct(a, n);
 	}
 
 
     template<typename T>
     inline void copy_construct_elements(const T& v, T *dst, size_t n)
     {
-    	_detail::__element_copy_helper<T, std::is_pod<T>::value>::copy_construct(v, dst, n);
+    	_detail::_element_copy_helper<T, std::is_pod<T>::value>::copy_construct(v, dst, n);
     }
 
     template<typename T>
     inline void copy_construct_elements(const T *src, T *dst, size_t n)
     {
-    	_detail::__element_copy_helper<T, std::is_pod<T>::value>::copy_construct(src, dst, n);
+    	_detail::_element_copy_helper<T, std::is_pod<T>::value>::copy_construct(src, dst, n);
     }
 
     template<typename T>
     inline void copy_elements(const T *src, T *dst, size_t n)
     {
-    	_detail::__element_copy_helper<T, std::is_pod<T>::value>::copy(src, dst, n);
+    	_detail::_element_copy_helper<T, std::is_pod<T>::value>::copy(src, dst, n);
     }
 
     template<typename T>
     inline bool elements_equal(const T *a, const T *b, size_t n)
     {
-    	return _detail::__element_compare_helper<T, std::is_pod<T>::value>::all_equal(a, b, n);
+    	return _detail::_element_compare_helper<T, std::is_pod<T>::value>::all_equal(a, b, n);
     }
 
     template<typename T>
@@ -254,7 +254,7 @@ namespace bcs
     template<typename T>
     inline void destruct_elements(T *dst, size_t n)
     {
-    	_detail::__element_destruct_helper<T, std::is_pod<T>::value>::destruct(dst, n);
+    	_detail::_element_destruct_helper<T, std::is_pod<T>::value>::destruct(dst, n);
     }
 
 

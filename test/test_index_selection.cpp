@@ -7,7 +7,7 @@
  */
 
 #include <bcslib/test/test_units.h>
-#include <bcslib/base/index_selectors.h>
+#include <bcslib/array/array_index.h>
 
 #include <functional>
 
