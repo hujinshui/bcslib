@@ -81,16 +81,16 @@ namespace bcs
 	};
 
 	template<typename T>
-	struct rgn_bound_fun : public std::unary_function<T, T>
+	struct clamp_fun : public std::unary_function<T, T>
 	{
 		BCS_STATIC_ASSERT_V(std::is_arithmetic<T>);
 
 		T lb, ub;
-		rgn_bound_fun(const T& lb_, const T& ub_) : lb(lb_), ub(ub_) { }
+		clamp_fun(const T& lb_, const T& ub_) : lb(lb_), ub(ub_) { }
 
 		T operator() (const T& x) const
 		{
-			return math::rgn_bound(x, lb, ub);
+			return math::clamp(x, lb, ub);
 		}
 	};
 

@@ -84,7 +84,8 @@ namespace bcs
 		}
 
 		template<typename T>
-		BCS_FORCE_INLINE T rgn_bound(T x, T lb, T ub)
+		BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+		clamp(T x, T lb, T ub)
 		{
 			return x < lb ? lb : (x > ub ? ub : x);
 		}

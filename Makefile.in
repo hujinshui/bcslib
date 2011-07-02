@@ -36,9 +36,7 @@ BASE_HEADERS = \
 	bcslib/base/basic_algorithms.h \
 	bcslib/base/iterator_wrappers.h \
 	bcslib/base/basic_mem.h \
-	bcslib/base/monitored_allocator.h \
-	bcslib/base/index_selectors.h \
-	bcslib/base/sexpression.h
+	bcslib/base/monitored_allocator.h
 
 BASE_TEST_HEADERS = \
 	bcslib/test/test_assertion.h \
@@ -79,10 +77,10 @@ LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
 #---------- Target groups -------------------
 
 .PHONY: all
-all: test bench
+all: test
 
 .PHONY: test
-test: test_c0x_support test_basics test_array
+test: test_c0x_support test_basics
 
 .PHONY: bench
 bench: bench_array
@@ -103,21 +101,8 @@ endif
 .PHONY: test_c0x_support
 test_c0x_support: $(TEST_BIN_DIR)/test_c0x_support.out
 
-$(TEST_BIN_DIR)/test_c0x_support.out: test/test_c0x_support.cpp
-	$(CXX) $(CXXFLAGS) -c test/test_c0x_support.cpp -o $(TEST_BIN_DIR)/test_c0x_support.out
-
-
 .PHONY: test_basics
 test_basics: $(TEST_BIN_DIR)/test_basics
-
-TEST_BASICS_SOURCES = \
-	test/test_basics.cpp \
-	test/test_basic_algorithms.cpp \
-	test/test_basic_memory.cpp \
-	test/test_index_selection.cpp
-	
-$(TEST_BIN_DIR)/test_basics: $(BASE_HEADERS) $(BASE_TEST_HEADERS) $(TEST_BASICS_SOURCES)
-	$(CXX) $(CXXFLAGS) $(TEST_BASICS_SOURCES) -o $(TEST_BIN_DIR)/test_basics 
 
 
 #------ Array tests (declaration) -----------
@@ -161,6 +146,24 @@ endif
 
 #----------------------------------------------------------
 #
+#   Basics test (details)
+#
+#----------------------------------------------------------
+
+$(TEST_BIN_DIR)/test_c0x_support.out: test/test_c0x_support.cpp
+	$(CXX) $(CXXFLAGS) -c test/test_c0x_support.cpp -o $(TEST_BIN_DIR)/test_c0x_support.out
+
+TEST_BASICS_SOURCES = \
+	test/test_basics.cpp \
+	test/test_basic_algorithms.cpp \
+	test/test_basic_memory.cpp \
+	
+$(TEST_BIN_DIR)/test_basics: $(BASE_HEADERS) $(BASE_TEST_HEADERS) $(TEST_BASICS_SOURCES)
+	$(CXX) $(CXXFLAGS) $(TEST_BASICS_SOURCES) -o $(TEST_BIN_DIR)/test_basics 
+
+
+#----------------------------------------------------------
+#
 #   Array test & bench (details)
 #
 #----------------------------------------------------------
@@ -169,6 +172,7 @@ endif
 
 TEST_ARRAY_BASICS_SOURCES = \
 	test/test_array_basics.cpp \
+	test/test_index_selection.cpp \
 	test/test_array1d.cpp \
 	test/test_array2d.cpp \
 	test/test_array_transpose.cpp

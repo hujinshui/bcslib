@@ -52,7 +52,7 @@ namespace bcs
 	using std::intptr_t;
 	using std::uintptr_t;
 
-	typedef int32_t index_t;
+	typedef ptrdiff_t index_t;
 
 	using std::pair;
 	using std::make_pair;

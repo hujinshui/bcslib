@@ -14,77 +14,245 @@
 #define BCSLIB_ARRAY_INDEX_H
 
 #include <bcslib/base/basic_defs.h>
-#include <bcslib/base/index_selectors.h>
 
 namespace bcs
 {
-	/**
-	 * The concept of indexer
-	 * ----------------------
+	/*****
 	 *
-	 * Let I be an indexer, it should support
+	 *  The Concept of index selector.
+	 *  --------------------------------
 	 *
-	 * - I.size();	// the number of elements along the dimension
-	 * - I[i];		// the mapped index of i
-	 * - array_indexer_traits
+	 *  Let S be an index selector. It should support:
 	 *
-	 * We note that the class indices (defined in index_selection.h)
-	 * is already an indexer class.
+	 *  - typedefs of the following types:
+	 *    - value_type (implicitly convertible to index_t)
+	 *    - size_type (size_t)
+	 *    - const_iterator: of concept forward_iterator
 	 *
+	 *  - copy-constructible and/or move-constructible
+	 *
+	 *  - S.size() -> the number of indices, of type size_type
+	 *  - S[i] -> the i-th selected index (i is of index_t type)
+	 *  - S.begin() -> the beginning iterator, of type const_iterator
+	 *  - S.end() -> the pass-by-end iterator, of type const_iterator
+	 *
+	 *  - is_index_selector<S>::value is explicitly specialized as true.
+	 *    (By default, it is false)
 	 */
 
-	template<class Indexer>
-	struct array_indexer_traits
+
+	struct is_index_selector
 	{
-		static bool is_continuous(const Indexer& indexer)
-		{
-			return false;
-		}
+		static const bool value = false;
 	};
 
+	struct whole { };
+	struct rev_whole { };
 
-	class id_ind
+	namespace _detail
+	{
+		class _range_iter_impl
+		{
+		public:
+			typedef index_t value_type;
+			typedef const index_t& reference;
+			typedef const index_t* pointer;
+
+			_range_iter_impl() : m_idx(0) { }
+
+			_range_iter_impl(const index_t& i): m_idx(i) { }
+
+			void move_next() { ++ m_idx; }
+
+			pointer ptr() const { return &m_idx; }
+
+			reference ref() const { return m_idx; }
+
+			bool operator == (const _range_iter_impl& rhs) const
+			{
+				return m_idx == rhs.m_idx;
+			}
+
+		private:
+			index_t m_idx;
+
+		}; // end _range_iter_impl
+
+
+		class _step_range_iter_impl
+		{
+		public:
+			typedef index_t value_type;
+			typedef const index_t& reference;
+			typedef const index_t* pointer;
+
+			_step_range_iter_impl() : m_idx(0), m_step(1) { }
+
+			_step_range_iter_impl(const index_t& i, const index_t& s): m_idx(i), m_step(s) { }
+
+			void move_next() { m_idx += m_step; }
+
+			pointer ptr() const { return &m_idx; }
+
+			reference ref() const { return m_idx; }
+
+			bool operator == (const _step_range_iter_impl& rhs) const
+			{
+				return m_idx == rhs.m_idx;
+			}
+
+		private:
+			index_t m_idx;
+			index_t m_step;
+
+		}; // end _step_range_iter_impl
+
+
+		class _rep_iter_impl
+		{
+		public:
+			typedef index_t value_type;
+			typedef const index_t& reference;
+			typedef const index_t* pointer;
+
+			_rep_iter_impl() : m_index(0), m_i(0) { }
+
+			_rep_iter_impl(const index_t& idx, const size_t& i): m_index(idx), m_i(i) { }
+
+			void move_next() { ++ m_i; }
+
+			pointer ptr() const { return &m_index; }
+
+			reference ref() const { return m_index; }
+
+			bool operator == (const _rep_iter_impl& rhs) const
+			{
+				return m_i == rhs.m_i;
+			}
+
+		private:
+			index_t m_index;
+			size_t m_i;
+
+		}; // end _rep_iter_impl
+	}
+
+
+	class range
 	{
 	public:
-		id_ind(size_t n) : m_n(n)
+		typedef index_t value_type;
+		typedef size_t size_type;
+		typedef forward_iterator_wrapper<_detail::_range_iter_impl> const_iterator;
+
+	public:
+		range()
+		: m_begin(0), m_end(0)
 		{
+		}
+
+		range(index_t b, index_t e)
+		: m_begin(b), m_end(e)
+		{
+		}
+
+		index_t begin_index() const
+		{
+			return m_begin;
+		}
+
+		index_t end_index() const
+		{
+			return m_end;
 		}
 
 		size_t size() const
 		{
-			return m_n;
+			return m_begin < m_end ? static_cast<size_t>(m_end - m_begin) : 0;
 		}
 
-		index_t operator[] (index_t i) const
+		index_t operator[] (const index_t& i) const
 		{
-			return i;
+			return m_begin + i;
+		}
+
+		index_t front() const
+		{
+			return m_begin;
+		}
+
+		index_t back() const
+		{
+			return m_end - 1;
+		}
+
+		const_iterator begin() const
+		{
+			return _detail::_range_iter_impl(begin_index());
+		}
+
+		const_iterator end() const
+		{
+			return _detail::_range_iter_impl(end_index());
+		}
+
+		bool operator == (const range& rhs) const
+		{
+			return m_begin == rhs.m_begin && m_end == rhs.m_end;
+		}
+
+		bool operator != (const range& rhs) const
+		{
+			return !(operator == (rhs));
 		}
 
 	private:
-		size_t m_n;
+		index_t m_begin;
+		index_t m_end;
 
-	}; // end class id_ind
-
-	template<>
-	struct array_indexer_traits<id_ind>
-	{
-		static bool is_continuous(const id_ind& indexer)
-		{
-			return true;
-		}
-	};
+	}; // end class range
 
 
-	class step_ind
+	class step_range
 	{
 	public:
-		step_ind(size_t n, index_t s) : m_n(n), m_step(s)
+		typedef index_t value_type;
+		typedef size_t size_type;
+		typedef forward_iterator_wrapper<_detail::_step_range_iter_impl> const_iterator;
+
+	public:
+		step_range()
+		: m_begin(0), m_n(0), m_step(0)
 		{
 		}
 
-		size_t size() const
+	private:
+		step_range(index_t b, index_t n, index_t step)
+		: m_begin(b), m_n(n), m_step(step)
 		{
-			return m_n;
+		}
+
+	public:
+		static step_range from_begin_end(index_t b, index_t e, index_t step)
+		{
+			return step_range(b, _calc_n(b, e, step), step);
+		}
+
+		static step_range from_begin_dim(index_t b, index_t n, index_t step)
+		{
+			return step_range(b, n, step);
+		}
+
+
+	public:
+		index_t begin_index() const
+		{
+			return m_begin;
+		}
+
+		index_t end_index() const
+		{
+			return m_begin + m_n * m_step;
 		}
 
 		index_t step() const
@@ -92,189 +260,158 @@ namespace bcs
 			return m_step;
 		}
 
-		index_t operator[] (index_t i) const
+		size_t size() const
 		{
-			return i * m_step;
+			return static_cast<size_t>(m_n);
+		}
+
+		index_t operator[] (const index_t& i) const
+		{
+			return m_begin + i * m_step;
+		}
+
+		index_t front() const
+		{
+			return m_begin;
+		}
+
+		index_t back() const
+		{
+			return m_begin + (m_n - 1) * m_step;
+		}
+
+		const_iterator begin() const
+		{
+			return _detail::_step_range_iter_impl(begin_index(), step());
+		}
+
+		const_iterator end() const
+		{
+			return _detail::_step_range_iter_impl(end_index(), step());
+		}
+
+		bool operator == (const step_range& rhs) const
+		{
+			return m_begin == rhs.m_begin && m_n == rhs.m_n && m_step == rhs.m_step;
+		}
+
+		bool operator != (const step_range& rhs) const
+		{
+			return !(operator == (rhs));
 		}
 
 	private:
-		size_t m_n;
+		static index_t _calc_n(index_t b, index_t e, index_t step)
+		{
+            return step > 0 ?
+            		((e > b) ? ((e - b - 1) / step + 1) : 0) :
+            		((e < b) ? ((e - b + 1) / step + 1) : 0);
+		}
+
+	private:
+		index_t m_begin;
+		index_t m_n;
 		index_t m_step;
 
-	}; // end class step_ind
-
-	template<>
-	struct array_indexer_traits<step_ind>
-	{
-		static bool is_continuous(const step_ind& indexer)
-		{
-			return indexer.step() == 1;
-		}
-	};
+	}; // end class step_range
 
 
-	class rep_ind
+	class rep_selector
 	{
 	public:
-		explicit rep_ind(size_t n) : m_n(n)
+		typedef index_t value_type;
+		typedef size_t size_type;
+		typedef forward_iterator_wrapper<_detail::_rep_iter_impl> const_iterator;
+
+	public:
+		rep_selector()
+		: m_index(0), m_n(0)
 		{
+		}
+
+		rep_selector(index_t index, size_t n)
+		: m_index(index), m_n(n)
+		{
+		}
+
+		index_t index() const
+		{
+			return m_index;
 		}
 
 		size_t size() const
 		{
-			return m_n;
+			return static_cast<size_t>(m_n);
 		}
 
-		index_t operator[] (index_t i) const
+		index_t operator[] (const index_t& i) const
 		{
-			return 0;
+			return m_index;
+		}
+
+		const_iterator begin() const
+		{
+			return _detail::_rep_iter_impl(m_index, 0);
+		}
+
+		const_iterator end() const
+		{
+			return _detail::_rep_iter_impl(m_index, m_n);
+		}
+
+		bool operator == (const rep_selector& rhs) const
+		{
+			return m_index == rhs.m_index && m_n == rhs.m_n;
+		}
+
+		bool operator != (const rep_selector& rhs) const
+		{
+			return !(operator == (rhs));
 		}
 
 	private:
+		index_t m_index;
 		size_t m_n;
 
-	}; // end class rep_ind
+	}; // end class rep_selector
 
 
+	// convenient functions for constructing regular selector
 
-	// step injection
-
-	// Note: a fully generic version is given in array1d.h
-	template<class TIndexer> struct inject_step;
-
-	template<>
-	struct inject_step<id_ind>
+	inline range rgn(index_t dim, whole)
 	{
-		typedef step_ind type;
+		return range(0, dim);
+	}
 
-		static type get(const id_ind& idx0, index_t step)
-		{
-			return step_ind(idx0.size(), step);
-		}
-	};
-
-
-	template<>
-	struct inject_step<step_ind>
+	inline step_range rgn(index_t dim, rev_whole)
 	{
-		typedef step_ind type;
+		return step_range::from_begin_dim(dim-1, dim, -1);
+	}
 
-		static type get(const step_ind& idx0, index_t step)
-		{
-			return step_ind(idx0.size(), idx0.step() * step);
-		}
-	};
-
-
-	template<>
-	struct inject_step<rep_ind>
+	inline range rgn(index_t begin_index, index_t end_index)
 	{
-		typedef rep_ind type;
+		return range(begin_index, end_index);
+	}
 
-		static type get(const rep_ind& idx0, index_t step)
-		{
-			return idx0;
-		}
-	};
-
-
-	/****************************************************************
-	 *
-	 * sub-indexer by imposing a selector upon an indexer
-	 *
-	 ****************************************************************/
-
-	// Note: a fully generic version is given in array1d.h
-	template<class TIndexer, class TSelector> struct sub_indexer;
-
-	// generic specialization when TSelector is whole or rep_selector
-
-	template<class TIndexer>
-	struct sub_indexer<TIndexer, whole>
+	inline step_range rgn(index_t begin_index, index_t end_index, index_t step)
 	{
-		typedef TIndexer type;
+		return step_range::from_begin_end(begin_index, end_index, step);
+	}
 
-		static type get(const TIndexer& base_indexer, whole, index_t& offset)
-		{
-			offset = 0;
-			return base_indexer;
-		}
-	};
-
-	template<class TIndexer>
-	struct sub_indexer<TIndexer, rep_selector>
+	inline range rgn_n(index_t begin_index, index_t n)
 	{
-		typedef rep_ind type;
+		return range(begin_index, begin_index + n);
+	}
 
-		static type get(const TIndexer& base_indexer, const rep_selector& selector, index_t& offset)
-		{
-			offset = base_indexer[selector.index()];
-			return rep_ind(selector.size());
-		}
-	};
-
-	template<class TIndexer>
-	struct sub_indexer<TIndexer, rev_whole>
+	inline step_range rgn_n(index_t begin_index, index_t n, index_t step)
 	{
-		typedef typename sub_indexer<TIndexer, step_range>::type type;
+		return step_range::from_begin_dim(begin_index, n, step);
+	}
 
-		static type get(const TIndexer& base_indexer, rev_whole, index_t& offset)
-		{
-			step_range rg = rgn(static_cast<index_t>(base_indexer.size()), rev_whole());
-			return sub_indexer<TIndexer, step_range>::get(base_indexer, rg, offset);
-		}
-	};
-
-
-	// specialized versions
-
-	template<>
-	struct sub_indexer<id_ind, range>
+	inline rep_selector rep(index_t index, size_t repeat_times)
 	{
-		typedef id_ind type;
-
-		static type get(const id_ind& base_indexer, const range& rg, index_t& offset)
-		{
-			offset = rg.begin_index();
-			return id_ind(rg.size());
-		}
-	};
-
-	template<>
-	struct sub_indexer<id_ind, step_range>
-	{
-		typedef step_ind type;
-
-		static type get(const id_ind& base_indexer, const step_range& rg, index_t& offset)
-		{
-			offset = rg.begin_index();
-			return step_ind(rg.size(), rg.step());
-		}
-	};
-
-	template<>
-	struct sub_indexer<step_ind, range>
-	{
-		typedef step_ind type;
-
-		static type get(const step_ind& base_indexer, const range& rg, index_t& offset)
-		{
-			offset = rg.begin_index() * base_indexer.step();
-			return step_ind(rg.size(), base_indexer.step());
-		}
-	};
-
-	template<>
-	struct sub_indexer<step_ind, step_range>
-	{
-		typedef step_ind type;
-
-		static type get(const step_ind& base_indexer, const step_range& rg, index_t& offset)
-		{
-			offset = rg.begin_index() * base_indexer.step();
-			return step_ind(rg.size(), rg.step() * base_indexer.step());
-		}
-	};
+		return rep_selector(index, repeat_times);
+	}
 
 }
 

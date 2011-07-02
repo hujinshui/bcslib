@@ -49,6 +49,9 @@
 	#error BCSLib can only be used with Microsoft Visual C++, GCC (G++), or clang (clang++).
 #endif
 
+#ifdef HAS_INTEL_ARBB
+	#define BCS_ENABLE_INTEL_ARBB
+#endif
 
 #ifdef HAS_INTEL_IPP
 	#define BCS_ENABLE_INTEL_IPPS
