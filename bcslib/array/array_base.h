@@ -18,6 +18,7 @@
 #include <bcslib/base/basic_mem.h>
 
 #include <type_traits>
+#include <complex>
 #include <array>
 #include <string>
 
@@ -26,27 +27,34 @@ namespace bcs
 {
 	typedef uint8_t dim_num_t;
 
+
+	/********************************************
+	 *
+	 *   Array layout order
+	 *
+	 ********************************************/
+
 	struct layout_1d_t { };
 	struct row_major_t { };
 	struct column_major_t { };
+
+	template<typename T> struct is_layout_order : public std::false_type { };
+
+	template<> struct is_layout_order<layout_1d_t> : public std::true_type { };
+	template<> struct is_layout_order<row_major_t> : public std::true_type { };
+	template<> struct is_layout_order<column_major_t> : public std::true_type { };
 
 	template<typename TOrd> struct layout_aux2d;
 
 	template<>
 	struct layout_aux2d<row_major_t>
 	{
-		static index_t offset(index_t d0, index_t d1, index_t i, index_t j)
+		BCS_FORCE_INLINE static index_t offset(index_t d0, index_t d1, index_t i, index_t j)
 		{
 			return i * d1 + j;
 		}
 
-		static void pass_by_end(index_t d0, index_t d1, index_t& i, index_t& j)
-		{
-			i = d0;
-			j = 0;
-		}
-
-		static std::array<index_t, 2> ind2sub(index_t d0, index_t d1, index_t idx)
+		BCS_FORCE_INLINE static std::array<index_t, 2> ind2sub(index_t d0, index_t d1, index_t idx)
 		{
 			std::array<index_t, 2> sub;
 			sub[0] = idx / d1;
@@ -59,18 +67,12 @@ namespace bcs
 	template<>
 	struct layout_aux2d<column_major_t>
 	{
-		static index_t offset(index_t d0, index_t d1, index_t i, index_t j)
+		BCS_FORCE_INLINE static index_t offset(index_t d0, index_t d1, index_t i, index_t j)
 		{
 			return i + j * d0;
 		}
 
-		static void pass_by_end(index_t d0, index_t d1, index_t& i, index_t& j)
-		{
-			i = 0;
-			j = d1;
-		}
-
-		static std::array<index_t, 2> ind2sub(index_t d0, index_t d1, index_t idx)
+		BCS_FORCE_INLINE static std::array<index_t, 2> ind2sub(index_t d0, index_t d1, index_t idx)
 		{
 			std::array<index_t, 2> sub;
 			sub[1] = idx / d0;
@@ -80,207 +82,182 @@ namespace bcs
 	};
 
 
+
 	/*********
 	 *
-	 * The concept of an array class
+	 *  The concept of an array class
+	 *  ------------------------------
 	 *
-	 * Let A be an array class with value_type T and #dims D,
+	 *  1. type definitions:
 	 *
-	 * bcs::is_array_view<A>::value is true
-	 * bcs::is_array_view_ndim<A, D>::value is true
-	 * the class bcs::array_view_traits<A> should be properly specialized.
+	 *     - value_type;
+	 *     - size_type;
+	 *     - index_type;
+	 *     - const_reference;
+	 *     - reference;
+	 *     - const_pointer;
+	 *     - pointer;
+	 *     - const_iterator;
+	 *     - iterator;
+	 *     - shape_type;
 	 *
-	 * Let a be an instance of A,
+	 *  2. static constant numbers:
 	 *
-	 * The following operations should be supported:
+	 *     - num_dimensions: dim_num_t
 	 *
-	 * get_array_shape(a):  the array shape: shape_type
-	 * get_num_elems(a): 	the number of elements -> size_t
+	 *  3. each instance is constructible with shape parameters,
+	 *     copy-constructible and assignable
 	 *
-	 * get(a, i), get(a, i, j), ...:  get value of individual elements
-	 * set(v, a, i), set(v, a, i, j), ...:  set value of individual elements
+	 *  4. non-static member functions:
 	 *
-	 * begin(a):  returns the begin iterator of a
-	 * end(a):    returns the end iterator of a
+	 *     - a(i, j, ...) -> (const) reference: element access
+	 *     - a.shape() -> shape_type:  get array shape
+	 *     - a.nelems() -> size_type:  number of elements
+	 *     - a.pbase() -> (const) pointer:  base address
 	 *
-	 * is_dense_view(a):  whether the memory layout is dense
-	 * when is_dense_view(a) is true, a should support ptr_base(a);
+	 *  5. is_array_view<Arr>::value is set to true.
 	 */
 
-	template<class A>
-	struct is_array_view
+	// forward declaration of all array and array view types, and extended array value types
+
+	// 1D
+
+	template<typename T> class caview1d;
+	template<typename T> class aview1d;
+	template<typename T, class Alloc=aligned_allocator<T> > class array1d;
+
+	template<typename T, class TIndexer> class caview1d_ex;
+	template<typename T, class TIndexer> class aview1d_ex;
+
+	// 2D
+
+	template<typename T, typename TOrd> class caview2d;
+	template<typename T, typename TOrd> class aview2d;
+	template<typename T, typename TOrd, class Alloc=aligned_allocator<T> > class array2d;
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1> class caview2d_ex;
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1> class aview2d_ex;
+
+
+	/********************************************
+	 *
+	 *  meta-programming helpers
+	 *
+	 ********************************************/
+
+	// array_type
+
+	template<typename T, dim_num_t D, typename TOrd> struct array_type;
+
+	template<typename T, typename TOrd>
+	struct array_type<T, 1, TOrd>
 	{
-		static const bool value = false;
+		typedef array1d<T> type;
 	};
 
-	template<class A, dim_num_t D>
-	struct is_array_view_ndim
+	template<typename T, typename TOrd>
+	struct array_type<T, 2, TOrd>
 	{
-		static const bool value = false;
+		typedef array2d<T, TOrd> type;
 	};
 
-	template<class A>
-	struct array_view_traits
-	{
-		typedef typename A::layout_order layout_order;
+	// array_cast
 
-		typedef typename A::value_type value_type;
-		typedef typename A::size_type size_type;
-		typedef typename A::index_type index_type;
-		typedef typename A::const_reference const_reference;
-		typedef typename A::reference reference;
-		typedef typename A::const_pointer const_pointer;
-		typedef typename A::pointer pointer;
-		typedef typename A::const_iterator const_iterator;
-		typedef typename A::iterator iterator;
+	template<class Arr, typename T=typename Arr::value_type, dim_num_t D=Arr::num_dimensions>
+	struct array_cast : public array_type<T, D, typename Arr::layout_order> { };
 
-		typedef typename A::shape_type shape_type;
+	// is_array_view
 
-		static const dim_num_t num_dims = A::num_dims;
-	};
-
-	template<class Arr>
-	struct is_row_major
-	{
-		static const bool value = std::is_same<typename array_view_traits<Arr>::layout_order, row_major_t>::value;
-	};
-
-	template<class Arr>
-	struct is_column_major
-	{
-		static const bool value = std::is_same<typename array_view_traits<Arr>::layout_order, column_major_t>::value;
-	};
-
-
-	// make array shape
-
-	inline std::array<index_t, 1> arr_shape(index_t n)
-	{
-		std::array<index_t, 1> shape;
-		shape[0] = n;
-		return shape;
-	}
-
-	inline std::array<index_t, 2> arr_shape(index_t d0, index_t d1)
-	{
-		std::array<index_t, 2> shape;
-		shape[0] = d0;
-		shape[1] = d1;
-		return shape;
-	}
-
-	inline std::array<index_t, 3> arr_shape(index_t d0, index_t d1, index_t d2)
-	{
-		std::array<index_t, 3> shape;
-		shape[0] = d0;
-		shape[1] = d1;
-		shape[2] = d2;
-		return shape;
-	}
-
-	inline std::array<index_t, 4> arr_shape(index_t d0, index_t d1, index_t d2, index_t d3)
-	{
-		std::array<index_t, 4> shape;
-		shape[0] = d0;
-		shape[1] = d1;
-		shape[2] = d2;
-		shape[3] = d3;
-		return shape;
-	}
-
-	// Other facilities
-
-	class array_dim_mismatch : public std::invalid_argument
-	{
-	public:
-		array_dim_mismatch()
-		: std::invalid_argument("The dimensions of array views are not consistent.")
-		{
-		}
-
-		array_dim_mismatch(std::string& msg)
-		: std::invalid_argument(msg)
-		{
-		}
-	};
-
-
-	namespace _detail
-	{
-
-		template<typename T>
-		struct _is_valid_arrelem_type
-		{
-			static const bool value = std::is_pod<T>::value;
-		};
-
-		template<typename T1, typename T2>
-		struct _is_valid_arrelem_type<std::pair<T1, T2> >
-		{
-			static const bool value = _is_valid_arrelem_type<T1>::value && _is_valid_arrelem_type<T2>::value;
-		};
-
-		template<typename T, size_t D>
-		struct _is_valid_arrelem_type<std::array<T, D> >
-		{
-			static const bool value = _is_valid_arrelem_type<T>::value;
-		};
-	}
+	template<class A> struct is_array_view : public std::false_type { };
 
 	template<typename T>
-	struct is_valid_array_element
+	struct is_array_view<caview1d<T> > : public std::true_type { };
+
+	template<typename T>
+	struct is_array_view<aview1d<T> > : public std::true_type { };
+
+	template<typename T, class Alloc>
+	struct is_array_view<array1d<T, Alloc> > : public std::true_type { };
+
+	template<typename T, typename TOrd>
+	struct is_array_view<caview2d<T, TOrd> > : public std::true_type { };
+
+	template<typename T, typename TOrd>
+	struct is_array_view<aview2d<T, TOrd> > : public std::true_type { };
+
+	template<typename T, typename TOrd, class Alloc>
+	struct is_array_view<array2d<T, TOrd, Alloc> > : public std::true_type { };
+
+	// is_array_view_ndim
+
+	template<class A, dim_num_t D>
+	struct is_array_view_ndim : public std::false_type { };
+
+	template<typename T>
+	struct is_array_view_ndim<caview1d<T>, 1> : public std::true_type { };
+
+	template<typename T>
+	struct is_array_view_ndim<aview1d<T>, 1> : public std::true_type { };
+
+	template<typename T, class Alloc>
+	struct is_array_view_ndim<array1d<T, Alloc>, 1> : public std::true_type { };
+
+	template<typename T, typename TOrd>
+	struct is_array_view_ndim<caview2d<T, TOrd>, 2> : public std::true_type { };
+
+	template<typename T, typename TOrd>
+	struct is_array_view_ndim<aview2d<T, TOrd>, 2> : public std::true_type { };
+
+	template<typename T, typename TOrd, class Alloc>
+	struct is_array_view_ndim<array2d<T, TOrd, Alloc>, 2> : public std::true_type { };
+
+
+	// is_valid_array_value
+
+	template<typename T>
+	struct is_valid_array_value
 	{
-		static const bool value = !std::is_const<T>::value && !std::is_reference<T>::value &&
-				_detail::_is_valid_arrelem_type<T>::value;
+		static const bool value = std::is_pod<T>::value;
 	};
+
+	template<typename T>
+	struct is_valid_array_value<std::complex<T> >
+	{
+		static const bool value = std::is_arithmetic<T>::value;
+	};
+
+	template<typename T1, typename T2>
+	struct is_valid_array_value<std::pair<T1, T2> >
+	{
+		static const bool value = is_valid_array_value<T1>::value && is_valid_array_value<T2>::value;
+	};
+
+	template<typename T, size_t D>
+	struct is_valid_array_value<std::array<T, D> >
+	{
+		static const bool value = is_valid_array_value<T>::value;
+	};
+
+	// is_compatible_array_views
+
+	template<class Arr1, class Arr2, class Arr3=nil_type> struct are_compatible_array_views;
 
 	template<class Arr1, class Arr2>
-	struct is_compatible_aviews
+	struct are_compatible_array_views<Arr1, Arr2, nil_type>
 	{
-		typedef array_view_traits<Arr1> _trs1;
-		typedef array_view_traits<Arr2> _trs2;
-
-		static const bool value = is_array_view<Arr1>::value && is_array_view<Arr2>::value &&
-				std::is_same<typename _trs1::value_type, typename _trs2::value_type>::value &&
-				array_view_traits<Arr1>::num_dims == array_view_traits<Arr2>::num_dims &&
-				std::is_same<typename _trs1::layout_order, typename _trs2::layout_order>::value;
+		static const bool value =
+				is_array_view<Arr1>::value && is_array_view<Arr2>::value &&
+				std::is_same<typename Arr1::value_type, typename Arr2::value_type>::value &&
+				Arr1::num_dimensions == Arr2::num_dimensions &&
+				std::is_same<typename Arr1::layout_order, typename Arr2::layout_order>::value;
 	};
 
-
-	template<class Arr1, class Arr2, dim_num_t NDim>
-	struct is_compatible_aviews_ndim
+	template<class Arr1, class Arr2, class Arr3>
+	struct are_compatible_array_views
 	{
-		typedef array_view_traits<Arr1> _trs1;
-		typedef array_view_traits<Arr2> _trs2;
-
-		static const bool value = is_array_view_ndim<Arr1, NDim>::value && is_array_view_ndim<Arr2, NDim>::value &&
-				std::is_same<typename _trs1::value_type, typename _trs2::value_type>::value &&
-				std::is_same<typename _trs1::layout_order, typename _trs2::layout_order>::value;
-	};
-
-	template<class Arr, class TV>
-	struct is_compatible_aview_v
-	{
-		typedef array_view_traits<Arr> _trs;
-
-		static const bool value = is_array_view<Arr>::value &&
-				std::is_convertible<TV, typename _trs::value_type>::value;
-	};
-
-	template<typename Arr> struct array_creater; // a helper class for constructing arrays
-
-	template<typename Arr, dim_num_t D>
-	struct dim_changed_array
-	{
-		typedef typename array_creater<Arr>::template remap<
-				typename array_view_traits<Arr>::value_type, D>::type _rcreater;
-
-		typedef typename _rcreater::result_type type;
-
-		static type create(const std::array<index_t, D>& shape)
-		{
-			return _rcreater::create(shape);
-		}
+		static const bool value =
+				are_compatible_array_views<Arr1, Arr2>::value &&
+				are_compatible_array_views<Arr2, Arr3>::value;
 	};
 
 }
@@ -289,10 +266,10 @@ namespace bcs
 // The macros help defining array classes
 
 #define BCS_ARRAY_CHECK_TYPE(T) \
-	static_assert(bcs::is_valid_array_element<T>::value, "T must be a valid element type");
+	static_assert(bcs::is_valid_array_value<T>::value, "T must be a valid element type");
 
 #define BCS_ARRAY_BASIC_TYPEDEFS(nd, T, lorder) \
-	static const dim_num_t num_dims = nd; \
+	static const dim_num_t num_dimensions = nd; \
 	typedef std::array<index_t, nd> shape_type; \
 	typedef T value_type; \
 	typedef T* pointer; \

@@ -15,6 +15,9 @@
 
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/iterator_wrappers.h>
+#include <bcslib/array/details/array_index_details.h>
+
+#include <array>
 
 namespace bcs
 {
@@ -42,17 +45,13 @@ namespace bcs
 	 */
 
 
-	template<class T>
-	struct is_indexer
-	{
-		static const bool value = false;
-	};
-
 	// forward declarations
 
 	class range;
 	class step_range;
 	class rep_range;
+
+	template<class T> struct is_indexer : public std::false_type { };
 
 	template<> struct is_indexer<range> : public std::true_type { };
 	template<> struct is_indexer<step_range> : public std::true_type { };
@@ -60,94 +59,6 @@ namespace bcs
 
 	struct whole { };
 	struct rev_whole { };
-
-	namespace _detail
-	{
-		class _range_iter_impl
-		{
-		public:
-			typedef index_t value_type;
-			typedef const index_t& reference;
-			typedef const index_t* pointer;
-
-			_range_iter_impl() : m_idx(0) { }
-
-			_range_iter_impl(const index_t& i): m_idx(i) { }
-
-			void move_next() { ++ m_idx; }
-
-			pointer ptr() const { return &m_idx; }
-
-			reference ref() const { return m_idx; }
-
-			bool operator == (const _range_iter_impl& rhs) const
-			{
-				return m_idx == rhs.m_idx;
-			}
-
-		private:
-			index_t m_idx;
-
-		}; // end _range_iter_impl
-
-
-		class _step_range_iter_impl
-		{
-		public:
-			typedef index_t value_type;
-			typedef const index_t& reference;
-			typedef const index_t* pointer;
-
-			_step_range_iter_impl() : m_idx(0), m_step(1) { }
-
-			_step_range_iter_impl(const index_t& i, const index_t& s): m_idx(i), m_step(s) { }
-
-			void move_next() { m_idx += m_step; }
-
-			pointer ptr() const { return &m_idx; }
-
-			reference ref() const { return m_idx; }
-
-			bool operator == (const _step_range_iter_impl& rhs) const
-			{
-				return m_idx == rhs.m_idx;
-			}
-
-		private:
-			index_t m_idx;
-			index_t m_step;
-
-		}; // end _step_range_iter_impl
-
-
-		class _rep_iter_impl
-		{
-		public:
-			typedef index_t value_type;
-			typedef const index_t& reference;
-			typedef const index_t* pointer;
-
-			_rep_iter_impl() : m_index(0), m_i(0) { }
-
-			_rep_iter_impl(const index_t& idx, const size_t& i): m_index(idx), m_i(i) { }
-
-			void move_next() { ++ m_i; }
-
-			pointer ptr() const { return &m_index; }
-
-			reference ref() const { return m_index; }
-
-			bool operator == (const _rep_iter_impl& rhs) const
-			{
-				return m_i == rhs.m_i;
-			}
-
-		private:
-			index_t m_index;
-			size_t m_i;
-
-		}; // end _rep_iter_impl
-	}
 
 
 	class range
@@ -425,6 +336,47 @@ namespace bcs
 		return rep_range(index, repeat_times);
 	}
 
+
+	/**********************************
+	 *
+	 *  array shapes
+	 *
+	 **********************************/
+
+	inline std::array<index_t, 1> arr_shape(index_t n)
+	{
+		std::array<index_t, 1> shape;
+		shape[0] = n;
+		return shape;
+	}
+
+	inline std::array<index_t, 2> arr_shape(index_t d0, index_t d1)
+	{
+		std::array<index_t, 2> shape;
+		shape[0] = d0;
+		shape[1] = d1;
+		return shape;
+	}
+
+	inline std::array<index_t, 3> arr_shape(index_t d0, index_t d1, index_t d2)
+	{
+		std::array<index_t, 3> shape;
+		shape[0] = d0;
+		shape[1] = d1;
+		shape[2] = d2;
+		return shape;
+	}
+
+	inline std::array<index_t, 4> arr_shape(index_t d0, index_t d1, index_t d2, index_t d3)
+	{
+		std::array<index_t, 4> shape;
+		shape[0] = d0;
+		shape[1] = d1;
+		shape[2] = d2;
+		shape[3] = d3;
+		return shape;
+	}
 }
 
 #endif 
+

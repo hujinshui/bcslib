@@ -125,7 +125,7 @@ namespace bcs
     template<typename T>
     inline void fill_elements(T *dst, size_t n, const T& v)
     {
-    	for (size_t i = 0; i < n; ++i) dst[i] = v;
+    	while (n--) { *(dst++) = v; }
     }
 
 

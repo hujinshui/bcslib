@@ -39,10 +39,7 @@ namespace bcs
 		{
 			static void default_construct(T *p, size_t n)
 			{
-				for (size_t i = 0; i < n; ++i)
-				{
-					new (p + i) T();  // construction via placement new
-				}
+				while (n --) { new (p++) T(); }
 			}
 		};
 
@@ -63,10 +60,7 @@ namespace bcs
 
 			static void copy_construct(const T& v, T *dst, size_t n)
 			{
-				for (size_t i = 0; i < n; ++i)
-				{
-					dst[i] = v;
-				}
+				while (n--) { *(dst++) = v; }
 			}
 		};
 
@@ -75,26 +69,17 @@ namespace bcs
 		{
 			static void copy(const T *src, T *dst, size_t n)
 			{
-				for (size_t i = 0; i < n; ++i)
-				{
-					dst[i] = src[i];
-				}
+				while (n--) { *(dst++) = *(src++); }
 			}
 
 			static void copy_construct(const T *src, T *dst, size_t n)
 			{
-				for (size_t i = 0; i < n; ++i)
-				{
-					new (dst + i) T(src[i]);
-				}
+				while (n--) { new (dst++) T(*(src++)); }
 			}
 
 			static void copy_construct(const T& v, T *dst, size_t n)
 			{
-				for (size_t i = 0; i < n; ++i)
-				{
-					new (dst + i) T(v);
-				}
+				while (n--) { new (dst++) T(v); }
 			}
 		};
 
@@ -112,10 +97,7 @@ namespace bcs
 		{
 			static void destruct(T *dst, size_t n)
 			{
-				for (size_t i = 0; i < n; ++i)
-				{
-					(dst+i)->~T();
-				}
+				while (n--) { (dst++)->~T(); }
 			}
 		};
 
