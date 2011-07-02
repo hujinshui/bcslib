@@ -14,6 +14,7 @@
 #define BCSLIB_ARRAY_INDEX_H
 
 #include <bcslib/base/basic_defs.h>
+#include <bcslib/base/iterator_wrappers.h>
 
 namespace bcs
 {
@@ -36,15 +37,26 @@ namespace bcs
 	 *  - S.begin() -> the beginning iterator, of type const_iterator
 	 *  - S.end() -> the pass-by-end iterator, of type const_iterator
 	 *
-	 *  - is_index_selector<S>::value is explicitly specialized as true.
+	 *  - is_indexer<S>::value is explicitly specialized as true.
 	 *    (By default, it is false)
 	 */
 
 
-	struct is_index_selector
+	template<class T>
+	struct is_indexer
 	{
 		static const bool value = false;
 	};
+
+	// forward declarations
+
+	class range;
+	class step_range;
+	class rep_range;
+
+	template<> struct is_indexer<range> : public std::true_type { };
+	template<> struct is_indexer<step_range> : public std::true_type { };
+	template<> struct is_indexer<rep_range> : public std::true_type { };
 
 	struct whole { };
 	struct rev_whole { };
@@ -316,7 +328,7 @@ namespace bcs
 	}; // end class step_range
 
 
-	class rep_selector
+	class rep_range
 	{
 	public:
 		typedef index_t value_type;
@@ -324,12 +336,12 @@ namespace bcs
 		typedef forward_iterator_wrapper<_detail::_rep_iter_impl> const_iterator;
 
 	public:
-		rep_selector()
+		rep_range()
 		: m_index(0), m_n(0)
 		{
 		}
 
-		rep_selector(index_t index, size_t n)
+		rep_range(index_t index, size_t n)
 		: m_index(index), m_n(n)
 		{
 		}
@@ -359,12 +371,12 @@ namespace bcs
 			return _detail::_rep_iter_impl(m_index, m_n);
 		}
 
-		bool operator == (const rep_selector& rhs) const
+		bool operator == (const rep_range& rhs) const
 		{
 			return m_index == rhs.m_index && m_n == rhs.m_n;
 		}
 
-		bool operator != (const rep_selector& rhs) const
+		bool operator != (const rep_range& rhs) const
 		{
 			return !(operator == (rhs));
 		}
@@ -373,7 +385,7 @@ namespace bcs
 		index_t m_index;
 		size_t m_n;
 
-	}; // end class rep_selector
+	}; // end class rep_range
 
 
 	// convenient functions for constructing regular selector
@@ -408,9 +420,9 @@ namespace bcs
 		return step_range::from_begin_dim(begin_index, n, step);
 	}
 
-	inline rep_selector rep(index_t index, size_t repeat_times)
+	inline rep_range rep(index_t index, size_t repeat_times)
 	{
-		return rep_selector(index, repeat_times);
+		return rep_range(index, repeat_times);
 	}
 
 }

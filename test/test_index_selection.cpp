@@ -18,10 +18,9 @@ using namespace bcs::test;
 template<class IndexSelector>
 bool verify_indices(const IndexSelector& S, const index_t *ref, size_t n)
 {
-	typedef typename index_selector_traits<IndexSelector>::input_type input_t;
 	if (S.size() != n) return false;
 
-	for (input_t i = 0; i < (input_t)n; ++i)
+	for (index_t i = 0; i < (index_t)n; ++i)
 	{
 		if (S[i] != ref[i]) return false;
 	}
@@ -115,15 +114,15 @@ BCS_TEST_CASE( test_step_range )
 }
 
 
-BCS_TEST_CASE( test_rep_selector )
+BCS_TEST_CASE( test_rep_range )
 {
-	rep_selector rs0;
+	rep_range rs0;
 	BCS_CHECK_EQUAL( rs0.index(), 0 );
 	BCS_CHECK_EQUAL( rs0.size(), 0 );
 	BCS_CHECK( rs0.begin() == rs0.end() );
 	BCS_CHECK( rs0 == rs0 );
 
-	rep_selector rs1(2, 5);
+	rep_range rs1(2, 5);
 	index_t rs1_inds[5] = {2, 2, 2, 2, 2};
 	BCS_CHECK_EQUAL( rs1.index(), 2 );
 	BCS_CHECK( verify_indices(rs1, rs1_inds, 5) );
@@ -146,26 +145,6 @@ BCS_TEST_CASE( test_whole_and_rev_whole )
 }
 
 
-BCS_TEST_CASE( test_indices )
-{
-	bool bs1[6] = {true, false, false, true, false, true};
-	std::vector<bool> v1(bs1, bs1+6);
-	index_t I1[3] = {0, 3, 5};
-	BCS_CHECK( verify_indices( indices(v1), I1, 3 ) );
-
-	using std::placeholders::_1;
-
-	int a2[5] = {1, 3, -2, -4, 5};
-	std::vector<int> v2(a2, a2+5);
-	index_t I2[3] = {0, 1, 4};
-	BCS_CHECK( verify_indices( indices(v2, std::bind(std::greater<int>(), _1, 0)),  I2, 3)  );
-
-	int a3[5] = {5, -4, 3, -2, 1};
-	std::vector<int> v3(a3, a3+5);
-	index_t I3[2] = {1, 4};
-	BCS_CHECK( verify_indices( indices(v2, v3, std::greater<int>()), I3, 2) );
-}
-
 
 test_suite *test_index_selection_suite()
 {
@@ -173,9 +152,8 @@ test_suite *test_index_selection_suite()
 
 	suite->add( new test_range() );
 	suite->add( new test_step_range() );
-	suite->add( new test_rep_selector() );
+	suite->add( new test_rep_range() );
 	suite->add( new test_whole_and_rev_whole() );
-	suite->add( new test_indices() );
 
 	return suite;
 }

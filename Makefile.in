@@ -36,6 +36,7 @@ BASE_HEADERS = \
 	bcslib/base/basic_algorithms.h \
 	bcslib/base/iterator_wrappers.h \
 	bcslib/base/basic_mem.h \
+	bcslib/base/details/basic_mem_details.h \
 	bcslib/base/monitored_allocator.h
 
 BASE_TEST_HEADERS = \
@@ -80,7 +81,7 @@ LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
 all: test
 
 .PHONY: test
-test: test_c0x_support test_basics
+test: test_c0x_support test_basics test_array
 
 .PHONY: bench
 bench: bench_array
@@ -113,7 +114,9 @@ test_basics: $(TEST_BIN_DIR)/test_basics
 ifeq ($(USE_INTEL), "yes")
 
 test_array: \
-	$(TEST_BIN_DIR)/test_array_basics \
+	$(TEST_BIN_DIR)/test_array_basics 
+	
+test_array_pending: \
 	$(TEST_BIN_DIR)/test_array_comp \
 	$(TEST_BIN_DIR)/test_array_comp_intel \
 	$(TEST_BIN_DIR)/test_linalg_intel
@@ -172,7 +175,9 @@ $(TEST_BIN_DIR)/test_basics: $(BASE_HEADERS) $(BASE_TEST_HEADERS) $(TEST_BASICS_
 
 TEST_ARRAY_BASICS_SOURCES = \
 	test/test_array_basics.cpp \
-	test/test_index_selection.cpp \
+	test/test_index_selection.cpp
+	
+TTTT = \
 	test/test_array1d.cpp \
 	test/test_array2d.cpp \
 	test/test_array_transpose.cpp
