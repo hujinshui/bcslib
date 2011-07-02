@@ -15,7 +15,6 @@
 
 #include <bcslib/array/array_base.h>
 #include <bcslib/base/basic_algorithms.h>
-#include <bcslib/base/index_selectors.h>
 #include <bcslib/base/arg_check.h>
 
 namespace bcs
@@ -213,28 +212,6 @@ namespace bcs
 	 *    Sub-array Selection
 	 *
 	 ******************************************************/
-
-	// select elements from 1D array
-
-	template<class Arr, class IndexSelector>
-	inline typename std::enable_if<is_array_view_ndim<Arr, 1>::value,
-	typename array_creater<Arr>::result_type>::type
-	select_elems(const Arr& a, const IndexSelector& inds)
-	{
-		typedef typename index_selector_traits<IndexSelector>::input_type input_t;
-		typedef typename array_view_traits<Arr>::value_type value_t;
-
-		input_t n = static_cast<input_t>(inds.size());
-		auto r = array_creater<Arr>::create(arr_shape((index_t)n));
-		value_t *rp = ptr_base(r);
-
-		for (input_t i = 0; i < n; ++i)
-		{
-			*(rp++) = get(a, inds[i]);
-		}
-
-		return r;
-	}
 
 
 	// select elements from 2D array
