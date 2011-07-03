@@ -44,7 +44,7 @@ BASE_TEST_HEADERS = \
 	bcslib/test/test_assertion.h \
 	bcslib/test/test_units.h \
 	bcslib/test/execution_mon.h \
-	bcslib/test/performance_timer.h
+	bcslib/test/timer.h
 
 ARRAY_TEST_HEADERS = $(TEST_HEADERS) bcslib/test/test_array_aux.h
 
@@ -79,7 +79,7 @@ LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
 #---------- Target groups -------------------
 
 .PHONY: all
-all: test
+all: test bench
 
 .PHONY: test
 test: test_c0x_support test_basics test_array
@@ -123,9 +123,7 @@ test_array_pending: \
 	$(TEST_BIN_DIR)/test_linalg_intel
 
 bench_array: \
-	$(BENCH_BIN_DIR)/bench_array_access \
-	$(BENCH_BIN_DIR)/bench_array_calc \
-	$(BENCH_BIN_DIR)/bench_array_calc_intel
+	$(BENCH_BIN_DIR)/bench_array_access
 
 else
 
