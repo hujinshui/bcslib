@@ -321,14 +321,14 @@ namespace bcs
 		return step_range::from_begin_end(begin_index, end_index, step);
 	}
 
-	inline range rgn_n(index_t begin_index, index_t n)
+	inline range rgn_n(index_t begin_index, size_t n)
 	{
-		return range(begin_index, begin_index + n);
+		return range(begin_index, begin_index + (index_t)n);
 	}
 
-	inline step_range rgn_n(index_t begin_index, index_t n, index_t step)
+	inline step_range rgn_n(index_t begin_index, size_t n, index_t step)
 	{
-		return step_range::from_begin_dim(begin_index, n, step);
+		return step_range::from_begin_dim(begin_index, (index_t)n, step);
 	}
 
 	inline rep_range rep(index_t index, size_t repeat_times)
