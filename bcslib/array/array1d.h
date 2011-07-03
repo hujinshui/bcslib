@@ -13,9 +13,10 @@
 #ifndef BCSLIB_ARRAY1D_H
 #define BCSLIB_ARRAY1D_H
 
+
 #include <bcslib/array/array_base.h>
 #include <bcslib/array/array_index.h>
-
+#include <bcslib/base/block.h>
 
 namespace bcs
 {
@@ -43,28 +44,6 @@ namespace bcs
 		, m_d0(static_cast<index_t>(indexer.size()))
 		, m_indexer(indexer)
 		{
-		}
-
-		caview1d_ex(const_pointer pbase, indexer_type&& indexer)
-		: m_pbase(const_cast<pointer>(pbase))
-		, m_d0(static_cast<index_t>(indexer.size()))
-		, m_indexer(std::move(indexer))
-		{
-		}
-
-		caview1d_ex(const caview1d_ex& r)
-		: m_pbase(r.m_pbase)
-		, m_d0(r.m_d0)
-		, m_indexer(r.m_indexer)
-		{
-		}
-
-		caview1d_ex(caview1d_ex&& r)
-		: m_pbase(r.m_pbase)
-		, m_d0(r.m_d0)
-		, m_indexer(std::move(r.m_indexer))
-		{
-			r.reset();
 		}
 
 	private:
@@ -114,13 +93,6 @@ namespace bcs
 		index_type m_d0;
 		indexer_type m_indexer;
 
-	private:
-		void reset()
-		{
-			m_pbase = BCS_NULL;
-			m_d0 = 0;
-		}
-
 	}; // end class caview1d_ex
 
 
@@ -143,18 +115,13 @@ namespace bcs
 		{
 		}
 
-		aview1d_ex(pointer pbase, indexer_type&& indexer)
-		: cview_type(pbase, std::move(indexer))
-		{
-		}
-
 		aview1d_ex(aview1d_ex& r)
 		: cview_type(r)
 		{
 		}
 
 		aview1d_ex(aview1d_ex&& r)
-		: cview_type(std::move(r))
+		: cview_type(r)
 		{
 		}
 
@@ -300,25 +267,20 @@ namespace bcs
 	public:
 		// Sub-view
 
+		cview_type V(whole) const
+		{
+			return *this;
+		}
+
 		cview_type V(const range& rgn) const
 		{
 			return cview_type(m_pbase + rgn.begin_index(), rgn.size());
 		}
 
 		template<class Indexer>
-		caview1d_ex<value_type, Indexer> V(const Indexer& indexer) const
+		caview1d_ex<value_type, typename indexer_remap<Indexer>::type> V(const Indexer& indexer) const
 		{
-			return caview1d_ex<value_type, Indexer>(m_pbase, indexer);
-		}
-
-		cview_type V(whole) const
-		{
-			return *this;
-		}
-
-		caview1d_ex<value_type, step_range> V(rev_whole) const
-		{
-			return V(rgn(m_d0, rev_whole()));
+			return caview1d_ex<value_type, Indexer>(m_pbase, indexer_remap<Indexer>::get(indexer));
 		}
 
 	protected:
@@ -359,7 +321,7 @@ namespace bcs
 		{
 		}
 
-		aview1d(const aview1d& r)
+		aview1d(aview1d& r)
 		: cview_type(r)
 		{
 		}
@@ -369,7 +331,7 @@ namespace bcs
 		{
 		}
 
-		aview1d& operator = (const aview1d& r)
+		aview1d& operator = (aview1d& r)
 		{
 			cview_type::operator =(r);
 			return *this;
@@ -509,13 +471,13 @@ namespace bcs
 	}
 
 	template<typename T>
-	typename aview1d<T>::const_iterator begin(aview1d<T>& a)
+	typename aview1d<T>::iterator begin(aview1d<T>& a)
 	{
 		return a.begin();
 	}
 
 	template<typename T>
-	typename aview1d<T>::const_iterator end(aview1d<T>& a)
+	typename aview1d<T>::iterator end(aview1d<T>& a)
 	{
 		return a.end();
 	}
@@ -777,13 +739,13 @@ namespace bcs
 	template<typename T>
 	inline array1d<T> clone_array(const caview1d<T>& a)
 	{
-		return array1d<double>(a);
+		return array1d<T>(a);
 	}
 
 	template<typename T, class Indexer>
 	inline array1d<T> clone_array(const caview1d_ex<T, Indexer>& a)
 	{
-		return array1d<double>(a);
+		return array1d<T>(a);
 	}
 
 
