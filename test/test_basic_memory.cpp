@@ -9,6 +9,7 @@
 #include <bcslib/test/test_units.h>
 
 #include <bcslib/base/basic_mem.h>
+#include <bcslib/base/block.h>
 #include <bcslib/base/monitored_allocator.h>
 #include <vector>
 

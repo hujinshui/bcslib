@@ -37,6 +37,7 @@ BASE_HEADERS = \
 	bcslib/base/iterator_wrappers.h \
 	bcslib/base/basic_mem.h \
 	bcslib/base/details/basic_mem_details.h \
+	bcslib/base/block.h \
 	bcslib/base/monitored_allocator.h
 
 BASE_TEST_HEADERS = \

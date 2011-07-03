@@ -44,44 +44,6 @@ namespace bcs
 	template<> struct is_layout_order<row_major_t> : public std::true_type { };
 	template<> struct is_layout_order<column_major_t> : public std::true_type { };
 
-	template<typename TOrd> struct layout_aux2d;
-
-	template<>
-	struct layout_aux2d<row_major_t>
-	{
-		BCS_FORCE_INLINE static index_t offset(index_t d0, index_t d1, index_t i, index_t j)
-		{
-			return i * d1 + j;
-		}
-
-		BCS_FORCE_INLINE static std::array<index_t, 2> ind2sub(index_t d0, index_t d1, index_t idx)
-		{
-			std::array<index_t, 2> sub;
-			sub[0] = idx / d1;
-			sub[1] = idx - sub[0] * d1;
-			return sub;
-		}
-	};
-
-
-	template<>
-	struct layout_aux2d<column_major_t>
-	{
-		BCS_FORCE_INLINE static index_t offset(index_t d0, index_t d1, index_t i, index_t j)
-		{
-			return i + j * d0;
-		}
-
-		BCS_FORCE_INLINE static std::array<index_t, 2> ind2sub(index_t d0, index_t d1, index_t idx)
-		{
-			std::array<index_t, 2> sub;
-			sub[1] = idx / d0;
-			sub[0] = idx - sub[1] * d0;
-			return sub;
-		}
-	};
-
-
 
 	/*********
 	 *

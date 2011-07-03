@@ -337,6 +337,98 @@ namespace bcs
 	}
 
 
+	// indexer remap
+
+	template<class R> struct indexer_remap;
+
+	template<> struct indexer_remap<range>
+	{
+		typedef range type;
+		static range get(index_t dim, const range& rgn)
+		{
+			return rgn;
+		}
+	};
+
+	template<> struct indexer_remap<step_range>
+	{
+		typedef step_range type;
+		static step_range get(index_t dim, const step_range& rgn)
+		{
+			return rgn;
+		}
+	};
+
+	template<> struct indexer_remap<rep_range>
+	{
+		typedef rep_range type;
+		static rep_range get(index_t dim, const rep_range& rgn)
+		{
+			return rgn;
+		}
+	};
+
+	template<> struct indexer_remap<whole>
+	{
+		typedef range type;
+		static range get(index_t dim, whole)
+		{
+			return rgn(dim, whole());
+		}
+	};
+
+	template<> struct indexer_remap<rev_whole>
+	{
+		typedef step_range type;
+		static step_range get(index_t dim, rev_whole)
+		{
+			return rgn(dim, rev_whole());
+		}
+	};
+
+
+	/**********************************
+	 *
+	 *  step injection to ranges
+	 *
+	 **********************************/
+
+	template<class Range> struct inject_step;
+
+	template<>
+	struct inject_step<range>
+	{
+		typedef step_range result_type;
+		result_type get(const range& rgn, index_t step)
+		{
+			return step_range::from_begin_dim(rgn.begin_index() * step,
+					static_cast<index_t>(rgn.size()), step);
+		}
+	};
+
+	template<>
+	struct inject_step<step_range>
+	{
+		typedef step_range result_type;
+		result_type get(const step_range& rgn, index_t step)
+		{
+			return step_range::from_begin_dim(rgn.begin_index() * step,
+					static_cast<index_t>(rgn.size()), rgn.step() * step);
+		}
+	};
+
+
+	template<>
+	struct inject_step<rep_range>
+	{
+		typedef rep_range result_type;
+		result_type get(const rep_range& rgn, index_t step)
+		{
+			return rep_range(rgn.index() * step, rgn.size());
+		}
+	};
+
+
 	/**********************************
 	 *
 	 *  array shapes
