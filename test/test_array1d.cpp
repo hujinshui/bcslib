@@ -157,18 +157,21 @@ BCS_TEST_CASE( test_dense_array1d )
 	BCS_CHECK( array_integrity_test(a1) );
 	BCS_CHECK( array_view_equal(a1, src1, n1) );
 	BCS_CHECK( array_iteration_test(a1) );
+	BCS_CHECK( test_generic_operations(a1, src1) );
 
 	array1d<double> a2(n2, v2);
 
 	BCS_CHECK( array_integrity_test(a2) );
 	BCS_CHECK( array_view_equal(a2, src2, n2) );
 	BCS_CHECK( array_iteration_test(a2) );
+	BCS_CHECK( test_generic_operations(a2, src2) );
 
 	array1d<double> a3(n1, src1);
 
 	BCS_CHECK( array_integrity_test(a3) );
 	BCS_CHECK( array_view_equal(a3, src1, n1) );
 	BCS_CHECK( array_iteration_test(a3) );
+	BCS_CHECK( test_generic_operations(a3, src1) );
 
 	array1d<double> a4(a3);
 
@@ -180,6 +183,7 @@ BCS_TEST_CASE( test_dense_array1d )
 	BCS_CHECK( array_integrity_test(a4) );
 	BCS_CHECK( array_view_equal(a4, src1, n1) );
 	BCS_CHECK( array_iteration_test(a4) );
+	BCS_CHECK( test_generic_operations(a4, src1) );
 
 	const double *p4 = a4.pbase();
 	array1d<double> a5(std::move(a4));
@@ -191,6 +195,7 @@ BCS_TEST_CASE( test_dense_array1d )
 	BCS_CHECK( array_integrity_test(a5) );
 	BCS_CHECK( array_view_equal(a5, src1, n1) );
 	BCS_CHECK( array_iteration_test(a5) );
+	BCS_CHECK( test_generic_operations(a5, src1) );
 
 	BCS_CHECK( a1 == a1 );
 	array1d<double> a6(a1);
@@ -204,12 +209,10 @@ BCS_TEST_CASE( test_dense_array1d )
 	BCS_CHECK( array_integrity_test(a7) );
 	BCS_CHECK( array_view_equal(a7, src1, n1) );
 	BCS_CHECK( array_iteration_test(a7) );
-
-	BCS_CHECK( test_generic_operations(a1, src1) );
 }
 
 
-BCS_TEST_CASE( test_step_array1d )
+BCS_TEST_CASE( test_step_aview1d )
 {
 	double src0[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double src1[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -220,6 +223,7 @@ BCS_TEST_CASE( test_step_array1d )
 
 	BCS_CHECK( array_integrity_test(a1) );
 	BCS_CHECK( array_view_equal(a1, r1, n1) );
+	BCS_CHECK( test_generic_operations(a1, r1) );
 
 	aview1d_ex<double, step_range> a2(src1, step_range::from_begin_dim(0, 4, 2));
 	double r2[] = {1, 3, 5, 7};
@@ -227,6 +231,7 @@ BCS_TEST_CASE( test_step_array1d )
 
 	BCS_CHECK( array_integrity_test(a2) );
 	BCS_CHECK( array_view_equal(a2, r2, n2) );
+	BCS_CHECK( test_generic_operations(a2, r2) );
 
 	aview1d_ex<double, step_range> a3(src1 + 7, step_range::from_begin_dim(0, 3, -2));
 	double r3[] = {8, 6, 4};
@@ -234,15 +239,14 @@ BCS_TEST_CASE( test_step_array1d )
 
 	BCS_CHECK( array_integrity_test(a3) );
 	BCS_CHECK( array_view_equal(a3, r3, n3) );
+	BCS_CHECK( test_generic_operations(a3, r3) );
 
 	aview1d_ex<double, step_range> a0(src0, step_range::from_begin_dim(0, 4, 2));
-
-	BCS_CHECK( test_generic_operations(a2, r2) );
 }
 
 
 
-BCS_TEST_CASE( test_rep_array1d )
+BCS_TEST_CASE( test_rep_aview1d )
 {
 	double v = 2;
 
@@ -257,8 +261,8 @@ BCS_TEST_CASE( test_rep_array1d )
 
 	BCS_CHECK( array_integrity_test(a1) );
 	BCS_CHECK( array_view_equal(a1, r1, n1) );
-
 	BCS_CHECK( test_generic_operations(a1, r1) );
+
 }
 
 
@@ -303,7 +307,8 @@ BCS_TEST_CASE( test_aview1d_clone )
 	BCS_CHECK( array_integrity_test(a1) );
 	BCS_CHECK( array_iteration_test(a1) );
 	BCS_CHECK( a1.pbase() != view1.pbase() );
-	BCS_CHECK_EQUAL( a1, view1 );
+	BCS_CHECK( array_view_equal(a1, src, 5) );
+	BCS_CHECK( test_generic_operations(a1, src) );
 
 	aview1d_ex<double, step_range> view2(src, step_range::from_begin_dim(1, 3, 2));
 	array1d<double> a2 = clone_array(view2);
@@ -312,6 +317,7 @@ BCS_TEST_CASE( test_aview1d_clone )
 	BCS_CHECK( array_iteration_test(a2) );
 	double r2[3] = {2, 4, 6};
 	BCS_CHECK( array_view_equal(a2, r2, 3) );
+	BCS_CHECK( test_generic_operations(a2, r2) );
 
 }
 
@@ -357,8 +363,8 @@ test_suite *test_array1d_suite()
 	test_suite *suite = new test_suite( "test_array1d" );
 
 	suite->add( new test_dense_array1d() );
-	suite->add( new test_step_array1d() );
-	suite->add( new test_rep_array1d() );
+	suite->add( new test_step_aview1d() );
+	suite->add( new test_rep_aview1d() );
 	suite->add( new test_regular_subview() );
 	suite->add( new test_aview1d_clone() );
 	suite->add( new test_subarr_selection() );

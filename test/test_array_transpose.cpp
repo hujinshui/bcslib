@@ -31,8 +31,8 @@ bool verify_blkwise_transpose(const T *src, T *dst, T *r, size_t bdim, size_t m,
 }
 
 
-template<typename T, typename TOrd, typename TIndexer0, typename TIndexer1>
-bool verify_array2d_transpose(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
+template<typename T, typename TOrd>
+bool verify_array2d_transpose(const caview2d<T, TOrd>& a)
 {
 	size_t m = a.nrows();
 	size_t n = a.ncolumns();
@@ -47,7 +47,7 @@ bool verify_array2d_transpose(const caview2d<T, TOrd, TIndexer0, TIndexer1>& a)
 		}
 	}
 
-	array2d<T, TOrd> t = a.Tp();
+	array2d<T, TOrd> t = transpose(a);
 
 	return t == r;
 }
@@ -292,32 +292,6 @@ BCS_TEST_CASE( test_array2d_transpose )
 	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[5], ds[3]) ) );
 	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[5], ds[4]) ) );
 	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[5], ds[5]) ) );
-
-	// non-dense views
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm_ex(src, 200, 200, step_ind(ds[2], 2), step_ind(ds[2], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm_ex(src, 200, 200, step_ind(ds[2], 2), step_ind(ds[3], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm_ex(src, 200, 200, step_ind(ds[2], 2), step_ind(ds[4], 2)) ) );
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm_ex(src, 200, 200, step_ind(ds[3], 2), step_ind(ds[2], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm_ex(src, 200, 200, step_ind(ds[3], 2), step_ind(ds[3], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm_ex(src, 200, 200, step_ind(ds[3], 2), step_ind(ds[4], 2)) ) );
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm_ex(src, 200, 200, step_ind(ds[4], 2), step_ind(ds[2], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm_ex(src, 200, 200, step_ind(ds[4], 2), step_ind(ds[3], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm_ex(src, 200, 200, step_ind(ds[4], 2), step_ind(ds[4], 2)) ) );
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm_ex(src, 200, 200, step_ind(ds[2], 2), step_ind(ds[2], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm_ex(src, 200, 200, step_ind(ds[2], 2), step_ind(ds[3], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm_ex(src, 200, 200, step_ind(ds[2], 2), step_ind(ds[4], 2)) ) );
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm_ex(src, 200, 200, step_ind(ds[3], 2), step_ind(ds[2], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm_ex(src, 200, 200, step_ind(ds[3], 2), step_ind(ds[3], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm_ex(src, 200, 200, step_ind(ds[3], 2), step_ind(ds[4], 2)) ) );
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm_ex(src, 200, 200, step_ind(ds[4], 2), step_ind(ds[2], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm_ex(src, 200, 200, step_ind(ds[4], 2), step_ind(ds[3], 2)) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm_ex(src, 200, 200, step_ind(ds[4], 2), step_ind(ds[4], 2)) ) );
 
 }
 

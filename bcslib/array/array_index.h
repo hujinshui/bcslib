@@ -399,7 +399,7 @@ namespace bcs
 	struct inject_step<range>
 	{
 		typedef step_range result_type;
-		result_type get(const range& rgn, index_t step)
+		static result_type get(const range& rgn, index_t step)
 		{
 			return step_range::from_begin_dim(rgn.begin_index() * step,
 					static_cast<index_t>(rgn.size()), step);
@@ -410,7 +410,7 @@ namespace bcs
 	struct inject_step<step_range>
 	{
 		typedef step_range result_type;
-		result_type get(const step_range& rgn, index_t step)
+		static result_type get(const step_range& rgn, index_t step)
 		{
 			return step_range::from_begin_dim(rgn.begin_index() * step,
 					static_cast<index_t>(rgn.size()), rgn.step() * step);
@@ -422,7 +422,7 @@ namespace bcs
 	struct inject_step<rep_range>
 	{
 		typedef rep_range result_type;
-		result_type get(const rep_range& rgn, index_t step)
+		static result_type get(const rep_range& rgn, index_t step)
 		{
 			return rep_range(rgn.index() * step, rgn.size());
 		}

@@ -613,7 +613,7 @@ namespace bcs
 
 	/******************************************************
 	 *
-	 *  standalone array class
+	 *  stand-alone array class
 	 *
 	 ******************************************************/
 
@@ -696,7 +696,7 @@ namespace bcs
 			view_type& v = *this;
 
 			s = std::move(r);
-			v = view_type(s.pointer_to_base(), r.nelems());
+			v = std::move(r);
 
 			return *this;
 		}
