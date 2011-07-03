@@ -296,6 +296,35 @@ BCS_TEST_CASE( test_regular_subview )
 
 }
 
+BCS_TEST_CASE( test_aview1d_copy )
+{
+	const size_t N = 5;
+
+	double a0_buf[N] = {2, 4, 5, 7, 8};
+	double a1_buf[N] = {0, 0, 0, 0, 0};
+	double e2_buf[2 * N] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	double e3_buf[2 * N] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	double a4_buf[N] = {0, 0, 0, 0, 0};
+
+	aview1d<double> a0(a0_buf, N);
+	aview1d<double> a1(a1_buf, N);
+	aview1d_ex<double, step_range> e2(e2_buf, rgn_n(0, N, 2));
+	aview1d_ex<double, step_range> e3(e3_buf, rgn_n(0, N, 2));
+	aview1d<double> a4(a4_buf, N);
+
+	copy(a0, a1);
+	BCS_CHECK( array_view_equal(a1, a0_buf, N) );
+
+	copy(a1, e2);
+	BCS_CHECK( array_view_equal(e2, a0_buf, N) );
+
+	copy(e2, e3);
+	BCS_CHECK( array_view_equal(e3, a0_buf, N) );
+
+	copy(e3, a4);
+	BCS_CHECK( array_view_equal(a4, a0_buf, N) );
+}
+
 
 BCS_TEST_CASE( test_aview1d_clone )
 {
@@ -318,7 +347,6 @@ BCS_TEST_CASE( test_aview1d_clone )
 	double r2[3] = {2, 4, 6};
 	BCS_CHECK( array_view_equal(a2, r2, 3) );
 	BCS_CHECK( test_generic_operations(a2, r2) );
-
 }
 
 
@@ -366,6 +394,7 @@ test_suite *test_array1d_suite()
 	suite->add( new test_step_aview1d() );
 	suite->add( new test_rep_aview1d() );
 	suite->add( new test_regular_subview() );
+	suite->add( new test_aview1d_copy() );
 	suite->add( new test_aview1d_clone() );
 	suite->add( new test_subarr_selection() );
 

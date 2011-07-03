@@ -586,6 +586,70 @@ BCS_TEST_CASE( test_array2d_subviews )
 }
 
 
+BCS_TEST_CASE( test_aview2d_copy )
+{
+	const size_t N = 6;
+	const size_t m = 2;
+	const size_t n = 3;
+
+	double a0_buf[N] = {2, 4, 5, 7, 8, 3};
+	double a1_buf[N];
+	double e2_buf[4 * N];
+	double e3_buf[4 * N];
+	double a4_buf[N];
+
+	set_zeros_to_elements(a1_buf, N);
+	set_zeros_to_elements(e2_buf, 4 * N);
+	set_zeros_to_elements(e3_buf, 4 * N);
+	set_zeros_to_elements(a4_buf, N);
+
+	// row major
+
+	aview2d<double, row_major_t> a0_rm(a0_buf, m, n);
+	aview2d<double, row_major_t> a1_rm(a1_buf, m, n);
+	aview2d_ex<double, row_major_t, step_range, step_range> e2_rm(e2_buf, 2*m, 2*n, rgn_n(0, m, 2), rgn_n(0, n, 2));
+	aview2d_ex<double, row_major_t, step_range, step_range> e3_rm(e3_buf, 2*m, 2*n, rgn_n(0, m, 2), rgn_n(0, n, 2));
+	aview2d<double, row_major_t> a4_rm(a4_buf, m, n);
+
+	copy(a0_rm, a1_rm);
+	BCS_CHECK( array_view_equal(a1_rm, a0_buf, m, n) );
+
+	copy(a1_rm, e2_rm);
+	BCS_CHECK( array_view_equal(e2_rm, a0_buf, m, n) );
+
+	copy(e2_rm, e3_rm);
+	BCS_CHECK( array_view_equal(e3_rm, a0_buf, m, n) );
+
+	copy(e3_rm, a4_rm);
+	BCS_CHECK( array_view_equal(a4_rm, a0_buf, m, n) );
+
+	set_zeros_to_elements(a1_buf, N);
+	set_zeros_to_elements(e2_buf, 4 * N);
+	set_zeros_to_elements(e3_buf, 4 * N);
+	set_zeros_to_elements(a4_buf, N);
+
+	// column_major
+
+	aview2d<double, column_major_t> a0_cm(a0_buf, m, n);
+	aview2d<double, column_major_t> a1_cm(a1_buf, m, n);
+	aview2d_ex<double, column_major_t, step_range, step_range> e2_cm(e2_buf, 2*m, 2*n, rgn_n(0, m, 2), rgn_n(0, n, 2));
+	aview2d_ex<double, column_major_t, step_range, step_range> e3_cm(e3_buf, 2*m, 2*n, rgn_n(0, m, 2), rgn_n(0, n, 2));
+	aview2d<double, column_major_t> a4_cm(a4_buf, m, n);
+
+	copy(a0_cm, a1_cm);
+	BCS_CHECK( array_view_equal(a1_cm, a0_buf, m, n) );
+
+	copy(a1_cm, e2_cm);
+	BCS_CHECK( array_view_equal(e2_cm, a0_buf, m, n) );
+
+	copy(e2_cm, e3_cm);
+	BCS_CHECK( array_view_equal(e3_cm, a0_buf, m, n) );
+
+	copy(e3_cm, a4_cm);
+	BCS_CHECK( array_view_equal(a4_cm, a0_buf, m, n) );
+}
+
+
 BCS_TEST_CASE( test_aview2d_clone )
 {
 	double src[24] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
@@ -712,6 +776,7 @@ test_suite *test_array2d_suite()
 	suite->add( new test_aview2d_ex() );
 	suite->add( new test_array2d_slices() );
 	suite->add( new test_array2d_subviews() );
+	suite->add( new test_aview2d_copy() );
 	suite->add( new test_aview2d_clone() );
 	suite->add( new test_subarr_selection2d() );
 
