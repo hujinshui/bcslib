@@ -946,8 +946,8 @@ namespace bcs
 	{
 		check_arg(src.shape() == dst.shape(), "aview2d copy: the shapes of src and dst are inconsistent.");
 
-		slice2d_info ss = src.slice();
-		slice2d_info sd = dst.slice();
+		slice2d_info ss = src.slice_info();
+		slice2d_info sd = dst.slice_info();
 
 		_detail::copy_elements_2d(ss.nslices, ss.len, src.pbase(), ss.stride, dst.pbase(), sd.stride);
 	}
