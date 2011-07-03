@@ -1298,7 +1298,19 @@ namespace bcs
 		array2d<T, TOrd> r(a.ncolumns(), a.nrows());
 
 		slice2d_info sli = a.slice_info();
-		transpose_matrix(a.pbase(), r.pbase(), sli.nslices, sli.len);
+
+		if (sli.stride == static_cast<index_t>(sli.len))
+		{
+			transpose_matrix(a.pbase(), r.pbase(), sli.nslices, sli.len);
+		}
+		else
+		{
+			// first packing
+			scoped_buffer<T> buf(a.nelems());
+			export_to(a, buf.pbase());
+
+			transpose_matrix(buf.pbase(), r.pbase(), sli.nslices, sli.len);
+		}
 
 		return r;
 	}
