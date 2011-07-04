@@ -131,6 +131,89 @@ namespace bcs
 	}
 
 
+	// clone (convert)
+
+	template<typename T>
+	inline arbb::dense<typename arbb::captured<T>::type, 1> to_arbb(const caview1d<T>& a)
+	{
+		typedef typename arbb::captured<T>::type CT;
+
+		size_t n = a.nelems();
+		arbb::dense<CT, 1> r(n);
+		copy(a, r);
+
+		return r;
+	}
+
+	template<typename CT>
+	inline array1d<typename arbb::uncaptured<CT>::type> from_arbb(const arbb::dense<CT, 1>& a)
+	{
+		typedef typename arbb::uncaptured<CT>::type T;
+
+		size_t n = arbb::value(a.length());
+		array1d<T> r(n);
+		copy(a, r);
+
+		return r;
+	}
+
+	template<typename T>
+	inline arbb::dense<typename arbb::captured<T>::type, 2> to_arbb(const caview2d<T, row_major_t>& a)
+	{
+		typedef typename arbb::captured<T>::type CT;
+
+		size_t m = a.nrows();
+		size_t n = a.ncolumns();
+
+		arbb::dense<CT, 2> r(n, m);
+		copy(a, r);
+
+		return r;
+	}
+
+	template<typename CT>
+	inline array2d<typename arbb::uncaptured<CT>::type, row_major_t> from_arbb(const arbb::dense<CT, 2>& a, row_major_t)
+	{
+		typedef typename arbb::uncaptured<CT>::type T;
+
+		size_t m = arbb::value(a.num_rows());
+		size_t n = arbb::value(a.num_cols());
+
+		array2d<T, row_major_t> r(m, n);
+		copy(a, r);
+
+		return r;
+	}
+
+	template<typename T>
+	inline arbb::dense<typename arbb::captured<T>::type, 2> to_arbb(const caview2d<T, column_major_t>& a)
+	{
+		typedef typename arbb::captured<T>::type CT;
+
+		size_t m = a.nrows();
+		size_t n = a.ncolumns();
+
+		arbb::dense<CT, 2> r(m, n);
+		copy(a, r);
+
+		return r;
+	}
+
+	template<typename CT>
+	inline array2d<typename arbb::uncaptured<CT>::type, column_major_t> from_arbb(const arbb::dense<CT, 2>& a, column_major_t)
+	{
+		typedef typename arbb::uncaptured<CT>::type T;
+
+		size_t n = arbb::value(a.num_rows());
+		size_t m = arbb::value(a.num_cols());
+
+		array2d<T, column_major_t> r(m, n);
+		copy(a, r);
+
+		return r;
+	}
+
+
 }
 
 
