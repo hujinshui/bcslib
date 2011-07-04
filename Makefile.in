@@ -20,6 +20,8 @@ ifeq ($(USE_INTEL), "yes")
     INTEL_FLAGS = -DHAS_INTEL_MKL -DHAS_INTEL_IPP $(INTEL_PATHS) $(INTEL_LINKS)
 endif
 
+ARBB_LINKS = -larbb -ltbb -littnotify
+
 #------ Output directory ----------
 
 TEST_BIN_DIR = bin
@@ -54,7 +56,8 @@ ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/array/details/array_index_details.h \
 	bcslib/array/array1d.h \
 	bcslib/array/array2d.h \
-	bcslib/array/details/array2d_details.h
+	bcslib/array/details/array2d_details.h \
+	bcslib/array/arbb_port.h
 	 	
 VEC_COMP_HEADERS = \
 	bcslib/veccomp/veccalc.h \
@@ -112,10 +115,9 @@ test_basics: $(TEST_BIN_DIR)/test_basics
 .PHONY: test_array
 .PHONY: bench_array	
 
-ifeq ($(USE_INTEL), "yes")
-
 test_array: \
-	$(TEST_BIN_DIR)/test_array_basics 
+	$(TEST_BIN_DIR)/test_array_basics \
+	$(TEST_BIN_DIR)/test_arbb_basics 
 	
 test_array_pending: \
 	$(TEST_BIN_DIR)/test_array_comp \
@@ -124,21 +126,6 @@ test_array_pending: \
 
 bench_array: \
 	$(BENCH_BIN_DIR)/bench_array_access
-
-else
-
-test_array: \
-	$(TEST_BIN_DIR)/test_array_basics \
-	$(TEST_BIN_DIR)/test_array_comp \
-	$(TEST_BIN_DIR)/test_access_performance \
-	$(TEST_BIN_DIR)/test_calc_performance
-
-bench_array: \
-	$(BENCH_BIN_DIR)/bench_array_access \
-	$(BENCH_BIN_DIR)/bench_array_calc
-
-endif
-
 
 
 #_________________________________________________________________________
@@ -181,6 +168,15 @@ TEST_ARRAY_BASICS_SOURCES = \
 	
 $(TEST_BIN_DIR)/test_array_basics: $(ARRAY_BASIC_HEADERS) $(ARRAY_TEST_HEADERS) $(TEST_ARRAY_BASICS_SOURCES) 
 	$(CXX) $(CXXFLAGS) $(TEST_ARRAY_BASICS_SOURCES) -o $(TEST_BIN_DIR)/test_array_basics
+	
+
+TEST_ARBB_BASICS_SOURCES = \
+	test/test_arbb_basics.cpp \
+	test/test_arbb_port.cpp
+
+$(TEST_BIN_DIR)/test_arbb_basics: $(ARRAY_BASIC_HEADERS) $(ARRAY_TEST_HEADERS) $(TEST_ARBB_BASICS_SOURCES)
+	$(CXX) $(CXXFLAGS) $(ARBB_LINKS) $(TEST_ARBB_BASICS_SOURCES) -o $(TEST_BIN_DIR)/test_arbb_basics 
+
 	
 TEST_ARRAY_COMP_SOURCES = \
 	test/test_array_comp.cpp \
