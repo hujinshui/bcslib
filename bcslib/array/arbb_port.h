@@ -214,6 +214,28 @@ namespace bcs
 	}
 
 
+	// bind
+
+	template<typename T>
+	inline void bind(arbb::dense<typename arbb::captured<T>::type, 1>& managed, aview1d<T>& native)
+	{
+		arbb::bind(managed, native.pbase(), native.nelems());
+	}
+
+	template<typename T>
+	inline void bind(arbb::dense<typename arbb::captured<T>::type, 2>& managed, aview2d<T, row_major_t>& native)
+	{
+		check_arg( native.base_dim1() == (index_t)native.ncolumns(), "bcs::bind: arbb with aview2d: can only bind to continuous views.");
+		arbb::bind(managed, native.pbase(), native.ncolumns(), native.nrows());
+	}
+
+	template<typename T>
+	inline void bind(arbb::dense<typename arbb::captured<T>::type, 2>& managed, aview2d<T, column_major_t>& native)
+	{
+		check_arg( native.base_dim0() == (index_t)native.nrows(), "bcs::bind: arbb with aview2d: can only bind to continuous views.");
+		arbb::bind(managed, native.pbase(), native.nrows(), native.ncolumns());
+	}
+
 }
 
 
