@@ -14,6 +14,7 @@
 #include <bcslib/test/timer.h>
 
 #include <algorithm>
+#include <ctime>
 
 
 using namespace bcs;
@@ -303,7 +304,7 @@ int main(int argc, char *argv[])
 
 	double *src = new double[nelems_s];
 
-	std::srand( (unsigned int)(std::time( 0 )) );
+	std::srand( (unsigned int)( std::time( 0 )) );
 	for (size_t i = 0; i < nelems_s; ++i)
 	{
 		src[i] = (double)std::rand() / RAND_MAX;
