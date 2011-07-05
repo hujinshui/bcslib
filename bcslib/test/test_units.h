@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 namespace bcs
 {
@@ -68,15 +69,9 @@ namespace bcs
 
 			virtual ~test_suite()
 			{
-				for (std::vector<base_test_unit*>::iterator it = m_tunits.begin();
-						it != m_tunits.end(); ++it)
-				{
-					delete(*it);
-				}
-				m_tunits.clear();
 			}
 
-			void add(base_test_unit *tunit)
+			void add(std::shared_ptr<base_test_unit> tunit)
 			{
 				m_tunits.push_back(tunit);
 				m_ncases += tunit->num_cases();
@@ -94,11 +89,11 @@ namespace bcs
 
 			base_test_unit* get_unit(int i) const
 			{
-				return m_tunits[(size_t)i];
+				return m_tunits[(size_t)i].get();
 			}
 
 		private:
-			std::vector<base_test_unit*> m_tunits;
+			std::vector<std::shared_ptr<base_test_unit> > m_tunits;
 			int m_ncases;
 
 		}; // end class test_suite
@@ -117,5 +112,10 @@ namespace bcs
 			virtual void run(); \
 	}; \
 	void case_name::run()
+
+#define BCS_NEW_TEST_SUITE( suite, title ) std::shared_ptr<bcs::test::test_suite> suite( new bcs::test::test_suite(title) )
+
+#define BCS_ADD_TEST_CASE( suite, case_cons ) suite->add( std::shared_ptr<bcs::test::base_test_case>(new case_cons) )
+
 
 #endif 

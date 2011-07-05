@@ -386,17 +386,17 @@ BCS_TEST_CASE( test_subarr_selection )
 }
 
 
-test_suite *test_array1d_suite()
+std::shared_ptr<test_suite> test_array1d_suite()
 {
-	test_suite *suite = new test_suite( "test_array1d" );
+	BCS_NEW_TEST_SUITE( suite, "test_array1d" );
 
-	suite->add( new test_dense_array1d() );
-	suite->add( new test_step_aview1d() );
-	suite->add( new test_rep_aview1d() );
-	suite->add( new test_regular_subview() );
-	suite->add( new test_aview1d_copy() );
-	suite->add( new test_aview1d_clone() );
-	suite->add( new test_subarr_selection() );
+	BCS_ADD_TEST_CASE( suite, test_dense_array1d() );
+	BCS_ADD_TEST_CASE( suite, test_step_aview1d() );
+	BCS_ADD_TEST_CASE( suite, test_rep_aview1d() );
+	BCS_ADD_TEST_CASE( suite, test_regular_subview() );
+	BCS_ADD_TEST_CASE( suite, test_aview1d_copy() );
+	BCS_ADD_TEST_CASE( suite, test_aview1d_clone() );
+	BCS_ADD_TEST_CASE( suite, test_subarr_selection() );
 
 	return suite;
 }

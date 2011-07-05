@@ -296,16 +296,16 @@ BCS_TEST_CASE( test_array2d_transpose )
 }
 
 
-test_suite* test_array_transposition_suite()
+std::shared_ptr<test_suite> test_array_transposition_suite()
 {
-	test_suite *tsuite = new test_suite("test_transposition");
+	BCS_NEW_TEST_SUITE( suite, "test_transposition" );
 
-	tsuite->add( new test_direct_transpose() );
-	tsuite->add( new test_sqmatrix_inplace_transpose() );
-	tsuite->add( new test_blockwise_transpose() );
-	tsuite->add( new test_array2d_transpose() );
+	BCS_ADD_TEST_CASE( suite, test_direct_transpose() );
+	BCS_ADD_TEST_CASE( suite, test_sqmatrix_inplace_transpose() );
+	BCS_ADD_TEST_CASE( suite, test_blockwise_transpose() );
+	BCS_ADD_TEST_CASE( suite, test_array2d_transpose() );
 
-	return tsuite;
+	return suite;
 }
 
 

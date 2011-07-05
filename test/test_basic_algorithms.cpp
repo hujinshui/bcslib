@@ -626,18 +626,18 @@ BCS_TEST_CASE( test_cumulation )
 }
 
 
-test_suite *test_basic_algorithms_suite()
+std::shared_ptr<test_suite> test_basic_algorithms_suite()
 {
-	test_suite *suite = new test_suite( "test_basic_algorithms" );
+	BCS_NEW_TEST_SUITE( suite, "test_basic_algorithms" );
 
-	suite->add( new test_min_and_max_e2() );
-	suite->add( new test_min_and_max_e3() );
-	suite->add( new test_min_and_max_e4() );
-	suite->add( new test_zip_and_extract() );
+	BCS_ADD_TEST_CASE( suite, test_min_and_max_e2() );
+	BCS_ADD_TEST_CASE( suite, test_min_and_max_e3() );
+	BCS_ADD_TEST_CASE( suite, test_min_and_max_e4() );
+	BCS_ADD_TEST_CASE( suite, test_zip_and_extract() );
 
-	suite->add( new test_simple_sort() );
-	suite->add( new test_tuple_sort() );
-	suite->add( new test_cumulation() );
+	BCS_ADD_TEST_CASE( suite, test_simple_sort() );
+	BCS_ADD_TEST_CASE( suite, test_tuple_sort() );
+	BCS_ADD_TEST_CASE( suite, test_cumulation() );
 
 	return suite;
 }

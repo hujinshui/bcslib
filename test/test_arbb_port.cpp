@@ -137,13 +137,13 @@ BCS_TEST_CASE( test_arbb_bind )
 }
 
 
-test_suite* test_arbb_port_suite()
+std::shared_ptr<test_suite> test_arbb_port_suite()
 {
-	test_suite *suite = new test_suite( "test_arbb_port" );
+	BCS_NEW_TEST_SUITE( suite, "test_arbb_port" );
 
-	suite->add( new test_arbb_copy() );
-	suite->add( new test_arbb_clone() );
-	suite->add( new test_arbb_bind() );
+	BCS_ADD_TEST_CASE( suite, test_arbb_copy() );
+	BCS_ADD_TEST_CASE( suite, test_arbb_clone() );
+	BCS_ADD_TEST_CASE( suite, test_arbb_bind() );
 
 	return suite;
 }
