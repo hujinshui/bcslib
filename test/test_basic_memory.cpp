@@ -410,19 +410,15 @@ BCS_TEST_CASE( mem_test_clean_end )
 }
 
 
-
-
-test_suite* test_basic_memory_suite()
+std::shared_ptr<test_suite> test_basic_memory_suite()
 {
-	test_suite *suite = new test_suite( "test_basic_memory" );
+	BCS_NEW_TEST_SUITE( suite, "test_basic_memory" );
 
-	suite->add( new mem_test_clean_start() );
-
-	suite->add( new test_basic_memory_operations() );
-	suite->add( new test_const_blocks() );
-	suite->add( new test_blocks() );
-
-	suite->add( new mem_test_clean_end() );
+	BCS_ADD_TEST_CASE( suite, mem_test_clean_start() );
+	BCS_ADD_TEST_CASE( suite, test_basic_memory_operations() );
+	BCS_ADD_TEST_CASE( suite, test_const_blocks() );
+	BCS_ADD_TEST_CASE( suite, test_blocks() );
+	BCS_ADD_TEST_CASE( suite, mem_test_clean_end() );
 
 	return suite;
 }

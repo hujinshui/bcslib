@@ -48,7 +48,7 @@ BASE_TEST_HEADERS = \
 	bcslib/test/execution_mon.h \
 	bcslib/test/timer.h
 
-ARRAY_TEST_HEADERS = $(TEST_HEADERS) bcslib/test/test_array_aux.h
+ARRAY_TEST_HEADERS = $(BASE_TEST_HEADERS) bcslib/test/test_array_aux.h
 
 ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/array/array_base.h \

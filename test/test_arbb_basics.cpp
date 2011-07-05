@@ -11,7 +11,7 @@
 
 using namespace bcs::test;
 
-extern test_suite* test_arbb_port_suite();
+extern std::shared_ptr<test_suite> test_arbb_port_suite();
 
 test_suite* master_suite()
 {

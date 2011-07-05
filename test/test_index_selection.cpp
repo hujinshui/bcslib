@@ -146,14 +146,14 @@ BCS_TEST_CASE( test_whole_and_rev_whole )
 
 
 
-test_suite *test_index_selection_suite()
+std::shared_ptr<test_suite> test_index_selection_suite()
 {
-	test_suite *suite = new test_suite( "test_index_selection" );
+	BCS_NEW_TEST_SUITE( suite, "test_index_selection" );
 
-	suite->add( new test_range() );
-	suite->add( new test_step_range() );
-	suite->add( new test_rep_range() );
-	suite->add( new test_whole_and_rev_whole() );
+	BCS_ADD_TEST_CASE( suite, test_range() );
+	BCS_ADD_TEST_CASE( suite, test_step_range() );
+	BCS_ADD_TEST_CASE( suite, test_rep_range() );
+	BCS_ADD_TEST_CASE( suite, test_whole_and_rev_whole() );
 
 	return suite;
 }

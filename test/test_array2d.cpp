@@ -768,17 +768,17 @@ BCS_TEST_CASE( test_subarr_selection2d )
 
 
 
-test_suite *test_array2d_suite()
+std::shared_ptr<test_suite> test_array2d_suite()
 {
-	test_suite *suite = new test_suite( "test_array2d" );
+	BCS_NEW_TEST_SUITE( suite, "test_array2d" );
 
-	suite->add( new test_dense_array2d() );
-	suite->add( new test_aview2d_ex() );
-	suite->add( new test_array2d_slices() );
-	suite->add( new test_array2d_subviews() );
-	suite->add( new test_aview2d_copy() );
-	suite->add( new test_aview2d_clone() );
-	suite->add( new test_subarr_selection2d() );
+	BCS_ADD_TEST_CASE( suite, test_dense_array2d() );
+	BCS_ADD_TEST_CASE( suite, test_aview2d_ex() );
+	BCS_ADD_TEST_CASE( suite, test_array2d_slices() );
+	BCS_ADD_TEST_CASE( suite, test_array2d_subviews() );
+	BCS_ADD_TEST_CASE( suite, test_aview2d_copy() );
+	BCS_ADD_TEST_CASE( suite, test_aview2d_clone() );
+	BCS_ADD_TEST_CASE( suite, test_subarr_selection2d() );
 
 	return suite;
 }

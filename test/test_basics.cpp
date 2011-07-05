@@ -14,12 +14,12 @@ using namespace bcs::test;
 
 bcs::memory_allocation_monitor bcs::global_memory_allocation_monitor;
 
-extern test_suite* test_basic_algorithms_suite();
-extern test_suite* test_basic_memory_suite();
+extern std::shared_ptr<test_suite> test_basic_algorithms_suite();
+extern std::shared_ptr<test_suite> test_basic_memory_suite();
 
 test_suite* master_suite()
 {
-	test_suite* msuite = new test_suite( "array_basics" );
+	test_suite* msuite = new test_suite( "library basics" );
 
 	msuite->add( test_basic_algorithms_suite() );
 	msuite->add( test_basic_memory_suite() );
