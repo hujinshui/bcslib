@@ -386,6 +386,7 @@ BCS_TEST_CASE( test_subarr_selection )
 }
 
 
+
 std::shared_ptr<test_suite> test_array1d_suite()
 {
 	BCS_NEW_TEST_SUITE( suite, "test_array1d" );
