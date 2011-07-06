@@ -357,6 +357,18 @@ namespace bcs
 			return m_idxcore.get_slice_info(nrows(), ncolumns());
 		}
 
+		bool is_continuous() const
+		{
+			if (std::is_same<layout_order, row_major_t>::value)
+			{
+				return dim1() == base_dim1();
+			}
+			else
+			{
+				return dim0() == base_dim0();
+			}
+		}
+
 		// just for temporary use in an expression, not allowed to pass around
 		array2d_transposed_t<T, TOrd> Tp() const
 		{
