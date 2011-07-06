@@ -72,6 +72,21 @@ struct sim_norm_Linf
 	}
 };
 
+struct sim_dot
+{
+	typedef double result_type;
+	double operator()(size_t n, const double *x, const double *y) const
+	{
+		double s = 0;
+		for (size_t i = 0; i < n; ++i)
+		{
+			s += x[i] * y[i];
+		}
+		return s;
+	}
+};
+
+
 
 
 BCS_TEST_CASE( test_arbb_norms )
@@ -169,12 +184,61 @@ BCS_TEST_CASE( test_arbb_norms )
 }
 
 
+BCS_TEST_CASE( test_arbb_dot )
+{
+	using arbb::f64;
+	using arbb::dense;
+
+	const size_t N = 6;
+	const size_t m = 2;
+	const size_t n = 3;
+	double src1[6] = {3, 1, 4, 6, 2, 5};
+	double src2[6] = {4, 5, 9, 3, 7, 2};
+
+	dense<f64, 1> avec1; arbb::bind(avec1, src1, N);
+	dense<f64, 1> avec2; arbb::bind(avec2, src2, N);
+
+	dense<f64, 2> amat1; arbb::bind(amat1, src1, n, m);
+	dense<f64, 2> amat2; arbb::bind(amat2, src2, n, m);
+
+	caview1d<double> vec1(src1, N);
+	caview1d<double> vec2(src2, N);
+	caview2d<double, row_major_t> mat1(src1, m, n);
+	caview2d<double, row_major_t> mat2(src2, m, n);
+
+	// reduce to scalar
+
+	f64 vd = dot(avec1, avec2);
+	f64 md = dot(amat1, amat2);
+	double vdv = vreduce(sim_dot(), vec1, vec2);
+	double mdv = vreduce(sim_dot(), mat1, mat2);
+
+	BCS_CHECK( test_scalar_approx(vd, vdv) );
+	BCS_CHECK( test_scalar_approx(md, mdv) );
+
+	// reduce to vector
+
+	dense<f64, 1> rd = dot(amat1, amat2, 0);
+	dense<f64, 1> cd = dot(amat1, amat2, 1);
+
+	array1d<double> rdv = vreduce(sim_dot(), per_row(), mat1, mat2);
+	array1d<double> cdv = vreduce(sim_dot(), per_col(), mat1, mat2);
+
+	BCS_CHECK( test_dense_size(rd, m) );
+	BCS_CHECK( test_dense_size(cd, n) );
+
+	BCS_CHECK( test_dense_approx(rd, rdv.pbase()) );
+	BCS_CHECK( test_dense_approx(cd, cdv.pbase()) );
+
+}
+
 
 std::shared_ptr<test_suite> test_arbb_linalg_suite()
 {
 	BCS_NEW_TEST_SUITE( suite, "test_arbb_linalg" );
 
 	BCS_ADD_TEST_CASE( suite, test_arbb_norms() );
+	BCS_ADD_TEST_CASE( suite, test_arbb_dot() );
 
 	return suite;
 }

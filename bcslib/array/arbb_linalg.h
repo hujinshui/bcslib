@@ -126,13 +126,7 @@ namespace bcs
 	}
 
 	template<typename T>
-	inline T vdot(const arbb::dense<T, 1>& a, const arbb::dense<T, 1>& b)
-	{
-		return arbb::add_reduce(a * b);
-	}
-
-	template<typename T>
-	inline arbb::dense<T, 1> vdot(const arbb::dense<T, 2>& a, const arbb::dense<T, 2>& b, unsigned int level = 0)
+	inline arbb::dense<T, 1> dot(const arbb::dense<T, 2>& a, const arbb::dense<T, 2>& b, unsigned int level)
 	{
 		return arbb::add_reduce(a * b, level);
 	}
