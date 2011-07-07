@@ -63,13 +63,17 @@ ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 ARRAY_COMP_HEADERS = $(ARRAY_BASIC_HEADERS) \
 	bcslib/array/arbb_port.h \
 	bcslib/array/arbb_linalg.h
-	 	
 	
 LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
 	bcslib/extern/blas_select.h \
 	bcslib/array/blas_base.h \
 	bcslib/array/generic_blas.h \
 	bcslib/array/mat_times.h
+
+PROB_BASIC_HEADERS = $(ARRAY_COMP_HEADERS) \
+	bcslib/prob/pdistr_base.h \
+	bcslib/prob/rstream.h \
+	bcslib/prob/arbb_rstream.h 
 
 
 #---------- Target groups -------------------
@@ -81,7 +85,7 @@ all: test bench
 test: test_c0x_support test_basics test_array
 
 .PHONY: bench
-bench: bench_array
+bench: bench_array bench_prob
 
 .PHONY: clean
 
@@ -119,6 +123,15 @@ test_array_pending: \
 
 bench_array: \
 	$(BENCH_BIN_DIR)/bench_array_access
+	
+	
+#------ Prob tests (declaration) -----------
+
+.PHONY: bench_prob
+
+bench_prob: \
+	$(BENCH_BIN_DIR)/bench_rng
+
 
 
 #_________________________________________________________________________
@@ -203,5 +216,15 @@ $(BENCH_BIN_DIR)/bench_array_calc: $(ARRAY_COMP_HEADERS) bench/bench_array_calc.
 $(BENCH_BIN_DIR)/bench_array_calc_intel: $(ARRAY_COMP_HEADERS) bench/bench_array_calc.cpp
 	$(CXX) $(CXXFLAGS) $(INTEL_FLAGS) $(OFLAGS) bench/bench_array_calc.cpp -o $(BENCH_BIN_DIR)/bench_array_calc_intel
 
-	
+
+#----------------------------------------------------------
+#
+#   Prob test & bench (details)
+#
+#----------------------------------------------------------
+
+
+$(BENCH_BIN_DIR)/bench_rng: $(PROB_BASIC_HEADERS) bench/bench_rng.cpp
+	$(CXX) $(CXXFLAGS) $(ARBB_LINKS) $(OFLAGS) bench/bench_rng.cpp -o $(BENCH_BIN_DIR)/bench_rng
+
 
