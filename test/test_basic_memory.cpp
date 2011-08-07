@@ -6,7 +6,7 @@
  * @author Dahua Lin
  */
 
-#include <bcslib/test/test_units.h>
+#include "bcs_test_basics.h"
 
 #include <bcslib/base/basic_mem.h>
 #include <bcslib/base/block.h>
@@ -31,6 +31,8 @@ template class bcs::block<int, monitored_allocator<int> >;
 typedef class bcs::const_block<int, monitored_allocator<int> > cblk_t;
 typedef class bcs::block<int, monitored_allocator<int> > blk_t;
 
+
+bcs::memory_allocation_monitor bcs::global_memory_allocation_monitor;
 
 class MyInt
 {
@@ -99,15 +101,11 @@ inline static bool test_block(const block<T, Allocator>& blk, bool own, size_t n
 }
 
 
-
-BCS_TEST_CASE( mem_test_clean_start )
+TEST( BasicMem, ElemWiseOperations )
 {
-	BCS_CHECK( !global_memory_allocation_monitor.has_pending() );
-}
+	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 
-
-BCS_TEST_CASE( test_basic_memory_operations )
-{
+	{
 	// POD
 
 	const size_t N = 5;
@@ -121,27 +119,27 @@ BCS_TEST_CASE( test_basic_memory_operations )
 	for (size_t i = 0; i < N; ++i) p[i] = 0;
 
 	copy_construct_elements(src, p, N);
-	BCS_CHECK( collection_equal(p, p+N, src, N) );
-	BCS_CHECK( elements_equal(src, p, N) );
+	EXPECT_TRUE( collection_equal(p, p+N, src, N) );
+	EXPECT_TRUE( elements_equal(src, p, N) );
 	p[2] = 0;
-	BCS_CHECK( !elements_equal(src, p, N) );
+	EXPECT_FALSE( elements_equal(src, p, N) );
 
 	fill_elements(p, N, 7);
-	BCS_CHECK( elements_equal(7, p, N) );
+	EXPECT_TRUE( elements_equal(7, p, N) );
 	p[2] = 0;
-	BCS_CHECK( !elements_equal(7, p, N) );
+	EXPECT_FALSE( elements_equal(7, p, N) );
 
 	copy_elements(src, p, N);
-	BCS_CHECK( elements_equal(p, src, N) );
+	EXPECT_TRUE( elements_equal(p, src, N) );
 
 	set_zeros_to_elements(p, N);
-	BCS_CHECK( elements_equal(0, p, N) );
+	EXPECT_TRUE( elements_equal(0, p, N) );
 
 	alloc.deallocate(p, N);
 
 	// non-POD
 
-	BCS_CHECK_EQUAL( MyInt::num_objects(), 0 );
+	EXPECT_EQ( MyInt::num_objects(), 0 );
 
 	std::vector<MyInt> objvec;
 	objvec.push_back( MyInt(1) );
@@ -150,44 +148,51 @@ BCS_TEST_CASE( test_basic_memory_operations )
 	objvec.push_back( MyInt(5) );
 	objvec.push_back( MyInt(2) );
 
-	BCS_CHECK_EQUAL( MyInt::num_objects(), N );
+	EXPECT_EQ( MyInt::num_objects(), N );
 	const MyInt *obj_src = objvec.data();
 
 	aligned_allocator<MyInt> obj_alloc;
 
 	MyInt *q = obj_alloc.allocate(N, BCS_NULL);
-	BCS_CHECK_EQUAL( MyInt::num_objects(), N );
+	ASSERT_EQ( MyInt::num_objects(), N );
 
 	copy_construct_elements(obj_src, q, N);
-	BCS_CHECK_EQUAL( MyInt::num_objects(), 2 * N );
-	BCS_CHECK( elements_equal(q, obj_src, N) );
+	ASSERT_EQ( MyInt::num_objects(), 2 * N );
+	EXPECT_TRUE( elements_equal(q, obj_src, N) );
 	q[2] = MyInt(0);
-	BCS_CHECK( !elements_equal(q, obj_src, N) );
+	EXPECT_FALSE( elements_equal(q, obj_src, N) );
 
 	fill_elements(q, N, MyInt(1));
-	BCS_CHECK_EQUAL( MyInt::num_objects(), 2 * N );
-	BCS_CHECK( elements_equal(MyInt(1), q, N) );
+	ASSERT_EQ( MyInt::num_objects(), 2 * N );
+	EXPECT_TRUE( elements_equal(MyInt(1), q, N) );
 	q[2] = MyInt(0);
-	BCS_CHECK( !elements_equal(MyInt(1), q, N) );
+	EXPECT_FALSE( elements_equal(MyInt(1), q, N) );
 
 	copy_elements(obj_src, q, N);
-	BCS_CHECK_EQUAL( MyInt::num_objects(), 2 * N );
-	BCS_CHECK( elements_equal(q, obj_src, N) );
+	ASSERT_EQ( MyInt::num_objects(), 2 * N );
+	EXPECT_TRUE( elements_equal(q, obj_src, N) );
 
 	destruct_elements(q, N);
-	BCS_CHECK_EQUAL( MyInt::num_objects(), N );
+	ASSERT_EQ( MyInt::num_objects(), N );
 
 	obj_alloc.deallocate(q, N);
 
 	objvec.clear();
-	BCS_CHECK_EQUAL( MyInt::num_objects(), 0 );
+	ASSERT_EQ( MyInt::num_objects(), 0 );
+
+	}
+
+	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 }
 
 
-#define CHECK_MEM_PENDING(k) BCS_CHECK_EQUAL( global_memory_allocation_monitor.num_pending_sections(), k )
+#define CHECK_MEM_PENDING(k) ASSERT_EQ( global_memory_allocation_monitor.num_pending_sections(), k )
 
-BCS_TEST_CASE( test_const_blocks )
+TEST( BasicMem, ConstBlocks )
 {
+	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
+	{
+
 	using std::swap;
 
 	const int *pnull = static_cast<const int*>(BCS_NULL);
@@ -198,44 +203,44 @@ BCS_TEST_CASE( test_const_blocks )
 	CHECK_MEM_PENDING( 0 );
 
 	cblk_t B0(cref_blk(src, N));
-	BCS_CHECK( test_block(B0, false, N, src) );
+	EXPECT_TRUE( test_block(B0, false, N, src) );
 
 	cblk_t B1(N, int(2));
-	BCS_CHECK( test_block(B1, true, N) );
-	BCS_CHECK( elements_equal(int(2), B1.pbase(), N) );
+	EXPECT_TRUE( test_block(B1, true, N) );
+	EXPECT_TRUE( elements_equal(int(2), B1.pbase(), N) );
 
 	CHECK_MEM_PENDING( 1 );
 
 	cblk_t B2(copy_blk(src, N));
-	BCS_CHECK( test_block(B2, true, N) );
-	BCS_CHECK( B2.pbase() != src );
-	BCS_CHECK( elements_equal(B2.pbase(), src, N) );
+	EXPECT_TRUE( test_block(B2, true, N) );
+	EXPECT_TRUE( B2.pbase() != src );
+	EXPECT_TRUE( elements_equal(B2.pbase(), src, N) );
 
 	CHECK_MEM_PENDING( 2 );
 
 	cblk_t B0c(B0);
-	BCS_CHECK( test_block(B0, false, N, src) );
-	BCS_CHECK( test_block(B0c, false, N, src) );
+	EXPECT_TRUE( test_block(B0, false, N, src) );
+	EXPECT_TRUE( test_block(B0c, false, N, src) );
 
 	cblk_t B0m(std::move(B0c));
-	BCS_CHECK( test_block(B0c, false, 0, pnull) );
-	BCS_CHECK( test_block(B0m, false, N, src) );
+	EXPECT_TRUE( test_block(B0c, false, 0, pnull) );
+	EXPECT_TRUE( test_block(B0m, false, N, src) );
 
 	CHECK_MEM_PENDING( 2 );
 
 	const int *p2 = B2.pbase();
 	cblk_t B2c(B2);
-	BCS_CHECK( test_block(B2, true, N, p2) );
-	BCS_CHECK( test_block(B2c, true, N) );
-	BCS_CHECK( B2c.pbase() != p2 );
-	BCS_CHECK( elements_equal(B2.pbase(), B2c.pbase(), N) );
+	EXPECT_TRUE( test_block(B2, true, N, p2) );
+	EXPECT_TRUE( test_block(B2c, true, N) );
+	EXPECT_TRUE( B2c.pbase() != p2 );
+	EXPECT_TRUE( elements_equal(B2.pbase(), B2c.pbase(), N) );
 
 	CHECK_MEM_PENDING( 3 );
 
 	const int *p2c = B2c.pbase();
 	cblk_t B2m(std::move(B2c));
-	BCS_CHECK( test_block(B2m, true, N, p2c) );
-	BCS_CHECK( test_block(B2c, false, 0, pnull) );
+	EXPECT_TRUE( test_block(B2m, true, N, p2c) );
+	EXPECT_TRUE( test_block(B2c, false, 0, pnull) );
 
 	CHECK_MEM_PENDING( 3 );
 
@@ -244,22 +249,22 @@ BCS_TEST_CASE( test_const_blocks )
 
 	swap(B1, B2m);
 	swap(p1, p2m);
-	BCS_CHECK( test_block(B1, true, N, p1) );
-	BCS_CHECK( test_block(B2m, true, N, p2m) );
+	EXPECT_TRUE( test_block(B1, true, N, p1) );
+	EXPECT_TRUE( test_block(B2m, true, N, p2m) );
 
 	CHECK_MEM_PENDING( 3 );
 
 	swap(B0, B1);
 
-	BCS_CHECK( test_block(B0, true, N, p1) );
-	BCS_CHECK( test_block(B1, false, N, src) );
+	EXPECT_TRUE( test_block(B0, true, N, p1) );
+	EXPECT_TRUE( test_block(B1, false, N, src) );
 
 	CHECK_MEM_PENDING( 3 );
 
 	swap(B0, B1);
 
-	BCS_CHECK( test_block(B1, true, N, p1) );
-	BCS_CHECK( test_block(B0, false, N, src) );
+	EXPECT_TRUE( test_block(B1, true, N, p1) );
+	EXPECT_TRUE( test_block(B0, false, N, src) );
 
 	CHECK_MEM_PENDING( 3 );
 
@@ -267,16 +272,16 @@ BCS_TEST_CASE( test_const_blocks )
 	p2c = p1;
 	p1 = BCS_NULL;
 
-	BCS_CHECK( test_block(B1, false, 0, pnull) );
-	BCS_CHECK( test_block(B2c, true, N, p2c) );
+	EXPECT_TRUE( test_block(B1, false, 0, pnull) );
+	EXPECT_TRUE( test_block(B2c, true, N, p2c) );
 
 	CHECK_MEM_PENDING( 3 );
 
 	B2c = std::move(B0);
 	p2c = src;
 
-	BCS_CHECK( test_block(B0, false, 0, pnull) );
-	BCS_CHECK( test_block(B2c, false, N, p2c) );
+	EXPECT_TRUE( test_block(B0, false, 0, pnull) );
+	EXPECT_TRUE( test_block(B2c, false, N, p2c) );
 
 	CHECK_MEM_PENDING( 2 );
 
@@ -284,14 +289,20 @@ BCS_TEST_CASE( test_const_blocks )
 	p2c = p2m;
 	p2m = BCS_NULL;
 
-	BCS_CHECK( test_block(B2c, true, N, p2c) );
-	BCS_CHECK( test_block(B2m, false, 0, pnull) );
+	EXPECT_TRUE( test_block(B2c, true, N, p2c) );
+	EXPECT_TRUE( test_block(B2m, false, 0, pnull) );
 
 	CHECK_MEM_PENDING( 2 );
+
+	}
+	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 }
 
-BCS_TEST_CASE( test_blocks )
+TEST( BasicMem, Blocks )
 {
+	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
+	{
+
 	using std::swap;
 
 	const int *pnull = static_cast<const int*>(BCS_NULL);
@@ -302,44 +313,44 @@ BCS_TEST_CASE( test_blocks )
 	CHECK_MEM_PENDING( 0 );
 
 	blk_t B0( ref_blk(src, N));
-	BCS_CHECK( test_block(B0, false, N, src) );
+	EXPECT_TRUE( test_block(B0, false, N, src) );
 
 	blk_t B1(N, int(2));
-	BCS_CHECK( test_block(B1, true, N) );
-	BCS_CHECK( elements_equal(int(2), B1.pbase(), N) );
+	EXPECT_TRUE( test_block(B1, true, N) );
+	EXPECT_TRUE( elements_equal(int(2), B1.pbase(), N) );
 
 	CHECK_MEM_PENDING( 1 );
 
 	blk_t B2(copy_blk(src, N));
-	BCS_CHECK( test_block(B2, true, N) );
-	BCS_CHECK( B2.pbase() != src );
-	BCS_CHECK( elements_equal(B2.pbase(), src, N) );
+	EXPECT_TRUE( test_block(B2, true, N) );
+	EXPECT_TRUE( B2.pbase() != src );
+	EXPECT_TRUE( elements_equal(B2.pbase(), src, N) );
 
 	CHECK_MEM_PENDING( 2 );
 
 	blk_t B0c(B0);
-	BCS_CHECK( test_block(B0, false, N, src) );
-	BCS_CHECK( test_block(B0c, false, N, src) );
+	EXPECT_TRUE( test_block(B0, false, N, src) );
+	EXPECT_TRUE( test_block(B0c, false, N, src) );
 
 	blk_t B0m(std::move(B0c));
-	BCS_CHECK( test_block(B0c, false, 0, pnull) );
-	BCS_CHECK( test_block(B0m, false, N, src) );
+	EXPECT_TRUE( test_block(B0c, false, 0, pnull) );
+	EXPECT_TRUE( test_block(B0m, false, N, src) );
 
 	CHECK_MEM_PENDING( 2 );
 
 	const int *p2 = B2.pbase();
 	blk_t B2c(B2);
-	BCS_CHECK( test_block(B2, true, N, p2) );
-	BCS_CHECK( test_block(B2c, true, N) );
-	BCS_CHECK( B2c.pbase() != p2 );
-	BCS_CHECK( elements_equal(B2.pbase(), B2c.pbase(), N) );
+	EXPECT_TRUE( test_block(B2, true, N, p2) );
+	EXPECT_TRUE( test_block(B2c, true, N) );
+	EXPECT_TRUE( B2c.pbase() != p2 );
+	EXPECT_TRUE( elements_equal(B2.pbase(), B2c.pbase(), N) );
 
 	CHECK_MEM_PENDING( 3 );
 
 	const int *p2c = B2c.pbase();
 	blk_t B2m(std::move(B2c));
-	BCS_CHECK( test_block(B2m, true, N, p2c) );
-	BCS_CHECK( test_block(B2c, false, 0, pnull) );
+	EXPECT_TRUE( test_block(B2m, true, N, p2c) );
+	EXPECT_TRUE( test_block(B2c, false, 0, pnull) );
 
 	CHECK_MEM_PENDING( 3 );
 
@@ -348,22 +359,22 @@ BCS_TEST_CASE( test_blocks )
 
 	swap(B1, B2m);
 	swap(p1, p2m);
-	BCS_CHECK( test_block(B1, true, N, p1) );
-	BCS_CHECK( test_block(B2m, true, N, p2m) );
+	EXPECT_TRUE( test_block(B1, true, N, p1) );
+	EXPECT_TRUE( test_block(B2m, true, N, p2m) );
 
 	CHECK_MEM_PENDING( 3 );
 
 	swap(B0, B1);
 
-	BCS_CHECK( test_block(B0, true, N, p1) );
-	BCS_CHECK( test_block(B1, false, N, src) );
+	EXPECT_TRUE( test_block(B0, true, N, p1) );
+	EXPECT_TRUE( test_block(B1, false, N, src) );
 
 	CHECK_MEM_PENDING( 3 );
 
 	swap(B0, B1);
 
-	BCS_CHECK( test_block(B1, true, N, p1) );
-	BCS_CHECK( test_block(B0, false, N, src) );
+	EXPECT_TRUE( test_block(B1, true, N, p1) );
+	EXPECT_TRUE( test_block(B0, false, N, src) );
 
 	CHECK_MEM_PENDING( 3 );
 
@@ -371,16 +382,16 @@ BCS_TEST_CASE( test_blocks )
 	p2c = p1;
 	p1 = BCS_NULL;
 
-	BCS_CHECK( test_block(B1, false, 0, pnull) );
-	BCS_CHECK( test_block(B2c, true, N, p2c) );
+	EXPECT_TRUE( test_block(B1, false, 0, pnull) );
+	EXPECT_TRUE( test_block(B2c, true, N, p2c) );
 
 	CHECK_MEM_PENDING( 3 );
 
 	B2c = std::move(B0);
 	p2c = src;
 
-	BCS_CHECK( test_block(B0, false, 0, pnull) );
-	BCS_CHECK( test_block(B2c, false, N, p2c) );
+	EXPECT_TRUE( test_block(B0, false, 0, pnull) );
+	EXPECT_TRUE( test_block(B2c, false, N, p2c) );
 
 	CHECK_MEM_PENDING( 2 );
 
@@ -388,38 +399,21 @@ BCS_TEST_CASE( test_blocks )
 	p2c = p2m;
 	p2m = BCS_NULL;
 
-	BCS_CHECK( test_block(B2c, true, N, p2c) );
-	BCS_CHECK( test_block(B2m, false, 0, pnull) );
+	EXPECT_TRUE( test_block(B2c, true, N, p2c) );
+	EXPECT_TRUE( test_block(B2m, false, 0, pnull) );
 
 	CHECK_MEM_PENDING( 2 );
 
 	blk_t Be(10);
 
-	BCS_CHECK( test_block(Be, true, 10) );
+	EXPECT_TRUE( test_block(Be, true, 10) );
 
 	CHECK_MEM_PENDING( 3 );
+
+	}
+	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 }
 
 
 #undef CHECK_MEM_PENDING
-
-
-BCS_TEST_CASE( mem_test_clean_end )
-{
-	BCS_CHECK( !global_memory_allocation_monitor.has_pending() );
-}
-
-
-std::shared_ptr<test_suite> test_basic_memory_suite()
-{
-	BCS_NEW_TEST_SUITE( suite, "test_basic_memory" );
-
-	BCS_ADD_TEST_CASE( suite, mem_test_clean_start() );
-	BCS_ADD_TEST_CASE( suite, test_basic_memory_operations() );
-	BCS_ADD_TEST_CASE( suite, test_const_blocks() );
-	BCS_ADD_TEST_CASE( suite, test_blocks() );
-	BCS_ADD_TEST_CASE( suite, mem_test_clean_end() );
-
-	return suite;
-}
 

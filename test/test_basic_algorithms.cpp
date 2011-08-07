@@ -7,7 +7,8 @@
  */
 
 
-#include <bcslib/test/test_units.h>
+#include "bcs_test_basics.h"
+
 #include <functional>
 #include <vector>
 
@@ -56,7 +57,7 @@ inline bool operator == (const val_idx<T>& lhs, const val_idx<T>& rhs)
 	return lhs.value == rhs.value && lhs.index == rhs.index;
 }
 
-BCS_TEST_CASE( test_min_and_max_e2 )
+TEST( BasicAlgs, MinAndMaxE2 )
 {
 	val_idx<double> v1 = mk_vidx(1.0, 1);
 	val_idx<double> v2 = mk_vidx(2.0, 2);
@@ -66,33 +67,33 @@ BCS_TEST_CASE( test_min_and_max_e2 )
 
 	std::greater<val_idx<double> > comp;
 
-	BCS_CHECK_EQUAL( min(v1, v2), v1 );
-	BCS_CHECK_EQUAL( min(v2, v1), v1 );
-	BCS_CHECK_EQUAL( min(p1, p2), p1 );
+	EXPECT_EQ( min(v1, v2), v1 );
+	EXPECT_EQ( min(v2, v1), v1 );
+	EXPECT_EQ( min(p1, p2), p1 );
 
-	BCS_CHECK_EQUAL( min(v1, v2, comp), v2 );
-	BCS_CHECK_EQUAL( min(v2, v1, comp), v2 );
-	BCS_CHECK_EQUAL( min(p1, p2, comp), p1 );
+	EXPECT_EQ( min(v1, v2, comp), v2 );
+	EXPECT_EQ( min(v2, v1, comp), v2 );
+	EXPECT_EQ( min(p1, p2, comp), p1 );
 
-	BCS_CHECK_EQUAL( max(v1, v2), v2 );
-	BCS_CHECK_EQUAL( max(v2, v1), v2 );
-	BCS_CHECK_EQUAL( max(p1, p2), p1 );
+	EXPECT_EQ( max(v1, v2), v2 );
+	EXPECT_EQ( max(v2, v1), v2 );
+	EXPECT_EQ( max(p1, p2), p1 );
 
-	BCS_CHECK_EQUAL( max(v1, v2, comp), v1 );
-	BCS_CHECK_EQUAL( max(v2, v1, comp), v1 );
-	BCS_CHECK_EQUAL( max(p1, p2, comp), p1 );
+	EXPECT_EQ( max(v1, v2, comp), v1 );
+	EXPECT_EQ( max(v2, v1, comp), v1 );
+	EXPECT_EQ( max(p1, p2, comp), p1 );
 
-	BCS_CHECK_EQUAL( bcs::minmax(v1, v2), mk_cpair(v1, v2) );
-	BCS_CHECK_EQUAL( bcs::minmax(v2, v1), mk_cpair(v1, v2) );
-	BCS_CHECK_EQUAL( bcs::minmax(p1, p2), mk_cpair(p1, p2) );
+	EXPECT_EQ( bcs::minmax(v1, v2), mk_cpair(v1, v2) );
+	EXPECT_EQ( bcs::minmax(v2, v1), mk_cpair(v1, v2) );
+	EXPECT_EQ( bcs::minmax(p1, p2), mk_cpair(p1, p2) );
 
-	BCS_CHECK_EQUAL( bcs::minmax(v1, v2, comp), mk_cpair(v2, v1) );
-	BCS_CHECK_EQUAL( bcs::minmax(v2, v1, comp), mk_cpair(v2, v1) );
-	BCS_CHECK_EQUAL( bcs::minmax(p1, p2, comp), mk_cpair(p1, p2) );
+	EXPECT_EQ( bcs::minmax(v1, v2, comp), mk_cpair(v2, v1) );
+	EXPECT_EQ( bcs::minmax(v2, v1, comp), mk_cpair(v2, v1) );
+	EXPECT_EQ( bcs::minmax(p1, p2, comp), mk_cpair(p1, p2) );
 }
 
 
-BCS_TEST_CASE( test_min_and_max_e3 )
+TEST( BasicAlgs, MinAndMaxE3 )
 {
 	val_idx<double> v1 = mk_vidx(1.0, 1);
 	val_idx<double> v2 = mk_vidx(2.0, 2);
@@ -104,58 +105,58 @@ BCS_TEST_CASE( test_min_and_max_e3 )
 
 	std::greater<val_idx<double> > comp;
 
-	BCS_CHECK_EQUAL( min(v1, v2, v3), v1 );
-	BCS_CHECK_EQUAL( min(v1, v3, v2), v1 );
-	BCS_CHECK_EQUAL( min(v2, v1, v3), v1 );
-	BCS_CHECK_EQUAL( min(v2, v3, v1), v1 );
-	BCS_CHECK_EQUAL( min(v3, v1, v2), v1 );
-	BCS_CHECK_EQUAL( min(v3, v2, v1), v1 );
-	BCS_CHECK_EQUAL( min(p1, p2, p3), p1 );
+	EXPECT_EQ( min(v1, v2, v3), v1 );
+	EXPECT_EQ( min(v1, v3, v2), v1 );
+	EXPECT_EQ( min(v2, v1, v3), v1 );
+	EXPECT_EQ( min(v2, v3, v1), v1 );
+	EXPECT_EQ( min(v3, v1, v2), v1 );
+	EXPECT_EQ( min(v3, v2, v1), v1 );
+	EXPECT_EQ( min(p1, p2, p3), p1 );
 
-	BCS_CHECK_EQUAL( min(v1, v2, v3, comp), v3 );
-	BCS_CHECK_EQUAL( min(v1, v3, v2, comp), v3 );
-	BCS_CHECK_EQUAL( min(v2, v1, v3, comp), v3 );
-	BCS_CHECK_EQUAL( min(v2, v3, v1, comp), v3 );
-	BCS_CHECK_EQUAL( min(v3, v1, v2, comp), v3 );
-	BCS_CHECK_EQUAL( min(v3, v2, v1, comp), v3 );
-	BCS_CHECK_EQUAL( min(p1, p2, p3, comp), p1 );
+	EXPECT_EQ( min(v1, v2, v3, comp), v3 );
+	EXPECT_EQ( min(v1, v3, v2, comp), v3 );
+	EXPECT_EQ( min(v2, v1, v3, comp), v3 );
+	EXPECT_EQ( min(v2, v3, v1, comp), v3 );
+	EXPECT_EQ( min(v3, v1, v2, comp), v3 );
+	EXPECT_EQ( min(v3, v2, v1, comp), v3 );
+	EXPECT_EQ( min(p1, p2, p3, comp), p1 );
 
-	BCS_CHECK_EQUAL( max(v1, v2, v3), v3 );
-	BCS_CHECK_EQUAL( max(v1, v3, v2), v3 );
-	BCS_CHECK_EQUAL( max(v2, v1, v3), v3 );
-	BCS_CHECK_EQUAL( max(v2, v3, v1), v3 );
-	BCS_CHECK_EQUAL( max(v3, v1, v2), v3 );
-	BCS_CHECK_EQUAL( max(v3, v2, v1), v3 );
-	BCS_CHECK_EQUAL( max(p1, p2, p3), p1 );
+	EXPECT_EQ( max(v1, v2, v3), v3 );
+	EXPECT_EQ( max(v1, v3, v2), v3 );
+	EXPECT_EQ( max(v2, v1, v3), v3 );
+	EXPECT_EQ( max(v2, v3, v1), v3 );
+	EXPECT_EQ( max(v3, v1, v2), v3 );
+	EXPECT_EQ( max(v3, v2, v1), v3 );
+	EXPECT_EQ( max(p1, p2, p3), p1 );
 
-	BCS_CHECK_EQUAL( max(v1, v2, v3, comp), v1 );
-	BCS_CHECK_EQUAL( max(v1, v3, v2, comp), v1 );
-	BCS_CHECK_EQUAL( max(v2, v1, v3, comp), v1 );
-	BCS_CHECK_EQUAL( max(v2, v3, v1, comp), v1 );
-	BCS_CHECK_EQUAL( max(v3, v1, v2, comp), v1 );
-	BCS_CHECK_EQUAL( max(v3, v2, v1, comp), v1 );
-	BCS_CHECK_EQUAL( max(p1, p2, p3, comp), p1 );
+	EXPECT_EQ( max(v1, v2, v3, comp), v1 );
+	EXPECT_EQ( max(v1, v3, v2, comp), v1 );
+	EXPECT_EQ( max(v2, v1, v3, comp), v1 );
+	EXPECT_EQ( max(v2, v3, v1, comp), v1 );
+	EXPECT_EQ( max(v3, v1, v2, comp), v1 );
+	EXPECT_EQ( max(v3, v2, v1, comp), v1 );
+	EXPECT_EQ( max(p1, p2, p3, comp), p1 );
 
-	BCS_CHECK_EQUAL( mk_cpair(v1, v3), mk_cpair(v1, v3) );
-	BCS_CHECK_EQUAL( minmax(v1, v2, v3), mk_cpair(v1, v3) );
-	BCS_CHECK_EQUAL( minmax(v1, v3, v2), mk_cpair(v1, v3) );
-	BCS_CHECK_EQUAL( minmax(v2, v1, v3), mk_cpair(v1, v3) );
-	BCS_CHECK_EQUAL( minmax(v2, v3, v1), mk_cpair(v1, v3) );
-	BCS_CHECK_EQUAL( minmax(v3, v1, v2), mk_cpair(v1, v3) );
-	BCS_CHECK_EQUAL( minmax(v3, v2, v1), mk_cpair(v1, v3) );
-	BCS_CHECK_EQUAL( minmax(p1, p2, p3), mk_cpair(p1, p3) );
+	EXPECT_EQ( mk_cpair(v1, v3), mk_cpair(v1, v3) );
+	EXPECT_EQ( minmax(v1, v2, v3), mk_cpair(v1, v3) );
+	EXPECT_EQ( minmax(v1, v3, v2), mk_cpair(v1, v3) );
+	EXPECT_EQ( minmax(v2, v1, v3), mk_cpair(v1, v3) );
+	EXPECT_EQ( minmax(v2, v3, v1), mk_cpair(v1, v3) );
+	EXPECT_EQ( minmax(v3, v1, v2), mk_cpair(v1, v3) );
+	EXPECT_EQ( minmax(v3, v2, v1), mk_cpair(v1, v3) );
+	EXPECT_EQ( minmax(p1, p2, p3), mk_cpair(p1, p3) );
 
-	BCS_CHECK_EQUAL( minmax(v1, v2, v3, comp), mk_cpair(v3, v1) );
-	BCS_CHECK_EQUAL( minmax(v1, v3, v2, comp), mk_cpair(v3, v1) );
-	BCS_CHECK_EQUAL( minmax(v2, v1, v3, comp), mk_cpair(v3, v1) );
-	BCS_CHECK_EQUAL( minmax(v2, v3, v1, comp), mk_cpair(v3, v1) );
-	BCS_CHECK_EQUAL( minmax(v3, v1, v2, comp), mk_cpair(v3, v1) );
-	BCS_CHECK_EQUAL( minmax(v3, v2, v1, comp), mk_cpair(v3, v1) );
-	BCS_CHECK_EQUAL( minmax(p1, p2, p3, comp), mk_cpair(p1, p3) );
+	EXPECT_EQ( minmax(v1, v2, v3, comp), mk_cpair(v3, v1) );
+	EXPECT_EQ( minmax(v1, v3, v2, comp), mk_cpair(v3, v1) );
+	EXPECT_EQ( minmax(v2, v1, v3, comp), mk_cpair(v3, v1) );
+	EXPECT_EQ( minmax(v2, v3, v1, comp), mk_cpair(v3, v1) );
+	EXPECT_EQ( minmax(v3, v1, v2, comp), mk_cpair(v3, v1) );
+	EXPECT_EQ( minmax(v3, v2, v1, comp), mk_cpair(v3, v1) );
+	EXPECT_EQ( minmax(p1, p2, p3, comp), mk_cpair(p1, p3) );
 }
 
 
-BCS_TEST_CASE( test_min_and_max_e4 )
+TEST( BasicAlgs, MinAndMaxE4 )
 {
 	val_idx<double> v1 = mk_vidx(1.0, 1);
 	val_idx<double> v2 = mk_vidx(2.0, 2);
@@ -171,200 +172,200 @@ BCS_TEST_CASE( test_min_and_max_e4 )
 
 	// min
 
-	BCS_CHECK_EQUAL( min(v1, v2, v3, v4), v1 );
-	BCS_CHECK_EQUAL( min(v1, v2, v4, v3), v1 );
-	BCS_CHECK_EQUAL( min(v1, v3, v2, v4), v1 );
-	BCS_CHECK_EQUAL( min(v1, v3, v4, v2), v1 );
-	BCS_CHECK_EQUAL( min(v1, v4, v2, v3), v1 );
-	BCS_CHECK_EQUAL( min(v1, v4, v3, v2), v1 );
+	EXPECT_EQ( min(v1, v2, v3, v4), v1 );
+	EXPECT_EQ( min(v1, v2, v4, v3), v1 );
+	EXPECT_EQ( min(v1, v3, v2, v4), v1 );
+	EXPECT_EQ( min(v1, v3, v4, v2), v1 );
+	EXPECT_EQ( min(v1, v4, v2, v3), v1 );
+	EXPECT_EQ( min(v1, v4, v3, v2), v1 );
 
-	BCS_CHECK_EQUAL( min(v2, v1, v3, v4), v1 );
-	BCS_CHECK_EQUAL( min(v2, v1, v4, v3), v1 );
-	BCS_CHECK_EQUAL( min(v2, v3, v1, v4), v1 );
-	BCS_CHECK_EQUAL( min(v2, v3, v4, v1), v1 );
-	BCS_CHECK_EQUAL( min(v2, v4, v1, v3), v1 );
-	BCS_CHECK_EQUAL( min(v2, v4, v3, v1), v1 );
+	EXPECT_EQ( min(v2, v1, v3, v4), v1 );
+	EXPECT_EQ( min(v2, v1, v4, v3), v1 );
+	EXPECT_EQ( min(v2, v3, v1, v4), v1 );
+	EXPECT_EQ( min(v2, v3, v4, v1), v1 );
+	EXPECT_EQ( min(v2, v4, v1, v3), v1 );
+	EXPECT_EQ( min(v2, v4, v3, v1), v1 );
 
-	BCS_CHECK_EQUAL( min(v3, v2, v1, v4), v1 );
-	BCS_CHECK_EQUAL( min(v3, v2, v4, v1), v1 );
-	BCS_CHECK_EQUAL( min(v3, v1, v2, v4), v1 );
-	BCS_CHECK_EQUAL( min(v3, v1, v4, v2), v1 );
-	BCS_CHECK_EQUAL( min(v3, v4, v1, v2), v1 );
-	BCS_CHECK_EQUAL( min(v3, v4, v2, v1), v1 );
+	EXPECT_EQ( min(v3, v2, v1, v4), v1 );
+	EXPECT_EQ( min(v3, v2, v4, v1), v1 );
+	EXPECT_EQ( min(v3, v1, v2, v4), v1 );
+	EXPECT_EQ( min(v3, v1, v4, v2), v1 );
+	EXPECT_EQ( min(v3, v4, v1, v2), v1 );
+	EXPECT_EQ( min(v3, v4, v2, v1), v1 );
 
-	BCS_CHECK_EQUAL( min(v4, v1, v2, v3), v1 );
-	BCS_CHECK_EQUAL( min(v4, v1, v3, v2), v1 );
-	BCS_CHECK_EQUAL( min(v4, v2, v1, v3), v1 );
-	BCS_CHECK_EQUAL( min(v4, v2, v3, v1), v1 );
-	BCS_CHECK_EQUAL( min(v4, v3, v1, v2), v1 );
-	BCS_CHECK_EQUAL( min(v4, v3, v2, v1), v1 );
+	EXPECT_EQ( min(v4, v1, v2, v3), v1 );
+	EXPECT_EQ( min(v4, v1, v3, v2), v1 );
+	EXPECT_EQ( min(v4, v2, v1, v3), v1 );
+	EXPECT_EQ( min(v4, v2, v3, v1), v1 );
+	EXPECT_EQ( min(v4, v3, v1, v2), v1 );
+	EXPECT_EQ( min(v4, v3, v2, v1), v1 );
 
-	BCS_CHECK_EQUAL( min(p1, p2, p3, p4), p1 );
+	EXPECT_EQ( min(p1, p2, p3, p4), p1 );
 
 	// min (comp)
 
-	BCS_CHECK_EQUAL( min(v1, v2, v3, v4, comp), v4 );
-	BCS_CHECK_EQUAL( min(v1, v2, v4, v3, comp), v4 );
-	BCS_CHECK_EQUAL( min(v1, v3, v2, v4, comp), v4 );
-	BCS_CHECK_EQUAL( min(v1, v3, v4, v2, comp), v4 );
-	BCS_CHECK_EQUAL( min(v1, v4, v2, v3, comp), v4 );
-	BCS_CHECK_EQUAL( min(v1, v4, v3, v2, comp), v4 );
+	EXPECT_EQ( min(v1, v2, v3, v4, comp), v4 );
+	EXPECT_EQ( min(v1, v2, v4, v3, comp), v4 );
+	EXPECT_EQ( min(v1, v3, v2, v4, comp), v4 );
+	EXPECT_EQ( min(v1, v3, v4, v2, comp), v4 );
+	EXPECT_EQ( min(v1, v4, v2, v3, comp), v4 );
+	EXPECT_EQ( min(v1, v4, v3, v2, comp), v4 );
 
-	BCS_CHECK_EQUAL( min(v2, v1, v3, v4, comp), v4 );
-	BCS_CHECK_EQUAL( min(v2, v1, v4, v3, comp), v4 );
-	BCS_CHECK_EQUAL( min(v2, v3, v1, v4, comp), v4 );
-	BCS_CHECK_EQUAL( min(v2, v3, v4, v1, comp), v4 );
-	BCS_CHECK_EQUAL( min(v2, v4, v1, v3, comp), v4 );
-	BCS_CHECK_EQUAL( min(v2, v4, v3, v1, comp), v4 );
+	EXPECT_EQ( min(v2, v1, v3, v4, comp), v4 );
+	EXPECT_EQ( min(v2, v1, v4, v3, comp), v4 );
+	EXPECT_EQ( min(v2, v3, v1, v4, comp), v4 );
+	EXPECT_EQ( min(v2, v3, v4, v1, comp), v4 );
+	EXPECT_EQ( min(v2, v4, v1, v3, comp), v4 );
+	EXPECT_EQ( min(v2, v4, v3, v1, comp), v4 );
 
-	BCS_CHECK_EQUAL( min(v3, v2, v1, v4, comp), v4 );
-	BCS_CHECK_EQUAL( min(v3, v2, v4, v1, comp), v4 );
-	BCS_CHECK_EQUAL( min(v3, v1, v2, v4, comp), v4 );
-	BCS_CHECK_EQUAL( min(v3, v1, v4, v2, comp), v4 );
-	BCS_CHECK_EQUAL( min(v3, v4, v1, v2, comp), v4 );
-	BCS_CHECK_EQUAL( min(v3, v4, v2, v1, comp), v4 );
+	EXPECT_EQ( min(v3, v2, v1, v4, comp), v4 );
+	EXPECT_EQ( min(v3, v2, v4, v1, comp), v4 );
+	EXPECT_EQ( min(v3, v1, v2, v4, comp), v4 );
+	EXPECT_EQ( min(v3, v1, v4, v2, comp), v4 );
+	EXPECT_EQ( min(v3, v4, v1, v2, comp), v4 );
+	EXPECT_EQ( min(v3, v4, v2, v1, comp), v4 );
 
-	BCS_CHECK_EQUAL( min(v4, v1, v2, v3, comp), v4 );
-	BCS_CHECK_EQUAL( min(v4, v1, v3, v2, comp), v4 );
-	BCS_CHECK_EQUAL( min(v4, v2, v1, v3, comp), v4 );
-	BCS_CHECK_EQUAL( min(v4, v2, v3, v1, comp), v4 );
-	BCS_CHECK_EQUAL( min(v4, v3, v1, v2, comp), v4 );
-	BCS_CHECK_EQUAL( min(v4, v3, v2, v1, comp), v4 );
+	EXPECT_EQ( min(v4, v1, v2, v3, comp), v4 );
+	EXPECT_EQ( min(v4, v1, v3, v2, comp), v4 );
+	EXPECT_EQ( min(v4, v2, v1, v3, comp), v4 );
+	EXPECT_EQ( min(v4, v2, v3, v1, comp), v4 );
+	EXPECT_EQ( min(v4, v3, v1, v2, comp), v4 );
+	EXPECT_EQ( min(v4, v3, v2, v1, comp), v4 );
 
-	BCS_CHECK_EQUAL( min(p1, p2, p3, p4, comp), p1 );
+	EXPECT_EQ( min(p1, p2, p3, p4, comp), p1 );
 
 	// max
 
-	BCS_CHECK_EQUAL( max(v1, v2, v3, v4), v4 );
-	BCS_CHECK_EQUAL( max(v1, v2, v4, v3), v4 );
-	BCS_CHECK_EQUAL( max(v1, v3, v2, v4), v4 );
-	BCS_CHECK_EQUAL( max(v1, v3, v4, v2), v4 );
-	BCS_CHECK_EQUAL( max(v1, v4, v2, v3), v4 );
-	BCS_CHECK_EQUAL( max(v1, v4, v3, v2), v4 );
+	EXPECT_EQ( max(v1, v2, v3, v4), v4 );
+	EXPECT_EQ( max(v1, v2, v4, v3), v4 );
+	EXPECT_EQ( max(v1, v3, v2, v4), v4 );
+	EXPECT_EQ( max(v1, v3, v4, v2), v4 );
+	EXPECT_EQ( max(v1, v4, v2, v3), v4 );
+	EXPECT_EQ( max(v1, v4, v3, v2), v4 );
 
-	BCS_CHECK_EQUAL( max(v2, v1, v3, v4), v4 );
-	BCS_CHECK_EQUAL( max(v2, v1, v4, v3), v4 );
-	BCS_CHECK_EQUAL( max(v2, v3, v1, v4), v4 );
-	BCS_CHECK_EQUAL( max(v2, v3, v4, v1), v4 );
-	BCS_CHECK_EQUAL( max(v2, v4, v1, v3), v4 );
-	BCS_CHECK_EQUAL( max(v2, v4, v3, v1), v4 );
+	EXPECT_EQ( max(v2, v1, v3, v4), v4 );
+	EXPECT_EQ( max(v2, v1, v4, v3), v4 );
+	EXPECT_EQ( max(v2, v3, v1, v4), v4 );
+	EXPECT_EQ( max(v2, v3, v4, v1), v4 );
+	EXPECT_EQ( max(v2, v4, v1, v3), v4 );
+	EXPECT_EQ( max(v2, v4, v3, v1), v4 );
 
-	BCS_CHECK_EQUAL( max(v3, v2, v1, v4), v4 );
-	BCS_CHECK_EQUAL( max(v3, v2, v4, v1), v4 );
-	BCS_CHECK_EQUAL( max(v3, v1, v2, v4), v4 );
-	BCS_CHECK_EQUAL( max(v3, v1, v4, v2), v4 );
-	BCS_CHECK_EQUAL( max(v3, v4, v1, v2), v4 );
-	BCS_CHECK_EQUAL( max(v3, v4, v2, v1), v4 );
+	EXPECT_EQ( max(v3, v2, v1, v4), v4 );
+	EXPECT_EQ( max(v3, v2, v4, v1), v4 );
+	EXPECT_EQ( max(v3, v1, v2, v4), v4 );
+	EXPECT_EQ( max(v3, v1, v4, v2), v4 );
+	EXPECT_EQ( max(v3, v4, v1, v2), v4 );
+	EXPECT_EQ( max(v3, v4, v2, v1), v4 );
 
-	BCS_CHECK_EQUAL( max(v4, v1, v2, v3), v4 );
-	BCS_CHECK_EQUAL( max(v4, v1, v3, v2), v4 );
-	BCS_CHECK_EQUAL( max(v4, v2, v1, v3), v4 );
-	BCS_CHECK_EQUAL( max(v4, v2, v3, v1), v4 );
-	BCS_CHECK_EQUAL( max(v4, v3, v1, v2), v4 );
-	BCS_CHECK_EQUAL( max(v4, v3, v2, v1), v4 );
+	EXPECT_EQ( max(v4, v1, v2, v3), v4 );
+	EXPECT_EQ( max(v4, v1, v3, v2), v4 );
+	EXPECT_EQ( max(v4, v2, v1, v3), v4 );
+	EXPECT_EQ( max(v4, v2, v3, v1), v4 );
+	EXPECT_EQ( max(v4, v3, v1, v2), v4 );
+	EXPECT_EQ( max(v4, v3, v2, v1), v4 );
 
-	BCS_CHECK_EQUAL( max(p1, p2, p3, p4), p1 );
+	EXPECT_EQ( max(p1, p2, p3, p4), p1 );
 
 	// max (comp)
 
-	BCS_CHECK_EQUAL( max(v1, v2, v3, v4, comp), v1 );
-	BCS_CHECK_EQUAL( max(v1, v2, v4, v3, comp), v1 );
-	BCS_CHECK_EQUAL( max(v1, v3, v2, v4, comp), v1 );
-	BCS_CHECK_EQUAL( max(v1, v3, v4, v2, comp), v1 );
-	BCS_CHECK_EQUAL( max(v1, v4, v2, v3, comp), v1 );
-	BCS_CHECK_EQUAL( max(v1, v4, v3, v2, comp), v1 );
+	EXPECT_EQ( max(v1, v2, v3, v4, comp), v1 );
+	EXPECT_EQ( max(v1, v2, v4, v3, comp), v1 );
+	EXPECT_EQ( max(v1, v3, v2, v4, comp), v1 );
+	EXPECT_EQ( max(v1, v3, v4, v2, comp), v1 );
+	EXPECT_EQ( max(v1, v4, v2, v3, comp), v1 );
+	EXPECT_EQ( max(v1, v4, v3, v2, comp), v1 );
 
-	BCS_CHECK_EQUAL( max(v2, v1, v3, v4, comp), v1 );
-	BCS_CHECK_EQUAL( max(v2, v1, v4, v3, comp), v1 );
-	BCS_CHECK_EQUAL( max(v2, v3, v1, v4, comp), v1 );
-	BCS_CHECK_EQUAL( max(v2, v3, v4, v1, comp), v1 );
-	BCS_CHECK_EQUAL( max(v2, v4, v1, v3, comp), v1 );
-	BCS_CHECK_EQUAL( max(v2, v4, v3, v1, comp), v1 );
+	EXPECT_EQ( max(v2, v1, v3, v4, comp), v1 );
+	EXPECT_EQ( max(v2, v1, v4, v3, comp), v1 );
+	EXPECT_EQ( max(v2, v3, v1, v4, comp), v1 );
+	EXPECT_EQ( max(v2, v3, v4, v1, comp), v1 );
+	EXPECT_EQ( max(v2, v4, v1, v3, comp), v1 );
+	EXPECT_EQ( max(v2, v4, v3, v1, comp), v1 );
 
-	BCS_CHECK_EQUAL( max(v3, v2, v1, v4, comp), v1 );
-	BCS_CHECK_EQUAL( max(v3, v2, v4, v1, comp), v1 );
-	BCS_CHECK_EQUAL( max(v3, v1, v2, v4, comp), v1 );
-	BCS_CHECK_EQUAL( max(v3, v1, v4, v2, comp), v1 );
-	BCS_CHECK_EQUAL( max(v3, v4, v1, v2, comp), v1 );
-	BCS_CHECK_EQUAL( max(v3, v4, v2, v1, comp), v1 );
+	EXPECT_EQ( max(v3, v2, v1, v4, comp), v1 );
+	EXPECT_EQ( max(v3, v2, v4, v1, comp), v1 );
+	EXPECT_EQ( max(v3, v1, v2, v4, comp), v1 );
+	EXPECT_EQ( max(v3, v1, v4, v2, comp), v1 );
+	EXPECT_EQ( max(v3, v4, v1, v2, comp), v1 );
+	EXPECT_EQ( max(v3, v4, v2, v1, comp), v1 );
 
-	BCS_CHECK_EQUAL( max(v4, v1, v2, v3, comp), v1 );
-	BCS_CHECK_EQUAL( max(v4, v1, v3, v2, comp), v1 );
-	BCS_CHECK_EQUAL( max(v4, v2, v1, v3, comp), v1 );
-	BCS_CHECK_EQUAL( max(v4, v2, v3, v1, comp), v1 );
-	BCS_CHECK_EQUAL( max(v4, v3, v1, v2, comp), v1 );
-	BCS_CHECK_EQUAL( max(v4, v3, v2, v1, comp), v1 );
+	EXPECT_EQ( max(v4, v1, v2, v3, comp), v1 );
+	EXPECT_EQ( max(v4, v1, v3, v2, comp), v1 );
+	EXPECT_EQ( max(v4, v2, v1, v3, comp), v1 );
+	EXPECT_EQ( max(v4, v2, v3, v1, comp), v1 );
+	EXPECT_EQ( max(v4, v3, v1, v2, comp), v1 );
+	EXPECT_EQ( max(v4, v3, v2, v1, comp), v1 );
 
-	BCS_CHECK_EQUAL( max(p1, p2, p3, p4, comp), p1 );
+	EXPECT_EQ( max(p1, p2, p3, p4, comp), p1 );
 
 	// minmax
 
-	BCS_CHECK_EQUAL( minmax(v1, v2, v3, v4), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v1, v2, v4, v3), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v1, v3, v2, v4), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v1, v3, v4, v2), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v1, v4, v2, v3), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v1, v4, v3, v2), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v1, v2, v3, v4), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v1, v2, v4, v3), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v1, v3, v2, v4), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v1, v3, v4, v2), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v1, v4, v2, v3), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v1, v4, v3, v2), mk_cpair(v1, v4) );
 
-	BCS_CHECK_EQUAL( minmax(v2, v1, v3, v4), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v2, v1, v4, v3), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v2, v3, v1, v4), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v2, v3, v4, v1), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v2, v4, v1, v3), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v2, v4, v3, v1), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v2, v1, v3, v4), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v2, v1, v4, v3), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v2, v3, v1, v4), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v2, v3, v4, v1), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v2, v4, v1, v3), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v2, v4, v3, v1), mk_cpair(v1, v4) );
 
-	BCS_CHECK_EQUAL( minmax(v3, v2, v1, v4), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v3, v2, v4, v1), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v3, v1, v2, v4), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v3, v1, v4, v2), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v3, v4, v1, v2), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v3, v4, v2, v1), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v3, v2, v1, v4), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v3, v2, v4, v1), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v3, v1, v2, v4), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v3, v1, v4, v2), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v3, v4, v1, v2), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v3, v4, v2, v1), mk_cpair(v1, v4) );
 
-	BCS_CHECK_EQUAL( minmax(v4, v1, v2, v3), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v4, v1, v3, v2), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v4, v2, v1, v3), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v4, v2, v3, v1), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v4, v3, v1, v2), mk_cpair(v1, v4) );
-	BCS_CHECK_EQUAL( minmax(v4, v3, v2, v1), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v4, v1, v2, v3), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v4, v1, v3, v2), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v4, v2, v1, v3), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v4, v2, v3, v1), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v4, v3, v1, v2), mk_cpair(v1, v4) );
+	EXPECT_EQ( minmax(v4, v3, v2, v1), mk_cpair(v1, v4) );
 
-	BCS_CHECK_EQUAL( minmax(p1, p2, p3, p4), mk_cpair(p1, p4) );
+	EXPECT_EQ( minmax(p1, p2, p3, p4), mk_cpair(p1, p4) );
 
 	// minmax (comp)
 
-	BCS_CHECK_EQUAL( minmax(v1, v2, v3, v4, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v1, v2, v4, v3, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v1, v3, v2, v4, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v1, v3, v4, v2, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v1, v4, v2, v3, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v1, v4, v3, v2, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v1, v2, v3, v4, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v1, v2, v4, v3, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v1, v3, v2, v4, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v1, v3, v4, v2, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v1, v4, v2, v3, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v1, v4, v3, v2, comp), mk_cpair(v4, v1) );
 
-	BCS_CHECK_EQUAL( minmax(v2, v1, v3, v4, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v2, v1, v4, v3, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v2, v3, v1, v4, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v2, v3, v4, v1, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v2, v4, v1, v3, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v2, v4, v3, v1, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v2, v1, v3, v4, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v2, v1, v4, v3, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v2, v3, v1, v4, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v2, v3, v4, v1, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v2, v4, v1, v3, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v2, v4, v3, v1, comp), mk_cpair(v4, v1) );
 
-	BCS_CHECK_EQUAL( minmax(v3, v2, v1, v4, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v3, v2, v4, v1, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v3, v1, v2, v4, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v3, v1, v4, v2, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v3, v4, v1, v2, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v3, v4, v2, v1, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v3, v2, v1, v4, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v3, v2, v4, v1, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v3, v1, v2, v4, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v3, v1, v4, v2, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v3, v4, v1, v2, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v3, v4, v2, v1, comp), mk_cpair(v4, v1) );
 
-	BCS_CHECK_EQUAL( minmax(v4, v1, v2, v3, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v4, v1, v3, v2, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v4, v2, v1, v3, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v4, v2, v3, v1, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v4, v3, v1, v2, comp), mk_cpair(v4, v1) );
-	BCS_CHECK_EQUAL( minmax(v4, v3, v2, v1, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v4, v1, v2, v3, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v4, v1, v3, v2, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v4, v2, v1, v3, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v4, v2, v3, v1, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v4, v3, v1, v2, comp), mk_cpair(v4, v1) );
+	EXPECT_EQ( minmax(v4, v3, v2, v1, comp), mk_cpair(v4, v1) );
 
-	BCS_CHECK_EQUAL( minmax(p1, p2, p3, p4, comp), mk_cpair(p1, p4) );
+	EXPECT_EQ( minmax(p1, p2, p3, p4, comp), mk_cpair(p1, p4) );
 
 }
 
 
-BCS_TEST_CASE( test_zip_and_extract )
+TEST( BasicAlgs, ZipAndExtract )
 {
 	const int N = 5;
 	int a1[N] = {2, 3, 4, 5, 6};
@@ -381,15 +382,15 @@ BCS_TEST_CASE( test_zip_and_extract )
 
 	zip_copy(a1, a1 + N, a2, pairs);
 
-	BCS_CHECK( collection_equal(pairs, pairs+N, pairs_ref, N) );
+	EXPECT_TRUE( collection_equal(pairs, pairs+N, pairs_ref, N) );
 
 	int b1[N] = {0, 0, 0, 0, 0};
 	int b2[N] = {0, 0, 0, 0, 0};
 
 	dispatch_copy(pairs, pairs+N, b1, b2);
 
-	BCS_CHECK( collection_equal(b1, b1+N, a1, N) );
-	BCS_CHECK( collection_equal(b2, b2+N, b2, N) );
+	EXPECT_TRUE( collection_equal(b1, b1+N, a1, N) );
+	EXPECT_TRUE( collection_equal(b2, b2+N, b2, N) );
 
 	int e1[N] = {0, 0, 0, 0, 0};
 	int e2[N] = {0, 0, 0, 0, 0};
@@ -397,150 +398,150 @@ BCS_TEST_CASE( test_zip_and_extract )
 	extract_copy(pairs, pairs+N, size_constant<0>(), e1);
 	extract_copy(pairs, pairs+N, size_constant<1>(), e2);
 
-	BCS_CHECK( collection_equal(e1, e1+N, a1, N) );
-	BCS_CHECK( collection_equal(e2, e2+N, b2, N) );
+	EXPECT_TRUE( collection_equal(e1, e1+N, a1, N) );
+	EXPECT_TRUE( collection_equal(e2, e2+N, b2, N) );
 }
 
 
-BCS_TEST_CASE( test_simple_sort )
+TEST( BasicAlgs, SimpleSort )
 {
 	int x = 0, y = 0, z = 0, w = 0;
 
 	// two
 	x = 1; y = 2;
 	simple_sort(x, y);
-	BCS_CHECK( x == 1 && y == 2 );
+	EXPECT_TRUE( x == 1 && y == 2 );
 
 	x = 2; y = 1;
 	simple_sort(x, y);
-	BCS_CHECK( x == 1 && y == 2 );
+	EXPECT_TRUE( x == 1 && y == 2 );
 
 	// three
 	x = 1; y = 2; z = 3;
 	simple_sort(x, y, z);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 );
 
 	x = 1; y = 3; z = 2;
 	simple_sort(x, y, z);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 );
 
 	x = 2; y = 1; z = 3;
 	simple_sort(x, y, z);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 );
 
 	x = 2; y = 3; z = 1;
 	simple_sort(x, y, z);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 );
 
 	x = 3; y = 1; z = 2;
 	simple_sort(x, y, z);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 );
 
 	x = 3; y = 2; z = 1;
 	simple_sort(x, y, z);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 );
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 );
 
 	// four
 
 	x = 1; y = 2; z = 3; w = 4;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 1; y = 2; z = 4; w = 3;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 1; y = 3; z = 2; w = 4;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 1; y = 3; z = 4; w = 2;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 1; y = 4; z = 2; w = 3;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 1; y = 4; z = 3; w = 2;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 2; y = 1; z = 3; w = 4;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 2; y = 1; z = 4; w = 3;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 2; y = 3; z = 1; w = 4;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 2; y = 3; z = 4; w = 1;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 2; y = 4; z = 1; w = 3;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 2; y = 4; z = 3; w = 1;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 3; y = 1; z = 2; w = 4;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 3; y = 1; z = 4; w = 2;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 3; y = 2; z = 1; w = 4;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 3; y = 2; z = 4; w = 1;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 3; y = 4; z = 1; w = 2;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 3; y = 4; z = 2; w = 1;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 4; y = 1; z = 2; w = 3;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 4; y = 1; z = 3; w = 2;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 4; y = 2; z = 1; w = 3;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 4; y = 2; z = 3; w = 1;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 4; y = 3; z = 1; w = 2;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 
 	x = 4; y = 3; z = 2; w = 1;
 	simple_sort(x, y, z, w);
-	BCS_CHECK( x == 1 && y == 2 && z == 3 && w == 4);
+	EXPECT_TRUE( x == 1 && y == 2 && z == 3 && w == 4);
 }
 
 
-BCS_TEST_CASE( test_tuple_sort )
+TEST( BasicAlgs, TupleSort )
 {
 	const int N = 5;
 	pair<int, int> pairs[N] = {
@@ -587,19 +588,19 @@ BCS_TEST_CASE( test_tuple_sort )
 
 	std::copy_n(pairs, N, rpairs);
 	sort_tuples_by_component(rpairs, rpairs+N, size_constant<0>());
-	BCS_CHECK( collection_equal(rpairs, rpairs+N, pairs_a0, N) );
+	EXPECT_TRUE( collection_equal(rpairs, rpairs+N, pairs_a0, N) );
 
 	std::copy_n(pairs, N, rpairs);
 	sort_tuples_by_component(rpairs, rpairs+N, size_constant<0>(), std::greater<int>());
-	BCS_CHECK( collection_equal(rpairs, rpairs+N, pairs_d0, N) );
+	EXPECT_TRUE( collection_equal(rpairs, rpairs+N, pairs_d0, N) );
 
 	std::copy_n(pairs, N, rpairs);
 	sort_tuples_by_component(rpairs, rpairs+N, size_constant<1>());
-	BCS_CHECK( collection_equal(rpairs, rpairs+N, pairs_a1, N) );
+	EXPECT_TRUE( collection_equal(rpairs, rpairs+N, pairs_a1, N) );
 
 	std::copy_n(pairs, N, rpairs);
 	sort_tuples_by_component(rpairs, rpairs+N, size_constant<1>(), std::greater<int>());
-	BCS_CHECK( collection_equal(rpairs, rpairs+N, pairs_d1, N) );
+	EXPECT_TRUE( collection_equal(rpairs, rpairs+N, pairs_d1, N) );
 
 }
 
@@ -613,34 +614,15 @@ struct my_inplace_plus
 };
 
 
-BCS_TEST_CASE( test_cumulation )
+TEST( BasicAlgs, Cumulation )
 {
 	int a[5] = {1, 2, 3, 4, 5};
 
 	int s = 10;
 	cumulate(s, a, a+5, my_inplace_plus());
-	BCS_CHECK_EQUAL(s, 25);
+	EXPECT_EQ(s, 25);
 
 	cumulate_n(s, a, 3, my_inplace_plus());
-	BCS_CHECK_EQUAL(s, 31);
+	EXPECT_EQ(s, 31);
 }
-
-
-std::shared_ptr<test_suite> test_basic_algorithms_suite()
-{
-	BCS_NEW_TEST_SUITE( suite, "test_basic_algorithms" );
-
-	BCS_ADD_TEST_CASE( suite, test_min_and_max_e2() );
-	BCS_ADD_TEST_CASE( suite, test_min_and_max_e3() );
-	BCS_ADD_TEST_CASE( suite, test_min_and_max_e4() );
-	BCS_ADD_TEST_CASE( suite, test_zip_and_extract() );
-
-	BCS_ADD_TEST_CASE( suite, test_simple_sort() );
-	BCS_ADD_TEST_CASE( suite, test_tuple_sort() );
-	BCS_ADD_TEST_CASE( suite, test_cumulation() );
-
-	return suite;
-}
-
-
 

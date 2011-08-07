@@ -100,7 +100,6 @@ namespace bcs
 
 		using std::exp2;
 		using std::log2;
-		using std::logb;
 		using std::expm1;
 		using std::log1p;
 
