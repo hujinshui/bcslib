@@ -20,7 +20,6 @@ ifeq ($(USE_INTEL), "yes")
     INTEL_FLAGS = -DHAS_INTEL_MKL -DHAS_INTEL_IPP $(INTEL_PATHS) $(INTEL_LINKS)
 endif
 
-ARBB_LINKS = -larbb -ltbb -littnotify
 
 #------ Output directory ----------
 
@@ -60,20 +59,11 @@ ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/array/details/array2d_details.h \
 	bcslib/array/array_eval.h
 	
-ARRAY_COMP_HEADERS = $(ARRAY_BASIC_HEADERS) \
-	bcslib/array/arbb_port.h \
-	bcslib/array/arbb_linalg.h
-	
 LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
 	bcslib/extern/blas_select.h \
 	bcslib/array/blas_base.h \
 	bcslib/array/generic_blas.h \
 	bcslib/array/mat_times.h
-
-PROB_BASIC_HEADERS = $(ARRAY_COMP_HEADERS) \
-	bcslib/prob/pdistr_base.h \
-	bcslib/prob/rstream.h \
-	bcslib/prob/arbb_rstream.h 
 
 
 #---------- Target groups -------------------
@@ -85,7 +75,7 @@ all: test bench
 test: test_c0x_support test_basics test_array
 
 .PHONY: bench
-bench: bench_array bench_prob
+bench: bench_array
 
 .PHONY: clean
 
@@ -113,8 +103,7 @@ test_basics: $(TEST_BIN_DIR)/test_basics
 .PHONY: bench_array	
 
 test_array: \
-	$(TEST_BIN_DIR)/test_array_basics \
-	$(TEST_BIN_DIR)/test_arbb_basics 
+	$(TEST_BIN_DIR)/test_array_basics
 	
 test_array_pending: \
 	$(TEST_BIN_DIR)/test_array_comp \
@@ -124,14 +113,6 @@ test_array_pending: \
 bench_array: \
 	$(BENCH_BIN_DIR)/bench_array_access
 	
-	
-#------ Prob tests (declaration) -----------
-
-.PHONY: bench_prob
-
-bench_prob: \
-	$(BENCH_BIN_DIR)/bench_rng
-
 
 
 #_________________________________________________________________________
@@ -176,15 +157,6 @@ TEST_ARRAY_BASICS_SOURCES = \
 $(TEST_BIN_DIR)/test_array_basics: $(ARRAY_BASIC_HEADERS) $(ARRAY_TEST_HEADERS) $(TEST_ARRAY_BASICS_SOURCES) 
 	$(CXX) $(CXXFLAGS) $(TEST_ARRAY_BASICS_SOURCES) -o $(TEST_BIN_DIR)/test_array_basics
 	
-
-TEST_ARBB_BASICS_SOURCES = \
-	test/test_arbb_basics.cpp \
-	test/test_arbb_port.cpp \
-	test/test_arbb_linalg.cpp
-
-$(TEST_BIN_DIR)/test_arbb_basics: $(ARRAY_COMP_HEADERS) $(ARRAY_TEST_HEADERS) $(TEST_ARBB_BASICS_SOURCES)
-	$(CXX) $(CXXFLAGS) $(ARBB_LINKS) $(TEST_ARBB_BASICS_SOURCES) -o $(TEST_BIN_DIR)/test_arbb_basics 
-
 	
 TEST_ARRAY_COMP_SOURCES = \
 	test/test_array_comp.cpp \
@@ -217,14 +189,6 @@ $(BENCH_BIN_DIR)/bench_array_calc_intel: $(ARRAY_COMP_HEADERS) bench/bench_array
 	$(CXX) $(CXXFLAGS) $(INTEL_FLAGS) $(OFLAGS) bench/bench_array_calc.cpp -o $(BENCH_BIN_DIR)/bench_array_calc_intel
 
 
-#----------------------------------------------------------
-#
-#   Prob test & bench (details)
-#
-#----------------------------------------------------------
 
-
-$(BENCH_BIN_DIR)/bench_rng: $(PROB_BASIC_HEADERS) bench/bench_rng.cpp
-	$(CXX) $(CXXFLAGS) $(ARBB_LINKS) $(OFLAGS) bench/bench_rng.cpp -o $(BENCH_BIN_DIR)/bench_rng
 
 
