@@ -6,8 +6,8 @@
  * @author Dahua Lin
  */
 
-#ifndef BCS_TEST_BASICS_H_
-#define BCS_TEST_BASICS_H_
+#ifndef BCSLIB_TEST_BASICS_H_
+#define BCSLIB_TEST_BASICS_H_
 
 #include <gtest/gtest.h>
 #include <cmath>
