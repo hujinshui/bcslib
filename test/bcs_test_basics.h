@@ -10,6 +10,8 @@
 #define BCSLIB_TEST_BASICS_H_
 
 #include <gtest/gtest.h>
+
+#include <bcslib/base/basic_defs.h>
 #include <cmath>
 
 namespace bcs { namespace test {
@@ -38,20 +40,33 @@ namespace bcs { namespace test {
 
 
 	template<class ArrayClass1, class ArrayClass2>
-	bool array_equal(const ArrayClass1& a, const ArrayClass2& b, size_t n)
+	bool array_equal(const ArrayClass1& a, const ArrayClass2& b, index_t n)
 	{
-		for (size_t i = 0; i < n; ++i)
+		for (index_t i = 0; i < n; ++i)
 		{
 			if (!(a[i] == b[i])) return false;
 		}
 		return true;
 	}
 
+	template<class ArrayClass1, class ArrayClass2>
+	bool array1d_equal(const ArrayClass1& a, const ArrayClass2& b)
+	{
+		if (a.dim0() != b.dim0()) return false;
+
+		index_t n = a.dim0();
+		for (index_t i = 0; i < n; ++i)
+		{
+			if (!(a(i) == b(i))) return false;
+		}
+		return true;
+	}
+
 
 	template<class ArrayClass1, class ArrayClass2>
-	bool array_approx(const ArrayClass1& a, const ArrayClass2& b, size_t n, double eps)
+	bool array_approx(const ArrayClass1& a, const ArrayClass2& b, index_t n, double eps)
 	{
-		for (size_t i = 0; i < n; ++i)
+		for (index_t i = 0; i < n; ++i)
 		{
 			double d = std::abs((double)(a[i] - b[i]));
 			if (d > eps) return false;
