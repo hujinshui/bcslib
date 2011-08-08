@@ -121,9 +121,9 @@ namespace bcs
 #endif
 
 #if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
-#define BCS_FORCE_INLINE __forceinline
+#define BCS_ENSURE_INLINE __forceinline
 #elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
-#define BCS_FORCE_INLINE __attribute__((always_inline))
+#define BCS_ENSURE_INLINE __attribute__((always_inline))
 #endif
 
 #endif
