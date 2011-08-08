@@ -20,129 +20,6 @@
 
 namespace bcs
 {
-	/******************************************************
-	 *
-	 *  Extended views
-	 *
-	 ******************************************************/
-
-	template<typename T, class TIndexer>
-	class caview1d_ex
-	{
-	public:
-		BCS_ARRAY_CHECK_TYPE(T)
-		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
-		BCS_ARRAY_BASIC_TYPEDEFS(1u, T, layout_1d_t)
-
-		typedef TIndexer indexer_type;
-		typedef caview1d_ex<value_type, indexer_type> cview_type;
-		typedef aview1d_ex<value_type, indexer_type> view_type;
-
-	public:
-		caview1d_ex(const_pointer pbase, const indexer_type& indexer)
-		: m_pbase(const_cast<pointer>(pbase))
-		, m_d0(static_cast<index_t>(indexer.size()))
-		, m_indexer(indexer)
-		{
-		}
-
-	private:
-		caview1d_ex& operator = (const caview1d_ex& r);
-
-	public:
-		dim_num_t ndims() const
-		{
-			return num_dimensions;
-		}
-
-		size_type size() const
-		{
-			return nelems();
-		}
-
-		size_type nelems() const
-		{
-			return static_cast<size_type>(m_d0);
-		}
-
-		index_type dim0() const
-		{
-			return m_d0;
-		}
-
-		shape_type shape() const
-		{
-			return arr_shape(m_d0);
-		}
-
-		const indexer_type& get_indexer() const
-		{
-			return m_indexer;
-		}
-
-	public:
-		// Element access
-
-		const_reference operator() (index_type i) const
-		{
-			return m_pbase[m_indexer[i]];
-		}
-
-	protected:
-		pointer m_pbase;
-		index_type m_d0;
-		indexer_type m_indexer;
-
-	}; // end class caview1d_ex
-
-
-
-	template<typename T, class TIndexer>
-	class aview1d_ex : public caview1d_ex<T, TIndexer>
-	{
-	public:
-		BCS_ARRAY_CHECK_TYPE(T)
-		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
-		BCS_ARRAY_BASIC_TYPEDEFS(1u, T, layout_1d_t)
-
-		typedef TIndexer indexer_type;
-		typedef caview1d_ex<value_type, indexer_type> cview_type;
-		typedef aview1d_ex<value_type, indexer_type> view_type;
-
-	public:
-		aview1d_ex(pointer pbase, const indexer_type& indexer)
-		: cview_type(pbase, indexer)
-		{
-		}
-
-		aview1d_ex(aview1d_ex& r)
-		: cview_type(r)
-		{
-		}
-
-		aview1d_ex(aview1d_ex&& r)
-		: cview_type(r)
-		{
-		}
-
-	private:
-		aview1d_ex& operator = (const aview1d_ex& r);
-
-	public:
-		// Element access
-
-		const_reference operator() (index_type i) const
-		{
-			return this->m_pbase[this->m_indexer[i]];
-		}
-
-		reference operator() (index_type i)
-		{
-			return this->m_pbase[this->m_indexer[i]];
-		}
-
-	}; // end class aview1d_ex
-
 
 	/******************************************************
 	 *
@@ -150,19 +27,32 @@ namespace bcs
 	 *
 	 ******************************************************/
 
+	template<class Derived>
+	class caview1d_base : public dense_caview_base<Derived>
+	{
+	public:
+		BCS_AVIEW_BASE_DEFS(Derived)
+
+		BCS_ENSURE_INLINE const Derived& derived() const
+		{
+			return *(static_cast<const Derived*>(this));
+		}
+
+		// interfaces to be implemented by Derived
+
+		index_t dim0() const
+		{
+			return derived().dim0();
+		}
+
+		template<class Indexer>
+		caview1d_ex<value_type, typename indexer_remap<Indexer>::type> V(const Indexer& indexer) const;
+
+	}; // end class caview1d_base
+
 	template<typename T>
 	class caview1d
 	{
-	public:
-		BCS_ARRAY_CHECK_TYPE(T)
-		BCS_ARRAY_BASIC_TYPEDEFS(1u, T, layout_1d_t)
-
-		typedef caview1d<value_type> cview_type;
-		typedef aview1d<value_type> view_type;
-
-		typedef const_pointer const_iterator;
-		typedef pointer iterator;
-
 	public:
 		caview1d(const_pointer pbase, size_type n)
 		: m_pbase(const_cast<pointer>(pbase))
@@ -747,6 +637,131 @@ namespace bcs
 	{
 		return array1d<T>(a);
 	}
+
+
+
+	/******************************************************
+	 *
+	 *  Extended views
+	 *
+	 ******************************************************/
+
+	template<typename T, class TIndexer>
+	class caview1d_ex
+	{
+	public:
+		BCS_ARRAY_CHECK_TYPE(T)
+		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
+		BCS_ARRAY_BASIC_TYPEDEFS(1u, T, layout_1d_t)
+
+		typedef TIndexer indexer_type;
+		typedef caview1d_ex<value_type, indexer_type> cview_type;
+		typedef aview1d_ex<value_type, indexer_type> view_type;
+
+	public:
+		caview1d_ex(const_pointer pbase, const indexer_type& indexer)
+		: m_pbase(const_cast<pointer>(pbase))
+		, m_d0(static_cast<index_t>(indexer.size()))
+		, m_indexer(indexer)
+		{
+		}
+
+	private:
+		caview1d_ex& operator = (const caview1d_ex& r);
+
+	public:
+		dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
+		size_type size() const
+		{
+			return nelems();
+		}
+
+		size_type nelems() const
+		{
+			return static_cast<size_type>(m_d0);
+		}
+
+		index_type dim0() const
+		{
+			return m_d0;
+		}
+
+		shape_type shape() const
+		{
+			return arr_shape(m_d0);
+		}
+
+		const indexer_type& get_indexer() const
+		{
+			return m_indexer;
+		}
+
+	public:
+		// Element access
+
+		const_reference operator() (index_type i) const
+		{
+			return m_pbase[m_indexer[i]];
+		}
+
+	protected:
+		pointer m_pbase;
+		index_type m_d0;
+		indexer_type m_indexer;
+
+	}; // end class caview1d_ex
+
+
+	template<typename T, class TIndexer>
+	class aview1d_ex : public caview1d_ex<T, TIndexer>
+	{
+	public:
+		BCS_ARRAY_CHECK_TYPE(T)
+		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
+		BCS_ARRAY_BASIC_TYPEDEFS(1u, T, layout_1d_t)
+
+		typedef TIndexer indexer_type;
+		typedef caview1d_ex<value_type, indexer_type> cview_type;
+		typedef aview1d_ex<value_type, indexer_type> view_type;
+
+	public:
+		aview1d_ex(pointer pbase, const indexer_type& indexer)
+		: cview_type(pbase, indexer)
+		{
+		}
+
+		aview1d_ex(aview1d_ex& r)
+		: cview_type(r)
+		{
+		}
+
+		aview1d_ex(aview1d_ex&& r)
+		: cview_type(r)
+		{
+		}
+
+	private:
+		aview1d_ex& operator = (const aview1d_ex& r);
+
+	public:
+		// Element access
+
+		const_reference operator() (index_type i) const
+		{
+			return this->m_pbase[this->m_indexer[i]];
+		}
+
+		reference operator() (index_type i)
+		{
+			return this->m_pbase[this->m_indexer[i]];
+		}
+
+	}; // end class aview1d_ex
+
 
 
 	/******************************************************

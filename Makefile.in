@@ -44,12 +44,13 @@ BASE_HEADERS = \
 	bcslib/base/basic_algorithms.h \
 	bcslib/base/iterator_wrappers.h \
 	bcslib/base/basic_mem.h \
-	bcslib/base/details/basic_mem_details.h \
 	bcslib/base/block.h \
-	bcslib/base/monitored_allocator.h
+	bcslib/base/monitored_allocator.h \
+	bcslib/base/timer.h
 
 ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/array/array_base.h \
+	bcslib/array/array_storage.h \
 	bcslib/array/array_index.h \
 	bcslib/array/details/array_index_details.h \
 	bcslib/array/array1d.h \
@@ -67,10 +68,10 @@ LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
 #---------- Target groups -------------------
 
 .PHONY: all
-all: test bench
+all: test
 
 .PHONY: test
-test: test_c0x_support test_basics 
+test: test_c0x_support test_basics test_array
 
 .PHONY: bench
 bench: bench_array
@@ -144,15 +145,15 @@ $(TEST_BIN_DIR)/test_basics: $(BASE_HEADERS) $(TEST_BASICS_SOURCES)
 # array tests
 
 TEST_ARRAY_BASICS_SOURCES = \
-	test/test_array_basics.cpp \
-	test/test_index_selection.cpp \
-	test/test_array1d.cpp \
-	test/test_array2d.cpp \
-	test/test_array_transpose.cpp \
-	test/test_array_eval.cpp
+	test/test_index_selection.cpp
+	
+# test/test_array1d.cpp
+# test/test_array2d.cpp
+# test/test_array_transpose.cpp
+# test/test_array_eval.cpp
 	
 $(TEST_BIN_DIR)/test_array_basics: $(ARRAY_BASIC_HEADERS) $(TEST_ARRAY_BASICS_SOURCES) 
-	$(CXX) $(CXXFLAGS) $(TEST_ARRAY_BASICS_SOURCES) -o $(TEST_BIN_DIR)/test_array_basics
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_ARRAY_BASICS_SOURCES) $(MAIN_TEST_POST) -o $(TEST_BIN_DIR)/test_array_basics
 	
 	
 TEST_ARRAY_COMP_SOURCES = \

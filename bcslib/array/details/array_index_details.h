@@ -83,7 +83,7 @@ namespace bcs
 
 			_rep_iter_impl() : m_index(0), m_i(0) { }
 
-			_rep_iter_impl(const index_t& idx, const size_t& i): m_index(idx), m_i(i) { }
+			_rep_iter_impl(const index_t& idx, const index_t& i): m_index(idx), m_i(i) { }
 
 			void move_next() { ++ m_i; }
 
@@ -98,7 +98,7 @@ namespace bcs
 
 		private:
 			index_t m_index;
-			size_t m_i;
+			index_t m_i;
 
 		}; // end _rep_iter_impl
 	}

@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#ifndef SLIPP_TIMER_H
-#define SLIPP_TIMER_H
+#ifndef BCSLIB_TIMER_H
+#define BCSLIB_TIMER_H
 
 #include <bcslib/base/config.h>
 #include <bcslib/base/basic_defs.h>
