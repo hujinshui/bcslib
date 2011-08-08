@@ -28,7 +28,7 @@ namespace bcs
 	 ******************************************************/
 
 	template<class Derived>
-	class caview1d_base : public caview_base<Derived>
+	class caview1d_base : public aview_traits<Derived>::dview_base
 	{
 	public:
 		BCS_CAVIEW_BASE_DEFS(Derived)
@@ -81,7 +81,7 @@ namespace bcs
 
 
 	template<class Derived>
-	class aview1d_base : public aview_base<Derived>, public caview1d_base<Derived>
+	class aview1d_base : public caview1d_base<Derived>
 	{
 	public:
 		BCS_AVIEW_BASE_DEFS(Derived)
@@ -149,7 +149,7 @@ namespace bcs
 
 
 	template<class Derived>
-	class dense_caview1d_base : public dense_caview_base<Derived>, public caview1d_base<Derived>
+	class dense_caview1d_base : public aview_traits<Derived>::view_nd_base
 	{
 	public:
 		BCS_CAVIEW_BASE_DEFS(Derived)
@@ -219,8 +219,7 @@ namespace bcs
 
 
 	template<class Derived>
-	class dense_aview1d_base :
-		public dense_aview_base<Derived>, public dense_caview1d_base<Derived>, public aview1d_base<Derived>
+	class dense_aview1d_base : public dense_caview1d_base<Derived>
 	{
 	public:
 		BCS_AVIEW_BASE_DEFS(Derived)
@@ -331,6 +330,11 @@ namespace bcs
 	struct aview_traits<caview1d_ex<T, TIndexer> >
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+
+		typedef caview1d_ex<T, TIndexer> self_type;
+		typedef caview1d_base<self_type> view_nd_base;
+		typedef caview_base<self_type> dview_base;
+		typedef caview_base<self_type> view_base;
 	};
 
 	template<typename T, class TIndexer>
@@ -403,6 +407,11 @@ namespace bcs
 	struct aview_traits<aview1d_ex<T, TIndexer> >
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+
+		typedef aview1d_ex<T, TIndexer> self_type;
+		typedef aview1d_base<self_type> view_nd_base;
+		typedef aview_base<self_type> dview_base;
+		typedef aview_base<self_type> view_base;
 	};
 
 	template<typename T, class TIndexer>
@@ -521,6 +530,11 @@ namespace bcs
 	struct aview_traits<caview1d<T> >
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+
+		typedef caview1d<T> self_type;
+		typedef caview1d_base<self_type> view_nd_base;
+		typedef dense_caview_base<self_type> dview_base;
+		typedef caview_base<self_type> view_base;
 	};
 
 	template<typename T>
@@ -613,6 +627,11 @@ namespace bcs
 	struct aview_traits<aview1d<T> >
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+
+		typedef aview1d<T> self_type;
+		typedef aview1d_base<self_type> view_nd_base;
+		typedef dense_aview_base<self_type> dview_base;
+		typedef aview_base<self_type> view_base;
 	};
 
 	template<typename T>
@@ -722,6 +741,22 @@ namespace bcs
 	}; // end class aview1d
 
 
+	// convenient functions
+
+	template<typename T>
+	inline caview1d<T> make_caview1d(const T* data, index_t n)
+	{
+		return caview1d<T>(data, n);
+	}
+
+	template<typename T>
+	inline aview1d<T> make_aview1d(T* data, index_t n)
+	{
+		return aview1d<T>(data, n);
+	}
+
+
+
 
 	/******************************************************
 	 *
@@ -789,6 +824,11 @@ namespace bcs
 	struct aview_traits<array1d<T> >
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+
+		typedef array1d<T> self_type;
+		typedef aview1d_base<self_type> view_nd_base;
+		typedef dense_aview_base<self_type> dview_base;
+		typedef aview_base<self_type> view_base;
 	};
 
 	template<typename T, class Alloc>
@@ -831,6 +871,8 @@ namespace bcs
 		array1d(array1d&& r)
 		: storage_base(std::move(r)), view_base(std::move(r))
 		{
+			view_base& rv = r;
+			rv.reset();
 		}
 
 		template<class Derived>
@@ -887,6 +929,20 @@ namespace bcs
 			view_base& v = *this;
 			view_base& rv = r;
 			swap(v, rv);
+		}
+
+		bool is_unique() const
+		{
+			return storage_base::is_unique();
+		}
+
+		void make_unique()
+		{
+			storage_base::make_unique();
+
+			view_base& v = *this;
+			index_t n = v.dim0();
+			v = view_base(storage_base::pointer_to_base(), n);
 		}
 
 	public:
@@ -1031,7 +1087,7 @@ namespace bcs
 	{
 		typedef typename Derived::value_type T;
 
-		index_t n = (size_t)inds.size();
+		index_t n = (index_t)inds.size();
 		array1d<T> r(n);
 
 		T *pd = r.pbase();

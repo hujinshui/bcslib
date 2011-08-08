@@ -394,7 +394,7 @@ namespace bcs
 	class id_ind
 	{
 	public:
-		id_ind(index_t n) : m_n(n)
+		explicit id_ind(index_t n) : m_n(n)
 		{
 		}
 
@@ -427,7 +427,7 @@ namespace bcs
 	class step_ind
 	{
 	public:
-		step_ind(index_t n, index_t step) : m_n(n), m_step(step)
+		explicit step_ind(index_t n, index_t step) : m_n(n), m_step(step)
 		{
 		}
 
@@ -461,7 +461,7 @@ namespace bcs
 	class rep_ind
 	{
 	public:
-		rep_ind(index_t n) : m_n(n)
+		explicit rep_ind(index_t n) : m_n(n)
 		{
 		}
 

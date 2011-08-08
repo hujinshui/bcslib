@@ -218,7 +218,7 @@ namespace bcs
 
 
 	template<class Derived>
-	class dense_caview_base : public caview_base<Derived>
+	class dense_caview_base : public aview_traits<Derived>::view_base
 	{
 	public:
 		BCS_CAVIEW_BASE_DEFS(Derived)
@@ -271,7 +271,7 @@ namespace bcs
 
 
 	template<class Derived>
-	class dense_aview_base : public dense_caview_base<Derived>, public aview_base<Derived>
+	class dense_aview_base : public dense_caview_base<Derived>
 	{
 	public:
 		BCS_AVIEW_BASE_DEFS(Derived)

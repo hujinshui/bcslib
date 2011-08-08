@@ -32,6 +32,7 @@
 #define BCS_STATIC_ASSERT(cond) static_assert(cond, #cond)
 #define BCS_STATIC_ASSERT_V(cond) static_assert(cond::value, #cond)
 #define BCS_ASSERT_SAME_TYPE(ty1, ty2) static_assert(std::is_same<ty1, ty2>::value, #ty1 " and " #ty2 " should be the same type")
+#define BCS_ASSERT_BASE_OF(ty1, ty2) static_assert(std::is_base_of<ty1, ty2>::value, #ty1 " it not a base of " #ty2)
 
 namespace bcs
 {
