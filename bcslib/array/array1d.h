@@ -806,10 +806,13 @@ namespace bcs
 	{
 		check_arg(is_same_shape(src, dst), "aview1d copy: the shapes of src and dst are inconsistent.");
 
+		const LDerived& srcd = src.derived();
+		RDerived& dstd = dst.derived();
+
 		index_t d0 = src.dim0();
 		for (index_t i = 0; i < d0; ++i)
 		{
-			dst(i) = src(i);
+			dstd(i) = srcd(i);
 		}
 	}
 
@@ -1058,12 +1061,14 @@ namespace bcs
 	{
 		index_t n = B.dim0();
 
+		const Derived& Bd = B.derived();
+
 		// count
 
 		index_t c = 0;
 		for (index_t i = 0; i < n; ++i)
 		{
-			if (B(i)) ++c;
+			if (Bd(i)) ++c;
 		}
 		array1d<index_t> r(c);
 
@@ -1072,7 +1077,7 @@ namespace bcs
 		index_t k = 0;
 		for(index_t i = 0; k < c; ++i)
 		{
-			if (B(i)) r[k++] = i;
+			if (Bd(i)) r[k++] = i;
 		}
 
 		return r;
@@ -1087,13 +1092,15 @@ namespace bcs
 	{
 		typedef typename Derived::value_type T;
 
+		const Derived& ad = a.derived();
+
 		index_t n = (index_t)inds.size();
 		array1d<T> r(n);
 
 		T *pd = r.pbase();
 		for (index_t i = 0; i < n; ++i)
 		{
-			pd[i] = a(inds[i]);
+			pd[i] = ad(inds[i]);
 		}
 
 		return r;
