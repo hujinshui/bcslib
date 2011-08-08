@@ -7,29 +7,31 @@
  */
 
 
-#include <bcslib/test/test_units.h>
-#include <bcslib/test/test_array_aux.h>
+#include "bcs_test_basics.h"
 #include <bcslib/array/array1d.h>
-
 
 using namespace bcs;
 using namespace bcs::test;
 
 // Explicit instantiation for syntax checking
 
-template class bcs::caview1d_ex<double, range>;
-template class bcs::caview1d_ex<double, step_range>;
-template class bcs::caview1d_ex<double, rep_range>;
 
-template class bcs::aview1d_ex<double, range>;
-template class bcs::aview1d_ex<double, step_range>;
-template class bcs::aview1d_ex<double, rep_range>;
+template class bcs::caview1d_ex<double, id_ind>;
+template class bcs::caview1d_ex<double, step_ind>;
+template class bcs::caview1d_ex<double, rep_ind>;
+
+template class bcs::aview1d_ex<double, id_ind>;
+template class bcs::aview1d_ex<double, step_ind>;
+template class bcs::aview1d_ex<double, rep_ind>;
 
 template class bcs::caview1d<double>;
 template class bcs::aview1d<double>;
 template class bcs::array1d<double>;
 
+
 // Auxiliary testing functions
+
+/*
 
 template<typename T>
 bool array_integrity_test(const bcs::caview1d<T>& view)
@@ -385,7 +387,9 @@ BCS_TEST_CASE( test_subarr_selection )
 	BCS_CHECK( array_iteration_test(s1) );
 }
 
+*/
 
+/*
 
 std::shared_ptr<test_suite> test_array1d_suite()
 {
@@ -403,6 +407,6 @@ std::shared_ptr<test_suite> test_array1d_suite()
 }
 
 
-
+*/
 
 

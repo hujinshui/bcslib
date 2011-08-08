@@ -145,7 +145,8 @@ $(TEST_BIN_DIR)/test_basics: $(BASE_HEADERS) $(TEST_BASICS_SOURCES)
 # array tests
 
 TEST_ARRAY_BASICS_SOURCES = \
-	test/test_index_selection.cpp
+	test/test_index_selection.cpp \
+	test/test_array1d.cpp
 	
 # test/test_array1d.cpp
 # test/test_array2d.cpp
