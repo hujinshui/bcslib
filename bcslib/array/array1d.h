@@ -48,9 +48,7 @@ namespace bcs
 
 	public:
 		caview1d_ex(const_pointer pbase, const indexer_type& indexer)
-		: m_pbase(const_cast<pointer>(pbase))
-		, m_d0(indexer.dim())
-		, m_indexer(indexer)
+		: m_pbase(pbase), m_d0(indexer.dim()), m_indexer(indexer)
 		{
 		}
 
@@ -100,8 +98,8 @@ namespace bcs
 			}
 		}
 
-	protected:
-		pointer m_pbase;
+	private:
+		const_pointer m_pbase;
 		index_type m_d0;
 		indexer_type m_indexer;
 
@@ -120,7 +118,7 @@ namespace bcs
 	};
 
 	template<typename T, class TIndexer>
-	class aview1d_ex : public caview1d_ex<T, TIndexer>, public aview1d_base<aview1d_ex<T, TIndexer> >
+	class aview1d_ex : public aview1d_base<aview1d_ex<T, TIndexer> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
@@ -128,13 +126,17 @@ namespace bcs
 
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
 
-		typedef caview1d_ex<T, TIndexer> super;
 		typedef TIndexer indexer_type;
 
 	public:
 		aview1d_ex(pointer pbase, const indexer_type& indexer)
-		: super(pbase, indexer)
+		: m_pbase(pbase), m_d0(indexer.dim()), m_indexer(indexer)
 		{
+		}
+
+		operator caview1d_ex<T, TIndexer>() const
+		{
+			return caview1d_ex<T, TIndexer>(m_pbase, m_indexer);
 		}
 
 	public:
@@ -146,42 +148,46 @@ namespace bcs
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
-			return super::size();
+			return static_cast<size_type>(nelems());
 		}
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return super::nelems();
+			return m_d0;
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return super::is_empty();
+			return m_d0 == 0;
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return super::dim0();
+			return m_d0;
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return super::shape();
+			return arr_shape(m_d0);
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_t i) const
 		{
-			return this->m_pbase[this->m_indexer[i]];
+			return m_pbase[m_indexer[i]];
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i)
 		{
-			return this->m_pbase[this->m_indexer[i]];
+			return m_pbase[m_indexer[i]];
 		}
 
 		void export_to(pointer dst) const
 		{
-			super::export_to(dst);
+			index_t d0 = dim0();
+			for (index_type i = 0; i < d0; ++i)
+			{
+				*(dst++) = operator()(i);
+			}
 		}
 
 		void import_from(const_pointer src)
@@ -201,6 +207,11 @@ namespace bcs
 				operator()(i) = v;
 			}
 		}
+
+	private:
+		pointer m_pbase;
+		index_type m_d0;
+		indexer_type m_indexer;
 
 	}; // end class aview1d_ex
 
@@ -328,14 +339,7 @@ namespace bcs
 			return subview(*this, I);
 		}
 
-	protected:
-		void reset()
-		{
-			m_pbase = BCS_NULL;
-			m_d0 = 0;
-		}
-
-	protected:
+	private:
 		pointer m_pbase;
 		index_type m_d0;
 
@@ -354,22 +358,26 @@ namespace bcs
 	};
 
 	template<typename T>
-	class aview1d : public caview1d<T>, public dense_aview1d_base<aview1d<T> >
+	class aview1d : public dense_aview1d_base<aview1d<T> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
-		typedef caview1d<T> super;
 
 	public:
 		aview1d(pointer pbase, index_type n)
-		: super(pbase, n)
+		: m_pbase(pbase), m_d0(n)
 		{
 		}
 
 		aview1d(pointer pbase, const shape_type& shape)
-		: super(pbase, shape)
+		: m_pbase(pbase), m_d0(shape[0])
 		{
+		}
+
+		operator caview1d<T>() const
+		{
+			return caview1d<T>(pbase(), dim0());
 		}
 
 	public:
@@ -381,62 +389,62 @@ namespace bcs
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
-			return super::size();
+			return static_cast<size_type>(nelems());
 		}
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return super::nelems();
+			return m_d0;
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return super::is_empty();
+			return m_d0 == 0;
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return super::dim0();
+			return m_d0;
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return super::shape();
+			return arr_shape(m_d0);
 		}
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
-			return this->m_pbase;
+			return m_pbase;
 		}
 
 		BCS_ENSURE_INLINE pointer pbase()
 		{
-			return this->m_pbase;
+			return m_pbase;
 		}
 
 		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
 		{
-			return this->m_pbase[i];
+			return m_pbase[i];
 		}
 
 		BCS_ENSURE_INLINE reference operator[](index_type i)
 		{
-			return this->m_pbase[i];
+			return m_pbase[i];
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i) const
 		{
-			return this->m_pbase[i];
+			return m_pbase[i];
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i)
 		{
-			return this->m_pbase[i];
+			return m_pbase[i];
 		}
 
 		void export_to(pointer dst) const
 		{
-			super::export_to(dst);
+			copy_elements(pbase(), dst, size());
 		}
 
 		void import_from(const_pointer src)
@@ -462,6 +470,10 @@ namespace bcs
 		{
 			return subview(*this, I);
 		}
+
+	private:
+		pointer m_pbase;
+		index_type m_d0;
 
 	}; // end class aview1d
 
@@ -561,59 +573,57 @@ namespace bcs
 
 	template<typename T, class Alloc>
 	class array1d
-	: private sharable_storage_base<T, Alloc>
-	, private aview1d<T>
-	, public dense_aview1d_base<array1d<T, Alloc> >
+	: public dense_aview1d_base<array1d<T, Alloc> >
+	, private sharable_storage_base<T, Alloc>
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
 
 		typedef sharable_storage_base<T, Alloc> storage_base;
-		typedef aview1d<T> view_base;
+		typedef aview1d<T> view_type;
 
 	public:
 		explicit array1d(index_type n)
-		: storage_base((size_t)n), view_base(storage_base::pointer_to_base(), n)
+		: storage_base((size_t)n), m_view(storage_base::pointer_to_base(), n)
 		{
 		}
 
 		explicit array1d(const shape_type& shape)
-		: storage_base((size_t)(shape[0])), view_base(storage_base::pointer_to_base(), shape[0])
+		: storage_base((size_t)(shape[0])), m_view(storage_base::pointer_to_base(), shape[0])
 		{
 		}
 
 		array1d(index_type n, const value_type& x)
-		: storage_base((size_t)n, x), view_base(storage_base::pointer_to_base(), n)
+		: storage_base((size_t)n, x), m_view(storage_base::pointer_to_base(), n)
 		{
 		}
 
 		array1d(index_type n, const_pointer src)
-		: storage_base((size_t)n, src), view_base(storage_base::pointer_to_base(), n)
+		: storage_base((size_t)n, src), m_view(storage_base::pointer_to_base(), n)
 		{
 		}
 
 		array1d(const array1d& r)
-		: storage_base(r), view_base(storage_base::pointer_to_base(), r.nelems())
+		: storage_base(r), m_view(storage_base::pointer_to_base(), r.nelems())
 		{
 		}
 
 		array1d(array1d&& r)
-		: storage_base(std::move(r)), view_base(std::move(r))
+		: storage_base(std::move(r)), m_view(std::move(r.m_view))
 		{
-			view_base& rv = r;
-			rv.reset();
+			r.m_view = view_type(BCS_NULL, 0);
 		}
 
 		template<class Derived>
 		explicit array1d(const caview1d_base<Derived>& r)
-		: storage_base(r.size()), view_base(storage_base::pointer_to_base(), r.nelems())
+		: storage_base(r.size()), m_view(storage_base::pointer_to_base(), r.nelems())
 		{
 			copy(r.derived(), *this);
 		}
 
 		array1d(const array1d& r, do_share ds)
-		: storage_base(r, ds), view_base(storage_base::pointer_to_base(), r.nelems())
+		: storage_base(r, ds), m_view(storage_base::pointer_to_base(), r.nelems())
 		{
 
 		}
@@ -628,10 +638,9 @@ namespace bcs
 			if (this != &r)
 			{
 				storage_base &s = *this;
-				view_base& v = *this;
-
 				s = r;
-				v = view_base(s.pointer_to_base(), r.nelems());
+
+				m_view = view_type(s.pointer_to_base(), r.nelems());
 			}
 			return *this;
 		}
@@ -639,13 +648,10 @@ namespace bcs
 		array1d& operator = (array1d&& r)
 		{
 			storage_base &s = *this;
-			view_base& v = *this;
-
 			s = std::move(r);
-			v = std::move(r);
 
-			view_base& rv = r;
-			rv.reset();
+			m_view = std::move(r);
+			r.m_view = view_type(BCS_NULL, 0);
 
 			return *this;
 		}
@@ -655,10 +661,7 @@ namespace bcs
 			using std::swap;
 
 			storage_base::swap(r);
-
-			view_base& v = *this;
-			view_base& rv = r;
-			swap(v, rv);
+			swap(m_view, r.m_view);
 		}
 
 		bool is_unique() const
@@ -670,9 +673,18 @@ namespace bcs
 		{
 			storage_base::make_unique();
 
-			view_base& v = *this;
-			index_t n = v.dim0();
-			v = view_base(storage_base::pointer_to_base(), n);
+			index_t n = dim0();
+			m_view = view_type(storage_base::pointer_to_base(), n);
+		}
+
+		operator caview1d<T>() const
+		{
+			return caview1d<T>(pbase(), dim0());
+		}
+
+		operator aview1d<T>()
+		{
+			return aview1d<T>(pbase(), dim0());
 		}
 
 	public:
@@ -683,87 +695,90 @@ namespace bcs
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
-			return view_base::size();
+			return m_view.size();
 		}
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return view_base::nelems();
+			return m_view.nelems();
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return view_base::is_empty();
+			return m_view.is_empty();
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return view_base::dim0();
+			return m_view.dim0();
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return view_base::shape();
+			return m_view.shape();
 		}
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
-			return view_base::pbase();
+			return m_view.pbase();
 		}
 
 		BCS_ENSURE_INLINE pointer pbase()
 		{
-			return view_base::pbase();
+			return m_view.pbase();
 		}
 
 		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
 		{
-			return this->m_pbase[i];
+			return m_view[i];
 		}
 
 		BCS_ENSURE_INLINE reference operator[](index_type i)
 		{
-			return this->m_pbase[i];
+			return m_view[i];
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i) const
 		{
-			return this->m_pbase[i];
+			return m_view[i];
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i)
 		{
-			return this->m_pbase[i];
+			return m_view[i];
 		}
 
 		void export_to(pointer dst) const
 		{
-			view_base::export_to(dst);
+			m_view.export_to(dst);
 		}
 
 		void import_from(const_pointer src)
 		{
-			view_base::import_from(src);
+			m_view.import_from(src);
 		}
 
 		void fill(const value_type& v)
 		{
-			view_base::fill(v);
+			m_view.fill(v);
 		}
 
 		template<class IndexSelector>
 		caview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
 		V(const IndexSelector& I) const
 		{
-			return view_base::V(I);
+			return m_view.V(I);
 		}
 
 		template<class IndexSelector>
 		aview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
 		V(const IndexSelector& I)
 		{
-			return view_base::V(I);
+			return m_view.V(I);
 		}
+
+	private:
+		view_type m_view;
 
 	}; // end class array1d
 

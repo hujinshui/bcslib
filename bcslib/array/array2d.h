@@ -53,7 +53,7 @@ namespace bcs
 
 	public:
 		caview2d_ex(const_pointer pbase, index_t base_d0, index_t base_d1, const indexer0_type& indexer0, const indexer1_type& indexer1)
-		: m_pbase(const_cast<pointer>(pbase))
+		: m_pbase(pbase)
 		, m_idxcore(base_d0, base_d1)
 		, m_d0(indexer0.dim())
 		, m_d1(indexer1.dim())
@@ -156,13 +156,13 @@ namespace bcs
 			}
 		}
 
-	protected:
+	private:
 		index_type offset(index_type i, index_type j) const
 		{
 			return m_idxcore.offset(m_indexer0[i], m_indexer1[j]);
 		}
 
-		pointer m_pbase;
+		const_pointer m_pbase;
 		_detail::index_core2d<layout_order> m_idxcore;
 		index_t m_d0;
 		index_t m_d1;
@@ -186,8 +186,7 @@ namespace bcs
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	class aview2d_ex
-	: public caview2d_ex<T, TOrd, TIndexer0, TIndexer1>
-	, public aview2d_base<aview2d_ex<T, TOrd, TIndexer0, TIndexer1> >
+	: public aview2d_base<aview2d_ex<T, TOrd, TIndexer0, TIndexer1> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
@@ -199,12 +198,22 @@ namespace bcs
 
 		typedef TIndexer0 indexer0_type;
 		typedef TIndexer1 indexer1_type;
-		typedef caview2d_ex<T, TOrd, TIndexer0, TIndexer1> super;
 
 	public:
-		aview2d_ex(const_pointer pbase, index_t base_d0, index_t base_d1, const indexer0_type& indexer0, const indexer1_type& indexer1)
-		: super(pbase, base_d0, base_d1, indexer0, indexer1)
+		aview2d_ex(pointer pbase, index_t base_d0, index_t base_d1, const indexer0_type& indexer0, const indexer1_type& indexer1)
+		: m_pbase(pbase)
+		, m_idxcore(base_d0, base_d1)
+		, m_d0(indexer0.dim())
+		, m_d1(indexer1.dim())
+		, m_indexer0(indexer0)
+		, m_indexer1(indexer1)
 		{
+		}
+
+		operator caview2d_ex<T, TOrd, TIndexer0, TIndexer1>() const
+		{
+			return caview2d_ex<T, TOrd, TIndexer0, TIndexer1>(
+					m_pbase, base_dim0(), base_dim1(), m_indexer0, m_indexer1);
 		}
 
 	public:
@@ -215,73 +224,95 @@ namespace bcs
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
-			return super::size();
+			return static_cast<size_type>(nelems());
 		}
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return super::nelems();
+			return m_d0 * m_d1;
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return super::is_empty();
+			return m_d0 == 0 || m_d1 == 0;
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return super::dim0();
+			return m_d0;
 		}
 
 		BCS_ENSURE_INLINE index_type dim1() const
 		{
-			return super::dim1();
+			return m_d1;
 		}
 
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
-			return super::nrows();
+			return m_d0;
 		}
 
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
-			return super::ncolumns();
+			return m_d1;
 		}
 
 		BCS_ENSURE_INLINE index_type base_dim0() const
 		{
-			return super::base_dim0();
+			return m_idxcore.base_dim0();
 		}
 
 		BCS_ENSURE_INLINE index_type base_dim1() const
 		{
-			return super::base_dim1();
+			return m_idxcore.base_dim1();
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return super::shape();
+			return arr_shape(m_d0, m_d1);
 		}
 
 		BCS_ENSURE_INLINE shape_type base_shape() const
 		{
-			return super::base_shape();
+			return m_idxcore.base_shape();
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
-			return this->m_pbase[this->offset(i, j)];
+			return m_pbase[offset(i, j)];
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
 		{
-			return this->m_pbase[this->offset(i, j)];
+			return m_pbase[offset(i, j)];
 		}
 
 	public:
 		void export_to(pointer dst) const
 		{
-			super::export_to(dst);
+			index_t d0 = dim0();
+			index_t d1 = dim1();
+
+			if (std::is_same<layout_order, row_major_t>::value)
+			{
+				for (index_t i = 0; i < d0; ++i)
+				{
+					for (index_t j = 0; j < d1; ++j)
+					{
+						*(dst++) = operator()(i, j);
+					}
+				}
+			}
+			else
+			{
+				for (index_t j = 0; j < d1; ++j)
+				{
+					for (index_t i = 0; i < d0; ++i)
+					{
+						*(dst++) = operator()(i, j);
+					}
+				}
+			}
 		}
 
 		void import_from(const_pointer src)
@@ -337,6 +368,19 @@ namespace bcs
 				}
 			}
 		}
+
+	private:
+		index_type offset(index_type i, index_type j) const
+		{
+			return m_idxcore.offset(m_indexer0[i], m_indexer1[j]);
+		}
+
+		pointer m_pbase;
+		_detail::index_core2d<layout_order> m_idxcore;
+		index_t m_d0;
+		index_t m_d1;
+		indexer0_type m_indexer0;
+		indexer1_type m_indexer1;
 
 	}; // end class aview2d_ex
 
@@ -521,14 +565,12 @@ namespace bcs
 
 	public:
 		caview2d(const_pointer pbase, index_type m, index_type n)
-		: m_pbase(const_cast<pointer>(pbase))
-		, m_idxcore(m, n)
+		: m_pbase(pbase), m_idxcore(m, n)
 		{
 		}
 
 		caview2d(const_pointer pbase, const shape_type& shape)
-		: m_pbase(const_cast<pointer>(pbase))
-		, m_idxcore(shape[0], shape[1])
+		: m_pbase(pbase), m_idxcore(shape[0], shape[1])
 		{
 		}
 
@@ -635,15 +677,8 @@ namespace bcs
 			return subview(*this, I, J);
 		}
 
-	protected:
-		void reset()
-		{
-			m_pbase = BCS_NULL;
-			m_idxcore = _detail::index_core2d<layout_order>(0, 0);
-		}
-
-	protected:
-		pointer m_pbase;
+	private:
+		const_pointer m_pbase;
 		_detail::index_core2d<layout_order> m_idxcore;
 
 	}; // end class caview2d
@@ -661,24 +696,27 @@ namespace bcs
 	};
 
 	template<typename T, typename TOrd>
-	class aview2d : public caview2d<T, TOrd>, public dense_aview2d_base<aview2d<T, TOrd> >
+	class aview2d : public dense_aview2d_base<aview2d<T, TOrd> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
-		typedef caview2d<T, TOrd> super;
-
 	public:
-		aview2d(const_pointer pbase, index_type m, index_type n)
-		: super(pbase, m, n)
+		aview2d(pointer pbase, index_type m, index_type n)
+		: m_pbase(pbase), m_idxcore(m, n)
 		{
 		}
 
-		aview2d(const_pointer pbase, const shape_type& shape)
-		: super(pbase, shape)
+		aview2d(pointer pbase, const shape_type& shape)
+		: m_pbase(pbase), m_idxcore(shape[0], shape[1])
 		{
+		}
+
+		operator caview2d<T, TOrd>() const
+		{
+			return caview2d<T, TOrd>(m_pbase, dim0(), dim1());
 		}
 
 	public:
@@ -689,78 +727,78 @@ namespace bcs
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
-			return super::size();
+			return static_cast<size_type>(nelems());
 		}
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return super::nelems();
+			return m_idxcore.base_nelems();
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return super::is_empty();
+			return dim0() == 0 && dim1() == 0;
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return super::dim0();
+			return m_idxcore.base_dim0();
 		}
 
 		BCS_ENSURE_INLINE index_type dim1() const
 		{
-			return super::dim1();
+			return m_idxcore.base_dim1();
 		}
 
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
-			return super::nrows();
+			return dim0();
 		}
 
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
-			return super::ncolumns();
+			return dim1();
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return super::shape();
+			return m_idxcore.base_shape();
 		}
 
 	public:
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
-			return this->m_pbase;
+			return m_pbase;
 		}
 
 		BCS_ENSURE_INLINE pointer pbase()
 		{
-			return this->m_pbase;
+			return m_pbase;
 		}
 
 		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
 		{
-			return this->m_pbase[i];
+			return m_pbase[i];
 		}
 
 		BCS_ENSURE_INLINE reference operator[](index_type i)
 		{
-			return this->m_pbase[i];
+			return m_pbase[i];
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
-			return this->m_pbase[this->m_idxcore.offset(i, j)];
+			return m_pbase[m_idxcore.offset(i, j)];
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
 		{
-			return this->m_pbase[this->m_idxcore.offset(i, j)];
+			return m_pbase[m_idxcore.offset(i, j)];
 		}
 
 		void export_to(pointer dst) const
 		{
-			super::export_to(dst);
+			copy_elements(pbase(), dst, size());
 		}
 
 		void import_from(const_pointer src)
@@ -843,6 +881,10 @@ namespace bcs
 		{
 			return subview(*this, I, J);
 		}
+
+	private:
+		pointer m_pbase;
+		_detail::index_core2d<layout_order> m_idxcore;
 
 	}; // end class aview2d
 
@@ -980,7 +1022,6 @@ namespace bcs
 	template<typename T, typename TOrd, class Alloc>
 	class array2d
 	: private sharable_storage_base<T, Alloc>
-	, private aview2d<T, TOrd>
 	, public dense_aview2d_base<array2d<T, TOrd, Alloc> >
 	{
 	public:
@@ -989,51 +1030,50 @@ namespace bcs
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
 		typedef sharable_storage_base<T, Alloc> storage_base;
-		typedef aview2d<T, TOrd> view_base;
+		typedef aview2d<T, TOrd> view_type;
 
 	public:
 		explicit array2d(index_type m, index_type n)
 		: storage_base((size_t)(m * n))
-		, view_base(storage_base::pointer_to_base(), m, n)
+		, m_view(storage_base::pointer_to_base(), m, n)
 		{
 		}
 
 		explicit array2d(const shape_type& shape)
 		: storage_base((size_t)(shape[0] * shape[1]))
-		, view_base(storage_base::pointer_to_base(), shape[0], shape[1])
+		, m_view(storage_base::pointer_to_base(), shape[0], shape[1])
 		{
 		}
 
 		array2d(index_type m, index_type n, const T& x)
 		: storage_base((size_t)(m * n), x)
-		, view_base(storage_base::pointer_to_base(), m, n)
+		, m_view(storage_base::pointer_to_base(), m, n)
 		{
 		}
 
 		array2d(index_type m, index_type n, const_pointer src)
 		: storage_base((size_t)(m * n), src)
-		, view_base(storage_base::pointer_to_base(), m, n)
+		, m_view(storage_base::pointer_to_base(), m, n)
 		{
 		}
 
 		array2d(const array2d& r)
 		: storage_base(r)
-		, view_base(storage_base::pointer_to_base(), r.nrows(), r.ncolumns())
+		, m_view(storage_base::pointer_to_base(), r.nrows(), r.ncolumns())
 		{
 		}
 
 		array2d(array2d&& r)
 		: storage_base(std::move(r))
-		, view_base(std::move(r))
+		, m_view(std::move(r.m_view))
 		{
-			view_base& rv = r;
-			rv.reset();
+			r.m_view = view_type(BCS_NULL, 0, 0);
 		}
 
 		template<class Derived>
 		explicit array2d(const caview2d_base<Derived>& r)
 		: storage_base(r.size())
-		, view_base(storage_base::pointer_to_base(), r.nrows(), r.ncolumns())
+		, m_view(storage_base::pointer_to_base(), r.nrows(), r.ncolumns())
 		{
 			copy(r.derived(), *this);
 		}
@@ -1041,7 +1081,7 @@ namespace bcs
 
 		array2d(const array2d& r, do_share ds)
 		: storage_base(r, ds)
-		, view_base(storage_base::pointer_to_base(), r.nrows(), r.ncolumns())
+		, m_view(storage_base::pointer_to_base(), r.nrows(), r.ncolumns())
 		{
 		}
 
@@ -1055,10 +1095,8 @@ namespace bcs
 			if (this != &r)
 			{
 				storage_base &s = *this;
-				view_base& v = *this;
-
 				s = r;
-				v = view_base(s.pointer_to_base(), r.nrows(), r.ncolumns());
+				m_view = view_type(s.pointer_to_base(), r.nrows(), r.ncolumns());
 			}
 			return *this;
 		}
@@ -1066,13 +1104,9 @@ namespace bcs
 		array2d& operator = (array2d&& r)
 		{
 			storage_base &s = *this;
-			view_base& v = *this;
-
 			s = std::move(r);
-			v = std::move(r);
-
-			view_base& rv = r;
-			rv.reset();
+			m_view = std::move(r.m_view);
+			r.m_view = view_type(BCS_NULL, 0, 0);
 
 			return *this;
 		}
@@ -1082,10 +1116,7 @@ namespace bcs
 			using std::swap;
 
 			storage_base::swap(r);
-
-			view_base& v = *this;
-			view_base& rv = r;
-			swap(v, rv);
+			swap(m_view, r.m_view);
 		}
 
 		bool is_unique() const
@@ -1097,10 +1128,19 @@ namespace bcs
 		{
 			storage_base::make_unique();
 
-			view_base& v = *this;
-			index_t m = v.dim0();
-			index_t n = v.dim1();
-			v = view_base(storage_base::pointer_to_base(), m, n);
+			index_t m = dim0();
+			index_t n = dim1();
+			m_view = view_type(storage_base::pointer_to_base(), m, n);
+		}
+
+		operator caview2d<T, TOrd>() const
+		{
+			return caview2d<T, TOrd>(pbase(), dim0(), dim1());
+		}
+
+		operator aview2d<T, TOrd>()
+		{
+			return aview2d<T, TOrd>(pbase(), dim0(), dim1());
 		}
 
 	public:
@@ -1111,141 +1151,141 @@ namespace bcs
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
-			return view_base::size();
+			return m_view.size();
 		}
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return view_base::nelems();
+			return m_view.nelems();
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return view_base::is_empty();
+			return m_view.is_empty();
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return view_base::dim0();
+			return m_view.dim0();
 		}
 
 		BCS_ENSURE_INLINE index_type dim1() const
 		{
-			return view_base::dim1();
+			return m_view.dim1();
 		}
 
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
-			return view_base::nrows();
+			return m_view.nrows();
 		}
 
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
-			return view_base::ncolumns();
+			return m_view.ncolumns();
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return view_base::shape();
+			return m_view.shape();
 		}
 
 	public:
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
-			return view_base::pbase();
+			return m_view.pbase();
 		}
 
 		BCS_ENSURE_INLINE pointer pbase()
 		{
-			return view_base::pbase();
+			return m_view.pbase();
 		}
 
 		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
 		{
-			return this->m_pbase[i];
+			return m_view[i];
 		}
 
 		BCS_ENSURE_INLINE reference operator[](index_type i)
 		{
-			return this->m_pbase[i];
+			return m_view[i];
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
-			return view_base::operator()(i, j);
+			return m_view(i, j);
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
 		{
-			return view_base::operator()(i, j);
+			return m_view(i, j);
 		}
 
 		void export_to(pointer dst) const
 		{
-			view_base::export_to(dst);
+			m_view.export_to(dst);
 		}
 
 		void import_from(const_pointer src)
 		{
-			view_base::import_from(src);
+			m_view.import_from(src);
 		}
 
 		void fill(const value_type& v)
 		{
-			view_base::fill(v);
+			m_view.fill(v);
 		}
 
 	public:
 		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
 		row(index_t i) const
 		{
-			return view_base::row(i);
+			return m_view.row(i);
 		}
 
 		typename _detail::slice_helper2d<value_type, layout_order>::row_view_type
 		row(index_t i)
 		{
-			return view_base::row(i);
+			return m_view.row(i);
 		}
 
 		template<class TRange>
 		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_cview_type
 		row(index_t i, const TRange& rgn) const
 		{
-			return view_base::row(i, rgn);
+			return m_view.row(i, rgn);
 		}
 
 		template<class TRange>
 		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_view_type
 		row(index_t i, const TRange& rgn)
 		{
-			return view_base::row(i, rgn);
+			return m_view.row(i, rgn);
 		}
 
 		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
 		column(index_t i) const
 		{
-			return view_base::column(i);
+			return m_view.column(i);
 		}
 
 		typename _detail::slice_helper2d<value_type, layout_order>::column_view_type
 		column(index_t i)
 		{
-			return view_base::column(i);
+			return m_view.column(i);
 		}
 
 		template<class TRange>
 		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_cview_type
 		column(index_t i, const TRange& rgn) const
 		{
-			return view_base::column(i, rgn);
+			return m_view.column(i, rgn);
 		}
 
 		template<class TRange>
 		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_view_type
 		column(index_t i, const TRange& rgn)
 		{
-			return view_base::column(i, rgn);
+			return m_view.column(i, rgn);
 		}
 
 		template<class TRange0, class TRange1>
@@ -1254,7 +1294,7 @@ namespace bcs
 			typename indexer_map<TRange1>::type>
 		V(const TRange0& I, const TRange1& J) const
 		{
-			return view_base::V(I, J);
+			return m_view.V(I, J);
 		}
 
 		template<class TRange0, class TRange1>
@@ -1263,8 +1303,11 @@ namespace bcs
 			typename indexer_map<TRange1>::type>
 		V(const TRange0& I, const TRange1& J)
 		{
-			return view_base::V(I, J);
+			return m_view.V(I, J);
 		}
+
+	private:
+		view_type m_view;
 
 	}; // end class array2d
 
