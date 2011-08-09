@@ -72,7 +72,7 @@ namespace bcs
 		void resume()
 		{
 			m_is_on = true;
-			::gettimeofday(&m_last_resume, SLI_NULL);
+			::gettimeofday(&m_last_resume, BCS_NULL);
 		}
 
 		void pause()
@@ -103,7 +103,7 @@ namespace bcs
 		BCS_ENSURE_INLINE long long last_elapsed() const
 		{
 			::timeval ct;
-			::gettimeofday(&ct, SLI_NULL);
+			::gettimeofday(&ct, BCS_NULL);
 			return static_cast<long long>(ct.tv_sec - m_last_resume.tv_sec) * 1000000
 					+ (ct.tv_usec - m_last_resume.tv_usec);
 		}

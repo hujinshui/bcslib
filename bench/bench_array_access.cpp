@@ -11,17 +11,16 @@
 
 #include <bcslib/array/array1d.h>
 #include <bcslib/array/array2d.h>
-#include <bcslib/test/timer.h>
+#include <bcslib/base/timer.h>
 
 #include <algorithm>
 #include <ctime>
 
 
 using namespace bcs;
-using namespace bcs::test;
 
 
-double time_copy_memory(int nrepeats, const size_t nelems, const double *src, double *buf)
+double time_copy_memory(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
 	copy_elements(src, buf, nelems);
 
@@ -35,14 +34,14 @@ double time_copy_memory(int nrepeats, const size_t nelems, const double *src, do
 }
 
 
-double time_raw_for_loop(int nrepeats, const size_t nelems, const double *src, double *buf)
+double time_raw_for_loop(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
 	copy_elements(src, buf, nelems);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		for (size_t j = 0; j < nelems; ++j)
+		for (index_t j = 0; j < nelems; ++j)
 		{
 			buf[j] = src[j];
 		}
@@ -52,16 +51,16 @@ double time_raw_for_loop(int nrepeats, const size_t nelems, const double *src, d
 }
 
 
-double time_dense1d_export(int nrepeats, const size_t nelems, const double *src, double *buf)
+double time_dense1d_export(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
 	caview1d<double> view(src, nelems);
 
-	export_to(view, buf);
+	view.export_to(buf);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		export_to(view, buf);
+		view.export_to(buf);
 	}
 
 	return tm.elapsed( SECONDS );
@@ -69,7 +68,7 @@ double time_dense1d_export(int nrepeats, const size_t nelems, const double *src,
 }
 
 
-double time_dense1d_access(int nrepeats, const size_t nelems, const double *src, double *buf)
+double time_dense1d_access(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
 	caview1d<double> view(src, nelems);
 
@@ -88,25 +87,46 @@ double time_dense1d_access(int nrepeats, const size_t nelems, const double *src,
 }
 
 
-double time_step1d_export(int nrepeats, const size_t nelems, const double *src, double *buf)
+double time_dense1d_access_via_base(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
-	caview1d_ex<double, step_range> view(src, rgn_n(0, nelems, 2));
+	caview1d<double> view(src, nelems);
+	caview1d_base<caview1d<double> >& viewb = view;
 
-	export_to(view, buf);
+	index_t n = (index_t)nelems;
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		export_to(view, buf);
+		for (index_t j = 0; j < n; ++j)
+		{
+			buf[j] = viewb(j);
+		}
 	}
 
 	return tm.elapsed( SECONDS );
 }
 
 
-double time_step1d_access(int nrepeats, const size_t nelems, const double *src, double *buf)
+
+double time_step1d_export(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
-	caview1d_ex<double, step_range> view(src, rgn_n(0, nelems, 2));
+	caview1d_ex<double, step_ind> view(src, step_ind(nelems, 2));
+
+	view.export_to(buf);
+
+	timer tm(true);
+	for (int i = 0; i < nrepeats; ++i)
+	{
+		view.export_to(buf);
+	}
+
+	return tm.elapsed( SECONDS );
+}
+
+
+double time_step1d_access(int nrepeats, const index_t nelems, const double *src, double *buf)
+{
+	caview1d_ex<double, step_ind> view(src, step_ind(nelems, 2));
 
 	index_t n = (index_t)nelems;
 
@@ -123,44 +143,44 @@ double time_step1d_access(int nrepeats, const size_t nelems, const double *src, 
 }
 
 
-double time_dense2d_rm_export(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
+double time_dense2d_rm_export(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d<double, row_major_t> view = get_aview2d_rm(src, m, n);
+	caview2d<double, row_major_t> view = make_caview2d_rm(src, m, n);
 
-	export_to(view, buf);
+	view.export_to(buf);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		export_to(view, buf);
+		view.export_to(buf);
 	}
 
 	return tm.elapsed( SECONDS );
 }
 
 
-double time_dense2d_cm_export(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
+double time_dense2d_cm_export(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d<double, column_major_t> view = get_aview2d_cm(src, m, n);
+	caview2d<double, column_major_t> view = make_caview2d_cm(src, m, n);
 
-	export_to(view, buf);
+	view.export_to(buf);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		export_to(view, buf);
+		view.export_to(buf);
 	}
 	return tm.elapsed( SECONDS );
 
 }
 
 
-double time_dense2d_rm_access(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
+double time_dense2d_rm_access(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d<double, row_major_t> view = get_aview2d_rm(src, m, n);
+	caview2d<double, row_major_t> view = make_caview2d_rm(src, m, n);
 
-	index_t d0 = (index_t)m;
-	index_t d1 = (index_t)n;
+	index_t d0 = m;
+	index_t d1 = n;
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
@@ -179,12 +199,12 @@ double time_dense2d_rm_access(int nrepeats, const size_t m, const size_t n, cons
 }
 
 
-double time_dense2d_cm_access(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
+double time_dense2d_cm_access(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d<double, column_major_t> view = get_aview2d_cm(src, m, n);
+	caview2d<double, column_major_t> view = make_caview2d_cm(src, m, n);
 
-	index_t d0 = (index_t)m;
-	index_t d1 = (index_t)n;
+	index_t d0 = m;
+	index_t d1 = n;
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
@@ -203,34 +223,34 @@ double time_dense2d_cm_access(int nrepeats, const size_t m, const size_t n, cons
 }
 
 
-double time_step2d_rm_export(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
+double time_step2d_rm_export(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d_ex<double, row_major_t, step_range, step_range> view(
-			src, (index_t)(2*m), (index_t)(2*n), rgn_n(0, m, 2), rgn_n(0, n,2));
+	caview2d_ex<double, row_major_t, step_ind, step_ind> view(
+			src, 2*m, 2*n, step_ind(m, 2), step_ind(n,2));
 
-	export_to(view, buf);
+	view.export_to(buf);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		export_to(view, buf);
+		view.export_to(buf);
 	}
 
 	return tm.elapsed( SECONDS );
 }
 
 
-double time_step2d_cm_export(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
+double time_step2d_cm_export(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d_ex<double, column_major_t, step_range, step_range> view(
-			src, (index_t)(2*m), (index_t)(2*n), rgn_n(0, m, 2), rgn_n(0, n,2));
+	caview2d_ex<double, column_major_t, step_ind, step_ind> view(
+			src, 2*m, 2*n, step_ind(m, 2), step_ind(n,2));
 
-	export_to(view, buf);
+	view.export_to(buf);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		export_to(view, buf);
+		view.export_to(buf);
 	}
 
 	return tm.elapsed( SECONDS );
@@ -238,13 +258,13 @@ double time_step2d_cm_export(int nrepeats, const size_t m, const size_t n, const
 }
 
 
-double time_step2d_rm_access(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
+double time_step2d_rm_access(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d_ex<double, row_major_t, step_range, step_range> view(
-			src, (index_t)(2*m), (index_t)(2*n), rgn_n(0, m, 2), rgn_n(0, n,2));
+	caview2d_ex<double, row_major_t, step_ind, step_ind> view(
+			src, 2*m, 2*n, step_ind(m, 2), step_ind(n,2));
 
-	index_t d0 = (index_t)m;
-	index_t d1 = (index_t)n;
+	index_t d0 = m;
+	index_t d1 = n;
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
@@ -263,13 +283,13 @@ double time_step2d_rm_access(int nrepeats, const size_t m, const size_t n, const
 }
 
 
-double time_step2d_cm_access(int nrepeats, const size_t m, const size_t n, const double *src, double *buf)
+double time_step2d_cm_access(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d_ex<double, column_major_t, step_range, step_range> view(
-			src, (index_t)(2*m), (index_t)(2*n), rgn_n(0, m, 2), rgn_n(0, n,2));
+	caview2d_ex<double, column_major_t, step_ind, step_ind> view(
+			src, 2*m, 2*n, step_ind(m, 2), step_ind(n,2));
 
-	index_t d0 = (index_t)m;
-	index_t d1 = (index_t)n;
+	index_t d0 = m;
+	index_t d1 = n;
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
@@ -291,10 +311,10 @@ double time_step2d_cm_access(int nrepeats, const size_t m, const size_t n, const
 
 int main(int argc, char *argv[])
 {
-	const size_t nrows = 1000;
-	const size_t ncols = 1000;
-	const size_t nelems = nrows * ncols;
-	const size_t nelems_s = 5 * nelems;
+	const index_t nrows = 1000;
+	const index_t ncols = 1000;
+	const index_t nelems = nrows * ncols;
+	const index_t nelems_s = 5 * nelems;
 
 	const int nrepeats = 100;
 
@@ -305,7 +325,7 @@ int main(int argc, char *argv[])
 	double *src = new double[nelems_s];
 
 	std::srand( (unsigned int)( std::time( 0 )) );
-	for (size_t i = 0; i < nelems_s; ++i)
+	for (index_t i = 0; i < nelems_s; ++i)
 	{
 		src[i] = (double)std::rand() / RAND_MAX;
 	}
@@ -325,6 +345,9 @@ int main(int argc, char *argv[])
 
 	std::printf("testing dense1d_access ...\n");
 	double e_dense1d_access = time_dense1d_access(nrepeats, nelems, src, buf);
+
+	std::printf("testing dense1d_access (via base) ...\n");
+	double e_dense1d_access_b = time_dense1d_access_via_base(nrepeats, nelems, src, buf);
 
 	std::printf("testing step1d_export ...\n");
 	double e_step1d_export = time_step1d_export(nrepeats, nelems, src, buf);
@@ -365,6 +388,7 @@ int main(int argc, char *argv[])
 	std::printf("\n");
 	std::printf("\tdense1d_export: %.4f s\n", e_dense1d_export);
 	std::printf("\tdense1d_access: %.4f s\n", e_dense1d_access);
+	std::printf("\tdense1d_access (via base): %.4f s\n", e_dense1d_access_b);
 	std::printf("\tstep1d_export:  %.4f s\n", e_step1d_export);
 	std::printf("\tstep1d_access:  %.4f s\n", e_step1d_access);
 	std::printf("\n");
