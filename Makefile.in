@@ -151,7 +151,7 @@ TEST_ARRAY_BASICS_SOURCES = \
 	test/test_array1d.cpp \
 	test/test_array2d.cpp \
 	test/test_array_transpose.cpp
-	
+		
 # test/test_array_eval.cpp
 	
 $(TEST_BIN_DIR)/test_array_basics: $(ARRAY_BASIC_HEADERS) $(TEST_ARRAY_BASICS_SOURCES) 

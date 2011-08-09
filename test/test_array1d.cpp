@@ -153,7 +153,9 @@ static_assert(std::is_base_of<
 template<typename T>
 void dummy_a1(const T& ) { }
 
-void get_derived_a1()
+inline void do_on_view1(const caview1d<double>& a) { }
+
+void syntax_check_arr1()
 {
 	typedef bcs::array1d<double> dt;
 
@@ -206,6 +208,8 @@ void get_derived_a1()
 	dummy_a1(end(a));
 	dummy_a1(begin(ca));
 	dummy_a1(end(ca));
+
+	do_on_view1(a);
 }
 
 
