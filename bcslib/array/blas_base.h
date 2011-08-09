@@ -14,7 +14,6 @@
 #define BCSLIB_BLAS_BASE_H_
 
 #include <bcslib/array/array_base.h>
-#include <bcslib/array/generic_array_functions.h>
 
 #include <bcslib/base/arg_check.h>
 #include <bcslib/extern/blas_select.h>
