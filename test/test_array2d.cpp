@@ -7,15 +7,25 @@
  */
 
 
-#include <bcslib/test/test_units.h>
-#include <bcslib/test/test_array_aux.h>
+#include "bcs_test_basics.h"
 #include <bcslib/array/array2d.h>
 #include <vector>
+#include <type_traits>
 
 using namespace bcs;
 using namespace bcs::test;
 
 // Explicit instantiation for syntax checking
+
+template class bcs::caview2d_ex<double, row_major_t,    step_ind, step_ind>;
+template class bcs::caview2d_ex<double, column_major_t, step_ind, step_ind>;
+template class bcs::aview2d_ex<double,  row_major_t,    step_ind, step_ind>;
+template class bcs::aview2d_ex<double,  column_major_t, step_ind, step_ind>;
+
+template class bcs::caview2d_ex<double, row_major_t,    id_ind, step_ind>;
+template class bcs::caview2d_ex<double, column_major_t, id_ind, step_ind>;
+template class bcs::aview2d_ex<double,  row_major_t,    id_ind, step_ind>;
+template class bcs::aview2d_ex<double,  column_major_t, id_ind, step_ind>;
 
 template class bcs::caview2d<double, row_major_t>;
 template class bcs::caview2d<double, column_major_t>;
@@ -23,14 +33,194 @@ template class bcs::caview2d<double, column_major_t>;
 template class bcs::aview2d<double, row_major_t>;
 template class bcs::aview2d<double, column_major_t>;
 
-template class bcs::caview2d_ex<double, row_major_t, step_range, step_range>;
-template class bcs::caview2d_ex<double, column_major_t, step_range, step_range>;
-template class bcs::aview2d_ex<double, row_major_t, step_range, step_range>;
-template class bcs::aview2d_ex<double, column_major_t, step_range, step_range>;
-
 template class bcs::array2d<double, row_major_t>;
 template class bcs::array2d<double, column_major_t>;
 
+
+/************************************************
+ *
+ *  Inheritance testing
+ *
+ ************************************************/
+
+// caview2d_ex
+
+static_assert(std::is_base_of<
+		bcs::caview_base<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >,
+		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::caview2d_base<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >,
+		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+
+// aview2d_ex
+
+static_assert(std::is_base_of<
+		bcs::caview_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
+		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::aview_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
+		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::caview2d_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
+		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::aview2d_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
+		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+
+// caview2d
+
+static_assert(std::is_base_of<
+		bcs::caview_base<bcs::caview2d<double, row_major_t> >,
+		bcs::caview2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::caview2d_base<bcs::caview2d<double, row_major_t> >,
+		bcs::caview2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::dense_caview_base<bcs::caview2d<double, row_major_t> >,
+		bcs::caview2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::dense_caview2d_base<bcs::caview2d<double, row_major_t> >,
+		bcs::caview2d<double, row_major_t> >::value, "inheritance test failed");
+
+// aview2d
+
+static_assert(std::is_base_of<
+		bcs::caview_base<bcs::aview2d<double, row_major_t> >,
+		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::aview_base<bcs::aview2d<double, row_major_t> >,
+		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::caview2d_base<bcs::aview2d<double, row_major_t> >,
+		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::aview2d_base<bcs::aview2d<double, row_major_t> >,
+		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::dense_caview_base<bcs::aview2d<double, row_major_t> >,
+		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::dense_aview_base<bcs::aview2d<double, row_major_t> >,
+		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::dense_caview2d_base<bcs::aview2d<double, row_major_t> >,
+		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::dense_aview2d_base<bcs::aview2d<double, row_major_t> >,
+		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+
+// aview2d
+
+static_assert(std::is_base_of<
+		bcs::caview_base<bcs::array2d<double, row_major_t> >,
+		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::aview_base<bcs::array2d<double, row_major_t> >,
+		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::caview2d_base<bcs::array2d<double, row_major_t> >,
+		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::aview2d_base<bcs::array2d<double, row_major_t> >,
+		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::dense_caview_base<bcs::array2d<double, row_major_t> >,
+		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::dense_aview_base<bcs::array2d<double, row_major_t> >,
+		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::dense_caview2d_base<bcs::array2d<double, row_major_t> >,
+		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+
+static_assert(std::is_base_of<
+		bcs::dense_aview2d_base<bcs::array2d<double, row_major_t> >,
+		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+
+template<typename T>
+void dummy_a2(const T& ) { }
+
+void get_derived()
+{
+	typedef bcs::array2d<double, column_major_t> dt;
+
+	dt a(3, 5);
+	const dt& ca = a;
+
+	caview_base<dt>& r1 = a;
+	const dt& d1 = r1.derived();
+	dummy_a2(d1);
+
+	aview_base<dt>& r2 = a;
+	const dt& d2 = r2.derived();
+	dummy_a2(d2);
+
+	dense_caview_base<dt>& r3 = a;
+	const dt& d3 = r3.derived();
+	dummy_a2(d3);
+
+	dense_aview_base<dt>& r4 = a;
+	const dt& d4 = r4.derived();
+	dummy_a2(d4);
+
+	caview2d_base<dt>& r5 = a;
+	const dt& d5 = r5.derived();
+	dummy_a2(d5);
+
+	aview2d_base<dt>& r6 = a;
+	const dt& d6 = r6.derived();
+	dummy_a2(d6);
+
+	dense_caview2d_base<dt>& r7 = a;
+	const dt& d7 = r7.derived();
+	dummy_a2(d7);
+
+	dense_aview2d_base<dt>& r8 = a;
+	const dt& d8 = r8.derived();
+	dummy_a2(d8);
+
+	dummy_a2(a.ndims());
+	dummy_a2(a.dim0());
+	dummy_a2(a.dim1());
+	dummy_a2(a.nrows());
+	dummy_a2(a.ncolumns());
+	dummy_a2(a.size());
+	dummy_a2(a.nelems());
+	dummy_a2(a.shape());
+	dummy_a2(a.pbase());
+	dummy_a2(a(0, 0));
+	dummy_a2(a[0]);
+	dummy_a2(ca(0, 0));
+	dummy_a2(ca[0]);
+	dummy_a2(begin(a));
+	dummy_a2(end(a));
+	dummy_a2(begin(ca));
+	dummy_a2(end(ca));
+}
+
+
+
+/*
 
 // Auxiliary test functions
 
@@ -783,7 +973,7 @@ std::shared_ptr<test_suite> test_array2d_suite()
 	return suite;
 }
 
-
+*/
 
 
 

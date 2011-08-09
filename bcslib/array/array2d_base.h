@@ -247,27 +247,27 @@ namespace bcs
 
 		// -- new --
 
-		typename _detail::slice_helper2d<value_type, layout_order_type>::row_cview_type
+		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
 		row(index_t i) const
 		{
 			return derived().row(i);
 		}
 
 		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order_type, IndexSelector>::row_range_cview_type
+		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::row_range_cview_type
 		row(index_t i, const IndexSelector& rgn) const
 		{
 			return derived().row(i, rgn);
 		}
 
-		typename _detail::slice_helper2d<value_type, layout_order_type>::column_cview_type
+		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
 		column(index_t i) const
 		{
 			return derived().column(i);
 		}
 
 		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order_type, IndexSelector>::column_range_cview_type
+		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::column_range_cview_type
 		column(index_t i, const IndexSelector& rgn) const
 		{
 			return derived().column(i, rgn);
@@ -385,53 +385,53 @@ namespace bcs
 
 		// -- new --
 
-		typename _detail::slice_helper2d<value_type, layout_order_type>::row_cview_type
+		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
 		row(index_t i) const
 		{
 			return derived().row(i);
 		}
 
-		typename _detail::slice_helper2d<value_type, layout_order_type>::row_view_type
+		typename _detail::slice_helper2d<value_type, layout_order>::row_view_type
 		row(index_t i)
 		{
 			return derived().row(i);
 		}
 
 		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order_type, IndexSelector>::row_range_cview_type
+		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::row_range_cview_type
 		row(index_t i, const IndexSelector& rgn) const
 		{
 			return derived().row(i, rgn);
 		}
 
 		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order_type, IndexSelector>::row_range_view_type
+		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::row_range_view_type
 		row(index_t i, const IndexSelector& rgn)
 		{
 			return derived().row(i, rgn);
 		}
 
-		typename _detail::slice_helper2d<value_type, layout_order_type>::column_cview_type
+		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
 		column(index_t i) const
 		{
 			return derived().column(i);
 		}
 
-		typename _detail::slice_helper2d<value_type, layout_order_type>::column_view_type
+		typename _detail::slice_helper2d<value_type, layout_order>::column_view_type
 		column(index_t i)
 		{
 			return derived().column(i);
 		}
 
 		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order_type, IndexSelector>::column_range_cview_type
+		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::column_range_cview_type
 		column(index_t i, const IndexSelector& rgn) const
 		{
 			return derived().column(i, rgn);
 		}
 
 		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order_type, IndexSelector>::column_range_view_type
+		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::column_range_view_type
 		column(index_t i, const IndexSelector& rgn)
 		{
 			return derived().column(i, rgn);

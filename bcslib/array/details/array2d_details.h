@@ -37,9 +37,9 @@ namespace bcs
 			{
 			}
 
-			size_t base_size() const
+			index_t base_nelems() const
 			{
-				return static_cast<size_t>(m_base_d0 * m_base_d1);
+				return m_base_d0 * m_base_d1;
 			}
 
 			index_t base_dim0() const
@@ -144,8 +144,8 @@ namespace bcs
 		{
 			typedef caview1d<T> column_cview_type;
 			typedef aview1d<T>  column_view_type;
-			typedef caview1d_ex<T, step_range> row_cview_type;
-			typedef aview1d_ex<T, step_range>  row_view_type;
+			typedef caview1d_ex<T, step_ind> row_cview_type;
+			typedef aview1d_ex<T, step_ind>  row_view_type;
 
 			static row_cview_type row_cview(const T* pbase, index_t d0, index_t d1, index_t irow)
 			{

@@ -548,12 +548,12 @@ namespace bcs
 	 *
 	 ******************************************************/
 
-	template<typename T>
-	struct aview_traits<array1d<T> >
+	template<typename T, class Alloc>
+	struct aview_traits<array1d<T, Alloc> >
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
 
-		typedef array1d<T> self_type;
+		typedef array1d<T, Alloc> self_type;
 		typedef aview1d_base<self_type> view_nd_base;
 		typedef dense_aview_base<self_type> dview_base;
 		typedef aview_base<self_type> view_base;
@@ -563,7 +563,7 @@ namespace bcs
 	class array1d
 	: private sharable_storage_base<T, Alloc>
 	, private aview1d<T>
-	, public dense_aview1d_base<array1d<T> >
+	, public dense_aview1d_base<array1d<T, Alloc> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
