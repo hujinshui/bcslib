@@ -150,13 +150,15 @@ static_assert(std::is_base_of<
 
 // further checking (for syntax)
 
-void dummy_a1(const bcs::array1d<double>& ) { }
+template<typename T>
+void dummy_a1(const T& ) { }
 
 void get_derived()
 {
 	typedef bcs::array1d<double> dt;
 
-	dt a(0);
+	dt a(2);
+	const dt& ca = a;
 
 	caview_base<dt>& r1 = a;
 	const dt& d1 = r1.derived();
@@ -189,6 +191,21 @@ void get_derived()
 	dense_aview1d_base<dt>& r8 = a;
 	const dt& d8 = r8.derived();
 	dummy_a1(d8);
+
+	dummy_a1(a.ndims());
+	dummy_a1(a.dim0());
+	dummy_a1(a.size());
+	dummy_a1(a.nelems());
+	dummy_a1(a.shape());
+	dummy_a1(a.pbase());
+	dummy_a1(a(0));
+	dummy_a1(a[0]);
+	dummy_a1(ca(0));
+	dummy_a1(ca[0]);
+	dummy_a1(begin(a));
+	dummy_a1(end(a));
+	dummy_a1(begin(ca));
+	dummy_a1(end(ca));
 }
 
 

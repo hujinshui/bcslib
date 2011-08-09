@@ -13,312 +13,11 @@
 #ifndef BCSLIB_ARRAY1D_H
 #define BCSLIB_ARRAY1D_H
 
-
-#include <bcslib/array/array_base.h>
-#include <bcslib/array/array_index.h>
+#include <bcslib/array/array1d_base.h>
 #include <bcslib/array/array_storage.h>
 
 namespace bcs
 {
-
-	/******************************************************
-	 *
-	 *  Basic concepts for 1D
-	 *
-	 ******************************************************/
-
-	template<class Derived>
-	class caview1d_base : public aview_traits<Derived>::dview_base
-	{
-	public:
-		BCS_CAVIEW_BASE_DEFS(Derived)
-
-		BCS_ENSURE_INLINE dim_num_t ndims() const
-		{
-			return num_dimensions;
-		}
-
-		// interfaces to be implemented by Derived
-
-		BCS_ENSURE_INLINE size_type size() const
-		{
-			return derived().size();
-		}
-
-		BCS_ENSURE_INLINE index_type nelems() const
-		{
-			return derived().nelems();
-		}
-
-		BCS_ENSURE_INLINE bool is_empty() const
-		{
-			return derived().is_empty();
-		}
-
-		BCS_ENSURE_INLINE shape_type shape() const
-		{
-			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
-		// -- new --
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE const_reference operator() (index_type i) const
-		{
-			return derived().operator()(i);
-		}
-
-	}; // end class caview1d_base
-
-
-	template<class Derived>
-	class aview1d_base : public caview1d_base<Derived>
-	{
-	public:
-		BCS_AVIEW_BASE_DEFS(Derived)
-
-		BCS_ENSURE_INLINE dim_num_t ndims() const
-		{
-			return num_dimensions;
-		}
-
-		// interfaces to be implemented by Derived
-
-		BCS_ENSURE_INLINE size_type size() const
-		{
-			return derived().size();
-		}
-
-		BCS_ENSURE_INLINE index_type nelems() const
-		{
-			return derived().nelems();
-		}
-
-		BCS_ENSURE_INLINE bool is_empty() const
-		{
-			return derived().is_empty();
-		}
-
-		BCS_ENSURE_INLINE shape_type shape() const
-		{
-			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
-		void import_from(const_pointer src)
-		{
-			derived().import_from(src);
-		}
-
-		void fill(const value_type& v)
-		{
-			derived().fill(v);
-		}
-
-		// -- new --
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE const_reference operator() (index_t i) const
-		{
-			return derived().operator()(i);
-		}
-
-		BCS_ENSURE_INLINE reference operator() (index_type i)
-		{
-			return derived().operator()(i);
-		}
-
-	}; // end class aview1d_base
-
-
-	template<class Derived>
-	class dense_caview1d_base : public aview_traits<Derived>::view_nd_base
-	{
-	public:
-		BCS_CAVIEW_BASE_DEFS(Derived)
-
-		BCS_ENSURE_INLINE dim_num_t ndims() const
-		{
-			return num_dimensions;
-		}
-
-		// interfaces to be implemented by Derived
-
-		BCS_ENSURE_INLINE size_type size() const
-		{
-			return derived().size();
-		}
-
-		BCS_ENSURE_INLINE index_type nelems() const
-		{
-			return derived().nelems();
-		}
-
-		BCS_ENSURE_INLINE bool is_empty() const
-		{
-			return derived().is_empty();
-		}
-
-		BCS_ENSURE_INLINE shape_type shape() const
-		{
-			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE const_pointer pbase() const
-		{
-			return derived().pbase();
-		}
-
-		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
-		{
-			return derived().operator[](i);
-		}
-
-		BCS_ENSURE_INLINE const_reference operator() (index_type i) const
-		{
-			return derived().operator()(i);
-		}
-
-		// -- new --
-
-		template<class IndexSelector>
-		caview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
-		V(const IndexSelector& I) const
-		{
-			return derived().V(I);
-		}
-
-	}; // end class dense_caview1d_base
-
-
-	template<class Derived>
-	class dense_aview1d_base : public dense_caview1d_base<Derived>
-	{
-	public:
-		BCS_AVIEW_BASE_DEFS(Derived)
-
-		BCS_ENSURE_INLINE dim_num_t ndims() const
-		{
-			return num_dimensions;
-		}
-
-		// interfaces to be implemented by Derived
-
-		BCS_ENSURE_INLINE size_type size() const
-		{
-			return derived().size();
-		}
-
-		BCS_ENSURE_INLINE index_type nelems() const
-		{
-			return derived().nelems();
-		}
-
-		BCS_ENSURE_INLINE bool is_empty() const
-		{
-			return derived().is_empty();
-		}
-
-		BCS_ENSURE_INLINE shape_type shape() const
-		{
-			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
-		void import_from(const_pointer src)
-		{
-			derived().import_from(src);
-		}
-
-		void fill(const value_type& v)
-		{
-			derived().fill(v);
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE const_pointer pbase() const
-		{
-			return derived().pbase();
-		}
-
-		BCS_ENSURE_INLINE pointer pbase()
-		{
-			return derived().pbase();
-		}
-
-		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
-		{
-			return derived().operator[](i);
-		}
-
-		BCS_ENSURE_INLINE reference operator[](index_type i)
-		{
-			return derived().operator[](i);
-		}
-
-		BCS_ENSURE_INLINE const_reference operator() (index_type i) const
-		{
-			return derived().operator()(i);
-		}
-
-		BCS_ENSURE_INLINE reference operator() (index_type i)
-		{
-			return derived().operator()(i);
-		}
-
-		// -- new --
-
-		template<class IndexSelector>
-		caview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
-		V(const IndexSelector& I) const
-		{
-			return derived().V(I);
-		}
-
-		template<class IndexSelector>
-		aview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
-		V(const IndexSelector& I)
-		{
-			return derived().V(I);
-		}
-
-	}; // end class dense_aview1d_base
-
 
 	/******************************************************
 	 *
@@ -357,6 +56,11 @@ namespace bcs
 
 	public:
 
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
 		BCS_ENSURE_INLINE size_type size() const
 		{
 			return static_cast<size_type>(nelems());
@@ -389,7 +93,8 @@ namespace bcs
 
 		void export_to(pointer dst) const
 		{
-			for (index_type i = 0; i < m_d0; ++i)
+			index_t d0 = dim0();
+			for (index_type i = 0; i < d0; ++i)
 			{
 				*(dst++) = operator()(i);
 			}
@@ -433,6 +138,12 @@ namespace bcs
 		}
 
 	public:
+
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
 		BCS_ENSURE_INLINE size_type size() const
 		{
 			return super::size();
@@ -475,7 +186,8 @@ namespace bcs
 
 		void import_from(const_pointer src)
 		{
-			for (index_type i = 0; i < this->m_d0; ++i)
+			index_t d0 = dim0();
+			for (index_type i = 0; i < d0; ++i)
 			{
 				operator()(i) = *(src++);
 			}
@@ -483,7 +195,8 @@ namespace bcs
 
 		void fill(const value_type& v)
 		{
-			for (index_type i = 0; i < this->m_d0; ++i)
+			index_t d0 = dim0();
+			for (index_type i = 0; i < d0; ++i)
 			{
 				operator()(i) = v;
 			}
@@ -557,6 +270,12 @@ namespace bcs
 		}
 
 	public:
+
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
 		BCS_ENSURE_INLINE size_type size() const
 		{
 			return static_cast<size_type>(nelems());
@@ -654,6 +373,12 @@ namespace bcs
 		}
 
 	public:
+
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
 		BCS_ENSURE_INLINE size_type size() const
 		{
 			return super::size();
@@ -797,7 +522,7 @@ namespace bcs
 	template<class LDerived, class RDerived>
 	inline void copy(const caview1d_base<LDerived>& src, dense_aview1d_base<RDerived>& dst)
 	{
-		check_arg(src.dim0() == dst.dim0(), "aview1d copy: the shapes of src and dst are inconsistent.");
+		check_arg(is_same_shape(src, dst), "aview1d copy: the shapes of src and dst are inconsistent.");
 		src.export_to(dst.pbase());
 	}
 
@@ -835,8 +560,10 @@ namespace bcs
 	};
 
 	template<typename T, class Alloc>
-	class array1d :
-		private sharable_storage_base<T, Alloc>, private aview1d<T>, public dense_aview1d_base<array1d<T> >
+	class array1d
+	: private sharable_storage_base<T, Alloc>
+	, private aview1d<T>
+	, public dense_aview1d_base<array1d<T> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
@@ -882,7 +609,7 @@ namespace bcs
 		explicit array1d(const caview1d_base<Derived>& r)
 		: storage_base(r.size()), view_base(storage_base::pointer_to_base(), r.nelems())
 		{
-			copy(r, *this);
+			copy(r.derived(), *this);
 		}
 
 		array1d(const array1d& r, do_share ds)
@@ -949,6 +676,11 @@ namespace bcs
 		}
 
 	public:
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
 		BCS_ENSURE_INLINE size_type size() const
 		{
 			return view_base::size();
