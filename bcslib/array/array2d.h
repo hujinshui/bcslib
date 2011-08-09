@@ -13,37 +13,11 @@
 #ifndef BCSLIB_ARRAY2D_H
 #define BCSLIB_ARRAY2D_H
 
+#include <bcslib/array/array2d_base.h>
 #include <bcslib/array/array1d.h>
-#include <bcslib/array/details/array2d_details.h>
 
 namespace bcs
 {
-	/******************************************************
-	 *
-	 *  A type to represent a matrix being transposed
-	 *
-	 ******************************************************/
-
-	template<typename T, typename TOrd>
-	class array2d_transposed_t
-	{
-	public:
-		typedef T value_type;
-		typedef caview2d<T, TOrd> cview_type;
-
-		explicit array2d_transposed_t(const cview_type& a) : m_cref(a) { }
-
-		array2d_transposed_t(const array2d_transposed_t& r) : m_cref(r.m_cref) { }
-
-		const cview_type& get() const
-		{
-			return m_cref;
-		}
-
-	private:
-		const cview_type& m_cref;
-	};
-
 
 	/******************************************************
 	 *
@@ -53,90 +27,122 @@ namespace bcs
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	class caview2d_ex
+	: public caview2d_base<caview2d_ex<T, TOrd, TIndexer0, TIndexer1> >
 	{
 	public:
-		BCS_ARRAY_CHECK_TYPE(T)
+		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
 		BCS_STATIC_ASSERT_V( is_indexer<TIndexer0> );
 		BCS_STATIC_ASSERT_V( is_indexer<TIndexer1> );
-		BCS_ARRAY_BASIC_TYPEDEFS(2u, T, TOrd)
+
+		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
 		typedef TIndexer0 indexer0_type;
 		typedef TIndexer1 indexer1_type;
-		typedef caview2d_ex<value_type, layout_order, indexer0_type, indexer1_type> cview_type;
-		typedef  aview2d_ex<value_type, layout_order, indexer0_type, indexer1_type> view_type;
 
 	public:
 		caview2d_ex(const_pointer pbase, index_t base_d0, index_t base_d1, const indexer0_type& indexer0, const indexer1_type& indexer1)
 		: m_pbase(const_cast<pointer>(pbase))
 		, m_idxcore(base_d0, base_d1)
-		, m_d0(static_cast<index_t>(indexer0.size()))
-		, m_d1(static_cast<index_t>(indexer1.size()))
+		, m_d0(indexer0.dim())
+		, m_d1(indexer1.dim())
 		, m_indexer0(indexer0)
 		, m_indexer1(indexer1)
 		{
 		}
 
-	private:
-		caview2d_ex& operator = (const caview2d_ex& r);
-
 	public:
-		dim_num_t ndims() const
+		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
 			return num_dimensions;
 		}
 
-		size_type size() const
+		BCS_ENSURE_INLINE size_type size() const
 		{
-			return nelems();
+			return static_cast<size_type>(nelems());
 		}
 
-		size_type nelems() const
+		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return static_cast<size_type>(m_d0 * m_d1);
+			return m_d0 * m_d1;
 		}
 
-		size_type nrows() const
+		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return static_cast<size_type>(m_d0);
+			return m_d0 == 0 || m_d1 == 0;
 		}
 
-		size_type ncolumns() const
-		{
-			return static_cast<size_type>(m_d1);
-		}
-
-		index_type dim0() const
+		BCS_ENSURE_INLINE index_type dim0() const
 		{
 			return m_d0;
 		}
 
-		index_type dim1() const
+		BCS_ENSURE_INLINE index_type dim1() const
 		{
 			return m_d1;
 		}
 
-		shape_type shape() const
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return m_d0;
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return m_d1;
+		}
+
+		BCS_ENSURE_INLINE index_type base_dim0() const
+		{
+			return m_idxcore.base_dim0();
+		}
+
+		BCS_ENSURE_INLINE index_type base_dim1() const
+		{
+			return m_idxcore.base_dim1();
+		}
+
+		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return arr_shape(m_d0, m_d1);
 		}
 
-		const indexer0_type& get_indexer0() const
+		BCS_ENSURE_INLINE shape_type base_shape() const
 		{
-			return m_indexer0;
+			return m_idxcore.base_shape();
 		}
 
-		const indexer1_type& get_indexer1() const
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
-			return m_indexer1;
+			return m_pbase[offset(i, j)];
 		}
 
 	public:
-		// Element access
-
-		const_reference operator() (index_type i, index_type j) const
+		void export_to(pointer dst) const
 		{
-			return m_pbase[offset(i, j)];
+			index_t d0 = dim0();
+			index_t d1 = dim1();
+
+			if (std::is_same<layout_order, row_major_t>::value)
+			{
+				for (index_t i = 0; i < d0; ++i)
+				{
+					for (index_t j = 0; j < d1; ++j)
+					{
+						*(dst++) = operator()(i, j);
+					}
+				}
+			}
+			else
+			{
+				for (index_t j = 0; j < d1; ++j)
+				{
+					for (index_t i = 0; i < d0; ++i)
+					{
+						*(dst++) = operator()(i, j);
+					}
+				}
+			}
 		}
 
 	protected:
@@ -156,53 +162,313 @@ namespace bcs
 
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	class aview2d_ex : public caview2d_ex<T, TOrd, TIndexer0, TIndexer1>
+	class aview2d_ex
+	: public caview2d_ex<T, TOrd, TIndexer0, TIndexer1>
+	, public aview2d_base<aview2d_ex<T, TOrd, TIndexer0, TIndexer1> >
 	{
 	public:
-		BCS_ARRAY_CHECK_TYPE(T)
+		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
 		BCS_STATIC_ASSERT_V( is_indexer<TIndexer0> );
 		BCS_STATIC_ASSERT_V( is_indexer<TIndexer1> );
-		BCS_ARRAY_BASIC_TYPEDEFS(2u, T, TOrd)
+
+		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
 		typedef TIndexer0 indexer0_type;
 		typedef TIndexer1 indexer1_type;
-		typedef caview2d_ex<value_type, layout_order, indexer0_type, indexer1_type> cview_type;
-		typedef  aview2d_ex<value_type, layout_order, indexer0_type, indexer1_type> view_type;
+		typedef caview2d_ex<T, TOrd, TIndexer0, TIndexer1> super;
 
 	public:
-		aview2d_ex(pointer pbase, index_t base_d0, index_t base_d1, const indexer0_type& indexer0, const indexer1_type& indexer1)
-		: cview_type(pbase, base_d0, base_d1, indexer0, indexer1)
+		aview2d_ex(const_pointer pbase, index_t base_d0, index_t base_d1, const indexer0_type& indexer0, const indexer1_type& indexer1)
+		: super(pbase, base_d0, base_d1, indexer0, indexer1)
 		{
 		}
-
-		aview2d_ex(aview2d_ex& r)
-		: cview_type(r)
-		{
-		}
-
-		aview2d_ex(aview2d_ex&& r)
-		: cview_type(r)
-		{
-		}
-
-	private:
-		aview2d_ex& operator = (const aview2d_ex& r);
 
 	public:
-		// Element access
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
 
-		const_reference operator() (index_type i, index_type j) const
+		BCS_ENSURE_INLINE size_type size() const
+		{
+			return super::size();
+		}
+
+		BCS_ENSURE_INLINE index_type nelems() const
+		{
+			return super::nelems();
+		}
+
+		BCS_ENSURE_INLINE bool is_empty() const
+		{
+			return super::is_empty();
+		}
+
+		BCS_ENSURE_INLINE index_type dim0() const
+		{
+			return super::dim0();
+		}
+
+		BCS_ENSURE_INLINE index_type dim1() const
+		{
+			return super::dim1();
+		}
+
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return super::nrows();
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return super::ncolumns();
+		}
+
+		BCS_ENSURE_INLINE index_type base_dim0() const
+		{
+			return super::base_dim0();
+		}
+
+		BCS_ENSURE_INLINE index_type base_dim1() const
+		{
+			return super::base_dim1();
+		}
+
+		BCS_ENSURE_INLINE shape_type shape() const
+		{
+			return super::shape();
+		}
+
+		BCS_ENSURE_INLINE shape_type base_shape() const
+		{
+			return super::base_shape();
+		}
+
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
 			return this->m_pbase[this->offset(i, j)];
 		}
 
-		reference operator() (index_type i, index_type j)
+		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
 		{
 			return this->m_pbase[this->offset(i, j)];
+		}
+
+	public:
+		void export_to(pointer dst) const
+		{
+			super::export_to(dst);
+		}
+
+		void import_from(const_pointer src)
+		{
+			index_t d0 = dim0();
+			index_t d1 = dim1();
+
+			if (std::is_same<layout_order, row_major_t>::value)
+			{
+				for (index_t i = 0; i < d0; ++i)
+				{
+					for (index_t j = 0; j < d1; ++j)
+					{
+						operator()(i, j) = *(src++);
+					}
+				}
+			}
+			else
+			{
+				for (index_t j = 0; j < d1; ++j)
+				{
+					for (index_t i = 0; i < d0; ++i)
+					{
+						operator()(i, j) = *(src++);
+					}
+				}
+			}
+		}
+
+		void fill(const value_type& v)
+		{
+			index_t d0 = dim0();
+			index_t d1 = dim1();
+
+			if (std::is_same<layout_order, row_major_t>::value)
+			{
+				for (index_t i = 0; i < d0; ++i)
+				{
+					for (index_t j = 0; j < d1; ++j)
+					{
+						operator()(i, j) = v;
+					}
+				}
+			}
+			else
+			{
+				for (index_t j = 0; j < d1; ++j)
+				{
+					for (index_t i = 0; i < d0; ++i)
+					{
+						operator()(i, j) = v;
+					}
+				}
+			}
 		}
 
 	}; // end class aview2d_ex
+
+
+	/******************************************************
+	 *
+	 *  Sub-views
+	 *
+	 ******************************************************/
+
+	template<class Derived, class IndexSelector0, class IndexSelector1>
+	inline caview2d_ex<
+		typename Derived::value_type,
+		typename Derived::layout_order,
+		typename indexer_map<IndexSelector0>::type,
+		typename indexer_map<IndexSelector1>::type>
+	subview(const dense_caview1d_base<Derived>& a, const IndexSelector0& I, const IndexSelector1& J)
+	{
+		typedef caview2d_ex<
+			typename Derived::value_type,
+			typename Derived::layout_order,
+			typename indexer_map<IndexSelector0>::type,
+			typename indexer_map<IndexSelector1>::type> ret_type;
+
+		index_t i0 = indexer_map<IndexSelector0>::get_offset(a.dim0(), I);
+		index_t j0 = indexer_map<IndexSelector1>::get_offset(a.dim1(), J);
+
+		return ret_type(&(a(i0, j0)),
+				indexer_map<IndexSelector0>::get_indexer(a.dim0(), I),
+				indexer_map<IndexSelector1>::get_indexer(a.dim1(), J));
+	}
+
+	template<class Derived, class IndexSelector0, class IndexSelector1>
+	inline aview2d_ex<
+		typename Derived::value_type,
+		typename Derived::layout_order,
+		typename indexer_map<IndexSelector0>::type,
+		typename indexer_map<IndexSelector1>::type>
+	subview(dense_aview1d_base<Derived>& a, const IndexSelector0& I, const IndexSelector1& J)
+	{
+		typedef aview2d_ex<
+			typename Derived::value_type,
+			typename Derived::layout_order,
+			typename indexer_map<IndexSelector0>::type,
+			typename indexer_map<IndexSelector1>::type> ret_type;
+
+		index_t i0 = indexer_map<IndexSelector0>::get_offset(a.dim0(), I);
+		index_t j0 = indexer_map<IndexSelector1>::get_offset(a.dim1(), J);
+
+		return ret_type(&(a(i0, j0)),
+				indexer_map<IndexSelector0>::get_indexer(a.dim0(), I),
+				indexer_map<IndexSelector1>::get_indexer(a.dim1(), J));
+	}
+
+	template<class Derived>
+	inline typename _detail::slice_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order>::row_cview_type
+	row(const dense_caview2d_base<Derived>& a, index_t irow)
+	{
+		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
+		return helper::row_cview(a.pbase(), a.dim0(), a.dim1(), irow);
+	}
+
+	template<class Derived>
+	inline typename _detail::slice_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order>::row_view_type
+	row(dense_aview2d_base<Derived>& a, index_t irow)
+	{
+		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
+		return helper::row_view(a.pbase(), a.dim0(), a.dim1(), irow);
+	}
+
+	template<class Derived>
+	inline typename _detail::slice_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order>::column_cview_type
+	column(const dense_caview2d_base<Derived>& a, index_t icol)
+	{
+		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
+		return helper::column_cview(a.pbase(), a.dim0(), a.dim1(), icol);
+	}
+
+	template<class Derived>
+	inline typename _detail::slice_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order>::column_view_type
+	column(dense_aview2d_base<Derived>& a, index_t icol)
+	{
+		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
+		return helper::column_view(a.pbase(), a.dim0(), a.dim1(), icol);
+	}
+
+
+	template<class Derived, class TRange>
+	inline typename _detail::slice_range_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order,
+		TRange>::row_range_cview_type
+	row(const dense_caview2d_base<Derived>& a, index_t irow, const TRange& rgn)
+	{
+		typedef _detail::slice_range_helper2d<
+				typename Derived::value_type,
+				typename Derived::layout_order,
+				TRange> helper;
+
+		return helper::row_range_cview(a.pbase(), a.dim0(), a.dim1(), irow, rgn);
+	}
+
+	template<class Derived, class TRange>
+	inline typename _detail::slice_range_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order,
+		TRange>::row_range_view_type
+	row(dense_aview2d_base<Derived>& a, index_t irow, const TRange& rgn)
+	{
+		typedef _detail::slice_range_helper2d<
+				typename Derived::value_type,
+				typename Derived::layout_order,
+				TRange> helper;
+
+		return helper::row_range_view(a.pbase(), a.dim0(), a.dim1(), irow, rgn);
+	}
+
+	template<class Derived, class TRange>
+	inline typename _detail::slice_range_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order,
+		TRange>::column_range_cview_type
+	column(const dense_caview2d_base<Derived>& a, index_t icol, const TRange& rgn)
+	{
+		typedef _detail::slice_range_helper2d<
+				typename Derived::value_type,
+				typename Derived::layout_order,
+				TRange> helper;
+
+		return helper::column_range_cview(a.pbase(), a.dim0(), a.dim1(), icol, rgn);
+	}
+
+	template<class Derived, class TRange>
+	inline typename _detail::slice_range_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order,
+		TRange>::column_range_view_type
+	column(dense_aview2d_base<Derived>& a, index_t icol, const TRange& rgn)
+	{
+		typedef _detail::slice_range_helper2d<
+				typename Derived::value_type,
+				typename Derived::layout_order,
+				TRange> helper;
+
+		return helper::column_range_view(a.pbase(), a.dim0(), a.dim1(), icol, rgn);
+	}
+
 
 
 	/******************************************************
@@ -212,525 +478,327 @@ namespace bcs
 	 ******************************************************/
 
 	template<typename T, typename TOrd>
-	class caview2d
+	class caview2d : public dense_caview2d_base<caview2d<T, TOrd> >
 	{
 	public:
-		BCS_ARRAY_CHECK_TYPE(T)
+		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
-		BCS_ARRAY_BASIC_TYPEDEFS(2u, T, TOrd)
-
-		typedef caview2d<value_type, layout_order> cview_type;
-		typedef aview2d<value_type, layout_order> view_type;
-
-	private:
-		typedef _detail::index_core2d<layout_order> index_core_t;
-		typedef _detail::iter_helper2d<value_type, layout_order> iter_helper;
-		typedef _detail::slice_helper2d<value_type, layout_order> slice_helper;
+		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
 	public:
-		typedef typename iter_helper::const_iterator const_iterator;
-		typedef typename iter_helper::iterator iterator;
-
-
-	public:
-		caview2d(const_pointer pbase, size_type m, size_type n)
+		caview2d(const_pointer pbase, index_type m, index_type n)
 		: m_pbase(const_cast<pointer>(pbase))
-		, m_d0(static_cast<index_type>(m))
-		, m_d1(static_cast<index_type>(n))
-		, m_idxcore(m_d0, m_d1)
+		, m_idxcore(m, n)
 		{
 		}
 
 		caview2d(const_pointer pbase, const shape_type& shape)
 		: m_pbase(const_cast<pointer>(pbase))
-		, m_d0(shape[0]), m_d1(shape[1])
-		, m_idxcore(m_d0, m_d1)
+		, m_idxcore(shape[0], shape[1])
 		{
-		}
-
-		caview2d(const_pointer pbase, size_type m, size_type n, index_type base_d0, index_type base_d1)
-		: m_pbase(const_cast<pointer>(pbase))
-		, m_d0(static_cast<index_type>(m))
-		, m_d1(static_cast<index_type>(n))
-		, m_idxcore(base_d0, base_d1)
-		{
-		}
-
-		caview2d(const_pointer pbase, const shape_type& shape, index_type base_d0, index_type base_d1)
-		: m_pbase(const_cast<pointer>(pbase))
-		, m_d0(shape[0]), m_d1(shape[1])
-		, m_idxcore(base_d0, base_d1)
-		{
-		}
-
-
-		caview2d(const caview2d& r)
-		: m_pbase(r.m_pbase)
-		, m_d0(r.m_d0), m_d1(r.m_d1)
-		, m_idxcore(r.m_idxcore)
-		{
-		}
-
-		caview2d(caview2d&& r)
-		: m_pbase(r.m_pbase)
-		, m_d0(r.m_d0), m_d1(r.m_d1)
-		, m_idxcore(r.m_idxcore)
-		{
-			r.reset();
-		}
-
-		caview2d& operator = (const caview2d& r)
-		{
-			m_pbase = r.m_pbase;
-			m_d0 = r.m_d0;
-			m_d1 = r.m_d1;
-			m_idxcore = r.m_idxcore;
-
-			return *this;
-		}
-
-		caview2d& operator = (caview2d&& r)
-		{
-			m_pbase = r.m_pbase;
-			m_d0 = r.m_d0;
-			m_d1 = r.m_d1;
-			m_idxcore = r.m_idxcore;
-
-			r.reset();
-
-			return *this;
 		}
 
 	public:
-		dim_num_t ndims() const
+		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
 			return num_dimensions;
 		}
 
-		size_type nelems() const
+		BCS_ENSURE_INLINE size_type size() const
 		{
-			return static_cast<size_t>(m_d0 * m_d1);
+			return static_cast<size_type>(nelems());
 		}
 
-		index_type dim0() const
+		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return m_d0;
+			return m_idxcore.base_nelems();
 		}
 
-		index_type dim1() const
+		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return m_d1;
+			return dim0() == 0 && dim1() == 0;
 		}
 
-		size_type nrows() const
-		{
-			return static_cast<size_type>(dim0());
-		}
-
-		size_type ncolumns() const
-		{
-			return static_cast<size_type>(dim1());
-		}
-
-		shape_type shape() const
-		{
-			return arr_shape(dim0(), dim1());
-		}
-
-		index_type base_dim0() const
+		BCS_ENSURE_INLINE index_type dim0() const
 		{
 			return m_idxcore.base_dim0();
 		}
 
-		index_type base_dim1() const
+		BCS_ENSURE_INLINE index_type dim1() const
 		{
 			return m_idxcore.base_dim1();
 		}
 
-		shape_type base_shape() const
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return dim0();
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return dim1();
+		}
+
+		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return m_idxcore.base_shape();
 		}
 
-		slice2d_info slice_info() const
-		{
-			return m_idxcore.get_slice_info(nrows(), ncolumns());
-		}
-
-		bool is_continuous() const
-		{
-			if (std::is_same<layout_order, row_major_t>::value)
-			{
-				return dim1() == base_dim1();
-			}
-			else
-			{
-				return dim0() == base_dim0();
-			}
-		}
-
-		// just for temporary use in an expression, not allowed to pass around
-		array2d_transposed_t<T, TOrd> Tp() const
-		{
-			return array2d_transposed_t<T, TOrd>(*this);
-		}
-
 	public:
-		// Element access
-
-		const_pointer pbase() const
+		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
 			return m_pbase;
 		}
 
-		const_pointer ptr(index_type i, index_type j) const
+		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
 		{
-			return m_pbase + m_idxcore.offset(i, j);
+			return m_pbase[i];
 		}
 
-		const_reference operator() (index_type i, index_type j) const
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
 			return m_pbase[m_idxcore.offset(i, j)];
 		}
 
-		// Iteration
-
-		const_iterator begin() const
+		void export_to(pointer dst) const
 		{
-			return iter_helper::get_const_begin(m_pbase, m_idxcore, m_d0, m_d1);
+			copy_elements(pbase(), dst, size());
 		}
-
-		const_iterator end() const
-		{
-			return iter_helper::get_const_end(m_pbase, m_idxcore, m_d0, m_d1);
-		}
-
 
 	public:
-		// Slice
-
-		typename slice_helper::row_cview_type row(index_type i) const
+		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
+		row(index_t i) const
 		{
-			return slice_helper::row_cview(m_idxcore, m_pbase + m_idxcore.row_offset(i), ncolumns());
+			return row(*this, i);
 		}
 
-		typename slice_helper::column_cview_type column(index_type j) const
+		template<class TRange>
+		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_cview_type
+		row(index_t i, const TRange& rgn) const
 		{
-			return slice_helper::column_cview(m_idxcore, m_pbase + m_idxcore.column_offset(j), nrows());
+			return row(*this, i, rgn);
 		}
 
-		template<class TIndexer>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::row_range_cview_type
-		row(index_type i, const TIndexer& rgn) const
+		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
+		column(index_t i) const
 		{
-			return _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::row_range_cview(
-					m_idxcore, m_pbase + m_idxcore.row_offset(i), rgn);
+			return column(*this, i);
 		}
 
-		template<class TIndexer>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::column_range_cview_type
-		column(index_t j, const TIndexer& rgn) const
+		template<class TRange>
+		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_cview_type
+		column(index_t i, const TRange& rgn) const
 		{
-			return _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::column_range_cview(
-					m_idxcore, m_pbase + m_idxcore.column_offset(j), rgn);
+			return column(*this, i, rgn);
 		}
 
-		// Sub-view
-
-		cview_type V(whole, whole) const
+		template<class TRange0, class TRange1>
+		caview2d_ex<value_type, layout_order,
+			typename indexer_map<TRange0>::type,
+			typename indexer_map<TRange1>::type>
+		V(const TRange0& I, const TRange1& J) const
 		{
-			return *this;
+			return subview(*this, I, J);
 		}
 
-		cview_type V(const range& I, const range& J) const
+	protected:
+		void reset()
 		{
-			return cview_type(ptr(I.begin_index(), J.begin_index()), I.size(), J.size(),
-					base_dim0(), base_dim1());
-		}
-
-		cview_type V(const range& I, whole) const
-		{
-			return V(I, rgn(dim1(), whole()));
-		}
-
-		cview_type V(whole, const range& J) const
-		{
-			return V(rgn(dim0(), whole()), J);
-		}
-
-
-		template<class TIndexer0, class TIndexer1>
-		caview2d_ex<T, TOrd, typename indexer_remap<TIndexer0>::type, typename indexer_remap<TIndexer1>::type>
-		V(const TIndexer0& I, const TIndexer1& J) const
-		{
-			typedef typename indexer_remap<TIndexer0>::type indexer0_t;
-			typedef typename indexer_remap<TIndexer1>::type indexer1_t;
-
-			return caview2d_ex<T, TOrd, indexer0_t, indexer1_t>(m_pbase, base_dim0(), base_dim1(),
-					indexer_remap<TIndexer0>::get(dim0(), I), indexer_remap<TIndexer1>::get(dim1(), J));
+			m_pbase = BCS_NULL;
+			m_idxcore = _detail::index_core2d<layout_order>(0, 0);
 		}
 
 	protected:
 		pointer m_pbase;
-		index_type m_d0;
-		index_type m_d1;
-		index_core_t m_idxcore;
-
-	private:
-		void reset()
-		{
-			m_pbase = BCS_NULL;
-			m_d0 = 0;
-			m_d1 = 0;
-		}
+		_detail::index_core2d<layout_order> m_idxcore;
 
 	}; // end class caview2d
 
 
 
 	template<typename T, typename TOrd>
-	class aview2d : public caview2d<T, TOrd>
+	class aview2d : public caview2d<T, TOrd>, public dense_aview2d_base<aview2d<T, TOrd> >
 	{
 	public:
-		BCS_ARRAY_CHECK_TYPE(T)
+		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
-		BCS_ARRAY_BASIC_TYPEDEFS(2u, T, TOrd)
+		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
-		typedef caview2d<value_type, layout_order> cview_type;
-		typedef aview2d<value_type, layout_order> view_type;
-
-	private:
-		typedef _detail::index_core2d<layout_order> index_core_t;
-		typedef _detail::iter_helper2d<value_type, layout_order> iter_helper;
-		typedef _detail::slice_helper2d<value_type, layout_order> slice_helper;
+		typedef caview2d<T, TOrd> super;
 
 	public:
-		typedef typename iter_helper::const_iterator const_iterator;
-		typedef typename iter_helper::iterator iterator;
-
-	public:
-		aview2d(const_pointer pbase, size_type m, size_type n)
-		: cview_type(pbase, m, n)
+		aview2d(const_pointer pbase, index_type m, index_type n)
+		: super(pbase, m, n)
 		{
 		}
 
 		aview2d(const_pointer pbase, const shape_type& shape)
-		: cview_type(pbase, shape)
+		: super(pbase, shape)
 		{
-		}
-
-		aview2d(const_pointer pbase, size_type m, size_type n, index_type base_d0, index_type base_d1)
-		: cview_type(pbase, m, n, base_d0, base_d1)
-		{
-		}
-
-		aview2d(const_pointer pbase, const shape_type& shape, index_type base_d0, index_type base_d1)
-		: cview_type(pbase, shape, base_d0, base_d1)
-		{
-		}
-
-		aview2d(aview2d& r)
-		: cview_type(r)
-		{
-		}
-
-		aview2d(aview2d&& r)
-		: cview_type(std::move(r))
-		{
-		}
-
-		aview2d& operator = (aview2d& r)
-		{
-			cview_type::operator = (r);
-			return *this;
-		}
-
-		aview2d& operator = (aview2d&& r)
-		{
-			cview_type::operator = (std::move(r));
-			return *this;
 		}
 
 	public:
-		// Element access
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
 
-		const_pointer pbase() const
+		BCS_ENSURE_INLINE size_type size() const
+		{
+			return super::size();
+		}
+
+		BCS_ENSURE_INLINE index_type nelems() const
+		{
+			return super::nelems();
+		}
+
+		BCS_ENSURE_INLINE bool is_empty() const
+		{
+			return super::is_empty();
+		}
+
+		BCS_ENSURE_INLINE index_type dim0() const
+		{
+			return super::dim0();
+		}
+
+		BCS_ENSURE_INLINE index_type dim1() const
+		{
+			return super::dim1();
+		}
+
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return super::nrows();
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return super::ncolumns();
+		}
+
+		BCS_ENSURE_INLINE shape_type shape() const
+		{
+			return super::shape();
+		}
+
+	public:
+		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
 			return this->m_pbase;
 		}
 
-		pointer pbase()
+		BCS_ENSURE_INLINE pointer pbase()
 		{
 			return this->m_pbase;
 		}
 
-		const_pointer ptr(index_type i, index_type j) const
+		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
 		{
-			return this->m_pbase + this->m_idxcore.offset(i, j);
+			return this->m_pbase[i];
 		}
 
-		pointer ptr(index_type i, index_type j)
+		BCS_ENSURE_INLINE reference operator[](index_type i)
 		{
-			return this->m_pbase + this->m_idxcore.offset(i, j);
+			return this->m_pbase[i];
 		}
 
-		const_reference operator() (index_type i, index_type j) const
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
 			return this->m_pbase[this->m_idxcore.offset(i, j)];
 		}
 
-		reference operator() (index_type i, index_type j)
+		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
 		{
 			return this->m_pbase[this->m_idxcore.offset(i, j)];
 		}
 
-		// Iteration
-
-		const_iterator begin() const
+		void export_to(pointer dst) const
 		{
-			return iter_helper::get_const_begin(this->m_pbase, this->m_idxcore, this->m_d0, this->m_d1);
+			super::export_to(dst);
 		}
 
-		const_iterator end() const
+		void import_from(const_pointer src)
 		{
-			return iter_helper::get_const_end(this->m_pbase, this->m_idxcore, this->m_d0, this->m_d1);
+			copy_elements(src, pbase(), size());
 		}
 
-		iterator begin()
+		void fill(const value_type& v)
 		{
-			return iter_helper::get_begin(this->m_pbase, this->m_idxcore, this->m_d0, this->m_d1);
-		}
-
-		iterator end()
-		{
-			return iter_helper::get_end(this->m_pbase, this->m_idxcore, this->m_d0, this->m_d1);
+			fill_elements(pbase(), size(), v);
 		}
 
 	public:
-		// Slice
-
-		typename slice_helper::row_cview_type row(index_type i) const
+		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
+		row(index_t i) const
 		{
-			return slice_helper::row_cview(this->m_idxcore, this->m_pbase + this->m_idxcore.row_offset(i), this->ncolumns());
+			return row(*this, i);
 		}
 
-		typename slice_helper::column_cview_type column(index_type j) const
+		typename _detail::slice_helper2d<value_type, layout_order>::row_view_type
+		row(index_t i)
 		{
-			return slice_helper::column_cview(this->m_idxcore, this->m_pbase + this->m_idxcore.column_offset(j), this->nrows());
+			return row(*this, i);
 		}
 
-		template<class TIndexer>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::row_range_cview_type
-		row(index_type i, const TIndexer& rgn) const
+		template<class TRange>
+		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_cview_type
+		row(index_t i, const TRange& rgn) const
 		{
-			return _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::row_range_cview(
-					this->m_idxcore, this->m_pbase + this->m_idxcore.row_offset(i), rgn);
+			return row(*this, i, rgn);
 		}
 
-		template<class TIndexer>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::column_range_cview_type
-		column(index_t j, const TIndexer& rgn) const
+		template<class TRange>
+		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_view_type
+		row(index_t i, const TRange& rgn)
 		{
-			return _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::column_range_cview(
-					this->m_idxcore, this->m_pbase + this->m_idxcore.column_offset(j), rgn);
+			return row(*this, i, rgn);
 		}
 
-		typename slice_helper::row_view_type row(index_type i)
+		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
+		column(index_t i) const
 		{
-			return slice_helper::row_view(this->m_idxcore, this->m_pbase + this->m_idxcore.row_offset(i), this->ncolumns());
+			return column(*this, i);
 		}
 
-		typename slice_helper::column_view_type column(index_type j)
+		typename _detail::slice_helper2d<value_type, layout_order>::column_view_type
+		column(index_t i)
 		{
-			return slice_helper::column_view(this->m_idxcore, this->m_pbase + this->m_idxcore.column_offset(j), this->nrows());
+			return column(*this, i);
 		}
 
-		template<class TIndexer>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::row_range_view_type
-		row(index_type i, const TIndexer& rgn)
+		template<class TRange>
+		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_cview_type
+		column(index_t i, const TRange& rgn) const
 		{
-			return _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::row_range_view(
-					this->m_idxcore, this->m_pbase + this->m_idxcore.row_offset(i), rgn);
+			return column(*this, i, rgn);
 		}
 
-		template<class TIndexer>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::column_range_view_type
-		column(index_t j, const TIndexer& rgn)
+		template<class TRange>
+		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_view_type
+		column(index_t i, const TRange& rgn)
 		{
-			return _detail::slice_range_helper2d<value_type, layout_order, TIndexer>::column_range_view(
-					this->m_idxcore, this->m_pbase + this->m_idxcore.column_offset(j), rgn);
+			return column(*this, i, rgn);
 		}
 
-
-		// Sub-view
-
-		cview_type V(whole, whole) const
+		template<class TRange0, class TRange1>
+		caview2d_ex<value_type, layout_order,
+			typename indexer_map<TRange0>::type,
+			typename indexer_map<TRange1>::type>
+		V(const TRange0& I, const TRange1& J) const
 		{
-			return *this;
+			return subview(*this, I, J);
 		}
 
-		cview_type V(const range& I, const range& J) const
+		template<class TRange0, class TRange1>
+		aview2d_ex<value_type, layout_order,
+			typename indexer_map<TRange0>::type,
+			typename indexer_map<TRange1>::type>
+		V(const TRange0& I, const TRange1& J)
 		{
-			return cview_type(ptr(I.begin_index(), J.begin_index()), I.size(), J.size(),
-					this->base_dim0(), this->base_dim1());
+			return subview(*this, I, J);
 		}
-
-		cview_type V(const range& I, whole) const
-		{
-			return V(I, rgn(this->dim1(), whole()));
-		}
-
-		cview_type V(whole, const range& J) const
-		{
-			return V(rgn(this->dim0(), whole()), J);
-		}
-
-
-		template<class TIndexer0, class TIndexer1>
-		caview2d_ex<T, TOrd, typename indexer_remap<TIndexer0>::type, typename indexer_remap<TIndexer1>::type>
-		V(const TIndexer0& I, const TIndexer1& J) const
-		{
-			typedef typename indexer_remap<TIndexer0>::type indexer0_t;
-			typedef typename indexer_remap<TIndexer1>::type indexer1_t;
-
-			return caview2d_ex<T, TOrd, indexer0_t, indexer1_t>(this->m_pbase, this->base_dim0(), this->base_dim1(),
-					indexer_remap<TIndexer0>::get(this->dim0(), I), indexer_remap<TIndexer1>::get(this->dim1(), J));
-		}
-
-
-		view_type V(whole, whole)
-		{
-			return *this;
-		}
-
-		view_type V(const range& I, const range& J)
-		{
-			return view_type(ptr(I.begin_index(), J.begin_index()), I.size(), J.size(),
-					this->base_dim0(), this->base_dim1());
-		}
-
-		view_type V(const range& I, whole)
-		{
-			return V(I, rgn(this->dim1(), whole()));
-		}
-
-		view_type V(whole, const range& J)
-		{
-			return V(rgn(this->dim0(), whole()), J);
-		}
-
-
-		template<class TIndexer0, class TIndexer1>
-		aview2d_ex<T, TOrd, typename indexer_remap<TIndexer0>::type, typename indexer_remap<TIndexer1>::type>
-		V(const TIndexer0& I, const TIndexer1& J)
-		{
-			typedef typename indexer_remap<TIndexer0>::type indexer0_t;
-			typedef typename indexer_remap<TIndexer1>::type indexer1_t;
-
-			return aview2d_ex<T, TOrd, indexer0_t, indexer1_t>(this->m_pbase, this->base_dim0(), this->base_dim1(),
-					indexer_remap<TIndexer0>::get(this->dim0(), I), indexer_remap<TIndexer1>::get(this->dim1(), J));
-		}
-
 
 	}; // end class aview2d
 
@@ -738,54 +806,29 @@ namespace bcs
 	// convenient functions to make 2D view
 
 	template<typename T>
-	inline caview2d<T, row_major_t> get_aview2d_rm(const T *base, size_t m, size_t n)
+	inline caview2d<T, row_major_t> make_aview2d_rm(const T *base, size_t m, size_t n)
 	{
 		return caview2d<T, row_major_t>(base, m, n);
 	}
 
 	template<typename T>
-	inline aview2d<T, row_major_t> get_aview2d_rm(T *base, size_t m, size_t n)
+	inline aview2d<T, row_major_t> make_aview2d_rm(T *base, size_t m, size_t n)
 	{
 		return aview2d<T, row_major_t>(base, m, n);
 	}
 
 	template<typename T>
-	inline caview2d<T, column_major_t> get_aview2d_cm(const T *base, size_t m, size_t n)
+	inline caview2d<T, column_major_t> make_aview2d_cm(const T *base, size_t m, size_t n)
 	{
 		return caview2d<T, column_major_t>(base, m, n);
 	}
 
 	template<typename T>
-	inline aview2d<T, column_major_t> get_aview2d_cm(T *base, size_t m, size_t n)
+	inline aview2d<T, column_major_t> make_aview2d_cm(T *base, size_t m, size_t n)
 	{
 		return aview2d<T, column_major_t>(base, m, n);
 	}
 
-	// iteration functions
-
-	template<typename T, typename TOrd>
-	typename caview2d<T, TOrd>::const_iterator begin(const caview2d<T, TOrd>& a)
-	{
-		return a.begin();
-	}
-
-	template<typename T, typename TOrd>
-	typename caview2d<T, TOrd>::const_iterator end(const caview2d<T, TOrd>& a)
-	{
-		return a.end();
-	}
-
-	template<typename T, typename TOrd>
-	typename aview2d<T, TOrd>::iterator begin(aview2d<T, TOrd>& a)
-	{
-		return a.begin();
-	}
-
-	template<typename T, typename TOrd>
-	typename aview2d<T, TOrd>::iterator end(aview2d<T, TOrd>& a)
-	{
-		return a.end();
-	}
 
 	/******************************************************
 	 *
@@ -793,207 +836,69 @@ namespace bcs
 	 *
 	 ******************************************************/
 
-	// element-wise comparison
+	// comparison
 
-	template<typename T, typename TOrd>
-	inline bool operator == (const caview2d<T, TOrd>& lhs, const caview2d<T, TOrd>& rhs)
+	template<class LDerived, class RDerived>
+	inline bool is_same_shape(const caview2d_base<LDerived>& lhs, const caview2d_base<RDerived>& rhs)
 	{
-		if (lhs.dim0() == rhs.dim0() && lhs.dim1() == rhs.dim1())
-		{
-			slice2d_info sl = lhs.slice_info();
-			slice2d_info sr = rhs.slice_info();
-
-			return _detail::elements_equal_2d(sl.nslices, sl.len, lhs.pbase(), sl.stride, rhs.pbase(), sr.stride);
-		}
-		else
-		{
-			return false;
-		}
+		return lhs.dim0() == rhs.dim0() && lhs.dim1() == rhs.dim1();
 	}
 
-	template<typename T, typename TOrd>
-	inline bool operator != (const caview2d<T, TOrd>& lhs, const caview2d<T, TOrd>& rhs)
+	template<class LDerived, class RDerived>
+	inline bool is_equal(const dense_caview2d_base<LDerived>& lhs, const dense_caview2d_base<RDerived>& rhs)
 	{
-		return !(lhs == rhs);
+		return is_same_shape(lhs, rhs) && elements_equal(lhs.pbase(), rhs.pbase(), lhs.size());
 	}
-
-	// export & import
-
-	template<typename T, typename TOrd>
-	inline void import_from(aview2d<T, TOrd>& a, const T *in)
-	{
-		slice2d_info s = a.slice_info();
-		_detail::copy_elements_2d(s.nslices, s.len, in, (index_t)(s.len), a.pbase(), s.stride);
-	}
-
-	template<typename T, typename TOrd, typename ForwardIterator>
-	inline void import_from(aview2d<T, TOrd>& a, ForwardIterator in)
-	{
-		std::copy_n(in, a.nelems(), a.begin());
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename ForwardIterator>
-	inline void import_from(aview2d_ex<T, TOrd, TIndexer0, TIndexer1>& a, ForwardIterator in)
-	{
-		index_t d0 = a.dim0();
-		index_t d1 = a.dim1();
-
-		if (std::is_same<TOrd, row_major_t>::value)
-		{
-			for (index_t i = 0; i < d0; ++i)
-			{
-				for (index_t j = 0; j < d1; ++j)
-				{
-					a(i, j) = *in;
-					++ in;
-				}
-			}
-		}
-		else
-		{
-			for (index_t j = 0; j < d1; ++j)
-			{
-				for (index_t i = 0; i < d0; ++i)
-				{
-					a(i, j) = *in;
-					++ in;
-				}
-			}
-		}
-	}
-
-	template<typename T, typename TOrd>
-	inline void export_to(const caview2d<T, TOrd>& a, T *out)
-	{
-		slice2d_info s = a.slice_info();
-		_detail::copy_elements_2d(s.nslices, s.len, a.pbase(), s.stride, out, (index_t)(s.len));
-	}
-
-	template<typename T, typename TOrd, typename ForwardIterator>
-	inline void export_to(const caview2d<T, TOrd>& a, ForwardIterator out)
-	{
-		std::copy_n(a.begin(), a.nelems(), out);
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1, typename ForwardIterator>
-	inline void export_to(const caview2d_ex<T, TOrd, TIndexer0, TIndexer1>& a, ForwardIterator out)
-	{
-		index_t d0 = a.dim0();
-		index_t d1 = a.dim1();
-
-		if (std::is_same<TOrd, row_major_t>::value)
-		{
-			for (index_t i = 0; i < d0; ++i)
-			{
-				for (index_t j = 0; j < d1; ++j)
-				{
-					*out = a(i, j);
-					++ out;
-				}
-			}
-		}
-		else
-		{
-			for (index_t j = 0; j < d1; ++j)
-			{
-				for (index_t i = 0; i < d0; ++i)
-				{
-					*out = a(i, j);
-					++ out;
-				}
-			}
-		}
-	}
-
-
-	// fill
-
-	template<typename T, typename TOrd>
-	inline void set_zeros(aview2d<T, TOrd>& dst)
-	{
-		slice2d_info s = dst.slice_info();
-		_detail::set_zeros_2d(s.nslices, s.len, dst.pbase(), s.stride);
-	}
-
-	template<typename T, typename TOrd>
-	inline void fill(aview2d<T, TOrd>& dst, const T& v)
-	{
-		slice2d_info s = dst.slice_info();
-		_detail::set_elements_2d(s.nslices, s.len, v, dst.pbase(), s.stride);
-	}
-
-	template<typename T, typename TOrd, typename TIndexer0, typename TIndexer1>
-	inline void fill(aview2d_ex<T, TOrd, TIndexer0, TIndexer1>& dst, const T& v)
-	{
-		index_t d0 = dst.dim0();
-		index_t d1 = dst.dim1();
-
-		if (std::is_same<TOrd, row_major_t>::value)
-		{
-			for (index_t i = 0; i < d0; ++i)
-			{
-				for (index_t j = 0; j < d1; ++j)
-				{
-					dst(i, j) = v;
-				}
-			}
-		}
-		else
-		{
-			for (index_t j = 0; j < d1; ++j)
-			{
-				for (index_t i = 0; i < d0; ++i)
-				{
-					dst(i, j) = v;
-				}
-			}
-		}
-	}
-
 
 	// copy
 
-	template<typename T, typename TOrd>
-	inline void copy(const caview2d<T, TOrd>& src, aview2d<T, TOrd>& dst)
+	template<class LDerived, class RDerived>
+	inline void copy(const dense_caview2d_base<LDerived>& src, dense_aview2d_base<RDerived>& dst)
 	{
-		check_arg(src.shape() == dst.shape(), "aview2d copy: the shapes of src and dst are inconsistent.");
+		BCS_CHECK_LAYOUT_ORD2(typename LDerived, typename RDerived)
 
-		slice2d_info ss = src.slice_info();
-		slice2d_info sd = dst.slice_info();
-
-		_detail::copy_elements_2d(ss.nslices, ss.len, src.pbase(), ss.stride, dst.pbase(), sd.stride);
+		check_arg(is_same_shape(src, dst), "aview2d copy: the shapes of src and dst are inconsistent.");
+		copy_elements(src.pbase(), dst.pbase(), src.size());
 	}
 
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline void copy(const caview2d<T, TOrd>& src, aview2d_ex<T, TOrd, TIndexer0, TIndexer1>& dst)
+	template<class LDerived, class RDerived>
+	inline void copy(const dense_caview2d_base<LDerived>& src, aview2d_base<RDerived>& dst)
 	{
-		check_arg(src.shape() == dst.shape(), "aview2d copy: the shapes of src and dst are inconsistent.");
-		import_from(dst, src.begin());
+		BCS_CHECK_LAYOUT_ORD2(typename LDerived, typename RDerived)
+
+		check_arg(is_same_shape(src, dst), "aview2d copy: the shapes of src and dst are inconsistent.");
+		dst.import_from(src.pbase());
 	}
 
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline void copy(const caview2d_ex<T, TOrd, TIndexer0, TIndexer1>& src, aview2d<T, TOrd>& dst)
+	template<class LDerived, class RDerived>
+	inline void copy(const caview2d_base<LDerived>& src, dense_aview2d_base<RDerived>& dst)
 	{
-		check_arg(src.shape() == dst.shape(), "aview2d copy: the shapes of src and dst are inconsistent.");
-		export_to(src, dst.begin());
+		BCS_CHECK_LAYOUT_ORD2(typename LDerived, typename RDerived)
+
+		check_arg(is_same_shape(src, dst), "aview2d copy: the shapes of src and dst are inconsistent.");
+		src.export_to(dst.pbase());
 	}
 
-	template<typename T, typename TOrd, class LIndexer0, class LIndexer1, class RIndexer0, class RIndexer1>
-	inline void copy(const caview2d_ex<T, TOrd, LIndexer0, LIndexer1>& src,
-			aview2d_ex<T, TOrd, RIndexer0, RIndexer1>& dst)
+	template<class LDerived, class RDerived>
+	inline void copy(const caview1d_base<LDerived>& src, aview1d_base<RDerived>& dst)
 	{
-		check_arg(src.shape() == dst.shape(), "aview2d copy: the shapes of src and dst are inconsistent.");
+		BCS_CHECK_LAYOUT_ORD2(typename LDerived, typename RDerived)
+
+		check_arg(is_same_shape(src, dst), "aview2d copy: the shapes of src and dst are inconsistent.");
+
+		const LDerived& srcd = src.derived();
+		RDerived& dstd = dst.derived();
 
 		index_t d0 = src.dim0();
 		index_t d1 = src.dim1();
 
-		if (std::is_same<TOrd, row_major_t>::value)
+		if (std::is_same<typename LDerived::layout_order>::value)
 		{
 			for (index_t i = 0; i < d0; ++i)
 			{
 				for (index_t j = 0; j < d1; ++j)
 				{
-					dst(i, j) = src(i, j);
+					dstd(i, j) = srcd(i, j);
 				}
 			}
 		}
@@ -1003,7 +908,7 @@ namespace bcs
 			{
 				for (index_t i = 0; i < d0; ++i)
 				{
-					dst(i, j) = src(i, j);
+					dstd(i, j) = srcd(i, j);
 				}
 			}
 		}
@@ -1017,110 +922,70 @@ namespace bcs
 	 ******************************************************/
 
 	template<typename T, typename TOrd, class Alloc>
-	class array2d : private sharable_storage_base<T, Alloc>, public aview2d<T, TOrd>
+	class array2d
+	: private sharable_storage_base<T, Alloc>
+	, private aview2d<T, TOrd>
+	, public dense_aview1d_base<array2d<T> >
 	{
 	public:
-		BCS_ARRAY_CHECK_TYPE(T)
+		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
-		BCS_ARRAY_BASIC_TYPEDEFS(2u, T, TOrd)
+		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
-		typedef caview2d<value_type, layout_order> cview_type;
-		typedef aview2d<value_type, layout_order> view_type;
-
-		typedef sharable_storage_base<T, Alloc> storage_base_type;
+		typedef sharable_storage_base<T, Alloc> storage_base;
+		typedef aview2d<T, TOrd> view_base;
 
 	public:
-		explicit array2d(size_type m, size_type n)
-		: storage_base_type(m * n)
-		, view_type(storage_base_type::pointer_to_base(), m, n)
+		explicit array2d(index_type m, index_type n)
+		: storage_base((size_t)(m * n))
+		, view_base(storage_base::pointer_to_base(), m, n)
 		{
 		}
 
 		explicit array2d(const shape_type& shape)
-		: storage_base_type(static_cast<size_type>(shape[0] * shape[1]))
-		, view_type(storage_base_type::pointer_to_base(), (size_t)shape[0], (size_t)shape[1])
+		: storage_base((size_t)(shape[0] * shape[1]))
+		, view_base(storage_base::pointer_to_base(), shape[0], shape[1])
 		{
 		}
 
-		array2d(size_type m, size_type n, const T& x)
-		: storage_base_type(m * n, x)
-		, view_type(storage_base_type::pointer_to_base(), m, n)
+		array2d(index_type m, index_type n, const T& x)
+		: storage_base((size_t)(m * n), x)
+		, view_base(storage_base::pointer_to_base(), m, n)
 		{
 		}
 
-		array2d(size_type m, size_type n, const_pointer src)
-		: storage_base_type(m * n, src)
-		, view_type(storage_base_type::pointer_to_base(), m, n)
+		array2d(index_type m, index_type n, const_pointer src)
+		: storage_base((size_t)(m * n), src)
+		, view_base(storage_base::pointer_to_base(), m, n)
 		{
 		}
 
 		array2d(const array2d& r)
-		: storage_base_type(r)
-		, view_type(storage_base_type::pointer_to_base(), r.nrows(), r.ncolumns())
+		: storage_base(r)
+		, view_base(storage_base::pointer_to_base(), r.nrows(), r.ncolumns())
 		{
 		}
 
 		array2d(array2d&& r)
-		: storage_base_type(std::move(r))
-		, view_type(std::move(r))
+		: storage_base(std::move(r))
+		, view_base(std::move(r))
 		{
+			view_base& rv = r;
+			rv.reset();
 		}
 
-		explicit array2d(const cview_type& r)
-		: storage_base_type(r.nelems(), r.pbase())
-		, view_type(storage_base_type::pointer_to_base(), r.nrows(), r.ncolumns())
+		template<class Derived>
+		explicit array2d(const caview2d_base<Derived>& r)
+		: storage_base(r.size())
+		, view_base(storage_base::pointer_to_base(), r.nrows(), r.ncolumns())
 		{
+			copy(r.derived(), *this);
 		}
 
-		template<typename TIndexer0, typename TIndexer1>
-		explicit array2d(const caview2d_ex<value_type, layout_order, TIndexer0, TIndexer1>& r)
-		: storage_base_type(r.nelems())
-		, view_type(storage_base_type::pointer_to_base(), r.nrows(), r.ncolumns())
-		{
-			copy(r, *this);
-		}
 
-		array2d& operator = (const array2d& r)
-		{
-			if (this != &r)
-			{
-				storage_base_type &s = *this;
-				view_type& v = *this;
-
-				s = r;
-				v = view_type(s.pointer_to_base(), r.nrows(), r.ncolumns(), r.base_dim0(), r.base_dim1());
-			}
-			return *this;
-		}
-
-		array2d& operator = (array2d&& r)
-		{
-			storage_base_type &s = *this;
-			view_type& v = *this;
-
-			s = std::move(r);
-			v = std::move(r);
-
-			return *this;
-		}
-
-		void swap(array2d& r)
-		{
-			using std::swap;
-
-			storage_base_type::swap(r);
-
-			view_type& v = *this;
-			view_type& rv = r;
-			swap(v, rv);
-		}
-
-		// sharing
-
-	public:
 		array2d(const array2d& r, do_share ds)
-		: storage_base_type(r, ds)
-		, view_type(storage_base_type::pointer_to_base(), r.nrows(), r.ncolumns(), r.base_dim0(), r.base_dim1())
+		: storage_base(r, ds)
+		, view_base(storage_base::pointer_to_base(), r.nrows(), r.ncolumns())
 		{
 		}
 
@@ -1129,7 +994,209 @@ namespace bcs
 			return array2d(*this, do_share());
 		}
 
+		array2d& operator = (const array2d& r)
+		{
+			if (this != &r)
+			{
+				storage_base &s = *this;
+				view_base& v = *this;
+
+				s = r;
+				v = view_base(s.pointer_to_base(), r.nrows(), r.ncolumns());
+			}
+			return *this;
+		}
+
+		array2d& operator = (array2d&& r)
+		{
+			storage_base &s = *this;
+			view_base& v = *this;
+
+			s = std::move(r);
+			v = std::move(r);
+
+			view_base& rv = r;
+			rv.reset();
+
+			return *this;
+		}
+
+		void swap(array2d& r)
+		{
+			using std::swap;
+
+			storage_base::swap(r);
+
+			view_base& v = *this;
+			view_base& rv = r;
+			swap(v, rv);
+		}
+
+	public:
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
+		BCS_ENSURE_INLINE size_type size() const
+		{
+			return view_base::size();
+		}
+
+		BCS_ENSURE_INLINE index_type nelems() const
+		{
+			return view_base::nelems();
+		}
+
+		BCS_ENSURE_INLINE bool is_empty() const
+		{
+			return view_base::is_empty();
+		}
+
+		BCS_ENSURE_INLINE index_type dim0() const
+		{
+			return view_base::dim0();
+		}
+
+		BCS_ENSURE_INLINE index_type dim1() const
+		{
+			return view_base::dim1();
+		}
+
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return view_base::nrows();
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return view_base::ncolumns();
+		}
+
+		BCS_ENSURE_INLINE shape_type shape() const
+		{
+			return view_base::shape();
+		}
+
+	public:
+		BCS_ENSURE_INLINE const_pointer pbase() const
+		{
+			return view_base::pbase();
+		}
+
+		BCS_ENSURE_INLINE pointer pbase()
+		{
+			return view_base::pbase();
+		}
+
+		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
+		{
+			return this->m_pbase[i];
+		}
+
+		BCS_ENSURE_INLINE reference operator[](index_type i)
+		{
+			return this->m_pbase[i];
+		}
+
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
+		{
+			return view_base::operator()(i, j);
+		}
+
+		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
+		{
+			return view_base::operator()(i, j);
+		}
+
+		void export_to(pointer dst) const
+		{
+			view_base::export_to(dst);
+		}
+
+		void import_from(const_pointer src)
+		{
+			view_base::import_from(src);
+		}
+
+		void fill(const value_type& v)
+		{
+			view_base::fill(v);
+		}
+
+	public:
+		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
+		row(index_t i) const
+		{
+			return view_base::row(i);
+		}
+
+		typename _detail::slice_helper2d<value_type, layout_order>::row_view_type
+		row(index_t i)
+		{
+			return view_base::row(i);
+		}
+
+		template<class TRange>
+		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_cview_type
+		row(index_t i, const TRange& rgn) const
+		{
+			return view_base::row(i, rgn);
+		}
+
+		template<class TRange>
+		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_view_type
+		row(index_t i, const TRange& rgn)
+		{
+			return view_base::row(i, rgn);
+		}
+
+		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
+		column(index_t i) const
+		{
+			return view_base::column(i);
+		}
+
+		typename _detail::slice_helper2d<value_type, layout_order>::column_view_type
+		column(index_t i)
+		{
+			return view_base::column(i);
+		}
+
+		template<class TRange>
+		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_cview_type
+		column(index_t i, const TRange& rgn) const
+		{
+			return view_base::column(i, rgn);
+		}
+
+		template<class TRange>
+		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_view_type
+		column(index_t i, const TRange& rgn)
+		{
+			return view_base::column(i, rgn);
+		}
+
+		template<class TRange0, class TRange1>
+		caview2d_ex<value_type, layout_order,
+			typename indexer_map<TRange0>::type,
+			typename indexer_map<TRange1>::type>
+		V(const TRange0& I, const TRange1& J) const
+		{
+			return view_base::subview(I, J);
+		}
+
+		template<class TRange0, class TRange1>
+		aview2d_ex<value_type, layout_order,
+			typename indexer_map<TRange0>::type,
+			typename indexer_map<TRange1>::type>
+		V(const TRange0& I, const TRange1& J)
+		{
+			return view_base::subview(I, J);
+		}
+
 	}; // end class array2d
+
 
 	template<typename T, typename TOrd, class Alloc>
 	inline void swap(array2d<T, TOrd, Alloc>& lhs, array2d<T, TOrd, Alloc>& rhs)
@@ -1137,14 +1204,9 @@ namespace bcs
 		lhs.swap(rhs);
 	}
 
-	template<typename T, typename TOrd>
-	inline array2d<T, TOrd> clone_array(const caview2d<T, TOrd>& a)
-	{
-		return array2d<T, TOrd>(a);
-	}
-
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
-	inline array2d<T, TOrd> clone_array(const caview2d_ex<T, TOrd, TIndexer0, TIndexer1>& a)
+	template<class Derived>
+	inline array2d<typename Derived::value_type, typename Derived::layout_order>
+	clone_array(const caview2d_base<Derived>& a)
 	{
 		return array2d<T, TOrd>(a);
 	}
@@ -1156,122 +1218,136 @@ namespace bcs
 	 *
 	 ******************************************************/
 
-	template<typename T, typename TOrd, class IndexIter>
-	array1d<T> select_elems(const caview2d<T, TOrd>& a, size_t n, IndexIter I, IndexIter J)
+	template<class Derived, class IndexSelector>
+	array1d<typename Derived::value_type>
+	select_elems(const caview2d_base<Derived>& a, const IndexSelector& I, const IndexSelector& J)
 	{
-		array1d<T> r(n);
+		index_t n = (index_t)I.size();
+		check_arg(n == (index_t)J.size(), "Inconsistent selector sizes.");
 
-		index_t d = r.dim0();
-		for (index_t i = 0; i < d; ++i, ++I, ++J)
+		array1d<typename Derived::value_type> r(n);
+
+		const Derived& ad = a.derived();
+
+		for (index_t i = 0; i < n; ++i)
 		{
-			r(i) = a(*I, *J);
+			r[i] = ad(I[i], J[i]);
 		}
-
 		return r;
 	}
 
 
-	template<typename T, typename TOrd, class IndexIter>
-	array2d<T, TOrd> select_rows(const caview2d<T, TOrd>& a, size_t m, IndexIter I)
+	template<class Derived, class IndexSelector>
+	array2d<typename Derived::value_type, typename Derived::layout_order>
+	select_rows(const caview2d_base<Derived>& a, const IndexSelector& I)
 	{
-		array2d<T, TOrd> r(m, a.ncolumns());
+		typedef typename Derived::value_type T;
+		typedef typename Derived::layout_order TOrd;
 
-		index_t d0 = r.dim0();
-		index_t d1 = r.dim1();
-
-		if (std::is_same<TOrd, row_major_t>::value)
-		{
-			for (index_t i = 0; i < d0; ++i, ++I)
-			{
-				index_t si = *I;
-				for (index_t j = 0; j < d1; ++j)
-				{
-					r(i, j) = a(si, j);
-				}
-			}
-		}
-		else
-		{
-			for (index_t j = 0; j < d1; ++j)
-			{
-				IndexIter _I(I);
-				for (index_t i = 0; i < d0; ++i, ++_I)
-				{
-					r(i, j) = a(*_I, j);
-				}
-			}
-		}
-
-		return r;
-	}
-
-
-	template<typename T, typename TOrd, class IndexIter>
-	array2d<T, TOrd> select_columns(const caview2d<T, TOrd>& a, size_t n, IndexIter J)
-	{
-		array2d<T, TOrd> r(a.nrows(), n);
-
-		index_t d0 = r.dim0();
-		index_t d1 = r.dim1();
-
-		if (std::is_same<TOrd, column_major_t>::value)
-		{
-			for (index_t j = 0; j < d1; ++j, ++J)
-			{
-				index_t sj = *J;
-				for (index_t i = 0; i < d0; ++i)
-				{
-					r(i, j) = a(i, sj);
-				}
-			}
-		}
-		else
-		{
-			for (index_t i = 0; i < d0; ++i)
-			{
-				IndexIter _J(J);
-				for (index_t j = 0; j < d1; ++j, ++_J)
-				{
-					r(i, j) = a(i, *_J);
-				}
-			}
-		}
-
-		return r;
-	}
-
-
-	template<typename T, typename TOrd, class IndexIter0, class IndexIter1>
-	array2d<T, TOrd> select_rows_and_cols(const caview2d<T, TOrd>& a, size_t m, IndexIter0 I, size_t n, IndexIter1 J)
-	{
+		index_t m = (index_t)I.size();
+		index_t n = a.ncolumns();
 		array2d<T, TOrd> r(m, n);
 
-		index_t d0 = r.dim0();
-		index_t d1 = r.dim1();
+		const Derived& ad = a.derived();
+		T* rp = r.pbase();
 
 		if (std::is_same<TOrd, row_major_t>::value)
 		{
-			for (index_t i = 0; i < d0; ++i, ++I)
+			for (index_t i = 0; i < m; ++i)
 			{
-				index_t si = *I;
-				IndexIter1 _J(J);
-
-				for (index_t j = 0; j < d1; ++j, ++_J)
+				index_t si = I[i];
+				for (index_t j = 0; j < n; ++j)
 				{
-					r(i, j) = a(si, *_J);
+					*(rp++) = ad(si, j);
 				}
 			}
 		}
 		else
 		{
-			for (index_t j = 0; j < d1; ++j, ++J)
+			for (index_t j = 0; j < n; ++j)
 			{
-				index_t sj = *J;
-				IndexIter0 _I(I);
-
 				for (index_t i = 0; i < d0; ++i, ++_I)
 				{
-					r(i, j) = a(*_I, sj);
+					*(rp++) = ad(I[i], j);
+				}
+			}
+		}
+
+		return r;
+	}
+
+
+	template<class Derived, class IndexSelector>
+	array2d<typename Derived::value_type, typename Derived::layout_order>
+	select_columns(const caview2d_base<Derived>& a, const IndexSelector& J)
+	{
+		typedef typename Derived::value_type T;
+		typedef typename Derived::layout_order TOrd;
+
+		index_t m = a.nrows();
+		index_t n = (index_t)J.size();
+		array2d<T, TOrd> r(m, n);
+
+		const Derived& ad = a.derived();
+		T* rp = r.pbase();
+
+		if (std::is_same<TOrd, row_major_t>::value)
+		{
+			for (index_t i = 0; i < m; ++i)
+			{
+				for (index_t j = 0; j < n; ++j)
+				{
+					*(rp++) = ad(i, J[j]);
+				}
+			}
+		}
+		else
+		{
+			for (index_t j = 0; j < n; ++j)
+			{
+				index_t sj = J[j];
+				for (index_t i = 0; i < d0; ++i, ++_I)
+				{
+					*(rp++) = ad(i, sj);
+				}
+			}
+		}
+
+		return r;
+	}
+
+
+	template<class Derived, class IndexSelectorI, class IndexSelectorJ>
+	array2d<typename Derived::value_type, typename Derived::layout_order>
+	select_rows_cols(const caview2d_base<Derived>& a, const IndexSelectorI& I, const IndexSelectorJ& J)
+	{
+		typedef typename Derived::value_type T;
+		typedef typename Derived::layout_order TOrd;
+
+		index_t m = (index_t)I.size();
+		index_t n = (index_t)J.size();
+		array2d<T, TOrd> r(m, n);
+
+		const Derived& ad = a.derived();
+		T* rp = r.pbase();
+
+		if (std::is_same<TOrd, row_major_t>::value)
+		{
+			for (index_t i = 0; i < m; ++i)
+			{
+				for (index_t j = 0; j < n; ++j)
+				{
+					*(rp++) = ad(I[i], J[j]);
+				}
+			}
+		}
+		else
+		{
+			for (index_t j = 0; j < n; ++j)
+			{
+				for (index_t i = 0; i < d0; ++i, ++_I)
+				{
+					*(rp++) = ad(I[i], J[j]);
 				}
 			}
 		}
@@ -1304,24 +1380,21 @@ namespace bcs
 		}
 	}
 
-	template<typename T, typename TOrd>
-	inline array2d<T, TOrd> transpose(const caview2d<T, TOrd>& a)
+	template<class Derived>
+	inline array2d<typename Derived::value_type, typename Derived::layout_order>
+	transpose(const dense_caview2d_base<Derived>& a)
 	{
-		array2d<T, TOrd> r(a.ncolumns(), a.nrows());
+		array2d<typename Derived::value_type, typename Derived::layout_order> r(a.ncolumns(), a.nrows());
 
-		slice2d_info sli = a.slice_info();
+		index_t nslices, slen;
 
-		if (sli.stride == static_cast<index_t>(sli.len))
+		if (std::is_same<typename Derived::layout_order, row_major_t>::value)
 		{
-			transpose_matrix(a.pbase(), r.pbase(), sli.nslices, sli.len);
+			transpose_matrix(a.pbase(), r.pbase(), a.nrows(), a.ncolumns());
 		}
 		else
 		{
-			// first packing
-			scoped_buffer<T> buf(a.nelems());
-			export_to(a, buf.pbase());
-
-			transpose_matrix(buf.pbase(), r.pbase(), sli.nslices, sli.len);
+			transpose_matrix(a.pbase(), r.pbase(), a.ncolumns(), a.nrows());
 		}
 
 		return r;

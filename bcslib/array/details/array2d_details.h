@@ -17,89 +17,8 @@
 
 namespace bcs
 {
-	struct slice2d_info
-	{
-		size_t nslices;
-		size_t len;
-		index_t stride;
-
-		bool is_compact() const
-		{
-			return (index_t)len == stride;
-		}
-	};
-
 	namespace _detail
 	{
-		/**************************************************
-		 *
-		 *  iterator implementation
-		 *
-		 **************************************************/
-
-		template<typename T>
-		class array2d_iterator_impl
-		{
-		public:
-			BCS_STATIC_ASSERT( !std::is_reference<T>::value  );
-
-			typedef typename std::remove_const<T>::type value_type;
-			typedef T& reference;
-			typedef T* pointer;
-
-		public:
-			array2d_iterator_impl()
-			: m_p(BCS_NULL), m_p_slend(BCS_NULL), m_slice_blen(0), m_slice_elen(0)
-			{
-			}
-
-			array2d_iterator_impl(pointer p, pointer p_slend, index_t sl_blen, index_t sl_elen)
-			: m_p(p), m_p_slend(p_slend), m_slice_blen(sl_blen), m_slice_elen(sl_elen)
-			{
-			}
-
-			pointer ptr() const
-			{
-				return m_p;
-			}
-
-			reference ref() const
-			{
-				return *m_p;
-			}
-
-			bool operator == (const array2d_iterator_impl& rhs) const
-			{
-				return m_p == rhs.m_p;
-			}
-
-			void move_next()
-			{
-				++ m_p;
-
-				if (m_p == m_p_slend)
-				{
-					m_p_slend += m_slice_blen;	// move slice end to next slice
-					m_p = m_p_slend - m_slice_elen; 	// infer the starting of such slice
-				}
-			}
-
-		public:
-			static array2d_iterator_impl slice_begin_iter(pointer p, index_t sl_blen, index_t sl_elen)
-			{
-				return array2d_iterator_impl(p, p + sl_elen, sl_blen, sl_elen);
-			}
-
-		private:
-			pointer m_p;
-			pointer m_p_slend;
-
-			index_t m_slice_blen;	// base length (whole line)
-			index_t m_slice_elen; 	// effective length
-
-		}; // end class array2d_iterator_impl
-
-
 
 		/**************************************************
 		 *
@@ -138,29 +57,9 @@ namespace bcs
 				return arr_shape(m_base_d0, m_base_d1);
 			}
 
-		public:
 			index_t offset(index_t i, index_t j) const
 			{
 				return i * m_base_d1 + j;
-			}
-
-			index_t row_offset(index_t i) const
-			{
-				return i * m_base_d1;
-			}
-
-			index_t column_offset(index_t j) const
-			{
-				return j;
-			}
-
-			slice2d_info get_slice_info(size_t m, size_t n) const
-			{
-				slice2d_info s;
-				s.nslices = m;
-				s.len = n;
-				s.stride = m_base_d1;
-				return s;
 			}
 
 		private:
@@ -177,9 +76,9 @@ namespace bcs
 			{
 			}
 
-			size_t base_size() const
+			index_t base_nelems() const
 			{
-				return static_cast<size_t>(m_base_d0 * m_base_d1);
+				return m_base_d0 * m_base_d1;
 			}
 
 			index_t base_dim0() const
@@ -197,29 +96,9 @@ namespace bcs
 				return arr_shape(m_base_d0, m_base_d1);
 			}
 
-		public:
 			index_t offset(index_t i, index_t j) const
 			{
 				return i + m_base_d0 * j;
-			}
-
-			index_t row_offset(index_t i) const
-			{
-				return i;
-			}
-
-			index_t column_offset(index_t j) const
-			{
-				return m_base_d0 * j;
-			}
-
-			slice2d_info get_slice_info(size_t m, size_t n) const
-			{
-				slice2d_info s;
-				s.nslices = n;
-				s.len = m;
-				s.stride = m_base_d0;
-				return s;
 			}
 
 		private:
@@ -228,99 +107,34 @@ namespace bcs
 		};
 
 
-		template<typename T, typename TOrd> struct iter_helper2d;
-
-		template<typename T>
-		struct iter_helper2d<T, row_major_t>
-		{
-			typedef index_core2d<row_major_t> index_core_t;
-			typedef forward_iterator_wrapper<array2d_iterator_impl<const T> > const_iterator;
-			typedef forward_iterator_wrapper<array2d_iterator_impl<T> > iterator;
-
-			static const_iterator get_const_begin(const T *pbase, const index_core_t& idxcore, index_t d0, index_t d1)
-			{
-				return array2d_iterator_impl<const T>::slice_begin_iter(pbase, idxcore.base_dim1(), d1);
-			}
-
-			static const_iterator get_const_end(const T *pbase, const index_core_t& idxcore, index_t d0, index_t d1)
-			{
-				return array2d_iterator_impl<const T>::slice_begin_iter(pbase + idxcore.row_offset(d0), idxcore.base_dim1(), d1);
-			}
-
-			static iterator get_begin(T *pbase, const index_core_t& idxcore, index_t d0, index_t d1)
-			{
-				return array2d_iterator_impl<T>::slice_begin_iter(pbase, idxcore.base_dim1(), d1);
-			}
-
-			static iterator get_end(T *pbase, const index_core_t& idxcore, index_t d0, index_t d1)
-			{
-				return array2d_iterator_impl<T>::slice_begin_iter(pbase + idxcore.row_offset(d0), idxcore.base_dim1(), d1);
-			}
-		};
-
-
-		template<typename T>
-		struct iter_helper2d<T, column_major_t>
-		{
-			typedef index_core2d<column_major_t> index_core_t;
-			typedef forward_iterator_wrapper<array2d_iterator_impl<const T> > const_iterator;
-			typedef forward_iterator_wrapper<array2d_iterator_impl<T> > iterator;
-
-			static const_iterator get_const_begin(const T *pbase, const index_core_t& idxcore, index_t d0, index_t d1)
-			{
-				return array2d_iterator_impl<const T>::slice_begin_iter(pbase, idxcore.base_dim0(), d0);
-			}
-
-			static const_iterator get_const_end(const T *pbase, const index_core_t& idxcore, index_t d0, index_t d1)
-			{
-				return array2d_iterator_impl<const T>::slice_begin_iter(pbase + idxcore.column_offset(d1), idxcore.base_dim0(), d0);
-			}
-
-			static iterator get_begin(T *pbase, const index_core_t& idxcore, index_t d0, index_t d1)
-			{
-				return array2d_iterator_impl<T>::slice_begin_iter(pbase, idxcore.base_dim0(), d0);
-			}
-
-			static iterator get_end(T *pbase, const index_core_t& idxcore, index_t d0, index_t d1)
-			{
-				return array2d_iterator_impl<T>::slice_begin_iter(pbase + idxcore.column_offset(d1), idxcore.base_dim0(), d0);
-			}
-		};
-
-
-
 		template<typename T, typename TOrd> struct slice_helper2d;
 
 		template<typename T>
 		struct slice_helper2d<T, row_major_t>
 		{
-			typedef index_core2d<row_major_t> index_core_t;
-
 			typedef caview1d<T> row_cview_type;
 			typedef aview1d<T>  row_view_type;
-			typedef caview1d_ex<T, step_range> column_cview_type;
-			typedef aview1d_ex<T, step_range>  column_view_type;
+			typedef caview1d_ex<T, step_ind> column_cview_type;
+			typedef aview1d_ex<T, step_ind>  column_view_type;
 
-			static row_cview_type row_cview(const index_core_t& idxcore, const T *prowbase, size_t rowlen)
+			static row_cview_type row_cview(const T* pbase, index_t d0, index_t d1, index_t irow)
 			{
-				return caview1d<T>(prowbase, rowlen);
+				return caview1d<T>(pbase + irow * d1, d1);
 			}
 
-			static row_view_type row_view(const index_core_t& idxcore, T *prowbase, size_t rowlen)
+			static row_view_type row_view(T *pbase, index_t d0, index_t d1, index_t irow)
 			{
-				return aview1d<T>(prowbase, rowlen);
+				return aview1d<T>(pbase + irow * d1, d1);
 			}
 
-			static column_cview_type column_cview(const index_core_t& idxcore, const T *pcolbase, size_t collen)
+			static column_cview_type column_cview(const T* pbase, index_t d0, index_t d1, index_t icol)
 			{
-				return caview1d_ex<T, step_range>( pcolbase,
-						step_range::from_begin_dim(0, (index_t)collen, idxcore.base_dim1()) );
+				return caview1d_ex<T, step_ind>(pbase + icol, step_ind(d0, d1));
 			}
 
-			static column_view_type column_view(const index_core_t& idxcore, T *pcolbase, size_t collen)
+			static column_view_type column_view(T* pbase, index_t d0, index_t d1, index_t icol)
 			{
-				return aview1d_ex<T, step_range>( pcolbase,
-						step_range::from_begin_dim(0, (index_t)collen, idxcore.base_dim1()) );
+				return aview1d_ex<T, step_ind>(pbase + icol, step_ind(d0, d1));
 			}
 		};
 
@@ -328,249 +142,112 @@ namespace bcs
 		template<typename T>
 		struct slice_helper2d<T, column_major_t>
 		{
-			typedef index_core2d<column_major_t> index_core_t;
-
 			typedef caview1d<T> column_cview_type;
 			typedef aview1d<T>  column_view_type;
 			typedef caview1d_ex<T, step_range> row_cview_type;
 			typedef aview1d_ex<T, step_range>  row_view_type;
 
-			static column_cview_type column_cview(const index_core_t& idxcore, const T *pcolbase, size_t collen)
+			static row_cview_type row_cview(const T* pbase, index_t d0, index_t d1, index_t irow)
 			{
-				return caview1d<T>(pcolbase, collen);
+				return caview1d_ex<T, step_ind>(pbase + irow, step_ind(d1, d0));
 			}
 
-			static column_view_type column_view(const index_core_t& idxcore, T *pcolbase, size_t collen)
+			static row_view_type row_view(T *pbase, index_t d0, index_t d1, index_t irow)
 			{
-				return aview1d<T>(pcolbase, collen);
+				return aview1d_ex<T, step_ind>(pbase + irow, step_ind(d1, d0));
 			}
 
-			static row_cview_type row_cview(const index_core_t& idxcore, const T *prowbase, size_t rowlen)
+			static column_cview_type column_cview(const T* pbase, index_t d0, index_t d1, index_t icol)
 			{
-				return caview1d_ex<T, step_range>( prowbase,
-						step_range::from_begin_dim(0, (index_t)rowlen, idxcore.base_dim0()) );
+				return caview1d<T>(pbase + icol * d0, d0);
 			}
 
-			static row_view_type row_view(const index_core_t& idxcore, T *prowbase, size_t rowlen)
+			static column_view_type column_view(T* pbase, index_t d0, index_t d1, index_t icol)
 			{
-				return aview1d_ex<T, step_range>( prowbase,
-						step_range::from_begin_dim(0, (index_t)rowlen, idxcore.base_dim0()) );
+				return aview1d<T>(pbase + icol * d0, d0);
 			}
 		};
 
 
 		template<typename T, typename TOrd, class TRange> struct slice_range_helper2d;
 
-		template<typename T>
-		struct slice_range_helper2d<T, row_major_t, range>
-		{
-			typedef index_core2d<row_major_t> index_core_t;
-
-			typedef caview1d<T> row_range_cview_type;
-			typedef aview1d<T>  row_range_view_type;
-			typedef caview1d_ex<T, step_range> column_range_cview_type;
-			typedef aview1d_ex<T, step_range>  column_range_view_type;
-
-			static row_range_cview_type row_range_cview(const index_core_t& idxcore, const T *prowbase, const range& rgn)
-			{
-				return caview1d<T>(prowbase + rgn.begin_index(), rgn.size());
-			}
-
-			static row_range_view_type row_range_view(const index_core_t& idxcore, T *prowbase, const range& rgn)
-			{
-				return aview1d<T>(prowbase + rgn.begin_index(), rgn.size());
-			}
-
-			static column_range_cview_type column_range_cview(const index_core_t& idxcore, const T *pcolbase, const range& rgn)
-			{
-				return caview1d_ex<T, step_range>(pcolbase, inject_step<range>::get(rgn, idxcore.base_dim1()) );
-			}
-
-			static column_range_view_type column_range_view(const index_core_t& idxcore, T *pcolbase, const range& rgn)
-			{
-				return aview1d_ex<T, step_range>(pcolbase, inject_step<range>::get(rgn, idxcore.base_dim1()) );
-			}
-		};
-
 		template<typename T, class TRange>
 		struct slice_range_helper2d<T, row_major_t, TRange>
 		{
 			typedef index_core2d<row_major_t> index_core_t;
 
-			typedef caview1d_ex<T, TRange> row_range_cview_type;
-			typedef aview1d_ex<T, TRange>  row_range_view_type;
-			typedef caview1d_ex<T, typename inject_step<TRange>::result_type> column_range_cview_type;
-			typedef aview1d_ex<T, typename inject_step<TRange>::result_type>  column_range_view_type;
+			typedef caview1d_ex<T, typename indexer_map<TRange>::type> row_range_cview_type;
+			typedef aview1d_ex<T, typename indexer_map<TRange>::type>  row_range_view_type;
+			typedef caview1d_ex<T, typename indexer_map<TRange>::stepped_type> column_range_cview_type;
+			typedef aview1d_ex<T, typename indexer_map<TRange>::stepped_type>  column_range_view_type;
 
-			static row_range_cview_type row_range_cview(const index_core_t& idxcore, const T *prowbase, const TRange& rgn)
+			static row_range_cview_type row_range_cview(const T *pbase, index_t d0, index_t d1, index_t irow, const TRange& rgn)
 			{
-				return caview1d_ex<T, TRange>(prowbase, rgn);
+				return caview1d_ex<T, typename indexer_map<TRange>::type>(
+						pbase + d1 * irow + indexer_map<TRange>::get_offset(d1, rgn),
+						indexer_map<TRange>::get_indexer(d1, rgn));
 			}
 
-			static row_range_view_type row_range_view(const index_core_t& idxcore, T *prowbase, const TRange& rgn)
+			static row_range_view_type row_range_view(T *pbase, index_t d0, index_t d1, index_t irow, const TRange& rgn)
 			{
-				return aview1d_ex<T, TRange>(prowbase, rgn);
+				return aview1d_ex<T, typename indexer_map<TRange>::type>(
+						pbase + d1 * irow + indexer_map<TRange>::get_offset(d1, rgn),
+						indexer_map<TRange>::get_indexer(d1, rgn));
 			}
 
-			static column_range_cview_type column_range_cview(const index_core_t& idxcore, const T *pcolbase, const TRange& rgn)
+			static column_range_cview_type column_range_cview(const T *pbase, index_t d0, index_t d1, index_t icol, const TRange& rgn)
 			{
-				return caview1d_ex<T, typename inject_step<TRange>::result_type>(pcolbase,
-						inject_step<TRange>::get(rgn, idxcore.base_dim1()) );
+				return caview1d_ex<T, typename indexer_map<TRange>::stepped_type>(
+						pbase + d1 * indexer_map<TRange>::get_offset(d0, rgn) + icol,
+						indexer_map<TRange>::get_stepped_indexer(d0, d1, rgn));
 			}
 
-			static column_range_view_type column_range_view(const index_core_t& idxcore, T *pcolbase, const TRange& rgn)
+			static column_range_view_type column_range_view(T *pbase, index_t d0, index_t d1, index_t icol, const TRange& rgn)
 			{
-				return aview1d_ex<T, typename inject_step<TRange>::result_type>(pcolbase,
-						inject_step<TRange>::get(rgn, idxcore.base_dim1()) );
-			}
-		};
-
-
-		template<typename T>
-		struct slice_range_helper2d<T, column_major_t, range>
-		{
-			typedef index_core2d<column_major_t> index_core_t;
-
-			typedef caview1d<T> column_range_cview_type;
-			typedef aview1d<T>  column_range_view_type;
-			typedef caview1d_ex<T, step_range> row_range_cview_type;
-			typedef aview1d_ex<T, step_range>  row_range_view_type;
-
-			static column_range_cview_type column_range_cview(const index_core_t& idxcore, const T *pcolbase, const range& rgn)
-			{
-				return caview1d<T>(pcolbase + rgn.begin_index(), rgn.size());
-			}
-
-			static column_range_view_type column_range_view(const index_core_t& idxcore, T *pcolbase, const range& rgn)
-			{
-				return aview1d<T>(pcolbase + rgn.begin_index(), rgn.size());
-			}
-
-			static row_range_cview_type row_range_cview(const index_core_t& idxcore, const T *prowbase, const range& rgn)
-			{
-				return caview1d_ex<T, step_range>(prowbase, inject_step<range>::get(rgn, idxcore.base_dim0()) );
-			}
-
-			static row_range_view_type row_range_view(const index_core_t& idxcore, T *prowbase, const range& rgn)
-			{
-				return aview1d_ex<T, step_range>(prowbase, inject_step<range>::get(rgn, idxcore.base_dim0()) );
+				return aview1d_ex<T, typename indexer_map<TRange>::stepped_type>(
+						pbase + d1 * indexer_map<TRange>::get_offset(d0, rgn) + icol,
+						indexer_map<TRange>::get_stepped_indexer(d0, d1, rgn));
 			}
 		};
-
 
 		template<typename T, class TRange>
 		struct slice_range_helper2d<T, column_major_t, TRange>
 		{
 			typedef index_core2d<column_major_t> index_core_t;
 
-			typedef caview1d_ex<T, TRange> column_range_cview_type;
-			typedef aview1d_ex<T, TRange>  column_range_view_type;
-			typedef caview1d_ex<T, typename inject_step<TRange>::result_type> row_range_cview_type;
-			typedef aview1d_ex<T, typename inject_step<TRange>::result_type>  row_range_view_type;
+			typedef caview1d_ex<T, typename indexer_map<TRange>::stepped_type> row_range_cview_type;
+			typedef aview1d_ex<T, typename indexer_map<TRange>::stepped_type>  row_range_view_type;
+			typedef caview1d_ex<T, typename indexer_map<TRange>::type> column_range_cview_type;
+			typedef aview1d_ex<T, typename indexer_map<TRange>::type>  column_range_view_type;
 
-			static column_range_cview_type column_range_cview(const index_core_t& idxcore, const T *pcolbase, const TRange& rgn)
+			static row_range_cview_type row_range_cview(const T *pbase, index_t d0, index_t d1, index_t irow, const TRange& rgn)
 			{
-				return caview1d_ex<T, TRange>(pcolbase, rgn);
+				return caview1d_ex<T, typename indexer_map<TRange>::stepped_type>(
+						pbase + d0 * indexer_map<TRange>::get_offset(d1, rgn) + irow,
+						indexer_map<TRange>::get_stepped_indexer(d1, d0, rgn));
 			}
 
-			static column_range_view_type column_range_view(const index_core_t& idxcore, T *pcolbase, const TRange& rgn)
+			static row_range_view_type row_range_view(T *pbase, index_t d0, index_t d1, index_t irow, const TRange& rgn)
 			{
-				return aview1d_ex<T, TRange>(pcolbase, rgn);
+				return aview1d_ex<T, typename indexer_map<TRange>::stepped_type>(
+						pbase + d0 * indexer_map<TRange>::get_offset(d1, rgn) + irow,
+						indexer_map<TRange>::get_stepped_indexer(d1, d0, rgn));
 			}
 
-			static row_range_cview_type row_range_cview(const index_core_t& idxcore, const T *prowbase, const TRange& rgn)
+			static column_range_cview_type column_range_cview(const T *pbase, index_t d0, index_t d1, index_t icol, const TRange& rgn)
 			{
-				return caview1d_ex<T, typename inject_step<TRange>::result_type>(prowbase,
-						inject_step<TRange>::get(rgn, idxcore.base_dim0()) );
+				return caview1d_ex<T, typename indexer_map<TRange>::type>(
+						pbase + d0 * icol + indexer_map<TRange>::get_offset(d0, rgn),
+						indexer_map<TRange>::get_indexer(d0, rgn));
 			}
 
-			static row_range_view_type row_range_view(const index_core_t& idxcore, T *prowbase, const TRange& rgn)
+			static column_range_view_type column_range_view(T *pbase, index_t d0, index_t d1, index_t icol, const TRange& rgn)
 			{
-				return aview1d_ex<T, typename inject_step<TRange>::result_type>(prowbase,
-						inject_step<TRange>::get(rgn, idxcore.base_dim0()) );
+				return aview1d_ex<T, typename indexer_map<TRange>::type>(
+						pbase + d0 * icol + indexer_map<TRange>::get_offset(d0, rgn),
+						indexer_map<TRange>::get_indexer(d0, rgn));
 			}
 		};
-
-
-		/**************************************************
-		 *
-		 *  memory operations
-		 *
-		 **************************************************/
-
-		inline bool is_compact_layout2d(size_t len, index_t stride)
-		{
-			return (index_t)len == stride;
-		}
-
-		inline bool is_compact_layout2d(size_t len, index_t stride1, index_t stride2)
-		{
-			index_t l = (index_t)len;
-			return l == stride1 && l == stride2;
-		}
-
-
-		template<typename T>
-		inline void copy_elements_2d(size_t ns, size_t len, const T* src, const index_t src_stride, T *dst, index_t dst_stride)
-		{
-			if (is_compact_layout2d(len, src_stride, dst_stride))
-			{
-				copy_elements(src, dst, ns * len);
-			}
-			else
-			{
-				for (size_t i = 0; i < ns; ++i, src += src_stride, dst += dst_stride)
-				{
-					copy_elements(src, dst, len);
-				}
-			}
-		}
-
-		template<typename T>
-		inline void set_elements_2d(size_t ns, size_t len, const T& v, T *dst, index_t dst_stride)
-		{
-			for (size_t i = 0; i < ns; ++i, dst += dst_stride)
-			{
-				for (size_t j = 0; j < len; ++j)
-				{
-					dst[j] = v;
-				}
-			}
-		}
-
-		template<typename T>
-		inline void set_zeros_2d(size_t ns, size_t len, T *dst, index_t dst_stride)
-		{
-			if (is_compact_layout2d(len, dst_stride))
-			{
-				set_zeros_to_elements(dst, ns * len);
-			}
-			else
-			{
-				for (size_t i = 0; i < ns; ++i, dst += dst_stride)
-				{
-					set_zeros_to_elements(dst, len);
-				}
-			}
-		}
-
-		template<typename T>
-		inline bool elements_equal_2d(size_t ns, size_t len,
-				const T* lhs, const index_t lhs_stride, const T *rhs, index_t rhs_stride)
-		{
-			if (is_compact_layout2d(len, lhs_stride, rhs_stride))
-			{
-				return elements_equal(lhs, rhs, ns * len);
-			}
-			else
-			{
-				for (size_t i = 0; i < ns; ++i, lhs += lhs_stride, rhs += rhs_stride)
-				{
-					if (!elements_equal(lhs, rhs, len)) return false;
-				}
-				return true;
-			}
-		}
 
 	}
 

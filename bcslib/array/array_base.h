@@ -52,6 +52,14 @@
 	typedef index_t index_type; \
 	typedef lorder layout_order;
 
+#define BCS_CHECK_LAYOUT_ORD2(t1, t2) \
+		static_assert(std::is_same<t1::layout_order, t2::layout_order>::value, "Inconsistent layout orders");
+
+#define BCS_CHECK_LAYOUT_ORD3(t1, t2, t3) \
+		static_assert( \
+				std::is_same<t1::layout_order, t2::layout_order>::value && \
+				std::is_same<t2::layout_order, t3::layout_order>::value, "Inconsistent layout orders");
+
 namespace bcs
 {
 	typedef uint8_t dim_num_t;
