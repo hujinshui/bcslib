@@ -1434,7 +1434,7 @@ namespace bcs
 	 ******************************************************/
 
 	template<typename T>
-	inline void transpose_matrix(const T *src, T *dst, size_t m, size_t n)
+	inline void transpose_matrix(const T *src, T *dst, index_t m, index_t n)
 	{
 		const size_t block_size = BCS_TRANSPOSITION_BLOCK_BYTES / sizeof(T);
 
@@ -1442,12 +1442,12 @@ namespace bcs
 
 		if (block_size < 4)
 		{
-			direct_transpose_matrix(src, dst, m, n);
+			direct_transpose_matrix(src, dst, (size_t)m, (size_t)n);
 		}
 		else
 		{
 			size_t bdim = (size_t)std::sqrt((double)block_size);
-			blockwise_transpose_matrix(src, dst, m, n, bdim, cache.data);
+			blockwise_transpose_matrix(src, dst, (size_t)m, (size_t)n, bdim, cache.data);
 		}
 	}
 
