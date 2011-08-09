@@ -850,25 +850,25 @@ namespace bcs
 	// convenient functions to make 2D view
 
 	template<typename T>
-	inline caview2d<T, row_major_t> make_aview2d_rm(const T *base, size_t m, size_t n)
+	inline caview2d<T, row_major_t> make_caview2d_rm(const T *base, index_t m, index_t n)
 	{
 		return caview2d<T, row_major_t>(base, m, n);
 	}
 
 	template<typename T>
-	inline aview2d<T, row_major_t> make_aview2d_rm(T *base, size_t m, size_t n)
+	inline aview2d<T, row_major_t> make_aview2d_rm(T *base, index_t m, index_t n)
 	{
 		return aview2d<T, row_major_t>(base, m, n);
 	}
 
 	template<typename T>
-	inline caview2d<T, column_major_t> make_aview2d_cm(const T *base, size_t m, size_t n)
+	inline caview2d<T, column_major_t> make_caview2d_cm(const T *base, index_t m, index_t n)
 	{
 		return caview2d<T, column_major_t>(base, m, n);
 	}
 
 	template<typename T>
-	inline aview2d<T, column_major_t> make_aview2d_cm(T *base, size_t m, size_t n)
+	inline aview2d<T, column_major_t> make_aview2d_cm(T *base, index_t m, index_t n)
 	{
 		return aview2d<T, column_major_t>(base, m, n);
 	}
@@ -1086,6 +1086,21 @@ namespace bcs
 			view_base& v = *this;
 			view_base& rv = r;
 			swap(v, rv);
+		}
+
+		bool is_unique() const
+		{
+			return storage_base::is_unique();
+		}
+
+		void make_unique()
+		{
+			storage_base::make_unique();
+
+			view_base& v = *this;
+			index_t m = v.dim0();
+			index_t n = v.dim1();
+			v = view_base(storage_base::pointer_to_base(), m, n);
 		}
 
 	public:

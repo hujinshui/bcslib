@@ -153,7 +153,7 @@ static_assert(std::is_base_of<
 template<typename T>
 void dummy_a1(const T& ) { }
 
-void get_derived()
+void get_derived_a1()
 {
 	typedef bcs::array1d<double> dt;
 

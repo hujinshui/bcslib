@@ -13,6 +13,7 @@
 
 #include <bcslib/base/basic_defs.h>
 #include <cmath>
+#include <type_traits>
 
 namespace bcs { namespace test {
 
@@ -49,6 +50,17 @@ namespace bcs { namespace test {
 		return true;
 	}
 
+
+	template<class ArrayClass1, typename T>
+	bool array_equal_scalar(const ArrayClass1& a, const T& v, index_t n)
+	{
+		for (index_t i = 0; i < n; ++i)
+		{
+			if (!(a[i] == v)) return false;
+		}
+		return true;
+	}
+
 	template<class ArrayClass1, class ArrayClass2>
 	bool array1d_equal(const ArrayClass1& a, const ArrayClass2& b)
 	{
@@ -58,6 +70,27 @@ namespace bcs { namespace test {
 		for (index_t i = 0; i < n; ++i)
 		{
 			if (!(a(i) == b(i))) return false;
+		}
+		return true;
+	}
+
+	template<class ArrayClass1, class ArrayClass2>
+	bool array2d_equal(const ArrayClass1& a, const ArrayClass2& b)
+	{
+		static_assert(std::is_same<typename ArrayClass1::layout_order, typename ArrayClass2::layout_order>::value,
+				"Inconsistent layout orders");
+
+		if (a.dim0() != b.dim0()) return false;
+		if (a.dim1() != b.dim1()) return false;
+
+		index_t m = a.dim0();
+		index_t n = a.dim1();
+		for (index_t i = 0; i < m; ++i)
+		{
+			for (index_t j = 0; j < n; ++j)
+			{
+				if (!(a(i, j) == b(i, j))) return false;
+			}
 		}
 		return true;
 	}
