@@ -14,6 +14,7 @@
 #include <bcslib/base/basic_defs.h>
 #include <cmath>
 #include <type_traits>
+#include <cstdio>
 
 namespace bcs { namespace test {
 
@@ -105,6 +106,35 @@ namespace bcs { namespace test {
 			if (d > eps) return false;
 		}
 		return true;
+	}
+
+
+	template<class ArrayClass>
+	void print_array1d(const ArrayClass& a, const char *fmt)
+	{
+		index_t n = a.nelems();
+		for (index_t i = 0; i < n; ++i)
+		{
+			std::printf(fmt, a(i));
+		}
+		std::printf("\n");
+	}
+
+
+	template<class ArrayClass>
+	void print_array2d(const ArrayClass& a, const char *fmt)
+	{
+		index_t m = a.nrows();
+		index_t n = a.ncolumns();
+
+		for (index_t i = 0; i < m; ++i)
+		{
+			for(index_t j = 0; j < n; ++j)
+			{
+				std::printf(fmt, a(i, j));
+			}
+			std::printf("\n");
+		}
 	}
 
 

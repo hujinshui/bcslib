@@ -353,7 +353,7 @@ namespace bcs
 		typename Derived::layout_order,
 		typename indexer_map<IndexSelector0>::type,
 		typename indexer_map<IndexSelector1>::type>
-	subview(const dense_caview1d_base<Derived>& a, const IndexSelector0& I, const IndexSelector1& J)
+	subview(const dense_caview2d_base<Derived>& a, const IndexSelector0& I, const IndexSelector1& J)
 	{
 		typedef caview2d_ex<
 			typename Derived::value_type,
@@ -364,7 +364,7 @@ namespace bcs
 		index_t i0 = indexer_map<IndexSelector0>::get_offset(a.dim0(), I);
 		index_t j0 = indexer_map<IndexSelector1>::get_offset(a.dim1(), J);
 
-		return ret_type(&(a(i0, j0)),
+		return ret_type(&(a(i0, j0)), a.dim0(), a.dim1(),
 				indexer_map<IndexSelector0>::get_indexer(a.dim0(), I),
 				indexer_map<IndexSelector1>::get_indexer(a.dim1(), J));
 	}
@@ -375,7 +375,7 @@ namespace bcs
 		typename Derived::layout_order,
 		typename indexer_map<IndexSelector0>::type,
 		typename indexer_map<IndexSelector1>::type>
-	subview(dense_aview1d_base<Derived>& a, const IndexSelector0& I, const IndexSelector1& J)
+	subview(dense_aview2d_base<Derived>& a, const IndexSelector0& I, const IndexSelector1& J)
 	{
 		typedef aview2d_ex<
 			typename Derived::value_type,
@@ -386,7 +386,7 @@ namespace bcs
 		index_t i0 = indexer_map<IndexSelector0>::get_offset(a.dim0(), I);
 		index_t j0 = indexer_map<IndexSelector1>::get_offset(a.dim1(), J);
 
-		return ret_type(&(a(i0, j0)),
+		return ret_type(&(a(i0, j0)), a.dim0(), a.dim1(),
 				indexer_map<IndexSelector0>::get_indexer(a.dim0(), I),
 				indexer_map<IndexSelector1>::get_indexer(a.dim1(), J));
 	}
@@ -1254,7 +1254,7 @@ namespace bcs
 			typename indexer_map<TRange1>::type>
 		V(const TRange0& I, const TRange1& J) const
 		{
-			return view_base::subview(I, J);
+			return view_base::V(I, J);
 		}
 
 		template<class TRange0, class TRange1>
@@ -1263,7 +1263,7 @@ namespace bcs
 			typename indexer_map<TRange1>::type>
 		V(const TRange0& I, const TRange1& J)
 		{
-			return view_base::subview(I, J);
+			return view_base::V(I, J);
 		}
 
 	}; // end class array2d
