@@ -11,40 +11,110 @@
 
 #include <bcslib/matlab/matlab_base.h>
 #include <bcslib/matlab/marray.h>
+
+#include <bcslib/array/array2d.h>
 #include <vector>
 #include <iterator>
 
-namespace bcs
-{
+namespace bcs {  namespace matlab {
 
-namespace matlab
-{
+	/********************************************
+	 *
+	 *  Typedefs
+	 *
+	 ********************************************/
+
+	typedef caview1d<double>   cvec_f64_view;
+	typedef caview1d<float>    cvec_f32_view;
+	typedef caview1d<int64_t>  cvec_i64_view;
+	typedef caview1d<uint64_t> cvec_u64_view;
+	typedef caview1d<int32_t>  cvec_i32_view;
+	typedef caview1d<uint32_t> cvec_u32_view;
+	typedef caview1d<int16_t>  cvec_i16_view;
+	typedef caview1d<uint16_t> cvec_u16_view;
+	typedef caview1d<int8_t>   cvec_i8_view;
+	typedef caview1d<uint8_t>  cvec_u8_view;
+
+	typedef aview1d<double>   vec_f64_view;
+	typedef aview1d<float>    vec_f32_view;
+	typedef aview1d<int64_t>  vec_i64_view;
+	typedef aview1d<uint64_t> vec_u64_view;
+	typedef aview1d<int32_t>  vec_i32_view;
+	typedef aview1d<uint32_t> vec_u32_view;
+	typedef aview1d<int16_t>  vec_i16_view;
+	typedef aview1d<uint16_t> vec_u16_view;
+	typedef aview1d<int8_t>   vec_i8_view;
+	typedef aview1d<uint8_t>  vec_u8_view;
+
+	typedef array1d<double>   vec_f64;
+	typedef array1d<float>    vec_f32;
+	typedef array1d<int64_t>  vec_i64;
+	typedef array1d<uint64_t> vec_u64;
+	typedef array1d<int32_t>  vec_i32;
+	typedef array1d<uint32_t> vec_u32;
+	typedef array1d<int16_t>  vec_i16;
+	typedef array1d<uint16_t> vec_u16;
+	typedef array1d<int8_t>   vec_i8;
+	typedef array1d<uint8_t>  vec_u8;
+
+
+	typedef caview2d<double, column_major_t>   cmat_f64_view;
+	typedef caview2d<float, column_major_t>    cmat_f32_view;
+	typedef caview2d<int64_t, column_major_t>  cmat_i64_view;
+	typedef caview2d<uint64_t, column_major_t> cmat_u64_view;
+	typedef caview2d<int32_t, column_major_t>  cmat_i32_view;
+	typedef caview2d<uint32_t, column_major_t> cmat_u32_view;
+	typedef caview2d<int16_t, column_major_t>  cmat_i16_view;
+	typedef caview2d<uint16_t, column_major_t> cmat_u16_view;
+	typedef caview2d<int8_t, column_major_t>   cmat_i8_view;
+	typedef caview2d<uint8_t, column_major_t>  cmat_u8_view;
+
+	typedef aview2d<double, column_major_t>   mat_f64_view;
+	typedef aview2d<float, column_major_t>    mat_f32_view;
+	typedef aview2d<int64_t, column_major_t>  mat_i64_view;
+	typedef aview2d<uint64_t, column_major_t> mat_u64_view;
+	typedef aview2d<int32_t, column_major_t>  mat_i32_view;
+	typedef aview2d<uint32_t, column_major_t> mat_u32_view;
+	typedef aview2d<int16_t, column_major_t>  mat_i16_view;
+	typedef aview2d<uint16_t, column_major_t> mat_u16_view;
+	typedef aview2d<int8_t, column_major_t>   mat_i8_view;
+	typedef aview2d<uint8_t, column_major_t>  mat_u8_view;
+
+	typedef array2d<double, column_major_t>   mat_f64;
+	typedef array2d<float, column_major_t>    mat_f32;
+	typedef array2d<int64_t, column_major_t>  mat_i64;
+	typedef array2d<uint64_t, column_major_t> mat_u64;
+	typedef array2d<int32_t, column_major_t>  mat_i32;
+	typedef array2d<uint32_t, column_major_t> mat_u32;
+	typedef array2d<int16_t, column_major_t>  mat_i16;
+	typedef array2d<uint16_t, column_major_t> mat_u16;
+	typedef array2d<int8_t, column_major_t>   mat_i8;
+	typedef array2d<uint8_t, column_major_t>  mat_u8;
+
+
 
 	// view from marray
 
 	template<typename T>
-	const_aview1d<T> view1d(const_marray a)
+	inline caview1d<T> view1d(const_marray a)
 	{
-		return const_aview1d<T>(a.data<T>(), a.nelems());
+		return caview1d<T>(a.data<T>(), (index_t)a.nelems());
 	}
 
-
 	template<typename T>
-	aview1d<T> view1d(marray a)
+	inline aview1d<T> view1d(marray a)
 	{
-		return aview1d<T>(a.data<T>(), a.nelems());
+		return aview1d<T>(a.data<T>(), (index_t)a.nelems());
 	}
 
-
 	template<typename T>
-	const_aview2d<T, column_major_t> view2d(const_marray a)
+	inline caview2d<T, column_major_t> view2d(const_marray a)
 	{
-		return const_aview2d<T, column_major_t>(a.data<T>(), a.nrows(), a.ncolumns(), a.nrows(), a.ncolumns());
+		return caview2d<T, column_major_t>(a.data<T>(), a.nrows(), a.ncolumns(), a.nrows(), a.ncolumns());
 	}
 
-
 	template<typename T>
-	aview2d<T, column_major_t> view2d(marray a)
+	inline aview2d<T, column_major_t> view2d(marray a)
 	{
 		return aview2d<T, column_major_t>(a.data<T>(), a.nrows(), a.ncolumns(), a.nrows(), a.ncolumns());
 	}
@@ -52,120 +122,75 @@ namespace matlab
 
 	// to matlab vector
 
-	template<typename T, class TIndexer>
-	marray to_matlab_row(const const_aview1d<T, TIndexer>& v)
+	template<class Derived>
+	inline marray to_matlab_row(const caview1d_base<Derived>& v)
 	{
-		marray a = create_marray<T>(1, v.nelems());
-		view1d<T>(a) << v;
+		marray a = create_marray<T>(1, v.size());
+		copy(v, view1d<typename Derived::value_type>(a));
 		return a;
 	}
 
-	template<typename T, class TIndexer>
-	marray to_matlab_column(const const_aview1d<T, TIndexer>& v)
+	template<class Derived>
+	inline marray to_matlab_row(const caview1d_base<Derived>& v)
 	{
-		marray a = create_marray<T>(v.nelems(), 1);
-		view1d<T>(a) << v;
+		marray a = create_marray<T>(v.size(), 1);
+		copy(v, view1d<typename Derived::value_type>(a));
 		return a;
 	}
 
 
 	template<typename T>
-	marray to_matlab_row(const std::vector<T>& v)
+	inline marray to_matlab_row(const std::vector<T>& v)
 	{
 		size_t n = v.size();
 		marray a = create_marray<T>(1, n);
-		copy_elements(&(v[0]), a.data<T>(), n);
+		copy_elements(v.data(), a.data<T>(), n);
 		return a;
 	}
 
 	template<typename T>
-	marray to_matlab_column(const std::vector<T>& v)
+	inline marray to_matlab_column(const std::vector<T>& v)
 	{
 		size_t n = v.size();
 		marray a = create_marray<T>(n, 1);
-		copy_elements(&(v[0]), a.data<T>(), n);
-		return a;
-	}
-
-	template<typename T, typename TFunc>
-	marray to_matlab_row(const std::vector<T>& v, TFunc f)
-	{
-		typedef typename TFunc::result_type R;
-		size_t n = v.size();
-		marray a = create_marray<R>(1, n);
-		aview1d<R> av = view1d<R>(a);
-
-		for (size_t i = 0; i < n; ++i)
-		{
-			av[i] = f(v[i]);
-		}
-		return a;
-	}
-
-	template<typename T, typename TFunc>
-	marray to_matlab_column(const std::vector<T>& v, TFunc f)
-	{
-		typedef typename TFunc::result_type R;
-		size_t n = v.size();
-		marray a = create_marray<R>(n, 1);
-		aview1d<R> av = view1d<R>(a);
-
-		for (size_t i = 0; i < n; ++i)
-		{
-			av[i] = f(v[i]);
-		}
+		copy_elements(v.data(), a.data<T>(), n);
 		return a;
 	}
 
 
 	template<typename TIter>
-	marray to_matlab_row(TIter first, TIter last)
+	inline marray to_matlab_row(TIter first, size_t n)
 	{
 		typedef typename std::iterator_traits<TIter>::value_type T;
-		std::vector<T> vec(first, last);
-		return to_matlab_row(vec);
+
+		marray a = create_marray<T>(1, n);
+		aview1d<T> v = view1d<T>(a);
+		std::copy_n(first, n, v.pbase());
+		return a;
 	}
 
 	template<typename TIter>
-	marray to_matlab_column(TIter first, TIter last)
+	inline marray to_matlab_column(TIter first, size_t n)
 	{
 		typedef typename std::iterator_traits<TIter>::value_type T;
-		std::vector<T> vec(first, last);
-		return to_matlab_column(vec);
+
+		marray a = create_marray<T>(n, 1);
+		aview1d<T> v = view1d<T>(a);
+		std::copy_n(first, n, v.pbase());
+		return a;
 	}
-
-
-	template<typename TIter, typename TFunc>
-	marray to_matlab_row(TIter first, TIter last, TFunc f)
-	{
-		typedef typename std::iterator_traits<TIter>::value_type T;
-		std::vector<T> vec(first, last);
-		return to_matlab_row(vec, f);
-	}
-
-	template<typename TIter, typename TFunc>
-	marray to_matlab_column(TIter first, TIter last, TFunc f)
-	{
-		typedef typename std::iterator_traits<TIter>::value_type T;
-		std::vector<T> vec(first, last);
-		return to_matlab_column(vec, f);
-	}
-
 
 	// to matlab matrix
 
-	template<typename T, class TIndexer0, class TIndexer1>
-	marray to_matlab_matrix(const const_aview2d<T, column_major_t, TIndexer0, TIndexer1>& v)
+	template<class Derived>
+	marray to_matlab_matrix(const caview2d_base<Derived>& v)
 	{
-		marray a = create_marray<T>(v.nrows(), v.ncolumns());
-		view2d<T>(a) << v;
+		marray a = create_marray<T>((size_t)v.nrows(), (size_t)v.ncolumns());
+		copy(v, view2d<typename Derived::value_type>(a));
 		return a;
 	}
 
-}
-
-
-}
+} }
 
 
 #define BCSMEX_MAINDEF \
