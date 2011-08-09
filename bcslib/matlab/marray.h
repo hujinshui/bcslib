@@ -11,11 +11,7 @@
 
 #include <bcslib/matlab/matlab_base.h>
 
-namespace bcs
-{
-
-namespace matlab
-{
+namespace bcs { namespace matlab {
 
 	class const_marray
 	{
@@ -483,8 +479,6 @@ namespace matlab
 		return mxDuplicateArray(a.mx_ptr());
 	}
 
-}
-
-}
+} }
 
 #endif 
