@@ -6,8 +6,7 @@
  * @author Dahua Lin
  */
 
-#include <bcslib/test/test_units.h>
-#include <bcslib/test/test_array_aux.h>
+#include "bcs_test_basics.h"
 #include <bcslib/array/array2d.h>
 
 using namespace bcs;
@@ -34,14 +33,14 @@ bool verify_blkwise_transpose(const T *src, T *dst, T *r, size_t bdim, size_t m,
 template<typename T, typename TOrd>
 bool verify_array2d_transpose(const caview2d<T, TOrd>& a)
 {
-	size_t m = a.nrows();
-	size_t n = a.ncolumns();
+	index_t m = a.nrows();
+	index_t n = a.ncolumns();
 
 	array2d<T, TOrd> r(n, m);
 
-	for (index_t i = 0; i < (index_t)m; ++i)
+	for (index_t i = 0; i < m; ++i)
 	{
-		for (index_t j = 0; j < (index_t)n; ++j)
+		for (index_t j = 0; j < n; ++j)
 		{
 			r(j, i) = a(i, j);
 		}
@@ -49,12 +48,12 @@ bool verify_array2d_transpose(const caview2d<T, TOrd>& a)
 
 	array2d<T, TOrd> t = transpose(a);
 
-	return t == r;
+	return is_equal(t, r);
 }
 
 
 
-BCS_TEST_CASE( test_direct_transpose )
+TEST( ArrayTranspose, DirectTranspose )
 {
 	size_t Nmax = 16;
 	double src[16];
@@ -67,7 +66,7 @@ BCS_TEST_CASE( test_direct_transpose )
 	double r0[m0 * n0] = {1, 2};
 
 	direct_transpose_matrix(src, t0, m0, n0);
-	BCS_CHECK( elements_equal(t0, r0, m0 * n0) );
+	EXPECT_TRUE( elements_equal(t0, r0, m0 * n0) );
 
 	// 2 x 2
 
@@ -76,7 +75,7 @@ BCS_TEST_CASE( test_direct_transpose )
 	double r1[m1 * n1] = {1, 3, 2, 4};
 
 	direct_transpose_matrix(src, t1, m1, n1);
-	BCS_CHECK( elements_equal(t1, r1, m1 * n1) );
+	EXPECT_TRUE( elements_equal(t1, r1, m1 * n1) );
 
 	// 2 x 3
 
@@ -85,7 +84,7 @@ BCS_TEST_CASE( test_direct_transpose )
 	double r2[m2 * n2] = {1, 4, 2, 5, 3, 6};
 
 	direct_transpose_matrix(src, t2, m2, n2);
-	BCS_CHECK( elements_equal(t2, r2, m2 * n2) );
+	EXPECT_TRUE( elements_equal(t2, r2, m2 * n2) );
 
 	// 3 x 2
 
@@ -94,7 +93,7 @@ BCS_TEST_CASE( test_direct_transpose )
 	double r3[m3 * n3] = {1, 3, 5, 2, 4, 6};
 
 	direct_transpose_matrix(src, t3, m3, n3);
-	BCS_CHECK( elements_equal(t3, r3, m3 * n3) );
+	EXPECT_TRUE( elements_equal(t3, r3, m3 * n3) );
 
 	// 3 x 3
 
@@ -103,11 +102,11 @@ BCS_TEST_CASE( test_direct_transpose )
 	double r4[m4 * n4] = {1, 4, 7, 2, 5, 8, 3, 6, 9};
 
 	direct_transpose_matrix(src, t4, m4, n4);
-	BCS_CHECK( elements_equal(t4, r4, m4 * n4) );
+	EXPECT_TRUE( elements_equal(t4, r4, m4 * n4) );
 }
 
 
-BCS_TEST_CASE( test_sqmatrix_inplace_transpose )
+TEST( ArrayTranspose, DirectTransposeSquare )
 {
 	// 1 x 1
 
@@ -115,7 +114,7 @@ BCS_TEST_CASE( test_sqmatrix_inplace_transpose )
 	double r1[1] = {1};
 
 	direct_transpose_sqmatrix_inplace(t1, 1);
-	BCS_CHECK( elements_equal(t1, r1, 1) );
+	EXPECT_TRUE( elements_equal(t1, r1, 1) );
 
 	// 2 x 2
 
@@ -123,7 +122,7 @@ BCS_TEST_CASE( test_sqmatrix_inplace_transpose )
 	double r2[4] = {1, 3, 2, 4};
 
 	direct_transpose_sqmatrix_inplace(t2, 2);
-	BCS_CHECK( elements_equal(t2, r2, 4) );
+	EXPECT_TRUE( elements_equal(t2, r2, 4) );
 
 	// 3 x 3
 
@@ -131,7 +130,7 @@ BCS_TEST_CASE( test_sqmatrix_inplace_transpose )
 	double r3[9] = {1, 4, 7, 2, 5, 8, 3, 6, 9};
 
 	direct_transpose_sqmatrix_inplace(t3, 3);
-	BCS_CHECK( elements_equal(t3, r3, 9) );
+	EXPECT_TRUE( elements_equal(t3, r3, 9) );
 
 	// 4 x 4
 
@@ -139,11 +138,11 @@ BCS_TEST_CASE( test_sqmatrix_inplace_transpose )
 	double r4[16] = {1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16};
 
 	direct_transpose_sqmatrix_inplace(t4, 4);
-	BCS_CHECK( elements_equal(t4, r4, 16) );
+	EXPECT_TRUE( elements_equal(t4, r4, 16) );
 }
 
 
-BCS_TEST_CASE( test_blockwise_transpose )
+TEST( ArrayTranspose, BlockwiseTranspose )
 {
 	const size_t Nmax = 200;
 	double src[Nmax];
@@ -153,49 +152,50 @@ BCS_TEST_CASE( test_blockwise_transpose )
 	double r[Nmax];
 	double cache[Nmax];
 
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 6, 6, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 6, 7, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 6, 8, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 6, 9, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 6, 6, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 6, 7, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 6, 8, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 6, 9, cache) );
 
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 7, 6, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 7, 7, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 7, 8, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 7, 9, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 7, 6, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 7, 7, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 7, 8, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 7, 9, cache) );
 
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 8, 6, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 8, 7, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 8, 8, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 8, 9, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 8, 6, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 8, 7, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 8, 8, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 8, 9, cache) );
 
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 9, 6, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 9, 7, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 9, 8, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 3, 9, 9, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 9, 6, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 9, 7, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 9, 8, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 3, 9, 9, cache) );
 
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 6, 6, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 6, 7, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 6, 8, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 6, 9, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 6, 6, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 6, 7, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 6, 8, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 6, 9, cache) );
 
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 7, 6, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 7, 7, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 7, 8, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 7, 9, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 7, 6, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 7, 7, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 7, 8, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 7, 9, cache) );
 
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 8, 6, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 8, 7, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 8, 8, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 8, 9, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 8, 6, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 8, 7, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 8, 8, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 8, 9, cache) );
 
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 9, 6, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 9, 7, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 9, 8, cache) );
-	BCS_CHECK( verify_blkwise_transpose(src, dst, r, 4, 9, 9, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 9, 6, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 9, 7, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 9, 8, cache) );
+	EXPECT_TRUE( verify_blkwise_transpose(src, dst, r, 4, 9, 9, cache) );
 }
 
 
-BCS_TEST_CASE( test_array2d_transpose )
+
+TEST( ArrayTranspose, Array2DTransposeRowMajor )
 {
 	const size_t Nmax = 40000;
 
@@ -203,109 +203,109 @@ BCS_TEST_CASE( test_array2d_transpose )
 	for (size_t i = 0; i < Nmax; ++i) buf[i] = (double)(i + 1);
 	const double *src = buf.pbase();
 
-	size_t ds[6] = {2, 5, 11, 20, 55, 83};
+	index_t ds[6] = {2, 5, 11, 20, 55, 83};
 
 	// row-major
 
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[0], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[0], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[0], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[0], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[0], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[0], ds[5]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[0], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[0], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[0], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[0], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[0], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[0], ds[5]) ) );
 
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[1], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[1], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[1], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[1], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[1], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[1], ds[5]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[1], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[1], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[1], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[1], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[1], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[1], ds[5]) ) );
 
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[2], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[2], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[2], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[2], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[2], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[2], ds[5]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[2], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[2], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[2], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[2], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[2], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[2], ds[5]) ) );
 
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[3], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[3], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[3], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[3], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[3], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[3], ds[5]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[3], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[3], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[3], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[3], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[3], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[3], ds[5]) ) );
 
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[4], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[4], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[4], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[4], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[4], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[4], ds[5]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[4], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[4], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[4], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[4], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[4], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[4], ds[5]) ) );
 
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[5], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[5], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[5], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[5], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[5], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_rm(src, ds[5], ds[5]) ) );
-
-	// column-major
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[0], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[0], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[0], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[0], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[0], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[0], ds[5]) ) );
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[1], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[1], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[1], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[1], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[1], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[1], ds[5]) ) );
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[2], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[2], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[2], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[2], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[2], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[2], ds[5]) ) );
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[3], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[3], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[3], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[3], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[3], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[3], ds[5]) ) );
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[4], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[4], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[4], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[4], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[4], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[4], ds[5]) ) );
-
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[5], ds[0]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[5], ds[1]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[5], ds[2]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[5], ds[3]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[5], ds[4]) ) );
-	BCS_CHECK( verify_array2d_transpose( get_aview2d_cm(src, ds[5], ds[5]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[5], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[5], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[5], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[5], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[5], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_rm(src, ds[5], ds[5]) ) );
 
 }
 
 
-std::shared_ptr<test_suite> test_array_transposition_suite()
+TEST( ArrayTranspose, Array2DTransposeColumnMajor )
 {
-	BCS_NEW_TEST_SUITE( suite, "test_transposition" );
+	const size_t Nmax = 40000;
 
-	BCS_ADD_TEST_CASE( suite, test_direct_transpose() );
-	BCS_ADD_TEST_CASE( suite, test_sqmatrix_inplace_transpose() );
-	BCS_ADD_TEST_CASE( suite, test_blockwise_transpose() );
-	BCS_ADD_TEST_CASE( suite, test_array2d_transpose() );
+	scoped_buffer<double> buf(Nmax);
+	for (size_t i = 0; i < Nmax; ++i) buf[i] = (double)(i + 1);
+	const double *src = buf.pbase();
 
-	return suite;
+	index_t ds[6] = {2, 5, 11, 20, 55, 83};
+
+	// column-major
+
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[0], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[0], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[0], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[0], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[0], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[0], ds[5]) ) );
+
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[1], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[1], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[1], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[1], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[1], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[1], ds[5]) ) );
+
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[2], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[2], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[2], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[2], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[2], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[2], ds[5]) ) );
+
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[3], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[3], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[3], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[3], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[3], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[3], ds[5]) ) );
+
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[4], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[4], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[4], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[4], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[4], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[4], ds[5]) ) );
+
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[5], ds[0]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[5], ds[1]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[5], ds[2]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[5], ds[3]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[5], ds[4]) ) );
+	EXPECT_TRUE( verify_array2d_transpose( make_caview2d_cm(src, ds[5], ds[5]) ) );
+
 }
 
 
