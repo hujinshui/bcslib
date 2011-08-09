@@ -26,6 +26,17 @@ namespace bcs
 	 ******************************************************/
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	struct aview_traits<caview2d_ex<T, TOrd, TIndexer0, TIndexer1> >
+	{
+		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
+
+		typedef caview2d_ex<T, TOrd, TIndexer0, TIndexer1> self_type;
+		typedef caview2d_base<self_type> view_nd_base;
+		typedef caview_base<self_type> dview_base;
+		typedef caview_base<self_type> view_base;
+	};
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	class caview2d_ex
 	: public caview2d_base<caview2d_ex<T, TOrd, TIndexer0, TIndexer1> >
 	{
@@ -160,6 +171,18 @@ namespace bcs
 
 	}; // end class caview2d_ex
 
+
+
+	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
+	struct aview_traits<aview2d_ex<T, TOrd, TIndexer0, TIndexer1> >
+	{
+		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
+
+		typedef aview2d_ex<T, TOrd, TIndexer0, TIndexer1> self_type;
+		typedef aview2d_base<self_type> view_nd_base;
+		typedef aview_base<self_type> dview_base;
+		typedef aview_base<self_type> view_base;
+	};
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	class aview2d_ex
@@ -372,7 +395,7 @@ namespace bcs
 	inline typename _detail::slice_helper2d<
 		typename Derived::value_type,
 		typename Derived::layout_order>::row_cview_type
-	row(const dense_caview2d_base<Derived>& a, index_t irow)
+	row_view(const dense_caview2d_base<Derived>& a, index_t irow)
 	{
 		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
 		return helper::row_cview(a.pbase(), a.dim0(), a.dim1(), irow);
@@ -382,7 +405,7 @@ namespace bcs
 	inline typename _detail::slice_helper2d<
 		typename Derived::value_type,
 		typename Derived::layout_order>::row_view_type
-	row(dense_aview2d_base<Derived>& a, index_t irow)
+	row_view(dense_aview2d_base<Derived>& a, index_t irow)
 	{
 		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
 		return helper::row_view(a.pbase(), a.dim0(), a.dim1(), irow);
@@ -392,7 +415,7 @@ namespace bcs
 	inline typename _detail::slice_helper2d<
 		typename Derived::value_type,
 		typename Derived::layout_order>::column_cview_type
-	column(const dense_caview2d_base<Derived>& a, index_t icol)
+	column_view(const dense_caview2d_base<Derived>& a, index_t icol)
 	{
 		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
 		return helper::column_cview(a.pbase(), a.dim0(), a.dim1(), icol);
@@ -402,7 +425,7 @@ namespace bcs
 	inline typename _detail::slice_helper2d<
 		typename Derived::value_type,
 		typename Derived::layout_order>::column_view_type
-	column(dense_aview2d_base<Derived>& a, index_t icol)
+	column_view(dense_aview2d_base<Derived>& a, index_t icol)
 	{
 		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
 		return helper::column_view(a.pbase(), a.dim0(), a.dim1(), icol);
@@ -414,7 +437,7 @@ namespace bcs
 		typename Derived::value_type,
 		typename Derived::layout_order,
 		TRange>::row_range_cview_type
-	row(const dense_caview2d_base<Derived>& a, index_t irow, const TRange& rgn)
+	row_view(const dense_caview2d_base<Derived>& a, index_t irow, const TRange& rgn)
 	{
 		typedef _detail::slice_range_helper2d<
 				typename Derived::value_type,
@@ -429,7 +452,7 @@ namespace bcs
 		typename Derived::value_type,
 		typename Derived::layout_order,
 		TRange>::row_range_view_type
-	row(dense_aview2d_base<Derived>& a, index_t irow, const TRange& rgn)
+	row_view(dense_aview2d_base<Derived>& a, index_t irow, const TRange& rgn)
 	{
 		typedef _detail::slice_range_helper2d<
 				typename Derived::value_type,
@@ -444,7 +467,7 @@ namespace bcs
 		typename Derived::value_type,
 		typename Derived::layout_order,
 		TRange>::column_range_cview_type
-	column(const dense_caview2d_base<Derived>& a, index_t icol, const TRange& rgn)
+	column_view(const dense_caview2d_base<Derived>& a, index_t icol, const TRange& rgn)
 	{
 		typedef _detail::slice_range_helper2d<
 				typename Derived::value_type,
@@ -459,7 +482,7 @@ namespace bcs
 		typename Derived::value_type,
 		typename Derived::layout_order,
 		TRange>::column_range_view_type
-	column(dense_aview2d_base<Derived>& a, index_t icol, const TRange& rgn)
+	column_view(dense_aview2d_base<Derived>& a, index_t icol, const TRange& rgn)
 	{
 		typedef _detail::slice_range_helper2d<
 				typename Derived::value_type,
@@ -476,6 +499,17 @@ namespace bcs
 	 *  Dense views
 	 *
 	 ******************************************************/
+
+	template<typename T, typename TOrd>
+	struct aview_traits<caview2d<T, TOrd> >
+	{
+		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
+
+		typedef caview2d<T, TOrd> self_type;
+		typedef caview2d_base<self_type> view_nd_base;
+		typedef dense_caview_base<self_type> dview_base;
+		typedef caview_base<self_type> view_base;
+	};
 
 	template<typename T, typename TOrd>
 	class caview2d : public dense_caview2d_base<caview2d<T, TOrd> >
@@ -569,27 +603,27 @@ namespace bcs
 		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
 		row(index_t i) const
 		{
-			return row(*this, i);
+			return row_view(*this, i);
 		}
 
 		template<class TRange>
 		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_cview_type
 		row(index_t i, const TRange& rgn) const
 		{
-			return row(*this, i, rgn);
+			return row_view(*this, i, rgn);
 		}
 
 		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
 		column(index_t i) const
 		{
-			return column(*this, i);
+			return column_view(*this, i);
 		}
 
 		template<class TRange>
 		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_cview_type
 		column(index_t i, const TRange& rgn) const
 		{
-			return column(*this, i, rgn);
+			return column_view(*this, i, rgn);
 		}
 
 		template<class TRange0, class TRange1>
@@ -615,6 +649,16 @@ namespace bcs
 	}; // end class caview2d
 
 
+	template<typename T, typename TOrd>
+	struct aview_traits<aview2d<T, TOrd> >
+	{
+		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
+
+		typedef aview2d<T, TOrd> self_type;
+		typedef aview2d_base<self_type> view_nd_base;
+		typedef dense_aview_base<self_type> dview_base;
+		typedef aview_base<self_type> view_base;
+	};
 
 	template<typename T, typename TOrd>
 	class aview2d : public caview2d<T, TOrd>, public dense_aview2d_base<aview2d<T, TOrd> >
@@ -733,53 +777,53 @@ namespace bcs
 		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
 		row(index_t i) const
 		{
-			return row(*this, i);
+			return row_view(*this, i);
 		}
 
 		typename _detail::slice_helper2d<value_type, layout_order>::row_view_type
 		row(index_t i)
 		{
-			return row(*this, i);
+			return row_view(*this, i);
 		}
 
 		template<class TRange>
 		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_cview_type
 		row(index_t i, const TRange& rgn) const
 		{
-			return row(*this, i, rgn);
+			return row_view(*this, i, rgn);
 		}
 
 		template<class TRange>
 		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_view_type
 		row(index_t i, const TRange& rgn)
 		{
-			return row(*this, i, rgn);
+			return row_view(*this, i, rgn);
 		}
 
 		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
 		column(index_t i) const
 		{
-			return column(*this, i);
+			return column_view(*this, i);
 		}
 
 		typename _detail::slice_helper2d<value_type, layout_order>::column_view_type
 		column(index_t i)
 		{
-			return column(*this, i);
+			return column_view(*this, i);
 		}
 
 		template<class TRange>
 		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_cview_type
 		column(index_t i, const TRange& rgn) const
 		{
-			return column(*this, i, rgn);
+			return column_view(*this, i, rgn);
 		}
 
 		template<class TRange>
 		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_view_type
 		column(index_t i, const TRange& rgn)
 		{
-			return column(*this, i, rgn);
+			return column_view(*this, i, rgn);
 		}
 
 		template<class TRange0, class TRange1>
@@ -880,7 +924,7 @@ namespace bcs
 	}
 
 	template<class LDerived, class RDerived>
-	inline void copy(const caview1d_base<LDerived>& src, aview1d_base<RDerived>& dst)
+	inline void copy(const caview2d_base<LDerived>& src, aview2d_base<RDerived>& dst)
 	{
 		BCS_CHECK_LAYOUT_ORD2(typename LDerived, typename RDerived)
 
@@ -892,7 +936,7 @@ namespace bcs
 		index_t d0 = src.dim0();
 		index_t d1 = src.dim1();
 
-		if (std::is_same<typename LDerived::layout_order>::value)
+		if (std::is_same<typename LDerived::layout_order, row_major_t>::value)
 		{
 			for (index_t i = 0; i < d0; ++i)
 			{
@@ -922,10 +966,22 @@ namespace bcs
 	 ******************************************************/
 
 	template<typename T, typename TOrd, class Alloc>
+	struct aview_traits<array2d<T, TOrd, Alloc> >
+	{
+		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
+
+		typedef array2d<T, TOrd, Alloc> self_type;
+		typedef aview2d_base<self_type> view_nd_base;
+		typedef dense_aview_base<self_type> dview_base;
+		typedef aview_base<self_type> view_base;
+	};
+
+
+	template<typename T, typename TOrd, class Alloc>
 	class array2d
 	: private sharable_storage_base<T, Alloc>
 	, private aview2d<T, TOrd>
-	, public dense_aview1d_base<array2d<T> >
+	, public dense_aview2d_base<array2d<T, TOrd, Alloc> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_valid_array_value<T> );
@@ -1208,7 +1264,7 @@ namespace bcs
 	inline array2d<typename Derived::value_type, typename Derived::layout_order>
 	clone_array(const caview2d_base<Derived>& a)
 	{
-		return array2d<T, TOrd>(a);
+		return array2d<typename Derived::value_type, typename Derived::layout_order>(a);
 	}
 
 
@@ -1266,7 +1322,7 @@ namespace bcs
 		{
 			for (index_t j = 0; j < n; ++j)
 			{
-				for (index_t i = 0; i < d0; ++i, ++_I)
+				for (index_t i = 0; i < m; ++i)
 				{
 					*(rp++) = ad(I[i], j);
 				}
@@ -1306,7 +1362,7 @@ namespace bcs
 			for (index_t j = 0; j < n; ++j)
 			{
 				index_t sj = J[j];
-				for (index_t i = 0; i < d0; ++i, ++_I)
+				for (index_t i = 0; i < m; ++i)
 				{
 					*(rp++) = ad(i, sj);
 				}
@@ -1345,7 +1401,7 @@ namespace bcs
 		{
 			for (index_t j = 0; j < n; ++j)
 			{
-				for (index_t i = 0; i < d0; ++i, ++_I)
+				for (index_t i = 0; i < m; ++i)
 				{
 					*(rp++) = ad(I[i], J[j]);
 				}
@@ -1385,8 +1441,6 @@ namespace bcs
 	transpose(const dense_caview2d_base<Derived>& a)
 	{
 		array2d<typename Derived::value_type, typename Derived::layout_order> r(a.ncolumns(), a.nrows());
-
-		index_t nslices, slen;
 
 		if (std::is_same<typename Derived::layout_order, row_major_t>::value)
 		{
