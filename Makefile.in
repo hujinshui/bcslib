@@ -55,10 +55,9 @@ ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/array/details/array_index_details.h \
 	bcslib/array/array1d_base.h \
 	bcslib/array/array1d.h \
-	bcslib/array/array2d_base.h \
-	bcslib/array/array2d.h \
 	bcslib/array/details/array2d_details.h \
-	bcslib/array/array_eval.h
+	bcslib/array/array2d_base.h \
+	bcslib/array/array2d.h
 	
 LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
 	bcslib/extern/blas_select.h \
