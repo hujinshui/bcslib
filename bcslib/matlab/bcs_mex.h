@@ -110,13 +110,13 @@ namespace bcs {  namespace matlab {
 	template<typename T>
 	inline caview2d<T, column_major_t> view2d(const_marray a)
 	{
-		return caview2d<T, column_major_t>(a.data<T>(), a.nrows(), a.ncolumns(), a.nrows(), a.ncolumns());
+		return caview2d<T, column_major_t>(a.data<T>(), a.nrows(), a.ncolumns());
 	}
 
 	template<typename T>
 	inline aview2d<T, column_major_t> view2d(marray a)
 	{
-		return aview2d<T, column_major_t>(a.data<T>(), a.nrows(), a.ncolumns(), a.nrows(), a.ncolumns());
+		return aview2d<T, column_major_t>(a.data<T>(), a.nrows(), a.ncolumns());
 	}
 
 
