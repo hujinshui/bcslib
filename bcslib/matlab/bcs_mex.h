@@ -125,16 +125,18 @@ namespace bcs {  namespace matlab {
 	template<class Derived>
 	inline marray to_matlab_row(const caview1d_base<Derived>& v)
 	{
+		typedef typename Derived::value_type T;
 		marray a = create_marray<T>(1, v.size());
-		copy(v, view1d<typename Derived::value_type>(a));
+		copy(v, view1d<T>(a));
 		return a;
 	}
 
 	template<class Derived>
-	inline marray to_matlab_row(const caview1d_base<Derived>& v)
+	inline marray to_matlab_column(const caview1d_base<Derived>& v)
 	{
+		typedef typename Derived::value_type T;
 		marray a = create_marray<T>(v.size(), 1);
-		copy(v, view1d<typename Derived::value_type>(a));
+		copy(v, view1d<T>(a));
 		return a;
 	}
 
@@ -185,8 +187,9 @@ namespace bcs {  namespace matlab {
 	template<class Derived>
 	marray to_matlab_matrix(const caview2d_base<Derived>& v)
 	{
+		typedef typename Derived::value_type T;
 		marray a = create_marray<T>((size_t)v.nrows(), (size_t)v.ncolumns());
-		copy(v, view2d<typename Derived::value_type>(a));
+		copy(v, view2d<T>(a));
 		return a;
 	}
 
