@@ -324,6 +324,7 @@ TEST( BasicMem, Blocks )
 	EXPECT_TRUE( test_block(B0, false, N, src) );
 
 	CHECK_MEM_PENDING( 3 );
+
 	}
 	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 }
