@@ -13,7 +13,7 @@
 #ifndef BCSLIB_ARRAY1D_H
 #define BCSLIB_ARRAY1D_H
 
-#include <bcslib/array/array1d_base.h>
+#include <bcslib/array/aview1d.h>
 #include <bcslib/array/array_storage.h>
 
 namespace bcs

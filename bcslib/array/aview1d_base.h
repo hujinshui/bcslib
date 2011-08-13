@@ -9,8 +9,8 @@
 #ifndef BCSLIB_ARRAY1D_BASE_H
 #define BCSLIB_ARRAY1D_BASE_H
 
-#include <bcslib/array/array_base.h>
-#include <bcslib/array/array_index.h>
+#include <bcslib/array/aview_base.h>
+#include <bcslib/array/aindex.h>
 
 namespace bcs
 {
