@@ -41,7 +41,7 @@ public:
 
 	~MyInt() { delete p_v; -- s_nobjs; }
 
-	explicit MyInt(const MyInt& r) : p_v(new int(r.value())) { ++ s_nobjs; }
+	MyInt(const MyInt& r) : p_v(new int(r.value())) { ++ s_nobjs; }
 
 	MyInt& operator = (const MyInt& r)
 	{
@@ -195,8 +195,6 @@ TEST( BasicMem, ConstBlocks )
 
 	using std::swap;
 
-	const int *pnull = static_cast<const int*>(BCS_NULL);
-
 	const size_t N = 5;
 	int src[N] = {4, 3, 1, 2, 5};
 
@@ -222,10 +220,6 @@ TEST( BasicMem, ConstBlocks )
 	EXPECT_TRUE( test_block(B0, false, N, src) );
 	EXPECT_TRUE( test_block(B0c, false, N, src) );
 
-	cblk_t B0m(std::move(B0c));
-	EXPECT_TRUE( test_block(B0c, false, 0, pnull) );
-	EXPECT_TRUE( test_block(B0m, false, N, src) );
-
 	CHECK_MEM_PENDING( 2 );
 
 	const int *p2 = B2.pbase();
@@ -237,20 +231,13 @@ TEST( BasicMem, ConstBlocks )
 
 	CHECK_MEM_PENDING( 3 );
 
-	const int *p2c = B2c.pbase();
-	cblk_t B2m(std::move(B2c));
-	EXPECT_TRUE( test_block(B2m, true, N, p2c) );
-	EXPECT_TRUE( test_block(B2c, false, 0, pnull) );
-
-	CHECK_MEM_PENDING( 3 );
-
 	const int *p1 = B1.pbase();
-	const int *p2m = B2m.pbase();
+	// const int *p2 = B2.pbase();
 
-	swap(B1, B2m);
-	swap(p1, p2m);
+	swap(B1, B2);
+	swap(p1, p2);
 	EXPECT_TRUE( test_block(B1, true, N, p1) );
-	EXPECT_TRUE( test_block(B2m, true, N, p2m) );
+	EXPECT_TRUE( test_block(B2, true, N, p2) );
 
 	CHECK_MEM_PENDING( 3 );
 
@@ -267,33 +254,6 @@ TEST( BasicMem, ConstBlocks )
 	EXPECT_TRUE( test_block(B0, false, N, src) );
 
 	CHECK_MEM_PENDING( 3 );
-
-	B2c = std::move(B1);
-	p2c = p1;
-	p1 = BCS_NULL;
-
-	EXPECT_TRUE( test_block(B1, false, 0, pnull) );
-	EXPECT_TRUE( test_block(B2c, true, N, p2c) );
-
-	CHECK_MEM_PENDING( 3 );
-
-	B2c = std::move(B0);
-	p2c = src;
-
-	EXPECT_TRUE( test_block(B0, false, 0, pnull) );
-	EXPECT_TRUE( test_block(B2c, false, N, p2c) );
-
-	CHECK_MEM_PENDING( 2 );
-
-	B2c = std::move(B2m);
-	p2c = p2m;
-	p2m = BCS_NULL;
-
-	EXPECT_TRUE( test_block(B2c, true, N, p2c) );
-	EXPECT_TRUE( test_block(B2m, false, 0, pnull) );
-
-	CHECK_MEM_PENDING( 2 );
-
 	}
 	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 }
@@ -304,8 +264,6 @@ TEST( BasicMem, Blocks )
 	{
 
 	using std::swap;
-
-	const int *pnull = static_cast<const int*>(BCS_NULL);
 
 	const size_t N = 5;
 	int src[N] = {4, 3, 1, 2, 5};
@@ -332,10 +290,6 @@ TEST( BasicMem, Blocks )
 	EXPECT_TRUE( test_block(B0, false, N, src) );
 	EXPECT_TRUE( test_block(B0c, false, N, src) );
 
-	blk_t B0m(std::move(B0c));
-	EXPECT_TRUE( test_block(B0c, false, 0, pnull) );
-	EXPECT_TRUE( test_block(B0m, false, N, src) );
-
 	CHECK_MEM_PENDING( 2 );
 
 	const int *p2 = B2.pbase();
@@ -347,20 +301,13 @@ TEST( BasicMem, Blocks )
 
 	CHECK_MEM_PENDING( 3 );
 
-	const int *p2c = B2c.pbase();
-	blk_t B2m(std::move(B2c));
-	EXPECT_TRUE( test_block(B2m, true, N, p2c) );
-	EXPECT_TRUE( test_block(B2c, false, 0, pnull) );
-
-	CHECK_MEM_PENDING( 3 );
-
 	const int *p1 = B1.pbase();
-	const int *p2m = B2m.pbase();
+	// const int *p2 = B2.pbase();
 
-	swap(B1, B2m);
-	swap(p1, p2m);
+	swap(B1, B2);
+	swap(p1, p2);
 	EXPECT_TRUE( test_block(B1, true, N, p1) );
-	EXPECT_TRUE( test_block(B2m, true, N, p2m) );
+	EXPECT_TRUE( test_block(B2, true, N, p2) );
 
 	CHECK_MEM_PENDING( 3 );
 
@@ -377,39 +324,6 @@ TEST( BasicMem, Blocks )
 	EXPECT_TRUE( test_block(B0, false, N, src) );
 
 	CHECK_MEM_PENDING( 3 );
-
-	B2c = std::move(B1);
-	p2c = p1;
-	p1 = BCS_NULL;
-
-	EXPECT_TRUE( test_block(B1, false, 0, pnull) );
-	EXPECT_TRUE( test_block(B2c, true, N, p2c) );
-
-	CHECK_MEM_PENDING( 3 );
-
-	B2c = std::move(B0);
-	p2c = src;
-
-	EXPECT_TRUE( test_block(B0, false, 0, pnull) );
-	EXPECT_TRUE( test_block(B2c, false, N, p2c) );
-
-	CHECK_MEM_PENDING( 2 );
-
-	B2c = std::move(B2m);
-	p2c = p2m;
-	p2m = BCS_NULL;
-
-	EXPECT_TRUE( test_block(B2c, true, N, p2c) );
-	EXPECT_TRUE( test_block(B2m, false, 0, pnull) );
-
-	CHECK_MEM_PENDING( 2 );
-
-	blk_t Be(10);
-
-	EXPECT_TRUE( test_block(Be, true, 10) );
-
-	CHECK_MEM_PENDING( 3 );
-
 	}
 	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 }

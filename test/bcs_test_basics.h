@@ -13,7 +13,6 @@
 
 #include <bcslib/base/basic_defs.h>
 #include <cmath>
-#include <type_traits>
 #include <cstdio>
 
 namespace bcs { namespace test {
@@ -78,8 +77,7 @@ namespace bcs { namespace test {
 	template<class ArrayClass1, class ArrayClass2>
 	bool array2d_equal(const ArrayClass1& a, const ArrayClass2& b)
 	{
-		static_assert(std::is_same<typename ArrayClass1::layout_order, typename ArrayClass2::layout_order>::value,
-				"Inconsistent layout orders");
+		::testing::StaticAssertTypeEq<typename ArrayClass1::layout_order, typename ArrayClass2::layout_order>();
 
 		if (a.dim0() != b.dim0()) return false;
 		if (a.dim1() != b.dim1()) return false;

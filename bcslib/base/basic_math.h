@@ -16,7 +16,6 @@
 
 #include <bcslib/base/basic_defs.h>
 #include <cmath>
-#include <type_traits>
 
 #ifndef BCSLIB_CMATH_H_
 #define BCSLIB_CMATH_H_
@@ -56,35 +55,31 @@ namespace bcs
 		// BCSLib's extras (for convenience)
 
 		template<typename T>
-		BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-		sqr(T x)
+		BCS_ENSURE_INLINE T sqr(T x)
 		{
 			return x * x;
 		}
 
 		template<typename T>
-		BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-		cube(T x)
+		BCS_ENSURE_INLINE T cube(T x)
 		{
 			return x * x * x;
 		}
 
 		template<typename T>
-		BCS_FORCE_INLINE typename std::enable_if<std::is_floating_point<T>::value, T>::type
-		rcp(T x)
+		BCS_ENSURE_INLINE T rcp(T x)
 		{
 			return T(1) / x;
 		}
 
 		template<typename T>
-		BCS_FORCE_INLINE typename std::enable_if<std::is_floating_point<T>::value, T>::type
-		rsqrt(T x)
+		BCS_ENSURE_INLINE T rsqrt(T x)
 		{
 			return T(1) / sqrt(x);
 		}
 
 		template<typename T>
-		BCS_FORCE_INLINE typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+		BCS_ENSURE_INLINE T
 		clamp(T x, T lb, T ub)
 		{
 			return x < lb ? lb : (x > ub ? ub : x);
@@ -94,37 +89,35 @@ namespace bcs
 
 #if BCS_PLATFORM_INTERFACE==BCS_POSIX_INTERFACE
 
-		using std::cbrt;
-		using std::copysign;
-		using std::hypot;
+		using ::cbrt;
+		using ::copysign;
+		using ::hypot;
 
-		using std::exp2;
-		using std::log2;
-		using std::expm1;
-		using std::log1p;
+		using ::exp2;
+		using ::log2;
+		using ::expm1;
+		using ::log1p;
 
-		using std::round;
-		using std::trunc;
+		using ::round;
+		using ::trunc;
 
 		using ::sincos;
 
-		using std::asinh;
-		using std::acosh;
-		using std::atanh;
+		using ::asinh;
+		using ::acosh;
+		using ::atanh;
 
-		using std::erf;
-		using std::erfc;
-		using std::lgamma;
-		using std::tgamma;
+		using ::erf;
+		using ::erfc;
+		using ::lgamma;
+		using ::tgamma;
 
-		using std::isfinite;
-		using std::isinf;
-		using std::isnan;
-		using std::signbit;
+		using ::isfinite;
+		using ::isinf;
+		using ::isnan;
+		using ::signbit;
 
-#else
 		// TODO: implement C99 math for MSVC
-#error Sorry, yet to implement the C99 math for MSVC.
 #endif
 
 

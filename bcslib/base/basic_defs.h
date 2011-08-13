@@ -16,42 +16,30 @@
 #include <bcslib/base/config.h>
 
 #include <cstddef>
-#include <cstdint>
+#include <stdint.h>
 #include <utility>
-
 
 // This is for temporary use,
 // and will be replaced with nullptr when it is available in most compilers
 
-#if ( (BCSLIB_COMPILER == BCSLIB_MSVC) || (BCSLIB_COMPILER == BCSLIB_GCC && __GNUC_MINOR__ >= 6) )
-#define BCS_NULL nullptr
-#else
-#define BCS_NULL 0L
-#endif
 
-#define BCS_STATIC_ASSERT(cond) static_assert(cond, #cond)
-#define BCS_STATIC_ASSERT_V(cond) static_assert(cond::value, #cond)
-#define BCS_ASSERT_SAME_TYPE(ty1, ty2) static_assert(std::is_same<ty1, ty2>::value, #ty1 " and " #ty2 " should be the same type")
-#define BCS_ASSERT_BASE_OF(ty1, ty2) static_assert(std::is_base_of<ty1, ty2>::value, #ty1 " it not a base of " #ty2)
+#define BCS_NULL NULL
 
 namespace bcs
 {
 
-	using std::int8_t;
-	using std::int16_t;
-	using std::int32_t;
-	using std::int64_t;
+	using ::int8_t;
+	using ::int16_t;
+	using ::int32_t;
+	using ::int64_t;
 
-	using std::uint8_t;
-	using std::uint16_t;
-	using std::uint32_t;
-	using std::uint64_t;
+	using ::uint8_t;
+	using ::uint16_t;
+	using ::uint32_t;
+	using ::uint64_t;
 
 	using std::ptrdiff_t;
 	using std::size_t;
-
-	using std::intptr_t;
-	using std::uintptr_t;
 
 	typedef ptrdiff_t index_t;
 
@@ -64,6 +52,11 @@ namespace bcs
 		return pair<T1&, T2&>(t1, t2);
 	}
 
+
+	/**
+	 * means no type is there
+	 */
+	struct nil_type { };
 
 	/**
 	 * The base class to make sure its derived classes are non-copyable
@@ -81,34 +74,12 @@ namespace bcs
 
 
 	/**
-	 * A compile time size constant
+	 *  Auxiliary class for static assertion
 	 */
-	template<size_t N>
-	struct size_constant
-	{
-		static const size_t value = N;
-	};
 
-
-	/**
-	 * means no type is there
-	 */
-	struct nil_type { };
-
-
-	/**
-	 * lazy enable_if
-	 */
-	template<bool Cond, class TypeHost>
-	struct lazy_enable_if
-	{
-		typedef typename TypeHost::type type;
-	};
-
-	template<class TypeHost>
-	struct lazy_enable_if<false, TypeHost>
-	{
-	};
+	template<bool x> struct BCSLIB_STATIC_ASSERT_FAILURE;
+	template<> struct BCSLIB_STATIC_ASSERT_FAILURE<true> { enum { value = 1 }; };
+	template<int x> struct static_assert_test { };
 
 }
 
@@ -126,6 +97,16 @@ namespace bcs
 #elif BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
 #define BCS_ENSURE_INLINE __attribute__((always_inline))
 #endif
+
+// static assertion
+
+#define BCS_CONCAT_STR(a, b) a##b
+
+#define BCS_STATIC_ASSERT( cond ) \
+   typedef ::bcs::static_assert_test< sizeof(::bcs::BCSLIB_STATIC_ASSERT_FAILURE< cond >) > \
+         BCS_CONCAT_STR(bcslib_static_assert_typedef_, __COUNTER__)
+
+#define BCS_STATIC_ASSERT_V(cond) BCS_STATIC_ASSERT(cond::value)
 
 #endif
 

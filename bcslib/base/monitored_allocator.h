@@ -14,9 +14,9 @@
 #define BCSLIB_MONITORED_ALLOCATOR_H
 
 #include <bcslib/base/basic_defs.h>
-#include <unordered_map>
 #include <stdexcept>
 #include <limits>
+#include <map>
 
 namespace bcs
 {
@@ -51,7 +51,7 @@ namespace bcs
 		bool verify(void *p, size_t nbytes) const
 		{
 			char *pc = static_cast<char*>(p);
-			auto it = m_ptrmap.find(pc);
+			map_type::const_iterator it = m_ptrmap.find(pc);
 			return it != m_ptrmap.end() && it->second == nbytes;
 		}
 
@@ -69,7 +69,7 @@ namespace bcs
 		{
 			char *pc = static_cast<char*>(p);
 
-			auto it = m_ptrmap.find(pc);
+			map_type::iterator it = m_ptrmap.find(pc);
 			if (it != m_ptrmap.end())
 			{
 				if (it->second == nbytes)
@@ -93,7 +93,8 @@ namespace bcs
 	private:
 		size_t m_pending_bytes;
 
-		std::unordered_map<char*, size_t> m_ptrmap;
+		typedef std::map<char*, size_t> map_type;
+		map_type m_ptrmap;
 
 	}; // end class memory_allocation_monitor
 

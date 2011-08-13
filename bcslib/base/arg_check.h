@@ -15,7 +15,6 @@
 
 #include <bcslib/base/basic_defs.h>
 
-#include <type_traits>
 #include <string>
 #include <stdexcept>
 

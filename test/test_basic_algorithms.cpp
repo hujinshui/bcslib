@@ -34,9 +34,9 @@ val_idx<T> mk_vidx(const T& v, const index_t& i)
 }
 
 template<typename T>
-std::pair<const val_idx<T>&, const val_idx<T>&> mk_cpair(const val_idx<T>& lhs, const val_idx<T>& rhs)
+std::pair<val_idx<T>, val_idx<T> > mk_cpair(const val_idx<T>& lhs, const val_idx<T>& rhs)
 {
-	return std::pair<const val_idx<T>&, const val_idx<T>&>(lhs, rhs);
+	return std::pair<val_idx<T>, val_idx<T> >(lhs, rhs);
 }
 
 template<typename T>
@@ -391,15 +391,6 @@ TEST( BasicAlgs, ZipAndExtract )
 
 	EXPECT_TRUE( collection_equal(b1, b1+N, a1, N) );
 	EXPECT_TRUE( collection_equal(b2, b2+N, b2, N) );
-
-	int e1[N] = {0, 0, 0, 0, 0};
-	int e2[N] = {0, 0, 0, 0, 0};
-
-	extract_copy(pairs, pairs+N, size_constant<0>(), e1);
-	extract_copy(pairs, pairs+N, size_constant<1>(), e2);
-
-	EXPECT_TRUE( collection_equal(e1, e1+N, a1, N) );
-	EXPECT_TRUE( collection_equal(e2, e2+N, b2, N) );
 }
 
 
@@ -568,39 +559,15 @@ TEST( BasicAlgs, TupleSort )
 			make_pair(1, 3)
 	};
 
-	pair<int, int> pairs_a1[N] = {
-			make_pair(1, 3),
-			make_pair(3, 4),
-			make_pair(8, 5),
-			make_pair(9, 6),
-			make_pair(7, 9)
-	};
-
-	pair<int, int> pairs_d1[N] = {
-			make_pair(7, 9),
-			make_pair(9, 6),
-			make_pair(8, 5),
-			make_pair(3, 4),
-			make_pair(1, 3)
-	};
-
 	pair<int, int> rpairs[N];
 
-	std::copy_n(pairs, N, rpairs);
-	sort_tuples_by_component(rpairs, rpairs+N, size_constant<0>());
+	bcs::copy_n(pairs, N, rpairs);
+	sort_pairs_by_key(rpairs, rpairs+N);
 	EXPECT_TRUE( collection_equal(rpairs, rpairs+N, pairs_a0, N) );
 
-	std::copy_n(pairs, N, rpairs);
-	sort_tuples_by_component(rpairs, rpairs+N, size_constant<0>(), std::greater<int>());
+	bcs::copy_n(pairs, N, rpairs);
+	sort_pairs_by_key(rpairs, rpairs+N, std::greater<int>());
 	EXPECT_TRUE( collection_equal(rpairs, rpairs+N, pairs_d0, N) );
-
-	std::copy_n(pairs, N, rpairs);
-	sort_tuples_by_component(rpairs, rpairs+N, size_constant<1>());
-	EXPECT_TRUE( collection_equal(rpairs, rpairs+N, pairs_a1, N) );
-
-	std::copy_n(pairs, N, rpairs);
-	sort_tuples_by_component(rpairs, rpairs+N, size_constant<1>(), std::greater<int>());
-	EXPECT_TRUE( collection_equal(rpairs, rpairs+N, pairs_d1, N) );
 
 }
 

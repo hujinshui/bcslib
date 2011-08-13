@@ -14,11 +14,9 @@
 #ifndef BCSLIB_BASIC_ALGORITHMS_H
 #define BCSLIB_BASIC_ALGORITHMS_H
 
-#include <bcslib/base/config.h>
 #include <bcslib/base/basic_defs.h>
-#include <type_traits>
-#include <algorithm>
 #include <functional>
+#include <algorithm>
 
 namespace bcs
 {
@@ -27,31 +25,6 @@ namespace bcs
 
 	using std::min;
 	using std::max;
-
-#if (BCSLIB_COMPILER == BCSLIB_MSVC)
-	// MSVC uses a non-standard-conformant way:
-	// it returns pair<T, T> instead of pair<const T&, const T&>
-	// below is a workaround
-
-	// --- MSVC-WORKAROUND (BEGIN) ---
-	
-	template<typename T>
-	inline std::pair<const T&, const T&> minmax(const T& x, const T& y)
-	{
-		return y < x ? std::pair<const T&, const T&>(y, x) : std::pair<const T&, const T&>(x, y);
-	}
-
-	template<typename T, typename Pred>
-	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, Pred comp)
-	{
-		return comp(y, x) ? std::pair<const T&, const T&>(y, x) : std::pair<const T&, const T&>(x, y);
-	}
-	
-	// --- MSVC-WORKAROUND (END) ---
-
-#else
-	using std::minmax;
-#endif
 
 	template<typename T>
 	inline const T& min(const T& x, const T& y, const T& z)
@@ -101,36 +74,60 @@ namespace bcs
 		return max(max(x, y, comp), max(z, w, comp), comp);
 	}
 
+
 	template<typename T>
-	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, const T& z)
+	inline std::pair<T, T> minmax(const T& x, const T& y)
 	{
-		auto mxy = bcs::minmax(x, y);
-		return std::pair<const T&, const T&>(min(mxy.first, z), max(z, mxy.second));
+		return y < x ? std::pair<T, T>(y, x) : std::pair<T, T>(x, y);
 	}
 
 	template<typename T, typename Pred>
-	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, const T& z, Pred comp)
+	inline std::pair<T, T> minmax(const T& x, const T& y, Pred comp)
 	{
-		auto mxy = bcs::minmax(x, y, comp);
-		return std::pair<const T&, const T&>(min(mxy.first, z, comp), max(z, mxy.second, comp));
+		return comp(y, x) ? std::pair<T, T>(y, x) : std::pair<T, T>(x, y);
 	}
 
 	template<typename T>
-	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, const T& z, const T& w)
+	inline std::pair<T, T> minmax(const T& x, const T& y, const T& z)
 	{
-		auto mxy = bcs::minmax(x, y);
-		auto mzw = bcs::minmax(z, w);
-		return std::pair<const T&, const T&>(min(mxy.first, mzw.first), max(mzw.second, mxy.second));
+		std::pair<T, T> mxy = bcs::minmax(x, y);
+		return std::pair<T, T>(min(mxy.first, z), max(z, mxy.second));
 	}
 
 	template<typename T, typename Pred>
-	inline std::pair<const T&, const T&> minmax(const T& x, const T& y, const T& z, const T& w, Pred comp)
+	inline std::pair<T, T> minmax(const T& x, const T& y, const T& z, Pred comp)
 	{
-		auto mxy = bcs::minmax(x, y, comp);
-		auto mzw = bcs::minmax(z, w, comp);
-		return std::pair<const T&, const T&>(min(mxy.first, mzw.first, comp), max(mzw.second, mxy.second, comp));
+		std::pair<T, T> mxy = bcs::minmax(x, y, comp);
+		return std::pair<T, T>(min(mxy.first, z, comp), max(z, mxy.second, comp));
 	}
 
+	template<typename T>
+	inline std::pair<T, T> minmax(const T& x, const T& y, const T& z, const T& w)
+	{
+		std::pair<T, T> mxy = bcs::minmax(x, y);
+		std::pair<T, T> mzw = bcs::minmax(z, w);
+		return std::pair<T, T>(min(mxy.first, mzw.first), max(mzw.second, mxy.second));
+	}
+
+	template<typename T, typename Pred>
+	inline std::pair<T, T> minmax(const T& x, const T& y, const T& z, const T& w, Pred comp)
+	{
+		std::pair<T, T> mxy = bcs::minmax(x, y, comp);
+		std::pair<T, T> mzw = bcs::minmax(z, w, comp);
+		return std::pair<T, T>(min(mxy.first, mzw.first, comp), max(mzw.second, mxy.second, comp));
+	}
+
+
+	// copy_n
+
+	template<typename InputIterator, typename OutputIterator>
+	inline void copy_n(InputIterator src, size_t n, OutputIterator dst)
+	{
+		for (size_t i = 0; i < n; ++i)
+		{
+			*(dst++) = *(src++);
+		}
+	}
 
 	// zip and extract
 
@@ -148,17 +145,8 @@ namespace bcs
 	{
 		for(; first != last; ++first, ++dst1, ++dst2)
 		{
-			*dst1 = std::get<0>(*first);
-			*dst2 = std::get<1>(*first);
-		}
-	}
-
-	template<typename InputIterator, typename OutputIterator, size_t I>
-	void extract_copy(InputIterator first, InputIterator last, size_constant<I>, OutputIterator dst)
-	{
-		for(; first != last; ++first, ++dst)
-		{
-			*dst = std::get<I>(*first);
+			*dst1 = first->first;
+			*dst2 = first->second;
 		}
 	}
 
@@ -226,41 +214,38 @@ namespace bcs
 
 
 
-	template<class Tuple, size_t I, typename Comp=std::less<typename std::tuple_element<I, Tuple>::type> >
-	struct tuple_cc
+	template<typename TKey, typename TValue, typename Comp=std::less<TKey> >
+	struct pair_cc
 	{
 		Comp component_comparer;
 
-		tuple_cc() : component_comparer() { }
-		tuple_cc(Comp comp) : component_comparer(comp) { }
+		pair_cc() : component_comparer() { }
+		pair_cc(Comp comp) : component_comparer(comp) { }
 
-		bool operator()(const Tuple& lhs, const Tuple& rhs) const
+		bool operator()(const std::pair<TKey, TValue>& lhs, const std::pair<TKey, TValue>& rhs) const
 		{
-			return component_comparer(std::get<I>(lhs), std::get<I>(rhs));
+			return component_comparer(lhs.first, rhs.first);
 		}
 	};
 
 
-	template<typename RandomAccessIterator, size_t I, typename Comp>  // Tuple type can be pair, tuple, and array
-	inline void sort_tuples_by_component(
-			RandomAccessIterator first,
-			RandomAccessIterator last,
-			size_constant<I>, Comp comp)
+	template<typename RandomAccessIterator, typename Comp>  // Tuple type can be pair, tuple, and array
+	inline void sort_pairs_by_key(RandomAccessIterator first, RandomAccessIterator last, Comp comp)
 	{
-		typedef typename std::iterator_traits<RandomAccessIterator>::value_type tuple_type;
-		std::sort(first, last, tuple_cc<tuple_type, I, Comp>(comp));
+		typedef typename std::iterator_traits<RandomAccessIterator>::value_type pair_type;
+		typedef typename pair_type::first_type key_type;
+		typedef typename pair_type::second_type value_type;
+
+		std::sort(first, last, pair_cc<key_type, value_type, Comp>(comp));
 	}
 
-	template<typename RandomAccessIterator, size_t I>
-	inline void sort_tuples_by_component(
-			RandomAccessIterator first,
-			RandomAccessIterator last,
-			size_constant<I>)
+	template<typename RandomAccessIterator>
+	inline void sort_pairs_by_key(RandomAccessIterator first, RandomAccessIterator last)
 	{
-		typedef typename std::iterator_traits<RandomAccessIterator>::value_type tuple_type;
-		typedef typename std::tuple_element<I, tuple_type>::type element_type;
+		typedef typename std::iterator_traits<RandomAccessIterator>::value_type pair_type;
+		typedef typename pair_type::first_type key_type;
 
-		sort_tuples_by_component(first, last, size_constant<I>(), std::less<element_type>());
+		sort_pairs_by_key(first, last, std::less<key_type>());
 	}
 
 
