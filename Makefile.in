@@ -49,14 +49,15 @@ BASE_HEADERS = \
 	bcslib/base/timer.h
 
 ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
-	bcslib/array/array_base.h \
-	bcslib/array/array_storage.h \
-	bcslib/array/array_index.h \
-	bcslib/array/details/array_index_details.h \
-	bcslib/array/array1d_base.h \
+	bcslib/array/aview_base.h \
+	bcslib/array/details/aindex_details.h \
+	bcslib/array/aindex.h \
+	bcslib/array/aview1d_base.h \
+	bcslib/array/aview1d.h \
+	bcslib/array/aview1d_ops.h \
 	bcslib/array/array1d.h \
-	bcslib/array/details/array2d_details.h \
-	bcslib/array/array2d_base.h \
+	bcslib/array/details/aview2d_details.h \
+	bcslib/array/aview2d_base.h \
 	bcslib/array/array2d.h
 	
 LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
@@ -72,9 +73,7 @@ LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
 all: test
 
 .PHONY: test
-test: test_basics 
-
-# test_array
+test: test_basics test_array
 
 .PHONY: bench
 bench: bench_array
@@ -143,10 +142,11 @@ $(TEST_BIN_DIR)/test_basics: $(BASE_HEADERS) $(TEST_BASICS_SOURCES)
 # array tests
 
 TEST_ARRAY_BASICS_SOURCES = \
-	test/test_index_selection.cpp \
-	test/test_array1d.cpp \
-	test/test_array2d.cpp \
-	test/test_array_transpose.cpp
+	test/test_aindex.cpp \
+	test/test_array1d.cpp
+	
+# test/test_array2d.cpp
+# test/test_array_transpose.cpp
 			
 $(TEST_BIN_DIR)/test_array_basics: $(ARRAY_BASIC_HEADERS) $(TEST_ARRAY_BASICS_SOURCES) 
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_ARRAY_BASICS_SOURCES) $(MAIN_TEST_POST) -o $(TEST_BIN_DIR)/test_array_basics

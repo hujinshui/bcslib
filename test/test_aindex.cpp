@@ -7,7 +7,7 @@
  */
 
 #include "bcs_test_basics.h"
-#include <bcslib/array/array_index.h>
+#include <bcslib/array/aindex.h>
 
 #include <functional>
 

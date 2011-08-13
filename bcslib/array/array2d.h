@@ -1019,6 +1019,8 @@ namespace bcs
 	};
 
 
+	template<typename T, typename TOrd, class Alloc=aligned_allocator<T> > class array2d;
+
 	template<typename T, typename TOrd, class Alloc>
 	class array2d
 	: private sharable_storage_base<T, Alloc>

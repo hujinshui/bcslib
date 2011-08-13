@@ -1,5 +1,5 @@
 /**
- * @file array_index.h
+ * @file aindex.h
  *
  * The indexer classes for array element accessing
  * 
@@ -10,10 +10,13 @@
 #pragma once
 #endif
 
-#ifndef BCSLIB_ARRAY_INDEX_H
-#define BCSLIB_ARRAY_INDEX_H
+#ifndef BCSLIB_AINDEX_H
+#define BCSLIB_AINDEX_H
 
 #include <bcslib/base/basic_defs.h>
+
+#include <bcslib/array/details/aindex_details.h>
+#include <bcslib/base/iterator_wrappers.h>
 
 namespace bcs
 {
@@ -49,11 +52,11 @@ namespace bcs
 	class step_range;
 	class rep_range;
 
-	template<class T> struct is_index_selector { static const bool value = false; }
+	template<class T> struct is_index_selector { static const bool value = false; };
 
-	template<> struct is_index_selector<range> { static const bool value = true; }
-	template<> struct is_index_selector<step_range> { static const bool value = true; }
-	template<> struct is_index_selector<rep_range> { static const bool value = true; }
+	template<> struct is_index_selector<range> { static const bool value = true; };
+	template<> struct is_index_selector<step_range> { static const bool value = true; };
+	template<> struct is_index_selector<rep_range> { static const bool value = true; };
 
 	struct whole { };
 	struct rev_whole { };
@@ -381,11 +384,11 @@ namespace bcs
 	class step_ind;
 	class rep_ind;
 
-	template<class T> struct is_indexer : public std::false_type { };
+	template<class T> struct is_indexer { static const bool value = false; };
 
-	template<> struct is_indexer<id_ind> : public std::true_type { };
-	template<> struct is_indexer<step_ind> : public std::true_type { };
-	template<> struct is_indexer<rep_ind> : public std::true_type { };
+	template<> struct is_indexer<id_ind> { static const bool value = true; };
+	template<> struct is_indexer<step_ind> { static const bool value = true; };
+	template<> struct is_indexer<rep_ind> { static const bool value = true; };
 
 	class id_ind
 	{

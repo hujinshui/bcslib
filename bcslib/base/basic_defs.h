@@ -100,7 +100,9 @@ namespace bcs
 
 // static assertion
 
-#define BCS_CONCAT_STR(a, b) a##b
+#define BCS_CONCAT_STR(a, b) BCS_DO_CONCAT_STR(a, b)
+#define BCS_DO_CONCAT_STR(a, b) BCS_DO_CONCAT_STR2(a, b)
+#define BCS_DO_CONCAT_STR2(a, b) a##b
 
 #define BCS_STATIC_ASSERT( cond ) \
    typedef ::bcs::static_assert_test< sizeof(::bcs::BCSLIB_STATIC_ASSERT_FAILURE< cond >) > \

@@ -569,6 +569,79 @@ namespace bcs
     	return copy_blk_t<T>(blk.pbase(), blk.nelems());
     }
 
+
+    /**********************************************
+     *
+     *  shared block
+     *
+     **********************************************/
+
+    template<typename T, class Allocator=aligned_allocator<T> >
+    class shared_block
+    {
+    public:
+    	typedef block<T, Allocator> block_type;
+
+    	explicit shared_block(size_t n)
+    	: m_sp_block(new block_type(n))
+    	{
+    	}
+
+    	shared_block(size_t n, const T& v)
+    	: m_sp_block(new block_type(n, v))
+    	{
+    	}
+
+    	shared_block(size_t n, const T *src)
+    	: m_sp_block(new block_type(copy_blk(src, n)))
+    	{
+    	}
+
+    public:
+    	size_t num_elements() const
+    	{
+    		return m_sp_block->nelems();
+    	}
+
+    	T* pointer_to_base()
+    	{
+    		return m_sp_block->pbase();
+    	}
+
+    	const T* pointer_to_base() const
+    	{
+    		return m_sp_block->pbase();
+    	}
+
+    public:
+    	void swap(shared_block& r)
+    	{
+    		m_sp_block.swap(r.m_sp_block);
+    	}
+
+    	bool is_unique() const
+    	{
+    		return m_sp_block.unique();
+    	}
+
+    	void make_unique()
+    	{
+    		if (!is_unique())
+    		{
+    			m_sp_block.reset(new block_type(*m_sp_block));
+    		}
+    	}
+
+    	shared_block deep_copy() const
+    	{
+    		return shared_block(num_elements(), pointer_to_base());
+    	}
+
+    private:
+    	shared_ptr<block_type> m_sp_block;
+
+    }; // end class sharable_storage_base
+
 }
 
 #endif 

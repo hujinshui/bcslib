@@ -54,11 +54,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
 		// -- new --
 
 		BCS_ENSURE_INLINE index_type dim0() const
@@ -120,21 +115,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
-		void import_from(const_pointer src)
-		{
-			derived().import_from(src);
-		}
-
-		void fill(const value_type& v)
-		{
-			derived().fill(v);
 		}
 
 		// -- new --
@@ -203,11 +183,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
@@ -316,21 +291,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
-		void import_from(const_pointer src)
-		{
-			derived().import_from(src);
-		}
-
-		void fill(const value_type& v)
-		{
-			derived().fill(v);
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
