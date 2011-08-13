@@ -9,7 +9,6 @@
 
 #include "bcs_test_basics.h"
 #include <bcslib/array/array1d.h>
-#include <type_traits>
 
 using namespace bcs;
 using namespace bcs::test;
@@ -36,117 +35,118 @@ template class bcs::array1d<double>;
 
 // caview1d_ex
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview_base<bcs::caview1d_ex<double, id_ind> >,
-		bcs::caview1d_ex<double, id_ind> >::value, "inheritance test failed");
+		bcs::caview1d_ex<double, id_ind> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d_base<bcs::caview1d_ex<double, id_ind> >,
-		bcs::caview1d_ex<double, id_ind> >::value, "inheritance test failed");
+		bcs::caview1d_ex<double, id_ind> >::value) );
 
 // aview1d_ex
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview_base<bcs::aview1d_ex<double, id_ind> >,
-		bcs::aview1d_ex<double, id_ind> >::value, "inheritance test failed");
+		bcs::aview1d_ex<double, id_ind> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview_base<bcs::aview1d_ex<double, id_ind> >,
-		bcs::aview1d_ex<double, id_ind> >::value, "inheritance test failed");
+		bcs::aview1d_ex<double, id_ind> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d_base<bcs::aview1d_ex<double, id_ind> >,
-		bcs::aview1d_ex<double, id_ind> >::value, "inheritance test failed");
+		bcs::aview1d_ex<double, id_ind> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview1d_base<bcs::aview1d_ex<double, id_ind> >,
-		bcs::aview1d_ex<double, id_ind> >::value, "inheritance test failed");
+		bcs::aview1d_ex<double, id_ind> >::value) );
 
 // caview1d
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview_base<bcs::caview1d<double> >,
-		bcs::caview1d<double> >::value, "inheritance test failed");
+		bcs::caview1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d_base<bcs::caview1d<double> >,
-		bcs::caview1d<double> >::value, "inheritance test failed");
+		bcs::caview1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview_base<bcs::caview1d<double> >,
-		bcs::caview1d<double> >::value, "inheritance test failed");
+		bcs::caview1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview1d_base<bcs::caview1d<double> >,
-		bcs::caview1d<double> >::value, "inheritance test failed");
+		bcs::caview1d<double> >::value) );
 
 // aview1d
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview_base<bcs::aview1d<double> >,
-		bcs::aview1d<double> >::value, "inheritance test failed");
+		bcs::aview1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview_base<bcs::aview1d<double> >,
-		bcs::aview1d<double> >::value, "inheritance test failed");
+		bcs::aview1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d_base<bcs::aview1d<double> >,
-		bcs::aview1d<double> >::value, "inheritance test failed");
+		bcs::aview1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview1d_base<bcs::aview1d<double> >,
-		bcs::aview1d<double> >::value, "inheritance test failed");
+		bcs::aview1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview_base<bcs::aview1d<double> >,
-		bcs::aview1d<double> >::value, "inheritance test failed");
+		bcs::aview1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview_base<bcs::aview1d<double> >,
-		bcs::aview1d<double> >::value, "inheritance test failed");
+		bcs::aview1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview1d_base<bcs::aview1d<double> >,
-		bcs::aview1d<double> >::value, "inheritance test failed");
+		bcs::aview1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview1d_base<bcs::aview1d<double> >,
-		bcs::aview1d<double> >::value, "inheritance test failed");
+		bcs::aview1d<double> >::value) );
 
 // array1d
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview_base<bcs::array1d<double> >,
-		bcs::array1d<double> >::value, "inheritance test failed");
+		bcs::array1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview_base<bcs::array1d<double> >,
-		bcs::array1d<double> >::value, "inheritance test failed");
+		bcs::array1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d_base<bcs::array1d<double> >,
-		bcs::array1d<double> >::value, "inheritance test failed");
+		bcs::array1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview1d_base<bcs::array1d<double> >,
-		bcs::array1d<double> >::value, "inheritance test failed");
+		bcs::array1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview_base<bcs::array1d<double> >,
-		bcs::array1d<double> >::value, "inheritance test failed");
+		bcs::array1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview_base<bcs::array1d<double> >,
-		bcs::array1d<double> >::value, "inheritance test failed");
+		bcs::array1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview1d_base<bcs::array1d<double> >,
-		bcs::array1d<double> >::value, "inheritance test failed");
+		bcs::array1d<double> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview1d_base<bcs::array1d<double> >,
-		bcs::array1d<double> >::value, "inheritance test failed");
+		bcs::array1d<double> >::value) );
+
 
 // further checking (for syntax)
 
@@ -264,7 +264,7 @@ bool elemwise_operation_test(bcs::aview1d_base<Derived>& a)
 	const T *b = blk.pbase();
 
 	// export
-	a.export_to(blk.pbase());
+	export_to(a, blk.pbase());
 
 	for (index_t i = 0; i < n; ++i)
 	{
@@ -273,7 +273,7 @@ bool elemwise_operation_test(bcs::aview1d_base<Derived>& a)
 
 	// fill
 	T v = T(123);
-	a.fill(v);
+	fill(a, v);
 
 	for (index_t i = 0; i < n; ++i)
 	{
@@ -281,7 +281,7 @@ bool elemwise_operation_test(bcs::aview1d_base<Derived>& a)
 	}
 
 	// import
-	a.import_from(blk.pbase());
+	import_from(a, blk.pbase());
 
 	for (index_t i = 0; i < n; ++i)
 	{
@@ -365,9 +365,9 @@ TEST( Array1D, Array1D )
 	array1d<double> a4(a3);
 
 	ASSERT_EQ(a4.dim0(), n1);
-	ASSERT_TRUE( a3.is_unique() );
-	ASSERT_TRUE( a4.is_unique() );
-	ASSERT_NE( a4.pbase(), a3.pbase() );
+	ASSERT_FALSE( a3.is_unique() );
+	ASSERT_FALSE( a4.is_unique() );
+	ASSERT_EQ( a4.pbase(), a3.pbase() );
 
 	ASSERT_TRUE( dense_array_integrity_test(a3) );
 	ASSERT_TRUE( array_equal(a3, src1, n1) );
@@ -376,69 +376,36 @@ TEST( Array1D, Array1D )
 	ASSERT_TRUE( array_equal(a4, src1, n1) );
 	ASSERT_TRUE( elemwise_operation_test(a4) );
 
-	const double *p4 = a4.pbase();
-	array1d<double> a5(std::move(a4));
+	a4.make_unique();
 
-	ASSERT_TRUE( a4.pbase() == BCS_NULL );
-	ASSERT_EQ( a4.nelems(), 0 );
-	ASSERT_EQ(a5.dim0(), n1);
+	ASSERT_NE( a4.pbase(), a3.pbase() );
+	ASSERT_TRUE( a3.is_unique() );
+	ASSERT_TRUE( a4.is_unique() );
 
-	ASSERT_TRUE( a5.is_unique() );
-	ASSERT_EQ( a5.pbase(), p4 );
-	ASSERT_TRUE( dense_array_integrity_test(a5) );
-	ASSERT_TRUE( array_equal(a5, src1, n1) );
-	ASSERT_TRUE( elemwise_operation_test(a5) );
+	ASSERT_EQ(a3.dim0(), n1);
+	ASSERT_EQ(a4.dim0(), n1);
 
-	array1d<double> a5m(0);
+	ASSERT_TRUE( dense_array_integrity_test(a3) );
+	ASSERT_TRUE( array_equal(a3, src1, n1) );
 
-	ASSERT_EQ( a5m.nelems(), 0 );
-	a5m = std::move(a5);
+	ASSERT_TRUE( dense_array_integrity_test(a4) );
+	ASSERT_TRUE( array_equal(a4, src1, n1) );
 
-	ASSERT_TRUE( a5.pbase() == BCS_NULL );
-	ASSERT_EQ( a5.nelems(), 0 );
-	ASSERT_EQ(a5m.dim0(), n1);
+	array1d<double> a5 = a1.deep_copy();
 
-	ASSERT_TRUE( a5m.is_unique() );
-	ASSERT_EQ( a5m.pbase(), p4 );
-	ASSERT_TRUE( dense_array_integrity_test(a5m) );
-	ASSERT_TRUE( array_equal(a5m, src1, n1) );
-	ASSERT_TRUE( elemwise_operation_test(a5m) );
-
-	ASSERT_TRUE( is_equal(a1, a1) );
-	array1d<double> a6(a1);
-
-	ASSERT_EQ(a6.dim0(), n1);
-	ASSERT_TRUE( is_equal(a1, a6) );
-	a6[2] += 1;
-	ASSERT_FALSE( is_equal(a1, a6) );
-
-	array1d<double> a7 = a1.shared_copy();
-
-	ASSERT_EQ(a7.dim0(), n1);
-	ASSERT_EQ( a7.pbase(), a1.pbase() );
-	ASSERT_FALSE( a1.is_unique() );
-	ASSERT_FALSE( a7.is_unique() );
-
-	ASSERT_TRUE( dense_array_integrity_test(a7) );
-	ASSERT_TRUE( array_equal(a7, src1, n1) );
-	ASSERT_TRUE( elemwise_operation_test(a7) );
-
-	a7.make_unique();
-
-	ASSERT_NE( a7.pbase(), a1.pbase() );
+	ASSERT_NE( a1.pbase(), a5.pbase() );
 	ASSERT_TRUE( a1.is_unique() );
-	ASSERT_TRUE( a7.is_unique() );
+	ASSERT_TRUE( a5.is_unique() );
 
 	ASSERT_EQ(a1.dim0(), n1);
-	ASSERT_EQ(a7.dim0(), n1);
+	ASSERT_EQ(a5.dim0(), n1);
 
 	ASSERT_TRUE( dense_array_integrity_test(a1) );
 	ASSERT_TRUE( array_equal(a1, src1, n1) );
-	ASSERT_TRUE( elemwise_operation_test(a1) );
 
-	ASSERT_TRUE( dense_array_integrity_test(a7) );
-	ASSERT_TRUE( array_equal(a7, src1, n1) );
-	ASSERT_TRUE( elemwise_operation_test(a7) );
+	ASSERT_TRUE( dense_array_integrity_test(a5) );
+	ASSERT_TRUE( array_equal(a5, src1, n1) );
+	ASSERT_TRUE( elemwise_operation_test(a5) );
 }
 
 

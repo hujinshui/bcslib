@@ -1,13 +1,13 @@
 /**
- * @file array1d_base.h
+ * @file aview1d_base.h
  *
  * The basic concepts for 1D array views
  * 
  * @author Dahua Lin
  */
 
-#ifndef BCSLIB_ARRAY1D_BASE_H
-#define BCSLIB_ARRAY1D_BASE_H
+#ifndef BCSLIB_AVIEW1D_BASE_H
+#define BCSLIB_AVIEW1D_BASE_H
 
 #include <bcslib/array/aview_base.h>
 #include <bcslib/array/aindex.h>
@@ -45,11 +45,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
 		}
 
 		// -- new --
@@ -98,21 +93,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
-		void import_from(const_pointer src)
-		{
-			derived().import_from(src);
-		}
-
-		void fill(const value_type& v)
-		{
-			derived().fill(v);
 		}
 
 		// -- new --
@@ -166,11 +146,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
@@ -236,21 +211,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
-		void import_from(const_pointer src)
-		{
-			derived().import_from(src);
-		}
-
-		void fill(const value_type& v)
-		{
-			derived().fill(v);
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const

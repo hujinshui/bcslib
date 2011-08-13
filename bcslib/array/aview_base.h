@@ -1,5 +1,5 @@
 /**
- * @file array_base.h
+ * @file aview_base.h
  *
  * Basic definitions for array classes
  * 
@@ -10,8 +10,8 @@
 #pragma once
 #endif
 
-#ifndef BCSLIB_ARRAY_BASE_H
-#define BCSLIB_ARRAY_BASE_H
+#ifndef BCSLIB_AVIEW_BASE_H
+#define BCSLIB_AVIEW_BASE_H
 
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/arg_check.h>
@@ -82,6 +82,27 @@ namespace bcs
 		}
 	};
 
+	bool operator == (const array_shape_t<1>& a, const array_shape_t<1>& b)
+	{
+		return a[0] == b[0];
+	}
+
+	bool operator == (const array_shape_t<2>& a, const array_shape_t<2>& b)
+	{
+		return a[0] == b[0] && a[1] == b[1];
+	}
+
+	bool operator == (const array_shape_t<3>& a, const array_shape_t<3>& b)
+	{
+		return a[0] == b[0] && a[1] == b[1] && a[2] == b[2];
+	}
+
+	template<dim_num_t D>
+	bool operator != (const array_shape_t<D>& a, const array_shape_t<D>& b)
+	{
+		return !(a == b);
+	}
+
 
 	inline array_shape_t<1> arr_shape(index_t d0)
 	{
@@ -118,11 +139,11 @@ namespace bcs
 	struct row_major_t { };
 	struct column_major_t { };
 
-	template<typename T> struct is_layout_order : public std::false_type { };
+	template<typename T> struct is_layout_order { static const bool value = false; };
 
-	template<> struct is_layout_order<layout_1d_t> : public std::true_type { };
-	template<> struct is_layout_order<row_major_t> : public std::true_type { };
-	template<> struct is_layout_order<column_major_t> : public std::true_type { };
+	template<> struct is_layout_order<layout_1d_t> { static const bool value = true; };
+	template<> struct is_layout_order<row_major_t> { static const bool value = true; };
+	template<> struct is_layout_order<column_major_t> { static const bool value = true; };
 
 
 	/********************************************
@@ -168,11 +189,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
 	}; // end class caview_base
 
 
@@ -209,23 +225,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
-		// -- new --
-
-		void import_from(const_pointer src)
-		{
-			derived().import_from(src);
-		}
-
-		void fill(const value_type& v)
-		{
-			derived().fill(v);
-		}
-
 	}; // end class aview_base
 
 
@@ -260,11 +259,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
 		}
 
 		// -- new --
@@ -313,21 +307,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		void export_to(pointer dst) const
-		{
-			derived().export_to(dst);
-		}
-
-		void import_from(const_pointer src)
-		{
-			derived().import_from(src);
-		}
-
-		void fill(const value_type& v)
-		{
-			derived().fill(v);
 		}
 
 		// -- new --
@@ -403,7 +382,6 @@ namespace bcs
 
 	template<typename T> class caview1d;
 	template<typename T> class aview1d;
-	template<typename T, class Alloc=aligned_allocator<T> > class array1d;
 
 	template<typename T, class TIndexer> class caview1d_ex;
 	template<typename T, class TIndexer> class aview1d_ex;
@@ -417,7 +395,6 @@ namespace bcs
 
 	template<typename T, typename TOrd> class caview2d;
 	template<typename T, typename TOrd> class aview2d;
-	template<typename T, typename TOrd, class Alloc=aligned_allocator<T> > class array2d;
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1> class caview2d_ex;
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1> class aview2d_ex;
