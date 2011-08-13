@@ -122,7 +122,7 @@ namespace bcs
     		, m_n(r.m_n)
     		, m_own(r.m_own)
     		{
-    			if (r.m_n > 0) copy_construct_elements(r.m_base, m_base, r.m_n);
+    			if (m_own && r.m_n > 0) copy_construct_elements(r.m_base, m_base, r.m_n);
     		}
 
     		void swap(block_impl& r)
