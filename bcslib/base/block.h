@@ -125,17 +125,6 @@ namespace bcs
     			if (r.m_n > 0) copy_construct_elements(r.m_base, m_base, r.m_n);
     		}
 
-    		block_impl(block_impl&& r)
-    		: m_allocator(std::move(r.m_allocator))
-    		, m_base(r.m_base)
-    		, m_n(r.m_n)
-    		, m_own(r.m_own)
-    		{
-    			r.m_base = BCS_NULL;
-    			r.m_n = 0;
-    			r.m_own = false;
-    		}
-
     		void swap(block_impl& r)
     		{
     			using std::swap;
@@ -153,12 +142,6 @@ namespace bcs
     				block_impl tmp(r);
     				swap(tmp);
     			}
-    		}
-
-    		void operator = (block_impl&& r)
-    		{
-    			swap(r);
-    			r.release();
     		}
 
     	public:
@@ -352,20 +335,9 @@ namespace bcs
 		{
 		}
 
-		const_block(const_block&& r)
-		: m_impl(std::move(r.m_impl))
-		{
-		}
-
 		const_block& operator = (const const_block& r)
 		{
 			m_impl = r.m_impl;
-			return *this;
-		}
-
-		const_block& operator = (const_block&& r)
-		{
-			m_impl = std::move(r.m_impl);
 			return *this;
 		}
 
@@ -373,9 +345,6 @@ namespace bcs
 		{
 			m_impl.swap(r.m_impl);
 		}
-
-		inline const_block(block<T, Allocator>&& r);
-		inline const_block& operator = (block<T, Allocator>&& r);
 
 	public:
 		size_type nelems() const
@@ -472,20 +441,9 @@ namespace bcs
 		{
 		}
 
-		block(block&& r)
-		: m_impl(std::move(r.m_impl))
-		{
-		}
-
 		block& operator = (const block& r)
 		{
 			m_impl = r.m_impl;
-			return *this;
-		}
-
-		block& operator = (block&& r)
-		{
-			m_impl = std::move(r.m_impl);
 			return *this;
 		}
 
@@ -544,21 +502,6 @@ namespace bcs
 		_detail::block_impl<T, Allocator> m_impl;
 
 	}; // end class block
-
-
-    template<typename T, class Allocator>
-	inline const_block<T, Allocator>::const_block(block<T, Allocator>&& r)
-	: m_impl(std::move(r.m_impl))
-	{
-	}
-
-    template<typename T, class Allocator>
-	inline const_block<T, Allocator>& const_block<T, Allocator>::operator = (block<T, Allocator>&& r)
-    {
-    	m_impl = std::move(r.m_impl);
-    	return *this;
-	}
-
 
 	// specialize swap for const_block and block
 
