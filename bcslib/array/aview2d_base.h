@@ -9,9 +9,9 @@
 #ifndef BCSLIB_ARRAY2D_BASE_H_
 #define BCSLIB_ARRAY2D_BASE_H_
 
-#include <bcslib/array/array_base.h>
-#include <bcslib/array/array_index.h>
-#include <bcslib/array/details/array2d_details.h>
+#include <bcslib/array/aview_base.h>
+#include <bcslib/array/aindex.h>
+#include <bcslib/array/details/aview2d_details.h>
 
 namespace bcs
 {

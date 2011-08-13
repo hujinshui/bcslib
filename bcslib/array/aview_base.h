@@ -15,12 +15,6 @@
 
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/arg_check.h>
-#include <bcslib/base/basic_mem.h>
-
-#include <type_traits>
-#include <complex>
-#include <array>
-#include <string>
 
 #define BCS_CAVIEW_BASE_DEFS(Derived) \
 	static const dim_num_t num_dimensions = aview_traits<Derived>::num_dimensions; \
@@ -41,7 +35,7 @@
 
 #define BCS_AVIEW_TRAITS_DEFS(nd, T, lorder) \
 	static const dim_num_t num_dimensions = nd; \
-	typedef std::array<index_t, nd> shape_type; \
+	typedef array_shape_t<nd> shape_type; \
 	typedef T value_type; \
 	typedef T* pointer; \
 	typedef const T* const_pointer; \
@@ -70,39 +64,49 @@ namespace bcs
 	 *
 	 **********************************/
 
-	inline std::array<index_t, 1> arr_shape(index_t n)
+	template<dim_num_t D>
+	struct array_shape_t
 	{
-		std::array<index_t, 1> shape;
-		shape[0] = n;
+		static const dim_num_t num_dimensions = D;
+
+		index_t dim[D];
+
+		dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
+		index_t operator[] (const dim_num_t& i) const
+		{
+			return dim[i];
+		}
+	};
+
+
+	inline array_shape_t<1> arr_shape(index_t d0)
+	{
+		array_shape_t<1> shape;
+		shape.dim[0] = d0;
 		return shape;
 	}
 
-	inline std::array<index_t, 2> arr_shape(index_t d0, index_t d1)
+	inline array_shape_t<2> arr_shape(index_t d0, index_t d1)
 	{
-		std::array<index_t, 2> shape;
-		shape[0] = d0;
-		shape[1] = d1;
+		array_shape_t<2> shape;
+		shape.dim[0] = d0;
+		shape.dim[1] = d1;
 		return shape;
 	}
 
-	inline std::array<index_t, 3> arr_shape(index_t d0, index_t d1, index_t d2)
+	inline array_shape_t<3> arr_shape(index_t d0, index_t d1, index_t d2)
 	{
-		std::array<index_t, 3> shape;
-		shape[0] = d0;
-		shape[1] = d1;
-		shape[2] = d2;
+		array_shape_t<3> shape;
+		shape.dim[0] = d0;
+		shape.dim[1] = d1;
+		shape.dim[2] = d2;
 		return shape;
 	}
 
-	inline std::array<index_t, 4> arr_shape(index_t d0, index_t d1, index_t d2, index_t d3)
-	{
-		std::array<index_t, 4> shape;
-		shape[0] = d0;
-		shape[1] = d1;
-		shape[2] = d2;
-		shape[3] = d3;
-		return shape;
-	}
 
 	/********************************************
 	 *
@@ -418,38 +422,6 @@ namespace bcs
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1> class caview2d_ex;
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1> class aview2d_ex;
 
-
-	/********************************************
-	 *
-	 *  meta-programming helpers
-	 *
-	 ********************************************/
-
-	// is_valid_array_value
-
-	template<typename T>
-	struct is_valid_array_value
-	{
-		static const bool value = std::is_pod<T>::value;
-	};
-
-	template<typename T>
-	struct is_valid_array_value<std::complex<T> >
-	{
-		static const bool value = std::is_arithmetic<T>::value;
-	};
-
-	template<typename T1, typename T2>
-	struct is_valid_array_value<std::pair<T1, T2> >
-	{
-		static const bool value = is_valid_array_value<T1>::value && is_valid_array_value<T2>::value;
-	};
-
-	template<typename T, size_t D>
-	struct is_valid_array_value<std::array<T, D> >
-	{
-		static const bool value = is_valid_array_value<T>::value;
-	};
 }
 
 #endif

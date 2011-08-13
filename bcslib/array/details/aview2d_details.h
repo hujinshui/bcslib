@@ -10,8 +10,6 @@
 #define BCSLIB_ARRAY2D_DETAILS_H
 
 #include <bcslib/base/basic_defs.h>
-#include <type_traits>
-#include <array>
 
 #define BCS_TRANSPOSITION_BLOCK_BYTES 1024
 
@@ -52,7 +50,7 @@ namespace bcs
 				return m_base_d1;
 			}
 
-			std::array<index_t, 2> base_shape() const
+			array_shape_t<2> base_shape() const
 			{
 				return arr_shape(m_base_d0, m_base_d1);
 			}
@@ -91,7 +89,7 @@ namespace bcs
 				return m_base_d1;
 			}
 
-			std::array<index_t, 2> base_shape() const
+			array_shape_t<2> base_shape() const
 			{
 				return arr_shape(m_base_d0, m_base_d1);
 			}

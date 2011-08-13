@@ -14,10 +14,6 @@
 #define BCSLIB_ARRAY_INDEX_H
 
 #include <bcslib/base/basic_defs.h>
-#include <bcslib/base/iterator_wrappers.h>
-#include <bcslib/array/details/array_index_details.h>
-
-#include <array>
 
 namespace bcs
 {
@@ -53,11 +49,11 @@ namespace bcs
 	class step_range;
 	class rep_range;
 
-	template<class T> struct is_index_selector : public std::false_type { };
+	template<class T> struct is_index_selector { static const bool value = false; }
 
-	template<> struct is_index_selector<range> : public std::true_type { };
-	template<> struct is_index_selector<step_range> : public std::true_type { };
-	template<> struct is_index_selector<rep_range> : public std::true_type { };
+	template<> struct is_index_selector<range> { static const bool value = true; }
+	template<> struct is_index_selector<step_range> { static const bool value = true; }
+	template<> struct is_index_selector<rep_range> { static const bool value = true; }
 
 	struct whole { };
 	struct rev_whole { };
