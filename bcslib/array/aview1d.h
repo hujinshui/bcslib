@@ -457,7 +457,17 @@ namespace bcs
 		return lhs.dim0() == rhs.dim0();
 	}
 
+	template<class Derived>
+	inline caview1d<typename Derived::value_type> flatten(const dense_caview_base<Derived>& a)
+	{
+		return caview1d<typename Derived::value_type>(a.pbase(), a.nelems());
+	}
 
+	template<class Derived>
+	inline aview1d<typename Derived::value_type> flatten(dense_aview_base<Derived>& a)
+	{
+		return caview1d<typename Derived::value_type>(a.pbase(), a.nelems());
+	}
 }
 
 #endif

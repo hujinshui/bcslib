@@ -58,6 +58,8 @@ ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/array/array1d.h \
 	bcslib/array/details/aview2d_details.h \
 	bcslib/array/aview2d_base.h \
+	bcslib/array/aview2d.h \
+	bcslib/array/aview2d_ops.h \
 	bcslib/array/array2d.h
 	
 LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
@@ -70,7 +72,7 @@ LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
 #---------- Target groups -------------------
 
 .PHONY: all
-all: test
+all: test bench
 
 .PHONY: test
 test: test_basics test_array
@@ -143,10 +145,9 @@ $(TEST_BIN_DIR)/test_basics: $(BASE_HEADERS) $(TEST_BASICS_SOURCES)
 
 TEST_ARRAY_BASICS_SOURCES = \
 	test/test_aindex.cpp \
-	test/test_array1d.cpp
-	
-# test/test_array2d.cpp
-# test/test_array_transpose.cpp
+	test/test_array1d.cpp \
+	test/test_array2d.cpp \
+	test/test_array_transpose.cpp
 			
 $(TEST_BIN_DIR)/test_array_basics: $(ARRAY_BASIC_HEADERS) $(TEST_ARRAY_BASICS_SOURCES) 
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_ARRAY_BASICS_SOURCES) $(MAIN_TEST_POST) -o $(TEST_BIN_DIR)/test_array_basics

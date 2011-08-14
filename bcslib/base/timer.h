@@ -100,17 +100,17 @@ namespace bcs
 		}
 
 	private:
-		BCS_ENSURE_INLINE long long last_elapsed() const
+		BCS_ENSURE_INLINE int64_t last_elapsed() const
 		{
 			::timeval ct;
 			::gettimeofday(&ct, BCS_NULL);
-			return static_cast<long long>(ct.tv_sec - m_last_resume.tv_sec) * 1000000
+			return static_cast<int64_t>(ct.tv_sec - m_last_resume.tv_sec) * 1000000
 					+ (ct.tv_usec - m_last_resume.tv_usec);
 		}
 
 	private:
 		bool m_is_on;
-		long long m_elapsed_usecs;
+		int64_t m_elapsed_usecs;
 		::timeval m_last_resume;
 
 	}; // end class performance timer
