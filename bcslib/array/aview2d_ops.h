@@ -14,6 +14,7 @@
 #define BCSLIB_AVIEW2D_OPS_H_
 
 #include <bcslib/array/aview2d_base.h>
+#include <bcslib/base/basic_mem.h>
 
 namespace bcs
 {
