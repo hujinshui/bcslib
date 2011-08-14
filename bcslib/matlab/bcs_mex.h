@@ -12,7 +12,12 @@
 #include <bcslib/matlab/matlab_base.h>
 #include <bcslib/matlab/marray.h>
 
-#include <bcslib/array/array2d.h>
+#include <bcslib/array/aview1d.h>
+#include <bcslib/array/aview2d.h>
+#include <bcslib/array/aview1d_ops.h>
+#include <bcslib/array/aview2d_ops.h>
+
+#include <cstring>
 #include <vector>
 #include <iterator>
 
@@ -46,18 +51,6 @@ namespace bcs {  namespace matlab {
 	typedef aview1d<int8_t>   vec_i8_view;
 	typedef aview1d<uint8_t>  vec_u8_view;
 
-	typedef array1d<double>   vec_f64;
-	typedef array1d<float>    vec_f32;
-	typedef array1d<int64_t>  vec_i64;
-	typedef array1d<uint64_t> vec_u64;
-	typedef array1d<int32_t>  vec_i32;
-	typedef array1d<uint32_t> vec_u32;
-	typedef array1d<int16_t>  vec_i16;
-	typedef array1d<uint16_t> vec_u16;
-	typedef array1d<int8_t>   vec_i8;
-	typedef array1d<uint8_t>  vec_u8;
-
-
 	typedef caview2d<double, column_major_t>   cmat_f64_view;
 	typedef caview2d<float, column_major_t>    cmat_f32_view;
 	typedef caview2d<int64_t, column_major_t>  cmat_i64_view;
@@ -79,18 +72,6 @@ namespace bcs {  namespace matlab {
 	typedef aview2d<uint16_t, column_major_t> mat_u16_view;
 	typedef aview2d<int8_t, column_major_t>   mat_i8_view;
 	typedef aview2d<uint8_t, column_major_t>  mat_u8_view;
-
-	typedef array2d<double, column_major_t>   mat_f64;
-	typedef array2d<float, column_major_t>    mat_f32;
-	typedef array2d<int64_t, column_major_t>  mat_i64;
-	typedef array2d<uint64_t, column_major_t> mat_u64;
-	typedef array2d<int32_t, column_major_t>  mat_i32;
-	typedef array2d<uint32_t, column_major_t> mat_u32;
-	typedef array2d<int16_t, column_major_t>  mat_i16;
-	typedef array2d<uint16_t, column_major_t> mat_u16;
-	typedef array2d<int8_t, column_major_t>   mat_i8;
-	typedef array2d<uint8_t, column_major_t>  mat_u8;
-
 
 
 	// view from marray
@@ -146,7 +127,7 @@ namespace bcs {  namespace matlab {
 	{
 		size_t n = v.size();
 		marray a = create_marray<T>(1, n);
-		copy_elements(v.data(), a.data<T>(), n);
+		copy_elements(&(v[0]), a.data<T>(), n);
 		return a;
 	}
 
@@ -155,7 +136,7 @@ namespace bcs {  namespace matlab {
 	{
 		size_t n = v.size();
 		marray a = create_marray<T>(n, 1);
-		copy_elements(v.data(), a.data<T>(), n);
+		copy_elements(&(v[0]), a.data<T>(), n);
 		return a;
 	}
 
@@ -166,8 +147,8 @@ namespace bcs {  namespace matlab {
 		typedef typename std::iterator_traits<TIter>::value_type T;
 
 		marray a = create_marray<T>(1, n);
-		aview1d<T> v = view1d<T>(a);
-		std::copy_n(first, n, v.pbase());
+		T *pa = a.data<T>();
+		for (size_t i = 0; i < n; ++i) *(pa++) = *(first++);
 		return a;
 	}
 
@@ -177,8 +158,8 @@ namespace bcs {  namespace matlab {
 		typedef typename std::iterator_traits<TIter>::value_type T;
 
 		marray a = create_marray<T>(n, 1);
-		aview1d<T> v = view1d<T>(a);
-		std::copy_n(first, n, v.pbase());
+		T *pa = a.data<T>();
+		for (size_t i = 0; i < n; ++i) *(pa++) = *(first++);
 		return a;
 	}
 
