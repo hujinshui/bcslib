@@ -9,7 +9,6 @@
 
 #include "bcs_test_basics.h"
 #include <bcslib/array/array2d.h>
-#include <type_traits>
 
 using namespace bcs;
 using namespace bcs::test;
@@ -44,117 +43,118 @@ template class bcs::array2d<double, column_major_t>;
 
 // caview2d_ex
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview_base<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >,
-		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview2d_base<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >,
-		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
 
 // aview2d_ex
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
-		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
-		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview2d_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
-		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview2d_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
-		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value, "inheritance test failed");
+		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
 
 // caview2d
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview_base<bcs::caview2d<double, row_major_t> >,
-		bcs::caview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::caview2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview2d_base<bcs::caview2d<double, row_major_t> >,
-		bcs::caview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::caview2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview_base<bcs::caview2d<double, row_major_t> >,
-		bcs::caview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::caview2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview2d_base<bcs::caview2d<double, row_major_t> >,
-		bcs::caview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::caview2d<double, row_major_t> >::value) );
 
 // aview2d
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::aview2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::aview2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview2d_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::aview2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview2d_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::aview2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::aview2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::aview2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview2d_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::aview2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview2d_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::aview2d<double, row_major_t> >::value) );
 
 // aview2d
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::array2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::array2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview2d_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::array2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview2d_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::array2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::array2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::array2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview2d_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::array2d<double, row_major_t> >::value) );
 
-static_assert(std::is_base_of<
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview2d_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value, "inheritance test failed");
+		bcs::array2d<double, row_major_t> >::value) );
+
 
 template<typename T>
 void dummy_a2(const T& ) { }
@@ -234,7 +234,7 @@ inline index_t sub2ind(const caview2d_base<Derived>& a, index_t i, index_t j)
 	index_t m = a.nrows();
 	index_t n = a.ncolumns();
 
-	return std::is_same<typename Derived::layout_order, row_major_t>::value ?
+	return is_same<typename Derived::layout_order, row_major_t>::value ?
 			(i * n + j) : (i + j * m);
 }
 
@@ -293,7 +293,7 @@ bool elemwise_operation_test(bcs::aview2d_base<Derived>& a)
 	const T *b = blk.pbase();
 
 	// export
-	a.export_to(blk.pbase());
+	export_to(a, blk.pbase());
 
 	for (index_t i = 0; i < m; ++i)
 	{
@@ -305,7 +305,7 @@ bool elemwise_operation_test(bcs::aview2d_base<Derived>& a)
 
 	// fill
 	T v = T(123);
-	a.fill(v);
+	fill(a, v);
 
 	for (index_t i = 0; i < m; ++i)
 	{
@@ -316,7 +316,7 @@ bool elemwise_operation_test(bcs::aview2d_base<Derived>& a)
 	}
 
 	// import
-	a.import_from(blk.pbase());
+	import_from(a, blk.pbase());
 
 	for (index_t i = 0; i < m; ++i)
 	{
@@ -448,84 +448,53 @@ TEST( Array2D, Array2DRowMajor  )
 
 	array2d<double, row_major_t> a4(a3);
 
-	ASSERT_EQ( a4.dim0(), m );
-	ASSERT_EQ( a4.dim1(), n );
-	ASSERT_TRUE( a4.is_unique() );
+	ASSERT_EQ(a4.dim0(), m);
+	ASSERT_EQ(a4.dim1(), n);
+	ASSERT_FALSE( a3.is_unique() );
+	ASSERT_FALSE( a4.is_unique() );
+	ASSERT_EQ( a4.pbase(), a3.pbase() );
+
 	ASSERT_TRUE( dense_array_integrity_test(a3) );
 	ASSERT_TRUE( array_equal(a3, src, m * n) );
 
-	ASSERT_TRUE( a4.pbase() != a3.pbase() );
 	ASSERT_TRUE( dense_array_integrity_test(a4) );
 	ASSERT_TRUE( array_equal(a4, src, m * n) );
 	ASSERT_TRUE( elemwise_operation_test(a4) );
 
-	const double *p4 = a4.pbase();
-	array2d<double, row_major_t> a5(std::move(a4));
+	a4.make_unique();
 
-	ASSERT_TRUE( a4.pbase() == BCS_NULL );
-	ASSERT_TRUE( a4.nelems() == 0 );
+	ASSERT_NE( a4.pbase(), a3.pbase() );
+	ASSERT_TRUE( a3.is_unique() );
+	ASSERT_TRUE( a4.is_unique() );
 
-	ASSERT_TRUE( a5.pbase() == p4 );
-	ASSERT_EQ( a5.dim0(), m );
-	ASSERT_EQ( a5.dim1(), n );
-	ASSERT_TRUE( a5.is_unique() );
-	ASSERT_TRUE( dense_array_integrity_test(a5) );
-	ASSERT_TRUE( array_equal(a5, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a5) );
+	ASSERT_EQ(a3.dim0(), m);
+	ASSERT_EQ(a3.dim1(), n);
+	ASSERT_EQ(a4.dim0(), m);
+	ASSERT_EQ(a4.dim1(), n);
 
-	array2d<double, row_major_t> a5m(0, 0);
+	ASSERT_TRUE( dense_array_integrity_test(a3) );
+	ASSERT_TRUE( array_equal(a3, src, m * n) );
 
-	ASSERT_EQ( a5m.nelems(), 0 );
-	a5m = std::move(a5);
+	ASSERT_TRUE( dense_array_integrity_test(a4) );
+	ASSERT_TRUE( array_equal(a4, src, m * n) );
 
-	ASSERT_TRUE( a5.pbase() == BCS_NULL );
-	ASSERT_EQ( a5.nelems(), 0 );
-	ASSERT_EQ( a5m.dim0(), m);
-	ASSERT_EQ( a5m.dim1(), n );
+	array2d<double, row_major_t> a5 = a1.deep_copy();
 
-	ASSERT_TRUE( a5m.is_unique() );
-	ASSERT_EQ( a5m.pbase(), p4 );
-	ASSERT_TRUE( dense_array_integrity_test(a5m) );
-	ASSERT_TRUE( array_equal(a5m, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a5m) );
-
-	ASSERT_TRUE( is_equal(a1, a1) );
-	array2d<double, row_major_t> a6(a1);
-	ASSERT_TRUE( is_equal(a1, a6) );
-	a6(1, 1) += 1;
-	ASSERT_FALSE( is_equal(a1, a6) );
-
-	array2d<double, row_major_t> a7 = a1.shared_copy();
-
-	ASSERT_TRUE( a7.pbase() == a1.pbase() );
-	ASSERT_FALSE( a1.is_unique() );
-	ASSERT_FALSE( a7.is_unique() );
-	ASSERT_EQ(a1.dim0(), m);
-	ASSERT_EQ(a1.dim1(), n);
-	ASSERT_EQ(a7.dim0(), m);
-	ASSERT_EQ(a7.dim1(), n);
-
-	ASSERT_TRUE( dense_array_integrity_test(a7) );
-	ASSERT_TRUE( array_equal(a7, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a7) );
-
-	a7.make_unique();
-
-	ASSERT_NE( a7.pbase(), a1.pbase() );
+	ASSERT_NE( a1.pbase(), a5.pbase() );
 	ASSERT_TRUE( a1.is_unique() );
-	ASSERT_TRUE( a7.is_unique() );
+	ASSERT_TRUE( a5.is_unique() );
+
 	ASSERT_EQ(a1.dim0(), m);
 	ASSERT_EQ(a1.dim1(), n);
-	ASSERT_EQ(a7.dim0(), m);
-	ASSERT_EQ(a7.dim1(), n);
+	ASSERT_EQ(a5.dim0(), m);
+	ASSERT_EQ(a5.dim1(), n);
 
 	ASSERT_TRUE( dense_array_integrity_test(a1) );
 	ASSERT_TRUE( array_equal(a1, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a1) );
 
-	ASSERT_TRUE( dense_array_integrity_test(a7) );
-	ASSERT_TRUE( array_equal(a7, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a7) );
+	ASSERT_TRUE( dense_array_integrity_test(a5) );
+	ASSERT_TRUE( array_equal(a5, src, m * n) );
+	ASSERT_TRUE( elemwise_operation_test(a5) );
 }
 
 
@@ -585,85 +554,55 @@ TEST( Array2D, Array2DColumnMajor  )
 
 	array2d<double, column_major_t> a4(a3);
 
-	ASSERT_EQ( a4.dim0(), m );
-	ASSERT_EQ( a4.dim1(), n );
-	ASSERT_TRUE( a4.is_unique() );
+	ASSERT_EQ(a4.dim0(), m);
+	ASSERT_EQ(a4.dim1(), n);
+	ASSERT_FALSE( a3.is_unique() );
+	ASSERT_FALSE( a4.is_unique() );
+	ASSERT_EQ( a4.pbase(), a3.pbase() );
+
 	ASSERT_TRUE( dense_array_integrity_test(a3) );
 	ASSERT_TRUE( array_equal(a3, src, m * n) );
 
-	ASSERT_TRUE( a4.pbase() != a3.pbase() );
 	ASSERT_TRUE( dense_array_integrity_test(a4) );
 	ASSERT_TRUE( array_equal(a4, src, m * n) );
 	ASSERT_TRUE( elemwise_operation_test(a4) );
 
-	const double *p4 = a4.pbase();
-	array2d<double, column_major_t> a5(std::move(a4));
+	a4.make_unique();
 
-	ASSERT_TRUE( a4.pbase() == BCS_NULL );
-	ASSERT_TRUE( a4.nelems() == 0 );
+	ASSERT_NE( a4.pbase(), a3.pbase() );
+	ASSERT_TRUE( a3.is_unique() );
+	ASSERT_TRUE( a4.is_unique() );
 
-	ASSERT_TRUE( a5.pbase() == p4 );
-	ASSERT_EQ( a5.dim0(), m );
-	ASSERT_EQ( a5.dim1(), n );
-	ASSERT_TRUE( a5.is_unique() );
-	ASSERT_TRUE( dense_array_integrity_test(a5) );
-	ASSERT_TRUE( array_equal(a5, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a5) );
+	ASSERT_EQ(a3.dim0(), m);
+	ASSERT_EQ(a3.dim1(), n);
+	ASSERT_EQ(a4.dim0(), m);
+	ASSERT_EQ(a4.dim1(), n);
 
-	array2d<double, column_major_t> a5m(0, 0);
+	ASSERT_TRUE( dense_array_integrity_test(a3) );
+	ASSERT_TRUE( array_equal(a3, src, m * n) );
 
-	ASSERT_EQ( a5m.nelems(), 0 );
-	a5m = std::move(a5);
+	ASSERT_TRUE( dense_array_integrity_test(a4) );
+	ASSERT_TRUE( array_equal(a4, src, m * n) );
 
-	ASSERT_TRUE( a5.pbase() == BCS_NULL );
-	ASSERT_EQ( a5.nelems(), 0 );
-	ASSERT_EQ( a5m.dim0(), m);
-	ASSERT_EQ( a5m.dim1(), n );
+	array2d<double, column_major_t> a5 = a1.deep_copy();
 
-	ASSERT_TRUE( a5m.is_unique() );
-	ASSERT_EQ( a5m.pbase(), p4 );
-	ASSERT_TRUE( dense_array_integrity_test(a5m) );
-	ASSERT_TRUE( array_equal(a5m, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a5m) );
-
-	ASSERT_TRUE( is_equal(a1, a1) );
-	array2d<double, column_major_t> a6(a1);
-	ASSERT_TRUE( is_equal(a1, a6) );
-	a6(1, 1) += 1;
-	ASSERT_FALSE( is_equal(a1, a6) );
-
-	array2d<double, column_major_t> a7 = a1.shared_copy();
-
-	ASSERT_TRUE( a7.pbase() == a1.pbase() );
-	ASSERT_FALSE( a1.is_unique() );
-	ASSERT_FALSE( a7.is_unique() );
-	ASSERT_EQ(a1.dim0(), m);
-	ASSERT_EQ(a1.dim1(), n);
-	ASSERT_EQ(a7.dim0(), m);
-	ASSERT_EQ(a7.dim1(), n);
-
-	ASSERT_TRUE( dense_array_integrity_test(a7) );
-	ASSERT_TRUE( array_equal(a7, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a7) );
-
-	a7.make_unique();
-
-	ASSERT_NE( a7.pbase(), a1.pbase() );
+	ASSERT_NE( a1.pbase(), a5.pbase() );
 	ASSERT_TRUE( a1.is_unique() );
-	ASSERT_TRUE( a7.is_unique() );
+	ASSERT_TRUE( a5.is_unique() );
+
 	ASSERT_EQ(a1.dim0(), m);
 	ASSERT_EQ(a1.dim1(), n);
-	ASSERT_EQ(a7.dim0(), m);
-	ASSERT_EQ(a7.dim1(), n);
+	ASSERT_EQ(a5.dim0(), m);
+	ASSERT_EQ(a5.dim1(), n);
 
 	ASSERT_TRUE( dense_array_integrity_test(a1) );
 	ASSERT_TRUE( array_equal(a1, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a1) );
 
-	ASSERT_TRUE( dense_array_integrity_test(a7) );
-	ASSERT_TRUE( array_equal(a7, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a7) );
+	ASSERT_TRUE( dense_array_integrity_test(a5) );
+	ASSERT_TRUE( array_equal(a5, src, m * n) );
+	ASSERT_TRUE( elemwise_operation_test(a5) );
 }
+
 
 
 TEST( Array2D, Aview2DExRowMajor )

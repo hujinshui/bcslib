@@ -55,7 +55,7 @@ double time_dense1d_export(int nrepeats, const index_t nelems, const double *src
 {
 	caview1d<double> view(src, nelems);
 
-	view.export_to(buf);
+	export_to(view, buf);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
@@ -112,12 +112,12 @@ double time_step1d_export(int nrepeats, const index_t nelems, const double *src,
 {
 	caview1d_ex<double, step_ind> view(src, step_ind(nelems, 2));
 
-	view.export_to(buf);
+	export_to(view, buf);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		view.export_to(buf);
+		export_to(view, buf);
 	}
 
 	return tm.elapsed( SECONDS );
@@ -147,12 +147,12 @@ double time_dense2d_rm_export(int nrepeats, const index_t m, const index_t n, co
 {
 	caview2d<double, row_major_t> view = make_caview2d_rm(src, m, n);
 
-	view.export_to(buf);
+	export_to(view, buf);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		view.export_to(buf);
+		export_to(view, buf);
 	}
 
 	return tm.elapsed( SECONDS );
@@ -163,12 +163,12 @@ double time_dense2d_cm_export(int nrepeats, const index_t m, const index_t n, co
 {
 	caview2d<double, column_major_t> view = make_caview2d_cm(src, m, n);
 
-	view.export_to(buf);
+	export_to(view, buf);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		view.export_to(buf);
+		export_to(view, buf);
 	}
 	return tm.elapsed( SECONDS );
 
@@ -228,12 +228,12 @@ double time_step2d_rm_export(int nrepeats, const index_t m, const index_t n, con
 	caview2d_ex<double, row_major_t, step_ind, step_ind> view(
 			src, 2*m, 2*n, step_ind(m, 2), step_ind(n,2));
 
-	view.export_to(buf);
+	export_to(view, buf);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		view.export_to(buf);
+		export_to(view, buf);
 	}
 
 	return tm.elapsed( SECONDS );
@@ -245,12 +245,12 @@ double time_step2d_cm_export(int nrepeats, const index_t m, const index_t n, con
 	caview2d_ex<double, column_major_t, step_ind, step_ind> view(
 			src, 2*m, 2*n, step_ind(m, 2), step_ind(n,2));
 
-	view.export_to(buf);
+	export_to(view, buf);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		view.export_to(buf);
+		export_to(view, buf);
 	}
 
 	return tm.elapsed( SECONDS );
@@ -308,6 +308,11 @@ double time_step2d_cm_access(int nrepeats, const index_t m, const index_t n, con
 
 }
 
+
+inline double sec_to_mps(const index_t n, double s)
+{
+	return double(n) * 1.0e-6 / s;
+}
 
 int main(int argc, char *argv[])
 {
@@ -381,25 +386,28 @@ int main(int argc, char *argv[])
 
 	// output
 
+	index_t N1d = nelems * nrepeats;
+	index_t N2d = nrows * ncols * nrepeats;
+
 	std::printf("Elapsed time:\n");
 	std::printf("=================\n");
-	std::printf("\tcopy_memory:    %.4f s\n", e_copymem);
-	std::printf("\traw_for_loop:   %.4f s\n", e_rawloop);
+	std::printf("\tcopy_memory:    %.2f MPS\n", sec_to_mps(N1d, e_copymem));
+	std::printf("\traw_for_loop:   %.2f MPS\n", sec_to_mps(N1d, e_rawloop));
 	std::printf("\n");
-	std::printf("\tdense1d_export: %.4f s\n", e_dense1d_export);
-	std::printf("\tdense1d_access: %.4f s\n", e_dense1d_access);
-	std::printf("\tdense1d_access (via base): %.4f s\n", e_dense1d_access_b);
-	std::printf("\tstep1d_export:  %.4f s\n", e_step1d_export);
-	std::printf("\tstep1d_access:  %.4f s\n", e_step1d_access);
+	std::printf("\tdense1d_export: %.2f MPS\n", sec_to_mps(N1d, e_dense1d_export));
+	std::printf("\tdense1d_access: %.2f MPS\n", sec_to_mps(N1d, e_dense1d_access));
+	std::printf("\tdense1d_access (via base): %.2f MPS\n", sec_to_mps(N1d, e_dense1d_access_b));
+	std::printf("\tstep1d_export:  %.2f MPS\n", sec_to_mps(N1d, e_step1d_export));
+	std::printf("\tstep1d_access:  %.2f MPS\n", sec_to_mps(N1d, e_step1d_access));
 	std::printf("\n");
-	std::printf("\tdense2d_rm_export: %.4f s\n", e_dense2d_rm_export);
-	std::printf("\tdense2d_cm_export: %.4f s\n", e_dense2d_cm_export);
-	std::printf("\tdense2d_rm_access: %.4f s\n", e_dense2d_rm_access);
-	std::printf("\tdense2d_cm_access: %.4f s\n", e_dense2d_cm_access);
-	std::printf("\tstep2d_rm_export: %.4f s\n", e_step2d_rm_export);
-	std::printf("\tstep2d_cm_export: %.4f s\n", e_step2d_cm_export);
-	std::printf("\tstep2d_rm_access: %.4f s\n", e_step2d_rm_access);
-	std::printf("\tstep2d_cm_access: %.4f s\n", e_step2d_cm_access);
+	std::printf("\tdense2d_rm_export: %.2f MPS\n", sec_to_mps(N2d, e_dense2d_rm_export));
+	std::printf("\tdense2d_cm_export: %.2f MPS\n", sec_to_mps(N2d, e_dense2d_cm_export));
+	std::printf("\tdense2d_rm_access: %.2f MPS\n", sec_to_mps(N2d, e_dense2d_rm_access));
+	std::printf("\tdense2d_cm_access: %.2f MPS\n", sec_to_mps(N2d, e_dense2d_cm_access));
+	std::printf("\tstep2d_rm_export: %.2f MPS\n", sec_to_mps(N2d, e_step2d_rm_export));
+	std::printf("\tstep2d_cm_export: %.2f MPS\n", sec_to_mps(N2d, e_step2d_cm_export));
+	std::printf("\tstep2d_rm_access: %.2f MPS\n", sec_to_mps(N2d, e_step2d_rm_access));
+	std::printf("\tstep2d_cm_access: %.2f MPS\n", sec_to_mps(N2d, e_step2d_cm_access));
 	std::printf("\n");
 
 	delete[] src;

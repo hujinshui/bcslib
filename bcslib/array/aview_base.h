@@ -46,14 +46,6 @@
 	typedef index_t index_type; \
 	typedef lorder layout_order;
 
-#define BCS_CHECK_LAYOUT_ORD2(t1, t2) \
-		static_assert(std::is_same<t1::layout_order, t2::layout_order>::value, "Inconsistent layout orders");
-
-#define BCS_CHECK_LAYOUT_ORD3(t1, t2, t3) \
-		static_assert( \
-				std::is_same<t1::layout_order, t2::layout_order>::value && \
-				std::is_same<t2::layout_order, t3::layout_order>::value, "Inconsistent layout orders");
-
 namespace bcs
 {
 	typedef uint8_t dim_num_t;
@@ -82,23 +74,23 @@ namespace bcs
 		}
 	};
 
-	bool operator == (const array_shape_t<1>& a, const array_shape_t<1>& b)
+	inline bool operator == (const array_shape_t<1>& a, const array_shape_t<1>& b)
 	{
 		return a[0] == b[0];
 	}
 
-	bool operator == (const array_shape_t<2>& a, const array_shape_t<2>& b)
+	inline bool operator == (const array_shape_t<2>& a, const array_shape_t<2>& b)
 	{
 		return a[0] == b[0] && a[1] == b[1];
 	}
 
-	bool operator == (const array_shape_t<3>& a, const array_shape_t<3>& b)
+	inline bool operator == (const array_shape_t<3>& a, const array_shape_t<3>& b)
 	{
 		return a[0] == b[0] && a[1] == b[1] && a[2] == b[2];
 	}
 
 	template<dim_num_t D>
-	bool operator != (const array_shape_t<D>& a, const array_shape_t<D>& b)
+	inline bool operator != (const array_shape_t<D>& a, const array_shape_t<D>& b)
 	{
 		return !(a == b);
 	}
@@ -144,6 +136,22 @@ namespace bcs
 	template<> struct is_layout_order<layout_1d_t> { static const bool value = true; };
 	template<> struct is_layout_order<row_major_t> { static const bool value = true; };
 	template<> struct is_layout_order<column_major_t> { static const bool value = true; };
+
+	namespace _detail
+	{
+		template<typename T1, typename T2> struct has_same_layout_order_helper { static const bool value = false; };
+
+		template<> struct has_same_layout_order_helper<layout_1d_t, layout_1d_t> { static const bool value = true; };
+		template<> struct has_same_layout_order_helper<row_major_t, row_major_t> { static const bool value = true; };
+		template<> struct has_same_layout_order_helper<column_major_t, column_major_t> { static const bool value = true; };
+	}
+
+	template<class C1, class C2>
+	struct has_same_layout_order
+	{
+		static const bool value = _detail::has_same_layout_order_helper<
+				typename C1::layout_order, typename C2::layout_order>::value;
+	};
 
 
 	/********************************************

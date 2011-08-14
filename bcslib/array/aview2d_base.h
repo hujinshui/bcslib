@@ -1,13 +1,13 @@
 /**
- * @file array2d_base.h
+ * @file aview2d_base.h
  *
  * The basic concepts for 2D array views
  * 
  * @author Dahua Lin
  */
 
-#ifndef BCSLIB_ARRAY2D_BASE_H_
-#define BCSLIB_ARRAY2D_BASE_H_
+#ifndef BCSLIB_AVIEW2D_BASE_H_
+#define BCSLIB_AVIEW2D_BASE_H_
 
 #include <bcslib/array/aview_base.h>
 #include <bcslib/array/aindex.h>

@@ -17,12 +17,6 @@
 
 namespace bcs
 {
-	/******************************************************
-	 *
-	 *  1D View operations
-	 *
-	 ******************************************************/
-
 	// comparison
 
 	template<class LDerived, class RDerived>
