@@ -598,19 +598,39 @@ namespace bcs
     	}
 
     public:
-    	size_t num_elements() const
+    	size_t nelems() const
     	{
     		return m_sp_block->nelems();
     	}
 
-    	T* pointer_to_base()
+    	T* pbase()
     	{
     		return m_sp_block->pbase();
     	}
 
-    	const T* pointer_to_base() const
+    	const T* pbase() const
     	{
     		return m_sp_block->pbase();
+    	}
+
+    	T* pend()
+    	{
+    		return pbase() + nelems();
+    	}
+
+    	const T* pend() const
+    	{
+    		return pbase() + nelems();
+    	}
+
+    	const T& operator[] (size_t i) const
+    	{
+    		return pbase()[i];
+    	}
+
+    	T& operator[] (size_t i)
+    	{
+    		return pbase()[i];
     	}
 
     public:
@@ -634,7 +654,7 @@ namespace bcs
 
     	shared_block deep_copy() const
     	{
-    		return shared_block(num_elements(), pointer_to_base());
+    		return shared_block(nelems(), pbase());
     	}
 
     private:

@@ -45,22 +45,22 @@ namespace bcs
 
 	public:
 		explicit array1d(index_type n)
-		: m_storage((size_t)n), m_view(m_storage.pointer_to_base(), n)
+		: m_storage((size_t)n), m_view(m_storage.pbase(), n)
 		{
 		}
 
 		explicit array1d(const shape_type& shape)
-		: m_storage((size_t)(shape[0])), m_view(m_storage.pointer_to_base(), shape[0])
+		: m_storage((size_t)(shape[0])), m_view(m_storage.pbase(), shape[0])
 		{
 		}
 
 		array1d(index_type n, const value_type& x)
-		: m_storage((size_t)n, x), m_view(m_storage.pointer_to_base(), n)
+		: m_storage((size_t)n, x), m_view(m_storage.pbase(), n)
 		{
 		}
 
 		array1d(index_type n, const_pointer src)
-		: m_storage((size_t)n, src), m_view(m_storage.pointer_to_base(), n)
+		: m_storage((size_t)n, src), m_view(m_storage.pbase(), n)
 		{
 		}
 
@@ -71,7 +71,7 @@ namespace bcs
 
 		template<class Derived>
 		explicit array1d(const caview1d_base<Derived>& r)
-		: m_storage(r.size()), m_view(m_storage.pointer_to_base(), r.nelems())
+		: m_storage(r.size()), m_view(m_storage.pbase(), r.nelems())
 		{
 			copy(r.derived(), *this);
 		}
@@ -104,7 +104,7 @@ namespace bcs
 			m_storage.make_unique();
 
 			index_t n = dim0();
-			m_view = view_type(m_storage.pointer_to_base(), n);
+			m_view = view_type(m_storage.pbase(), n);
 		}
 
 		array1d deep_copy()

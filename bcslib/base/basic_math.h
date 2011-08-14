@@ -112,10 +112,8 @@ namespace bcs
 		using ::lgamma;
 		using ::tgamma;
 
-		using ::isfinite;
 		using ::isinf;
 		using ::isnan;
-		using ::signbit;
 
 		// TODO: implement C99 math for MSVC
 #endif

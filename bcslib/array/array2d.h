@@ -48,25 +48,25 @@ namespace bcs
 	public:
 		explicit array2d(index_type m, index_type n)
 		: m_storage((size_t)(m * n))
-		, m_view(m_storage.pointer_to_base(), m, n)
+		, m_view(m_storage.pbase(), m, n)
 		{
 		}
 
 		explicit array2d(const shape_type& shape)
 		: m_storage((size_t)(shape[0] * shape[1]))
-		, m_view(m_storage.pointer_to_base(), shape[0], shape[1])
+		, m_view(m_storage.pbase(), shape[0], shape[1])
 		{
 		}
 
 		array2d(index_type m, index_type n, const T& x)
 		: m_storage((size_t)(m * n), x)
-		, m_view(m_storage.pointer_to_base(), m, n)
+		, m_view(m_storage.pbase(), m, n)
 		{
 		}
 
 		array2d(index_type m, index_type n, const_pointer src)
 		: m_storage((size_t)(m * n), src)
-		, m_view(m_storage.pointer_to_base(), m, n)
+		, m_view(m_storage.pbase(), m, n)
 		{
 		}
 
@@ -78,7 +78,7 @@ namespace bcs
 		template<class Derived>
 		explicit array2d(const caview2d_base<Derived>& r)
 		: m_storage(r.size())
-		, m_view(m_storage.pointer_to_base(), r.nrows(), r.ncolumns())
+		, m_view(m_storage.pbase(), r.nrows(), r.ncolumns())
 		{
 			copy(r.derived(), *this);
 		}
@@ -112,7 +112,7 @@ namespace bcs
 
 			index_t m = dim0();
 			index_t n = dim1();
-			m_view = view_type(m_storage.pointer_to_base(), m, n);
+			m_view = view_type(m_storage.pbase(), m, n);
 		}
 
 		array2d deep_copy()
