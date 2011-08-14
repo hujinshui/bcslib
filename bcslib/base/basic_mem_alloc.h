@@ -22,6 +22,7 @@
 #endif
 
 #include <limits> // for allocator's max_size method
+#include <new> // for std::bad_alloc
 
 #ifndef BCS_DEFAULT_ALIGNMENT
 #define BCS_DEFAULT_ALIGNMENT 32
