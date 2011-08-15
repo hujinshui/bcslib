@@ -37,8 +37,8 @@
 		#endif
 		#define BCSLIB_COMPILER BCSLIB_CLANG
 	#else
-		#if ((__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 3))
-			#error GCC of version lower than 4.3.0 is not supported
+		#if ((__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 2))
+			#error GCC of version lower than 4.2.0 is not supported
 		#endif
 		#define BCSLIB_COMPILER BCSLIB_GCC
 	#endif

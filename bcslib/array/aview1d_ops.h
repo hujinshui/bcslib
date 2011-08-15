@@ -40,7 +40,7 @@ namespace bcs
 	template<class Derived>
 	inline void import_from(dense_aview1d_base<Derived>& a, typename Derived::const_pointer src)
 	{
-		copy_elements(src, a.pbase(), a.nelems());
+		copy_elements(src, a.pbase(), a.size());
 	}
 
 	template<class Derived>
@@ -55,7 +55,7 @@ namespace bcs
 	template<class Derived>
 	inline void export_to(const dense_caview1d_base<Derived>& a, typename Derived::pointer dst)
 	{
-		copy_elements(a.pbase(), dst, a.nelems());
+		copy_elements(a.pbase(), dst, a.size());
 	}
 
 
