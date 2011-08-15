@@ -287,11 +287,6 @@ namespace bcs
 			return m_pbase[i];
 		}
 
-		void export_to(pointer dst) const
-		{
-			copy_elements(pbase(), dst, size());
-		}
-
 		template<class IndexSelector>
 		caview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
 		V(const IndexSelector& I) const
@@ -399,21 +394,6 @@ namespace bcs
 		BCS_ENSURE_INLINE reference operator() (index_type i)
 		{
 			return m_pbase[i];
-		}
-
-		void export_to(pointer dst) const
-		{
-			copy_elements(pbase(), dst, size());
-		}
-
-		void import_from(const_pointer src)
-		{
-			copy_elements(src, pbase(), size());
-		}
-
-		void fill(const value_type& v)
-		{
-			fill_elements(pbase(), size(), v);
 		}
 
 		template<class IndexSelector>

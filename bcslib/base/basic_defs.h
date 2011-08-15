@@ -104,9 +104,15 @@ namespace bcs
 #define BCS_DO_CONCAT_STR(a, b) BCS_DO_CONCAT_STR2(a, b)
 #define BCS_DO_CONCAT_STR2(a, b) a##b
 
+#if BCSLIB_COMPILER == BCSLIB_GCC && __GNUC_MINOR__ < 4
+#define BCS_STATIC_ASSERT( cond ) \
+   typedef ::bcs::static_assert_test< sizeof(::bcs::BCSLIB_STATIC_ASSERT_FAILURE< cond >) > \
+         BCS_CONCAT_STR(bcslib_static_assert_typedef_, __LINE__)
+#else
 #define BCS_STATIC_ASSERT( cond ) \
    typedef ::bcs::static_assert_test< sizeof(::bcs::BCSLIB_STATIC_ASSERT_FAILURE< cond >) > \
          BCS_CONCAT_STR(bcslib_static_assert_typedef_, __COUNTER__)
+#endif
 
 #define BCS_STATIC_ASSERT_V(cond) BCS_STATIC_ASSERT(cond::value)
 

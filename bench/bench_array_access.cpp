@@ -60,7 +60,7 @@ double time_dense1d_export(int nrepeats, const index_t nelems, const double *src
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		view.export_to(buf);
+		export_to(view, buf);
 	}
 
 	return tm.elapsed( SECONDS );
