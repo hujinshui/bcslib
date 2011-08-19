@@ -14,11 +14,10 @@
 #include <bcslib/base/basic_defs.h>
 #include <cuda.h>
 
-/*
 #if __CUDA_API_VERSION < 3000
 #error CUDA API vesion must be at least 3.0
 #endif
-*/
+
 namespace bcs { namespace cuda {
 
 
@@ -29,12 +28,12 @@ namespace bcs { namespace cuda {
 	 ******************************************************/
 
 	/**
-	 * The class to represent a CUDA error
+	 * The exception class to represent a CUDA error
 	 */
-	class cuda_err
+	class cuda_exception
 	{
 	public:
-		cuda_err(cudaError_t e)
+		cuda_exception(cudaError_t e)
 		: m_err(e) { }
 
 		const cudaError_t& get() const
@@ -53,7 +52,7 @@ namespace bcs { namespace cuda {
 		}
 
 	public:
-		static cuda_err last_error()
+		static cuda_exception last_error()
 		{
 			return ::cudaGetLastErr();
 		}
@@ -66,7 +65,7 @@ namespace bcs { namespace cuda {
 
 	/******************************************************
 	 *
-	 *  GPU pointer
+	 *  GPU pointer and memory allocation
 	 *
 	 ******************************************************/
 
@@ -204,6 +203,24 @@ namespace bcs { namespace cuda {
 		const T* m_p;
 
 	}; // end class gpu_cptr
+
+
+	template<typename T>
+	inline gpu_ptr<T> device_allocate(size_t n)
+	{
+		T *p = BCS_NULL;
+		cudaError_t ret = ::cudaMalloc( (void**)&p, n * sizeof(T) );
+		if (ret != cudaSuccess)
+		{
+			throw cuda_exception(ret);
+		}
+	}
+
+	template<typename T>
+	inline void device_free(gpu_ptr<T> p)
+	{
+		::cudaFree(p.get());
+	}
 
 
 } }
