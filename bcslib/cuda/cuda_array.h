@@ -16,10 +16,7 @@
 #include <bcslib/cuda/cuda_base.h>
 
 
-#define BCS_CUDA_DEVICE_AVIEW_DEFS(T) \
-	typedef T value_type; \
-	typedef gpu_cptr<T> const_pointer; \
-	typedef gpu_ptr<T> pointer;
+
 
 namespace bcs { namespace cuda {
 

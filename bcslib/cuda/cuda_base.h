@@ -65,9 +65,41 @@ namespace bcs { namespace cuda {
 
 	/******************************************************
 	 *
-	 *  GPU pointer and memory allocation
+	 *  pointer classes
 	 *
 	 ******************************************************/
+
+	/**
+	 * A light-weight wrapper of host pointer
+	 */
+	template<typename T>
+	class host_ptr
+	{
+	public:
+		typedef T value_type;
+
+		explicit host_ptr()
+		: m_p(BCS_NULL) { }
+
+		explicit host_ptr(T *p)
+		: m_p(p) { }
+
+		T* get() const
+		{
+			return m_p;
+		}
+
+		operator bool() const
+		{
+			return m_p != BCS_NULL;
+		}
+
+	private:
+		T *m_p;
+
+	};
+
+
 
 	/**
 	 * A light-weight wrapper class for device pointer
@@ -224,6 +256,11 @@ namespace bcs { namespace cuda {
 
 
 } }
+
+#define BCS_CUDA_DEVICE_AVIEW_DEFS(T) \
+	typedef T value_type; \
+	typedef gpu_cptr<T> const_pointer; \
+	typedef gpu_ptr<T> pointer;
 
 
 #endif 
