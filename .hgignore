@@ -4,6 +4,7 @@ Makefile
 makefile
 .project
 .cproject
+.settings/*
 Debug/*
 temp/*
 bin/*

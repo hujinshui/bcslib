@@ -12,6 +12,9 @@ CPPFLAGS = @cppflags@
 CXXFLAGS = $(CPPFLAGS) @cxxflags@
 OFLAGS = @oflags@ 
 
+CUDA_CC=nvcc
+CUDA_FLAGS = --compiler-options @cuda_cxxflags@ @cudaflags@
+
 USE_INTEL = "yes"
 
 ifndef GTEST_HOME
@@ -19,7 +22,11 @@ $(error GTEST_HOME is not defined)
 endif
 
 MAIN_TEST_PRE=-isystem $(GTEST_HOME)/include test/bcs_test_main.cpp
-MAIN_TEST_POST=$(GTEST_HOME)/lib/libgtest.a -lpthread
+MAIN_TEST_POST=$(GTEST_HOME)/lib/@gtestlib_main@ -lpthread
+
+CUDA_TEST_PRE=-isystem $(GTEST_HOME)/include test/bcs_test_main.cpp
+CUDA_TEST_POST=$(GTEST_HOME)/lib/@gtestlib_cuda@ -lpthread
+
 
 ifeq ($(USE_INTEL), "yes")
     INTEL_PATHS = @intel_paths@
@@ -62,11 +69,17 @@ ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/array/aview2d_ops.h \
 	bcslib/array/array2d.h
 	
-LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
+LINALG_HEADERS = $(ARRAY_BASIC_HEADERS) \
 	bcslib/extern/blas_select.h \
 	bcslib/array/blas_base.h \
 	bcslib/array/generic_blas.h \
 	bcslib/array/mat_times.h
+	
+CUDA_BASIC_HEADERS = $(BASE_HEADERS) \
+	bcslib/cuda/cuda_base.h \
+	bcslib/cuda/cuda_vec.h \
+	bcslib/cuda/cuda_mat.h \
+	bcslib/cuda/cuda_texture.h
 
 
 #---------- Target groups -------------------
@@ -75,7 +88,7 @@ LINALG_HEADERS = $(ARRAY_COMP_HEADERS) \
 all: test bench
 
 .PHONY: test
-test: test_basics test_array
+test: test_basics test_array test_cuda
 
 .PHONY: bench
 bench: bench_array
@@ -113,6 +126,14 @@ test_array_pending: \
 bench_array: \
 	$(BENCH_BIN_DIR)/bench_array_access
 	
+	
+#------ CUDA tests (declaration) -----------
+
+.PHONY: test_cuda
+
+test_cuda: \
+	$(TEST_BIN_DIR)/test_cuda_basics
+
 
 
 #_________________________________________________________________________
@@ -150,27 +171,37 @@ TEST_ARRAY_BASICS_SOURCES = \
 	test/test_array_transpose.cpp
 			
 $(TEST_BIN_DIR)/test_array_basics: $(ARRAY_BASIC_HEADERS) $(TEST_ARRAY_BASICS_SOURCES) 
-	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_ARRAY_BASICS_SOURCES) $(MAIN_TEST_POST) -o $(TEST_BIN_DIR)/test_array_basics
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_ARRAY_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
 	
 TEST_LINALG_SOURCES = \
 	test/test_linalg.cpp \
 	test/test_array_blas.cpp
 
 $(TEST_BIN_DIR)/test_linalg_intel: $(LINALG_HEADERS) $(ARRAY_TEST_HEADERS) $(TEST_LINALG_SOURCES)
-	$(CXX) $(CXXFLAGS) $(INTEL_FLAGS) $(TEST_LINALG_SOURCES) -o $(TEST_BIN_DIR)/test_linalg_intel
+	$(CXX) $(CXXFLAGS) $(INTEL_FLAGS) $(TEST_LINALG_SOURCES) -o $@
 
 # array bench
 
 $(BENCH_BIN_DIR)/bench_array_access: $(ARRAY_BASIC_HEADERS) bench/bench_array_access.cpp
-	$(CXX) $(CXXFLAGS) $(OFLAGS) bench/bench_array_access.cpp -o $(BENCH_BIN_DIR)/bench_array_access
-		
-$(BENCH_BIN_DIR)/bench_array_calc: $(ARRAY_COMP_HEADERS) bench/bench_array_calc.cpp
-	$(CXX) $(CXXFLAGS) $(OFLAGS) bench/bench_array_calc.cpp -o $(BENCH_BIN_DIR)/bench_array_calc
-	
+	$(CXX) $(CXXFLAGS) $(OFLAGS) bench/bench_array_access.cpp -o $@
+			
 $(BENCH_BIN_DIR)/bench_array_calc_intel: $(ARRAY_COMP_HEADERS) bench/bench_array_calc.cpp
-	$(CXX) $(CXXFLAGS) $(INTEL_FLAGS) $(OFLAGS) bench/bench_array_calc.cpp -o $(BENCH_BIN_DIR)/bench_array_calc_intel
+	$(CXX) $(CXXFLAGS) $(INTEL_FLAGS) $(OFLAGS) bench/bench_array_calc.cpp -o $@
 
 
+#----------------------------------------------------------
+#
+#   CUDA test & bench
+#
+#----------------------------------------------------------
+
+# CUDA tests
+
+TEST_CUDA_BASICS_SOURCES = \
+	test/test_cuda_base.cpp
+	
+$(TEST_BIN_DIR)/test_cuda_basics: $(CUDA_BASIC_HEADERS) $(TEST_CUDA_BASICS_SOURCES) 
+	$(CUDA_CC) $(CUDA_FLAGS) $(CUDA_TEST_PRE) $(TEST_CUDA_BASICS_SOURCES) $(CUDA_TEST_POST) -o $@
 
 
 
