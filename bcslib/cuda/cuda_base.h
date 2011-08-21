@@ -103,9 +103,9 @@ namespace bcs { namespace cuda {
 			return m_p;
 		}
 
-		__host__ operator bool() const
+		__host__ bool is_null() const
 		{
-			return bool(m_p);
+			return m_p == BCS_NULL;
 		}
 
 	public:
@@ -197,9 +197,9 @@ namespace bcs { namespace cuda {
 			return m_p;
 		}
 
-		__host__ operator bool() const
+		__host__ bool is_null() const
 		{
-			return bool(m_p);
+			return m_p == BCS_NULL;
 		}
 
 		__host__ operator host_cptr<T>() const
@@ -296,9 +296,9 @@ namespace bcs { namespace cuda {
 			return m_p;
 		}
 
-		__host__ __device__ operator bool() const
+		__host__ __device__ bool is_null() const
 		{
-			return m_p != BCS_NULL;
+			return m_p == BCS_NULL;
 		}
 
 	public:
@@ -391,9 +391,9 @@ namespace bcs { namespace cuda {
 			return m_p;
 		}
 
-		__host__ __device__ operator bool() const
+		__host__ __device__ bool is_null() const
 		{
-			return m_p != BCS_NULL;
+			return m_p == BCS_NULL;
 		}
 
 		__host__ __device__ operator device_cptr<T>() const
@@ -538,7 +538,7 @@ namespace bcs { namespace cuda {
 	template<typename T>
 	inline __host__ void device_free(device_ptr<T> p)
 	{
-		if (p) ::cudaFree(p.get());
+		if (!p.is_null()) ::cudaFree(p.get());
 	}
 
 
