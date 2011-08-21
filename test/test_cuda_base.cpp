@@ -13,6 +13,13 @@
 using namespace bcs;
 using namespace bcs::cuda;
 
+// template instantiation for syntax check
+
+template class bcs::cuda::host_cptr<float>;
+template class bcs::cuda::host_ptr<float>;
+template class bcs::cuda::device_cptr<float>;
+template class bcs::cuda::device_ptr<float>;
+
 
 TEST( CudaBase, HostCPtr )
 {

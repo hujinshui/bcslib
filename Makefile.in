@@ -198,7 +198,8 @@ $(BENCH_BIN_DIR)/bench_array_calc_intel: $(ARRAY_COMP_HEADERS) bench/bench_array
 # CUDA tests
 
 TEST_CUDA_BASICS_SOURCES = \
-	test/test_cuda_base.cpp
+	test/test_cuda_base.cpp \
+	test/test_cuda_vec.cpp
 	
 $(TEST_BIN_DIR)/test_cuda_basics: $(CUDA_BASIC_HEADERS) $(TEST_CUDA_BASICS_SOURCES) 
 	$(CUDA_CC) $(CUDA_FLAGS) $(CUDA_TEST_PRE) $(TEST_CUDA_BASICS_SOURCES) $(CUDA_TEST_POST) -o $@

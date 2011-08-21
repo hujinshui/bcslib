@@ -207,6 +207,11 @@ namespace bcs { namespace cuda {
 			return host_cptr<T>(m_p);
 		}
 
+		__host__ host_cptr<T> cptr() const
+		{
+			return host_cptr<T>(m_p);
+		}
+
 	public:
 		__host__ host_ptr operator+ (index_t n) const
 		{
@@ -397,6 +402,11 @@ namespace bcs { namespace cuda {
 		}
 
 		__host__ __device__ operator device_cptr<T>() const
+		{
+			return device_cptr<T>(m_p);
+		}
+
+		__host__ __device__ device_cptr<T> cptr() const
 		{
 			return device_cptr<T>(m_p);
 		}
