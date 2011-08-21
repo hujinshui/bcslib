@@ -168,7 +168,7 @@ namespace bcs { namespace cuda {
 		__host__
 		void set_zeros()
 		{
-			bcs::cuda::set_zeros(m_pbase, m_len);
+			bcs::cuda::set_zeros((size_t)m_len, m_pbase);
 		}
 
 	private:
@@ -213,42 +213,42 @@ namespace bcs { namespace cuda {
 		device_vec(index_type n, host_cptr<T> src)
 		: m_capa(n), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory(n, src, m_pbase);
+			if (n > 0) copy_memory((size_t)n, src, m_pbase);
 		}
 
 		__host__
 		device_vec(index_type n, host_cptr<T> src, index_type cap)
 		: m_capa(calc_max(n, cap)), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory(n, src, m_pbase);
+			if (n > 0) copy_memory((size_t)n, src, m_pbase);
 		}
 
 		__host__
 		device_vec(index_type n, device_cptr<T> src)
 		: m_capa(n), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory(n, src, m_pbase);
+			if (n > 0) copy_memory((size_t)n, src, m_pbase);
 		}
 
 		__host__
 		device_vec(index_type n, device_cptr<T> src, index_type cap)
 		: m_capa(calc_max(n, cap)), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory(n, src, m_pbase);
+			if (n > 0) copy_memory((size_t)n, src, m_pbase);
 		}
 
 		__host__
 		device_vec(const device_vec& src)
 		: m_capa(src.m_len), m_len(src.m_len), m_pbase(device_allocate<T>(m_capa))
 		{
-			copy_memory(m_len, src.m_pbase, m_pbase);
+			copy_memory((size_t)m_len, src.m_pbase.cptr(), m_pbase);
 		}
 
 		__host__
 		device_vec(const device_vec& src, index_type cap)
 		: m_capa(calc_max(src.m_len, cap)), m_len(src.m_len), m_pbase(device_allocate<T>(m_capa))
 		{
-			copy_memory(m_len, src.m_pbase, m_pbase);
+			copy_memory((size_t)m_len, src.m_pbase.cptr(), m_pbase);
 		}
 
 		__host__
@@ -258,12 +258,13 @@ namespace bcs { namespace cuda {
 			{
 				if (m_capa >= rhs.m_len)
 				{
-					copy_memory(m_len, rhs.m_pbase, m_pbase);
+					copy_memory((size_t)m_len, rhs.m_pbase.cptr(), m_pbase);
 					m_len = rhs.m_len;
 				}
 				else
 				{
-					swap(device_vec(rhs));
+					device_vec tmp(rhs);
+					swap(tmp);
 				}
 			}
 			return *this;
@@ -402,7 +403,7 @@ namespace bcs { namespace cuda {
 		__host__
 		void set_zeros()
 		{
-			bcs::cuda::set_zeros(m_pbase, m_len);
+			bcs::cuda::set_zeros((size_t)m_len, m_pbase);
 		}
 
 	private:
