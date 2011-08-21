@@ -14,12 +14,28 @@
 #define BCSLIB_ARG_CHECK_H_
 
 #include <bcslib/base/basic_defs.h>
-
-#include <string>
-#include <stdexcept>
+#include <exception>
 
 namespace bcs
 {
+
+	class invalid_argument : public std::exception
+	{
+	public:
+		invalid_argument(const char *msg)
+		: m_msg(msg)
+		{
+		}
+
+		virtual const char* what() const throw()
+		{
+			return m_msg;
+		}
+
+	private:
+		const char *m_msg;
+	};
+
 
 	// generic argument checking
 
@@ -27,16 +43,7 @@ namespace bcs
 	{
 		if (!cond)
 		{
-			throw std::invalid_argument("Invalid argument");
-		}
-	}
-
-
-	inline void check_arg(bool cond, const std::string& message)
-	{
-		if (!cond)
-		{
-			throw std::invalid_argument(message);
+			throw invalid_argument("Invalid argument");
 		}
 	}
 
@@ -44,7 +51,7 @@ namespace bcs
 	{
 		if (!cond)
 		{
-			throw std::invalid_argument(message);
+			throw invalid_argument(message);
 		}
 	}
 

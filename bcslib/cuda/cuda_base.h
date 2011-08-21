@@ -12,7 +12,8 @@
 #define BCSLIB_CUDA_BASE_H
 
 #include <bcslib/base/basic_defs.h>
-#include <cuda_runtime_api.h>
+#include <cuda_runtime.h>
+#include <exception>
 
 #if CUDART_VERSION < 3000
 #error CUDA Runtime vesion must be at least 3.0
@@ -28,31 +29,44 @@ namespace bcs { namespace cuda {
 	 ******************************************************/
 
 	/**
-	 * The exception class to represent a CUDA error
+	 * The base class for all exception related to CUDA
 	 */
-	class cuda_exception
+	class cuda_exception : public std::exception
 	{
 	public:
-		__host__ cuda_exception(cudaError_t e)
+		__host__ virtual const char *what() const throw()
+		{
+			return "generic CUDA-related exception.";
+		}
+	};
+
+
+	/**
+	 * The exception class to represent a CUDA error
+	 */
+	class cuda_error : public cuda_exception
+	{
+	public:
+		__host__ cuda_error(cudaError_t e)
 		: m_err(e) { }
 
-		__host__ const cudaError_t& get() const
+		__host__ const cudaError_t& get() const throw()
 		{
 			return m_err;
 		}
 
-		__host__ const char* what() const
+		__host__ virtual const char* what() const throw()
 		{
 			return ::cudaGetErrorString(m_err);
 		}
 
-		__host__ operator cudaError_t() const
+		__host__ operator cudaError_t() const throw()
 		{
 			return m_err;
 		}
 
 	public:
-		__host__ static cuda_exception last_error()
+		__host__ static cuda_error last_error() throw()
 		{
 			return ::cudaGetLastError();
 		}
@@ -60,7 +74,7 @@ namespace bcs { namespace cuda {
 	private:
 		cudaError_t m_err;
 
-	}; // end class cudaErr
+	}; // end class cuda_error
 
 
 	/******************************************************
@@ -139,6 +153,22 @@ namespace bcs { namespace cuda {
 		__host__ bool operator != (const host_cptr& rhs) const
 		{
 			return m_p != rhs.m_p;
+		}
+
+	public:
+		__host__ const T& operator [] (int i) const
+		{
+			return m_p[i];
+		}
+
+		__host__ const T& operator * () const
+		{
+			return *m_p;
+		}
+
+		__host__ const T* operator -> () const
+		{
+			return m_p;
 		}
 
 	private:
@@ -224,6 +254,22 @@ namespace bcs { namespace cuda {
 			return m_p != rhs.m_p;
 		}
 
+	public:
+		__host__ T& operator [] (int i) const
+		{
+			return m_p[i];
+		}
+
+		__host__ T& operator * () const
+		{
+			return *m_p;
+		}
+
+		__host__ T* operator -> () const
+		{
+			return m_p;
+		}
+
 	private:
 		T *m_p;
 
@@ -300,6 +346,22 @@ namespace bcs { namespace cuda {
 		__host__ __device__ bool operator != (const device_cptr& rhs) const
 		{
 			return m_p != rhs.m_p;
+		}
+
+	public:
+		__device__ const T& operator [] (int i) const
+		{
+			return m_p[i];
+		}
+
+		__device__ const T& operator * () const
+		{
+			return *m_p;
+		}
+
+		__device__ const T* operator -> () const
+		{
+			return m_p;
 		}
 
 	private:
@@ -386,10 +448,51 @@ namespace bcs { namespace cuda {
 			return m_p != rhs.m_p;
 		}
 
+	public:
+		__device__ T& operator [] (int i) const
+		{
+			return m_p[i];
+		}
+
+		__device__ T& operator * () const
+		{
+			return *m_p;
+		}
+
+		__device__ T* operator -> () const
+		{
+			return m_p;
+		}
+
 	private:
 		T* m_p;
 
 	}; // end class device_ptr
+
+
+	template<typename T>
+	inline host_cptr<T> make_host_cptr(const T *p)
+	{
+		return host_cptr<T>(p);
+	}
+
+	template<typename T>
+	inline host_ptr<T> make_host_ptr(T *p)
+	{
+		return host_ptr<T>(p);
+	}
+
+	template<typename T>
+	inline device_cptr<T> make_device_cptr(const T *p)
+	{
+		return device_cptr<T>(p);
+	}
+
+	template<typename T>
+	inline device_ptr<T> make_device_ptr(T *p)
+	{
+		return device_ptr<T>(p);
+	}
 
 
 	/******************************************************
@@ -408,7 +511,7 @@ namespace bcs { namespace cuda {
 			cudaError_t ret = ::cudaMalloc( (void**)&p, n * sizeof(T) );
 			if (ret != cudaSuccess)
 			{
-				throw cuda_exception(ret);
+				throw cuda_error(ret);
 			}
 		}
 
@@ -416,16 +519,16 @@ namespace bcs { namespace cuda {
 	}
 
 	template<typename T>
-	inline __host__ device_ptr<T> device_allocate2d(size_t w, size_t h, size_t& pitch)
+	inline __host__ device_ptr<T> device_allocate2d(size_t m, size_t n, size_t& pitch)
 	{
 		T *p = BCS_NULL;
 
-		if (w > 0 && h > 0)
+		if (m > 0 && n > 0)
 		{
-			cudaError_t ret = ::cudaMallocPitch( (void**)&p, &pitch, w * sizeof(T), h);
+			cudaError_t ret = ::cudaMallocPitch( (void**)&p, &pitch, n * sizeof(T), m);
 			if (ret != cudaSuccess)
 			{
-				throw cuda_exception(ret);
+				throw cuda_error(ret);
 			}
 		}
 
@@ -441,27 +544,65 @@ namespace bcs { namespace cuda {
 
 	/******************************************************
 	 *
-	 *  memory copy
+	 *  memory copy & set
 	 *
 	 ******************************************************/
 
+	// 1D
+
 	template<typename T>
-	inline __host__ void copy_memory(host_cptr<T> src, device_ptr<T> dst, size_t n)
+	inline __host__ void copy_memory(size_t n, host_cptr<T> src, device_ptr<T> dst)
 	{
 		::cudaMemcpy(dst.get(), src.get(), n * sizeof(T), cudaMemcpyHostToDevice);
 	}
 
 	template<typename T>
-	inline __host__ void copy_memory(device_cptr<T> src, host_ptr<T> dst, size_t n)
+	inline __host__ void copy_memory(size_t n, device_cptr<T> src, host_ptr<T> dst)
 	{
 		::cudaMemcpy(dst.get(), src.get(), n * sizeof(T), cudaMemcpyDeviceToHost);
 	}
 
 	template<typename T>
-	inline __host__ void copy_memory(device_cptr<T> src, device_ptr<T> dst, size_t n)
+	inline __host__ void copy_memory(size_t n, device_cptr<T> src, device_ptr<T> dst)
 	{
 		::cudaMemcpy(dst.get(), src.get(), n * sizeof(T), cudaMemcpyDeviceToDevice);
 	}
+
+	template<typename T>
+	inline __host__ void set_zeros(size_t n, device_ptr<T> dst)
+	{
+		::cudaMemset(dst.get(), 0, n * sizeof(T));
+	}
+
+	// 2D
+
+	template<typename T>
+	inline __host__ void copy_memory2d(size_t m, size_t n,
+			host_cptr<T> src, size_t spitch, device_ptr<T> dst, size_t dpitch)
+	{
+		::cudaMemcpy2D(dst.get(), dpitch, src.get(), spitch, n * sizeof(T), m, cudaMemcpyHostToDevice);
+	}
+
+	template<typename T>
+	inline __host__ void copy_memory2d(size_t m, size_t n,
+			device_cptr<T> src, size_t spitch, host_ptr<T> dst, size_t dpitch)
+	{
+		::cudaMemcpy2D(dst.get(), dpitch, src.get(), spitch, n * sizeof(T), m, cudaMemcpyDeviceToHost);
+	}
+
+	template<typename T>
+	inline __host__ void copy_memory2d(size_t m, size_t n,
+			device_cptr<T> src, size_t spitch, device_ptr<T> dst, size_t dpitch)
+	{
+		::cudaMemcpy2D(dst.get(), dpitch, src.get(), spitch, n * sizeof(T), m, cudaMemcpyDeviceToDevice);
+	}
+
+	template<typename T>
+	inline __host__ void set_zeros2d(size_t m, size_t n, device_ptr<T> dst, size_t dpitch)
+	{
+		::cudaMemset2D(dst.get(), dpitch, 0, n * sizeof(T), m);
+	}
+
 
 
 } }
@@ -470,7 +611,8 @@ namespace bcs { namespace cuda {
 #define BCS_CUDA_DEVICE_AVIEW_DEFS(T) \
 	typedef T value_type; \
 	typedef device_cptr<T> const_pointer; \
-	typedef device_ptr<T> pointer;
+	typedef device_ptr<T> pointer; \
+	typedef int index_type;
 
 
 #endif 

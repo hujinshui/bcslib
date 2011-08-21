@@ -14,6 +14,7 @@
 #define BCSLIB_CUDA_VEC_H_
 
 #include <bcslib/cuda/cuda_base.h>
+#include <bcslib/array/aview1d.h>
 
 namespace bcs { namespace cuda {
 
@@ -26,14 +27,20 @@ namespace bcs { namespace cuda {
 
 	public:
 		__host__ __device__
-		device_cview1d(const_pointer pbase, size_t len)
+		device_cview1d(const_pointer pbase, index_type len)
 		: m_pbase(pbase), m_len(len)
 		{
 		}
 
 	public:
 		__host__ __device__
-		size_t length() const
+		index_type nelems() const
+		{
+			return m_len;
+		}
+
+		__host__ __device__
+		index_type length() const
 		{
 			return m_len;
 		}
@@ -45,14 +52,27 @@ namespace bcs { namespace cuda {
 		}
 
 		__host__ __device__
-		device_cview1d csubview(size_t i, size_t slen) const
+		device_cview1d cblock(index_type i, index_type slen) const
 		{
 			return device_cview1d(pbase() + i, slen);
 		}
 
-	protected:
+	public:
+		__device__
+		const T& operator[] (index_type i) const
+		{
+			return m_pbase[i];
+		}
+
+		__device__
+		const T& operator() (index_type i) const
+		{
+			return m_pbase[i];
+		}
+
+	private:
 		const_pointer m_pbase;
-		size_t m_len;
+		index_type m_len;
 
 	}; // end class device_cview1d
 
@@ -65,7 +85,7 @@ namespace bcs { namespace cuda {
 
 	public:
 		__host__ __device__
-		device_view1d(pointer pbase, size_t len)
+		device_view1d(pointer pbase, index_type len)
 		: m_pbase(pbase), m_len(len)
 		{
 		}
@@ -84,7 +104,13 @@ namespace bcs { namespace cuda {
 
 	public:
 		__host__ __device__
-		size_t length() const
+		index_type nelems() const
+		{
+			return m_len;
+		}
+
+		__host__ __device__
+		index_type length() const
 		{
 			return m_len;
 		}
@@ -102,20 +128,52 @@ namespace bcs { namespace cuda {
 		}
 
 		__host__ __device__
-		device_vec_cview<T> csubview(size_t i, size_t slen) const
+		device_cview1d<T> cblock(index_type i, index_type slen) const
 		{
-			return device_vec_cview<T>(pbase() + i, slen);
+			return device_cview1d<T>(pbase() + i, slen);
 		}
 
 		__host__ __device__
-		device_view1d subview(size_t i, size_t slen)
+		device_view1d block(index_type i, index_type slen)
 		{
 			return device_view1d(pbase() + i, slen);
 		}
 
+	public:
+		__device__
+		const T& operator[] (index_type i) const
+		{
+			return m_pbase[i];
+		}
+
+		__device__
+		T& operator[] (index_type i)
+		{
+			return m_pbase[i];
+		}
+
+		__device__
+		const T& operator() (index_type i) const
+		{
+			return m_pbase[i];
+		}
+
+		__device__
+		T& operator() (index_type i)
+		{
+			return m_pbase[i];
+		}
+
+	public:
+		__host__
+		void set_zeros()
+		{
+			bcs::cuda::set_zeros(m_pbase, m_len);
+		}
+
 	private:
 		pointer m_pbase;
-		size_t m_len;
+		index_type m_len;
 
 	}; // end class device_view1d
 
@@ -140,57 +198,57 @@ namespace bcs { namespace cuda {
 		}
 
 		__host__
-		explicit device_vec(size_t n)
+		explicit device_vec(index_type n)
 		: m_capa(n), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
 		}
 
 		__host__
-		explicit device_vec(size_t n, size_t cap)
+		explicit device_vec(index_type n, index_type cap)
 		: m_capa(calc_max(n, cap)), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
 		}
 
 		__host__
-		device_vec(size_t n, host_cptr<T> src)
+		device_vec(index_type n, host_cptr<T> src)
 		: m_capa(n), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory(src, m_pbase, n);
+			if (n > 0) copy_memory(n, src, m_pbase);
 		}
 
 		__host__
-		device_vec(size_t n, host_cptr<T> src, size_t cap)
+		device_vec(index_type n, host_cptr<T> src, index_type cap)
 		: m_capa(calc_max(n, cap)), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory(src, m_pbase, n);
+			if (n > 0) copy_memory(n, src, m_pbase);
 		}
 
 		__host__
-		device_vec(size_t n, device_cptr<T> src)
+		device_vec(index_type n, device_cptr<T> src)
 		: m_capa(n), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory(src, m_pbase, n);
+			if (n > 0) copy_memory(n, src, m_pbase);
 		}
 
 		__host__
-		device_vec(size_t n, device_cptr<T> src, size_t cap)
+		device_vec(index_type n, device_cptr<T> src, index_type cap)
 		: m_capa(calc_max(n, cap)), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory(src, m_pbase, n);
+			if (n > 0) copy_memory(n, src, m_pbase);
 		}
 
 		__host__
 		device_vec(const device_vec& src)
 		: m_capa(src.m_len), m_len(src.m_len), m_pbase(device_allocate<T>(m_capa))
 		{
-			copy_memory(src.m_pbase, m_pbase, m_len);
+			copy_memory(m_len, src.m_pbase, m_pbase);
 		}
 
 		__host__
-		device_vec(const device_vec& src, size_t cap)
+		device_vec(const device_vec& src, index_type cap)
 		: m_capa(calc_max(src.m_len, cap)), m_len(src.m_len), m_pbase(device_allocate<T>(m_capa))
 		{
-			copy_memory(src.m_pbase, m_pbase, m_len);
+			copy_memory(m_len, src.m_pbase, m_pbase);
 		}
 
 		__host__
@@ -200,7 +258,7 @@ namespace bcs { namespace cuda {
 			{
 				if (m_capa >= rhs.m_len)
 				{
-					copy_memory(rhs.m_pbase, m_pbase, m_len);
+					copy_memory(m_len, rhs.m_pbase, m_pbase);
 					m_len = rhs.m_len;
 				}
 				else
@@ -214,20 +272,9 @@ namespace bcs { namespace cuda {
 		__host__ __device__
 		void swap(device_vec& rhs)
 		{
-			// swap capacity
-			size_t tc = rhs.m_capa;
-			rhs.m_capa = m_capa;
-			m_capa = tc;
-
-			// swap length
-			size_t tl = rhs.m_len;
-			rhs.m_len = m_len;
-			m_len = tl;
-
-			// swap pointer
-			pointer tp = rhs.m_pbase;
-			rhs.m_pbase = m_pbase;
-			m_pbase = tp;
+			swap_(m_capa, rhs.m_capa);
+			swap_(m_len, rhs.m_len);
+			swap_(m_pbase, rhs.m_pbase);
 		}
 
 	public:
@@ -257,7 +304,7 @@ namespace bcs { namespace cuda {
 
 	public:
 		__host__
-		void reserve(size_t cap)  // after reservation, the length is reset to 0
+		void reserve(index_type cap)  // after reservation, the length is reset to 0
 		{
 			if (m_capa < cap)
 			{
@@ -268,22 +315,36 @@ namespace bcs { namespace cuda {
 		}
 
 		__host__
-		void reimport(size_t n, host_cptr<T> src)
+		void reimport(index_type n, host_cptr<T> src)
 		{
 			reserve(n);
-			copy_memory(src, m_pbase, n);
+			copy_memory(n, src, m_pbase);
+			m_len = n;
 		}
 
 		__host__
-		void reimport(size_t n, device_cptr<T> src)
+		void reimport(index_type n, device_cptr<T> src)
 		{
 			reserve(n);
-			copy_memory(src, m_pbase, n);
+			copy_memory(n, src, m_pbase);
+			m_len = n;
 		}
 
 	public:
 		__host__ __device__
-		size_t length() const
+		index_type capacity() const
+		{
+			return m_capa;
+		}
+
+		__host__ __device__
+		index_type nelems() const
+		{
+			return m_len;
+		}
+
+		__host__ __device__
+		index_type length() const
 		{
 			return m_len;
 		}
@@ -301,36 +362,111 @@ namespace bcs { namespace cuda {
 		}
 
 		__host__ __device__
-		device_cview1d<T> csubview(size_t i, size_t slen) const
+		device_cview1d<T> cblock(index_type i, index_type slen) const
 		{
 			return device_cview1d<T>(pbase() + i, slen);
 		}
 
 		__host__ __device__
-		device_view1d<T> subview(size_t i, size_t slen)
+		device_view1d<T> block(index_type i, index_type slen)
 		{
 			return device_view1d<T>(pbase() + i, slen);
 		}
 
+	public:
+		__device__
+		const T& operator[] (index_type i) const
+		{
+			return m_pbase[i];
+		}
+
+		__device__
+		T& operator[] (index_type i)
+		{
+			return m_pbase[i];
+		}
+
+		__device__
+		const T& operator() (index_type i) const
+		{
+			return m_pbase[i];
+		}
+
+		__device__
+		T& operator() (index_type i)
+		{
+			return m_pbase[i];
+		}
+
+	public:
+		__host__
+		void set_zeros()
+		{
+			bcs::cuda::set_zeros(m_pbase, m_len);
+		}
+
 	private:
-		static size_t calc_max(size_t a, size_t b)
+		__host__ __device__
+		static index_type calc_max(index_type a, index_type b)
 		{
 			return a < b ? b : a;
 		}
 
+		__host__ __device__
+		static void swap_(index_type& x, index_type& y)
+		{
+			index_type t = x;
+			x = y;
+			y = t;
+		}
+
+		__host__ __device__
+		static void swap_(pointer& x, pointer& y)
+		{
+			pointer t = x;
+			x = y;
+			y = t;
+		}
+
 	private:
-		size_t m_capa;
-		size_t m_len;
+		index_type m_capa;
+		index_type m_len;
 		pointer m_pbase;
 
 	}; // end class device_vec
 
 
 	template<typename T>
-	void swap(device_vec<T>& lhs, device_vec<T>& rhs)
+	inline __host__ __device__ void swap(device_vec<T>& lhs, device_vec<T>& rhs)
 	{
 		lhs.swap(rhs);
 	}
+
+
+	// copy between views
+
+	template<typename T>
+	inline __host__ void copy(caview1d<T> src, device_view1d<T> dst)
+	{
+		check_arg(src.dim0() == (index_t)dst.length());
+		copy_memory((size_t)dst.length(), make_host_cptr(src.pbase()), dst.pbase());
+	}
+
+	template<typename T>
+	inline __host__ void copy(device_cview1d<T> src, aview1d<T> dst)
+	{
+		check_arg((index_t)src.length() == dst.dim0());
+		copy_memory((size_t)src.length(), src.pbase(), make_host_ptr(dst.pbase()));
+	}
+
+	template<typename T>
+	inline __host__ void copy(device_cview1d<T> src, device_view1d<T> dst)
+	{
+		check_arg(src.length() == dst.length());
+		copy_memory((size_t)src.length(), src.pbase(), dst.pbase());
+	}
+
+
 
 } }
 
