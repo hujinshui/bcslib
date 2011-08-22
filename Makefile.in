@@ -132,7 +132,8 @@ bench_array: \
 .PHONY: test_cuda
 
 test_cuda: \
-	$(TEST_BIN_DIR)/test_cuda_basics
+	$(TEST_BIN_DIR)/test_cuda_basics \
+	$(TEST_BIN_DIR)/stest_cuda_elemacc
 
 
 
@@ -205,5 +206,7 @@ TEST_CUDA_BASICS_SOURCES = \
 $(TEST_BIN_DIR)/test_cuda_basics: $(CUDA_BASIC_HEADERS) $(TEST_CUDA_BASICS_SOURCES) 
 	$(CUDA_CC) $(CUDA_FLAGS) $(CUDA_TEST_PRE) $(TEST_CUDA_BASICS_SOURCES) $(CUDA_TEST_POST) -o $@
 
+$(TEST_BIN_DIR)/stest_cuda_elemacc: $(CUDA_BASIC_HEADERS) test/stest_cuda_elemacc.cu
+	$(CUDA_CC) $(CUDA_FLAGS) test/stest_cuda_elemacc.cu -o $@
 
 
