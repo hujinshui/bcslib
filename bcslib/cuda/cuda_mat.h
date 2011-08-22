@@ -10,6 +10,7 @@
 #define BCSLIB_CUDA_MAT_H_
 
 #include <bcslib/cuda/cuda_base.h>
+#include <bcslib/cuda/cuda_vec.h>
 #include <bcslib/array/aview2d.h>
 
 namespace bcs { namespace cuda {
@@ -223,7 +224,7 @@ namespace bcs { namespace cuda {
 		}
 
 		__host__ __device__
-		pointer prow(index_type i)
+		pointer prowbase(index_type i)
 		{
 			return make_device_ptr(prow_(i));
 		}
@@ -384,7 +385,7 @@ namespace bcs { namespace cuda {
 		{
 			if (m_nrows > 0 && m_ncolumns > 0)
 			{
-				copy_memory2d((size_t)m_nrows, (size_t)m_ncolumns,
+				copy_memory2d<T>((size_t)m_nrows, (size_t)m_ncolumns,
 						src.m_pbase, (size_t)src.m_pitch, m_pbase, (size_t)m_pitch);
 			}
 		}
@@ -397,7 +398,7 @@ namespace bcs { namespace cuda {
 		{
 			if (m_nrows > 0 && m_ncolumns > 0)
 			{
-				copy_memory2d((size_t)m_nrows, (size_t)m_ncolumns,
+				copy_memory2d<T>((size_t)m_nrows, (size_t)m_ncolumns,
 						src.m_pbase, (size_t)src.m_pitch, m_pbase, (size_t)m_pitch);
 			}
 		}
@@ -409,7 +410,7 @@ namespace bcs { namespace cuda {
 			{
 				if (m_max_nrows >= rhs.m_nrows && m_max_ncols >= rhs.m_ncolumns)
 				{
-					copy_memory2d((size_t)rhs.m_nrows, (size_t)rhs.m_ncolumns,
+					copy_memory2d<T>((size_t)rhs.m_nrows, (size_t)rhs.m_ncolumns,
 							rhs.m_pbase, rhs.m_pitch, m_pbase, m_pitch);
 
 					m_nrows = rhs.m_nrows;
@@ -417,7 +418,8 @@ namespace bcs { namespace cuda {
 				}
 				else
 				{
-					swap(device_mat(rhs, m_max_nrows, m_max_ncols));
+					device_mat tmp(rhs, m_max_nrows, m_max_ncols);
+					swap(tmp);
 				}
 			}
 			return *this;
@@ -588,7 +590,7 @@ namespace bcs { namespace cuda {
 		}
 
 		__host__ __device__
-		pointer prow(index_type i)
+		pointer prowbase(index_type i)
 		{
 			return make_device_ptr(prow_(i));
 		}
@@ -652,8 +654,9 @@ namespace bcs { namespace cuda {
 		static pointer alloc_mat(index_type m, index_type n, index_type& pitch)
 		{
 			size_t pitch_u;
-			device_allocate2d<T>((size_t)m, (size_t)n, pitch_u);
-			pitch = (index_type)pitch;
+			pointer p = device_allocate2d<T>((size_t)m, (size_t)n, pitch_u);
+			pitch = (index_type)pitch_u;
+			return p;
 		}
 
 		__host__ __device__
