@@ -284,6 +284,81 @@ TEST( CudaMat, DeviceView2D )
 }
 
 
+TEST( CudaMat, RowViews)
+{
+	const int m = 16;
+	const int n = 32;
+
+	float src[m * n];
+	for (int i = 0; i < m * n; ++i) src[i] = float(i);
+
+	device_mat<float> mat0(m, n, make_host_cptr(src));
+	device_cview2d<float> cview0 = mat0.cview();
+	device_view2d<float> view0 = mat0.view();
+	int pitch = mat0.pitch();
+
+	ASSERT_TRUE( verify_device_mem2d<float>(m, n, mat0.pbase(), pitch, src) );
+
+	const int irow = 3;
+	float r1[n];
+	for (int i = 0; i < n; ++i) r1[i] = float(irow * n + i);
+
+	ASSERT_EQ( cview0.crow(irow).nelems(), n );
+	ASSERT_EQ( cview0.crow(irow).pbase(), cview0.prowbase(irow) );
+	EXPECT_TRUE( verify_device_mem1d<float>(n, cview0.crow(irow).pbase(), r1) );
+
+	ASSERT_EQ( view0.row(irow).nelems(), n );
+	ASSERT_EQ( view0.row(irow).pbase(), view0.prowbase(irow) );
+	EXPECT_TRUE( verify_device_mem1d<float>(n, view0.row(irow).pbase(), r1) );
+
+	ASSERT_EQ( view0.crow(irow).nelems(), n );
+	ASSERT_EQ( view0.crow(irow).pbase(), view0.prowbase(irow) );
+	EXPECT_TRUE( verify_device_mem1d<float>(n, view0.crow(irow).pbase(), r1) );
+
+	ASSERT_EQ( mat0.row(irow).nelems(), n );
+	ASSERT_EQ( mat0.row(irow).pbase(), mat0.prowbase(irow) );
+	EXPECT_TRUE( verify_device_mem1d<float>(n, mat0.row(irow).pbase(), r1) );
+
+	ASSERT_EQ( mat0.crow(irow).nelems(), n );
+	ASSERT_EQ( mat0.crow(irow).pbase(), mat0.prowbase(irow) );
+	EXPECT_TRUE( verify_device_mem1d<float>(n, mat0.crow(irow).pbase(), r1) );
+
+	const int sm = 5;
+
+	float r2[sm * n];
+	for (int k = 0; k < sm; ++k)
+	{
+		for (int i = 0; i < n; ++i)
+			r2[k * n + i] = float((irow+k) * n + i);
+	}
+
+	ASSERT_TRUE( verify_dev2d(cview0.crows(irow, sm), sm, n) );
+	ASSERT_EQ( cview0.crows(irow, sm).pbase(), cview0.prowbase(irow) );
+	ASSERT_EQ( cview0.crows(irow, sm).pitch(), pitch );
+	EXPECT_TRUE( verify_device_mem2d<float>(sm, n, cview0.crows(irow, sm).pbase(), pitch, r2) );
+
+	ASSERT_TRUE( verify_dev2d(view0.rows(irow, sm), sm, n) );
+	ASSERT_EQ( view0.rows(irow, sm).pbase(), view0.prowbase(irow) );
+	ASSERT_EQ( view0.rows(irow, sm).pitch(), pitch );
+	EXPECT_TRUE( verify_device_mem2d<float>(sm, n, view0.rows(irow, sm).pbase(), pitch, r2) );
+
+	ASSERT_TRUE( verify_dev2d(view0.crows(irow, sm), sm, n) );
+	ASSERT_EQ( view0.crows(irow, sm).pbase(), view0.prowbase(irow) );
+	ASSERT_EQ( view0.crows(irow, sm).pitch(), pitch );
+	EXPECT_TRUE( verify_device_mem2d<float>(sm, n, view0.crows(irow, sm).pbase(), pitch, r2) );
+
+	ASSERT_TRUE( verify_dev2d(mat0.rows(irow, sm), sm, n) );
+	ASSERT_EQ( mat0.rows(irow, sm).pbase(), mat0.prowbase(irow) );
+	ASSERT_EQ( mat0.rows(irow, sm).pitch(), pitch );
+	EXPECT_TRUE( verify_device_mem2d<float>(sm, n, mat0.rows(irow, sm).pbase(), pitch, r2) );
+
+	ASSERT_TRUE( verify_dev2d(mat0.crows(irow, sm), sm, n) );
+	ASSERT_EQ( mat0.crows(irow, sm).pbase(), mat0.prowbase(irow) );
+	ASSERT_EQ( mat0.crows(irow, sm).pitch(), pitch );
+	EXPECT_TRUE( verify_device_mem2d<float>(sm, n, mat0.crows(irow, sm).pbase(), pitch, r2) );
+}
+
+
 TEST( CudaMat, BlockViews )
 {
 	const int m = 16;
@@ -328,6 +403,38 @@ TEST( CudaMat, BlockViews )
 	ASSERT_EQ( b1.ncolumns(), 12 );
 	ASSERT_EQ( b1.pitch(), pitch );
 	ASSERT_EQ( b1.pbase(),  make_device_ptr((float*)((char*)p0 + pitch *  i) + j) );
+}
+
+
+TEST( CudaMat, Reimport )
+{
+	const int Nmax = 512;
+	static float src[Nmax];
+	for (int i = 0; i < Nmax; ++i) src[i] = float(i);
+	host_cptr<float> srcp = make_host_cptr(src);
+
+	device_mat<float> mat;
+	ASSERT_TRUE( verify_devmat(mat, 0, 0, 0, 0) );
+
+	mat.reimport(6, 8, srcp);
+	ASSERT_TRUE( verify_devmat(mat, 6, 8, 6, 8) );
+	EXPECT_TRUE( verify_device_mem2d<float>(6, 8, mat.pbase(), mat.pitch(), src) );
+
+	mat.reimport(4, 5, srcp + 2);
+	ASSERT_TRUE( verify_devmat(mat, 4, 5, 6, 8) );
+	EXPECT_TRUE( verify_device_mem2d<float>(4, 5, mat.pbase(), mat.pitch(), src + 2) );
+
+	mat.reimport(8, 6, srcp + 1);
+	ASSERT_TRUE( verify_devmat(mat, 8, 6, 8, 8) );
+	EXPECT_TRUE( verify_device_mem2d<float>(8, 6, mat.pbase(), mat.pitch(), src + 1) );
+
+	mat.reimport(6, 10, srcp + 2);
+	ASSERT_TRUE( verify_devmat(mat, 6, 10, 8, 10) );
+	EXPECT_TRUE( verify_device_mem2d<float>(6, 10, mat.pbase(), mat.pitch(), src + 2) );
+
+	mat.reimport(12, 16, srcp);
+	ASSERT_TRUE( verify_devmat(mat, 12, 16, 12, 16) );
+	EXPECT_TRUE( verify_device_mem2d<float>(12, 16, mat.pbase(), mat.pitch(), src) );
 }
 
 

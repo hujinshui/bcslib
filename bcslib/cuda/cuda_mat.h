@@ -483,6 +483,8 @@ namespace bcs { namespace cuda {
 
 				m_nrows = 0;
 				m_ncolumns = 0;
+				m_max_nrows = ma;
+				m_max_ncols = na;
 			}
 		}
 
@@ -508,12 +510,6 @@ namespace bcs { namespace cuda {
 			copy_memory2d(m, n, src, spitch, m_pbase, m_pitch);
 			m_nrows = m;
 			m_ncolumns = n;
-		}
-
-		__host__
-		void reimport(index_type m, index_type n, device_cptr<T> src)
-		{
-			reimport(m, n, src, sizeof(T) * n);
 		}
 
 	public:

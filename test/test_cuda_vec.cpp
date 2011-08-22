@@ -267,6 +267,38 @@ TEST( CudaVec, BlockViews )
 }
 
 
+TEST( CudaVec, Reimport )
+{
+	const int N = 32;
+	static float src[N];
+	for (int i = 0; i < N; ++i) src[i] = float(i);
+
+	device_vec<float> vec;
+	ASSERT_EQ( vec.capacity(), 0 );
+	ASSERT_EQ( vec.nelems(), 0 );
+
+	vec.reimport(10, make_host_cptr(src));
+	ASSERT_EQ( vec.capacity(), 10 );
+	ASSERT_EQ( vec.nelems(), 10 );
+	EXPECT_TRUE( verify_device_mem1d<float>(10, vec.pbase(), src) );
+
+	vec.reimport(5, make_host_cptr(src + 2) );
+	ASSERT_EQ( vec.capacity(), 10 );
+	ASSERT_EQ( vec.nelems(), 5 );
+	EXPECT_TRUE( verify_device_mem1d<float>(5, vec.pbase(), src + 2) );
+
+	vec.reimport(8, make_host_cptr(src + 1) );
+	ASSERT_EQ( vec.capacity(), 10 );
+	ASSERT_EQ( vec.nelems(), 8 );
+	EXPECT_TRUE( verify_device_mem1d<float>(8, vec.pbase(), src + 1) );
+
+	vec.reimport(12, make_host_cptr(src) );
+	ASSERT_EQ( vec.capacity(), 12 );
+	ASSERT_EQ( vec.nelems(), 12 );
+	EXPECT_TRUE( verify_device_mem1d<float>(12, vec.pbase(), src) );
+}
+
+
 TEST( CudaVec, CopyViews )
 {
 	const int N = 128;
