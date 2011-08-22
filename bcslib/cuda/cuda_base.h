@@ -563,25 +563,53 @@ namespace bcs { namespace cuda {
 	template<typename T>
 	inline __host__ void copy_memory(size_t n, host_cptr<T> src, device_ptr<T> dst)
 	{
-		::cudaMemcpy(dst.get(), src.get(), n * sizeof(T), cudaMemcpyHostToDevice);
+		if (n > 0)
+		{
+			cudaError_t ret = ::cudaMemcpy(dst.get(), src.get(), n * sizeof(T), cudaMemcpyHostToDevice);
+			if (ret != cudaSuccess)
+			{
+				throw cuda_error(ret);
+			}
+		}
 	}
 
 	template<typename T>
 	inline __host__ void copy_memory(size_t n, device_cptr<T> src, host_ptr<T> dst)
 	{
-		::cudaMemcpy(dst.get(), src.get(), n * sizeof(T), cudaMemcpyDeviceToHost);
+		if (n > 0)
+		{
+			cudaError_t ret = ::cudaMemcpy(dst.get(), src.get(), n * sizeof(T), cudaMemcpyDeviceToHost);
+			if (ret != cudaSuccess)
+			{
+				throw cuda_error(ret);
+			}
+		}
 	}
 
 	template<typename T>
 	inline __host__ void copy_memory(size_t n, device_cptr<T> src, device_ptr<T> dst)
 	{
-		::cudaMemcpy(dst.get(), src.get(), n * sizeof(T), cudaMemcpyDeviceToDevice);
+		if (n > 0)
+		{
+			cudaError_t ret = ::cudaMemcpy(dst.get(), src.get(), n * sizeof(T), cudaMemcpyDeviceToDevice);
+			if (ret != cudaSuccess)
+			{
+				throw cuda_error(ret);
+			}
+		}
 	}
 
 	template<typename T>
 	inline __host__ void set_zeros(size_t n, device_ptr<T> dst)
 	{
-		::cudaMemset(dst.get(), 0, n * sizeof(T));
+		if (n > 0)
+		{
+			cudaError_t ret = ::cudaMemset(dst.get(), 0, n * sizeof(T));
+			if (ret != cudaSuccess)
+			{
+				throw cuda_error(ret);
+			}
+		}
 	}
 
 	// 2D
@@ -590,29 +618,63 @@ namespace bcs { namespace cuda {
 	inline __host__ void copy_memory2d(size_t m, size_t n,
 			host_cptr<T> src, size_t spitch, device_ptr<T> dst, size_t dpitch)
 	{
-		::cudaMemcpy2D(dst.get(), dpitch, src.get(), spitch, n * sizeof(T), m, cudaMemcpyHostToDevice);
+		if (m > 0 && n > 0)
+		{
+			cudaError_t ret = ::cudaMemcpy2D(dst.get(), dpitch, src.get(), spitch,
+					n * sizeof(T), m, cudaMemcpyHostToDevice);
+
+			if (ret != cudaSuccess)
+			{
+				throw cuda_error(ret);
+			}
+		}
 	}
 
 	template<typename T>
 	inline __host__ void copy_memory2d(size_t m, size_t n,
 			device_cptr<T> src, size_t spitch, host_ptr<T> dst, size_t dpitch)
 	{
-		::cudaMemcpy2D(dst.get(), dpitch, src.get(), spitch, n * sizeof(T), m, cudaMemcpyDeviceToHost);
+		if (m > 0 && n > 0)
+		{
+			cudaError_t ret = ::cudaMemcpy2D(dst.get(), dpitch, src.get(), spitch,
+					n * sizeof(T), m, cudaMemcpyDeviceToHost);
+
+			if (ret != cudaSuccess)
+			{
+				throw cuda_error(ret);
+			}
+		}
 	}
 
 	template<typename T>
 	inline __host__ void copy_memory2d(size_t m, size_t n,
 			device_cptr<T> src, size_t spitch, device_ptr<T> dst, size_t dpitch)
 	{
-		::cudaMemcpy2D(dst.get(), dpitch, src.get(), spitch, n * sizeof(T), m, cudaMemcpyDeviceToDevice);
+		if (m > 0 && n > 0)
+		{
+			cudaError_t ret = ::cudaMemcpy2D(dst.get(), dpitch, src.get(), spitch,
+					n * sizeof(T), m, cudaMemcpyDeviceToDevice);
+
+			if (ret != cudaSuccess)
+			{
+				throw cuda_error(ret);
+			}
+		}
 	}
 
 	template<typename T>
 	inline __host__ void set_zeros2d(size_t m, size_t n, device_ptr<T> dst, size_t dpitch)
 	{
-		::cudaMemset2D(dst.get(), dpitch, 0, n * sizeof(T), m);
-	}
+		if (m > 0 && n > 0)
+		{
+			cudaError_t ret = ::cudaMemset2D(dst.get(), dpitch, 0, n * sizeof(T), m);
 
+			if (ret != cudaSuccess)
+			{
+				throw cuda_error(ret);
+			}
+		}
+	}
 
 
 } }
