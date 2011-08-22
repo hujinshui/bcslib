@@ -213,28 +213,28 @@ namespace bcs { namespace cuda {
 		device_vec(index_type n, host_cptr<T> src)
 		: m_capa(n), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory((size_t)n, src, m_pbase);
+			copy_memory((size_t)n, src, m_pbase);
 		}
 
 		__host__
 		device_vec(index_type n, host_cptr<T> src, index_type cap)
 		: m_capa(calc_max(n, cap)), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory((size_t)n, src, m_pbase);
+			copy_memory((size_t)n, src, m_pbase);
 		}
 
 		__host__
 		device_vec(index_type n, device_cptr<T> src)
 		: m_capa(n), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory((size_t)n, src, m_pbase);
+			copy_memory((size_t)n, src, m_pbase);
 		}
 
 		__host__
 		device_vec(index_type n, device_cptr<T> src, index_type cap)
 		: m_capa(calc_max(n, cap)), m_len(n), m_pbase(device_allocate<T>(m_capa))
 		{
-			if (n > 0) copy_memory((size_t)n, src, m_pbase);
+			copy_memory((size_t)n, src, m_pbase);
 		}
 
 		__host__
@@ -258,7 +258,7 @@ namespace bcs { namespace cuda {
 			{
 				if (m_capa >= rhs.m_len)
 				{
-					copy_memory((size_t)m_len, rhs.m_pbase.cptr(), m_pbase);
+					copy_memory((size_t)rhs.m_len, rhs.m_pbase.cptr(), m_pbase);
 					m_len = rhs.m_len;
 				}
 				else

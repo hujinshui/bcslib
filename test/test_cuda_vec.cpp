@@ -169,6 +169,7 @@ TEST( CudaVec, DeviceVec )
 
 	EXPECT_TRUE( verify_device_mem1d<float>(8, u1.pbase(), ref1) );
 	EXPECT_TRUE( verify_device_mem1d<float>(6, u2.pbase(), ref0) );
+
 }
 
 
