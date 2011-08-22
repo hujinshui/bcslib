@@ -265,6 +265,13 @@ namespace bcs { namespace cuda {
 			return device_view2d(prowbase(i) + j, nr, nc, m_pitch);
 		}
 
+	public:
+		__host__
+		void set_zeros()
+		{
+			bcs::cuda::set_zeros2d((size_t)nrows(), (size_t)ncolumns(), pbase(), pitch());
+		}
+
 	private:
 		__host__ __device__
 		const T* prow_(index_type i) const
@@ -351,7 +358,7 @@ namespace bcs { namespace cuda {
 		}
 
 		__host__
-		device_mat(index_type m, index_type n, device_cptr<T> src)
+		device_mat(index_type m, index_type n, device_cptr<T> src, index_type spitch)
 		: m_max_nrows(m), m_max_ncols(n)
 		, m_nrows(m), m_ncolumns(n)
 		, m_pitch(0), m_pbase(alloc_mat(m_max_nrows, m_max_ncols, m_pitch))
@@ -359,12 +366,12 @@ namespace bcs { namespace cuda {
 			if (m > 0 && n > 0)
 			{
 				copy_memory2d((size_t)m, (size_t)n,
-						src, (size_t)n * sizeof(T), m_pbase, (size_t)m_pitch);
+						src, spitch, m_pbase, (size_t)m_pitch);
 			}
 		}
 
 		__host__
-		device_mat(index_type m, index_type n, device_cptr<T> src, index_type max_m, index_type max_n)
+		device_mat(index_type m, index_type n, device_cptr<T> src, index_type spitch, index_type max_m, index_type max_n)
 		: m_max_nrows(calc_max(m, max_m)), m_max_ncols(calc_max(n, max_n))
 		, m_nrows(m), m_ncolumns(n)
 		, m_pitch(0), m_pbase(alloc_mat(m_max_nrows, m_max_ncols, m_pitch))
@@ -372,7 +379,7 @@ namespace bcs { namespace cuda {
 			if (m > 0 && n > 0)
 			{
 				copy_memory2d((size_t)m, (size_t)n,
-						src, (size_t)n * sizeof(T), m_pbase, (size_t)m_pitch);
+						src, spitch, m_pbase, (size_t)m_pitch);
 			}
 		}
 
@@ -631,6 +638,13 @@ namespace bcs { namespace cuda {
 			return device_view2d<T>(prowbase(i) + j, nr, nc, m_pitch);
 		}
 
+	public:
+		__host__
+		void set_zeros()
+		{
+			bcs::cuda::set_zeros2d((size_t)nrows(), (size_t)ncolumns(), pbase(), pitch());
+		}
+
 	private:
 		__host__ __device__
 		const T* prow_(index_type i) const
@@ -686,6 +700,66 @@ namespace bcs { namespace cuda {
 		pointer m_pbase;
 
 	}; // end class device_mat
+
+
+	// copy between views
+
+	template<typename T>
+	inline __host__ void copy(caview2d<T, row_major_t> src, device_view2d<T> dst)
+	{
+		check_arg(src.nrows() == (index_t)dst.nrows() && src.ncolumns() == (index_t)dst.ncolumns());
+
+		size_t m = (size_t)src.nrows();
+		size_t n = (size_t)src.ncolumns();
+		copy_memory2d(m, n, make_host_cptr(src.pbase()), n * sizeof(T), dst.pbase(), dst.pitch());
+	}
+
+	template<typename T>
+	inline __host__ void copy(device_cview2d<T> src, aview2d<T, row_major_t> dst)
+	{
+		check_arg((index_t)src.nrows() == dst.nrows() && (index_t)src.ncolumns() == dst.ncolumns());
+
+		size_t m = (size_t)src.nrows();
+		size_t n = (size_t)src.ncolumns();
+
+		copy_memory2d(m, n, src.pbase(), src.pitch(), make_host_ptr(dst.pbase()), n * sizeof(T));
+	}
+
+	template<typename T>
+	inline __host__ void copy(device_cview2d<T> src, device_view2d<T> dst)
+	{
+		check_arg(src.nrows() == dst.nrows() && src.ncolumns() == dst.ncolumns());
+
+		size_t m = (size_t)src.nrows();
+		size_t n = (size_t)src.ncolumns();
+
+		copy_memory2d(m, n, src.pbase(), src.pitch(), dst.pbase(), dst.pitch());
+	}
+
+	template<typename T>
+	inline __host__ void trans_copy(caview2d<T, column_major_t> src, device_view2d<T> dst)
+	{
+		// src: n x m --> dst: m x n
+
+		check_arg(src.nrows() == (index_t)dst.ncolumns() && src.ncolumns() == (index_t)dst.nrows());
+
+		size_t m = (size_t)dst.nrows();
+		size_t n = (size_t)dst.ncolumns();
+		copy_memory2d(m, n, make_host_cptr(src.pbase()), n * sizeof(T), dst.pbase(), dst.pitch());
+	}
+
+	template<typename T>
+	inline __host__ void trans_copy(device_cview2d<T> src, aview2d<T, column_major_t> dst)
+	{
+		// src: n x m --> dst: m x n
+
+		check_arg((index_t)src.nrows() == dst.ncolumns() && (index_t)src.ncolumns() == dst.nrows());
+
+		size_t m = (size_t)src.nrows();
+		size_t n = (size_t)src.ncolumns();
+
+		copy_memory2d(m, n, src.pbase(), src.pitch(), make_host_ptr(dst.pbase()), n * sizeof(T));
+	}
 
 
 } }
