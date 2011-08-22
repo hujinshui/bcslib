@@ -99,6 +99,7 @@ TEST( CudaVec, DeviceVec )
 	ASSERT_EQ( v4.capacity(), N );
 	ASSERT_EQ( v4.nelems(), N );
 	ASSERT_EQ( v4.length(), N );
+	ASSERT_NE( v4.pbase(), v2.pbase() );
 	ASSERT_FALSE( v4.pbase().is_null() );
 
 	EXPECT_TRUE( verify_device_mem1d<float>((size_t)N, v4.pbase(), ref1) );
@@ -108,6 +109,7 @@ TEST( CudaVec, DeviceVec )
 	ASSERT_EQ( v4e.capacity(), 2 * N );
 	ASSERT_EQ( v4e.nelems(), N );
 	ASSERT_EQ( v4e.length(), N );
+	ASSERT_NE( v4e.pbase(), v2.pbase() );
 	ASSERT_FALSE( v4e.pbase().is_null() );
 
 	EXPECT_TRUE( verify_device_mem1d<float>((size_t)N, v4e.pbase(), ref1) );
@@ -167,8 +169,6 @@ TEST( CudaVec, DeviceVec )
 
 	EXPECT_TRUE( verify_device_mem1d<float>(8, u1.pbase(), ref1) );
 	EXPECT_TRUE( verify_device_mem1d<float>(6, u2.pbase(), ref0) );
-
-
 }
 
 
@@ -244,6 +244,16 @@ TEST( CudaVec, BlockViews )
 	ASSERT_EQ( cb1.length(), 5 );
 	ASSERT_EQ( cb1.pbase(), cp0 + 3 );
 
+	cb1 = view0.cblock(3, 5);
+	ASSERT_EQ( cb1.nelems(), 5 );
+	ASSERT_EQ( cb1.length(), 5 );
+	ASSERT_EQ( cb1.pbase(), cp0 + 3 );
+
+	cb1 = vec0.cblock(3, 5);
+	ASSERT_EQ( cb1.nelems(), 5 );
+	ASSERT_EQ( cb1.length(), 5 );
+	ASSERT_EQ( cb1.pbase(), cp0 + 3 );
+
 	device_view1d<float> b1 = view0.block(3, 5);
 	ASSERT_EQ( b1.nelems(), 5 );
 	ASSERT_EQ( b1.length(), 5 );
@@ -254,4 +264,44 @@ TEST( CudaVec, BlockViews )
 	ASSERT_EQ( b1.length(), 5 );
 	ASSERT_EQ( b1.pbase(), p0 + 3 );
 }
+
+
+TEST( CudaVec, CopyViews )
+{
+	const int N = 128;
+
+	static float src[N];
+	for (int i = 0; i < N; ++i) src[i] = float(i);
+
+	static float dst[N];
+	for (int i = 0; i < N; ++i) dst[i] = float(0);
+
+
+	caview1d<float> a0(src, N);
+	ASSERT_EQ( a0.nelems(), N );
+
+	device_vec<float> v0(N);
+	ASSERT_EQ( v0.nelems(), N );
+
+	device_vec<float> v1(N);
+	ASSERT_EQ( v1.nelems(), N );
+
+	aview1d<float> a1(dst, N);
+	ASSERT_EQ( a1.nelems(), N );
+
+
+	copy(a0, v0.view());
+	ASSERT_TRUE( verify_device_mem1d<float>(N, v0.pbase(), src) );
+
+	copy(v0.cview(), v1.view());
+	ASSERT_TRUE( verify_device_mem1d<float>(N, v1.pbase(), src) );
+
+	copy(v1.cview(), a1);
+	ASSERT_TRUE( verify_host_mem1d<float>(N, make_host_cptr(dst), src) );
+
+}
+
+
+
+
 
