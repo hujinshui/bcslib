@@ -413,11 +413,6 @@ namespace bcs
 			return derived().pbase();
 		}
 
-		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
-		{
-			return derived().operator[](i);
-		}
-
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
 			return derived().operator()(i, j);
@@ -506,16 +501,6 @@ namespace bcs
 		BCS_ENSURE_INLINE pointer pbase()
 		{
 			return derived().pbase();
-		}
-
-		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
-		{
-			return derived().operator[](i);
-		}
-
-		BCS_ENSURE_INLINE reference operator[](index_type i)
-		{
-			return derived().operator[](i);
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const

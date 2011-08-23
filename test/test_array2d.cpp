@@ -25,6 +25,12 @@ template class bcs::caview2d_ex<double, column_major_t, id_ind, step_ind>;
 template class bcs::aview2d_ex<double,  row_major_t,    id_ind, step_ind>;
 template class bcs::aview2d_ex<double,  column_major_t, id_ind, step_ind>;
 
+template class bcs::caview2d_block<double, row_major_t>;
+template class bcs::caview2d_block<double, column_major_t>;
+
+template class bcs::aview2d_block<double, row_major_t>;
+template class bcs::aview2d_block<double, column_major_t>;
+
 template class bcs::caview2d<double, row_major_t>;
 template class bcs::caview2d<double, column_major_t>;
 
@@ -80,6 +86,60 @@ BCS_STATIC_ASSERT( (is_base_of<
 BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview2d_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
 		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
+
+
+// caview2d_block
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::caview_base<bcs::caview2d_block<double, row_major_t> >,
+		bcs::caview2d_block<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::caview2d_base<bcs::caview2d_block<double, row_major_t> >,
+		bcs::caview2d_block<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::dense_caview2d_base<bcs::caview2d_block<double, row_major_t> >,
+		bcs::caview2d_block<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::block_caview2d_base<bcs::caview2d_block<double, row_major_t> >,
+		bcs::caview2d_block<double, row_major_t> >::value) );
+
+// aview2d_block
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::caview_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::aview2d_block<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::aview_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::aview2d_block<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::caview2d_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::aview2d_block<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::aview2d_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::aview2d_block<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::dense_caview2d_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::aview2d_block<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::dense_aview2d_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::aview2d_block<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::block_caview2d_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::aview2d_block<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::block_aview2d_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::aview2d_block<double, row_major_t> >::value) );
+
 
 // caview2d
 
@@ -411,6 +471,7 @@ bool elemwise_operation_test(bcs::dense_aview2d_base<Derived>& a)
  *
  **********************************************************/
 
+
 TEST( Array2D, Aview2DRowMajor )
 {
 	double src[6] = {3, 4, 5, 1, 2, 7};
@@ -433,9 +494,6 @@ TEST( Array2D, Aview2DRowMajor )
 	ASSERT_TRUE( array_equal(a2, src, m * n) );
 
 	ASSERT_EQ( a1.pbase(), a2.pbase() );
-	ASSERT_TRUE( cont_array_integrity_test(a2) );
-	ASSERT_TRUE( array_equal(a2, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a2) );
 }
 
 
@@ -461,9 +519,65 @@ TEST( Array2D, Aview2DColumnMajor )
 	ASSERT_TRUE( array_equal(a2, src, m * n) );
 
 	ASSERT_EQ( a1.pbase(), a2.pbase() );
-	ASSERT_TRUE( cont_array_integrity_test(a2) );
-	ASSERT_TRUE( array_equal(a2, src, m * n) );
-	ASSERT_TRUE( elemwise_operation_test(a2) );
+}
+
+
+TEST( Array2D, Aview2DBlockRowMajor )
+{
+	double src[12] = {3, 4, 5, 1, 2, 7, 8, 9, 0, 3, 7, 6};
+	row_extent bext(4);
+	index_t m = 2;
+	index_t n = 3;
+
+	double ref[6] = {3, 4, 5, 2, 7, 8};
+
+	aview2d_block<double, row_major_t> a1(src, bext, m, n);
+
+	ASSERT_EQ(a1.dim0(), m);
+	ASSERT_EQ(a1.dim1(), n);
+	ASSERT_EQ(a1.base_extent().value, 4);
+	ASSERT_TRUE( array_integrity_test(a1) );
+	ASSERT_TRUE( array2d_equal(a1, make_aview2d_rm(ref, m, n)) );
+	ASSERT_TRUE( elemwise_operation_test(a1) );
+
+	aview2d_block<double, row_major_t> a2(a1);
+
+	ASSERT_EQ(a2.dim0(), m);
+	ASSERT_EQ(a2.dim1(), n);
+	ASSERT_EQ(a1.base_extent().value, 4);
+	ASSERT_TRUE( array_integrity_test(a2) );
+	ASSERT_TRUE( array2d_equal(a2, make_aview2d_rm(ref, m, n)) );
+
+	ASSERT_EQ( a1.pbase(), a2.pbase() );
+}
+
+TEST( Array2D, Aview2DBlockColumnMajor )
+{
+	double src[12] = {3, 4, 5, 1, 2, 7, 8, 9, 0, 3, 7, 6};
+	column_extent bext(3);
+	index_t m = 2;
+	index_t n = 3;
+
+	double ref[6] = {3, 4, 1, 2, 8, 9};
+
+	aview2d_block<double, column_major_t> a1(src, bext, m, n);
+
+	ASSERT_EQ(a1.dim0(), m);
+	ASSERT_EQ(a1.dim1(), n);
+	ASSERT_EQ(a1.base_extent().value, 3);
+	ASSERT_TRUE( array_integrity_test(a1) );
+	ASSERT_TRUE( array2d_equal(a1, make_aview2d_cm(ref, m, n)) );
+	ASSERT_TRUE( elemwise_operation_test(a1) );
+
+	aview2d_block<double, column_major_t> a2(a1);
+
+	ASSERT_EQ(a2.dim0(), m);
+	ASSERT_EQ(a2.dim1(), n);
+	ASSERT_EQ(a1.base_extent().value, 3);
+	ASSERT_TRUE( array_integrity_test(a2) );
+	ASSERT_TRUE( array2d_equal(a2, make_aview2d_cm(ref, m, n)) );
+
+	ASSERT_EQ( a1.pbase(), a2.pbase() );
 }
 
 
@@ -849,10 +963,75 @@ TEST( Array2D, Slices )
 	double src[60];
 	for (int i = 0; i < 60; ++i) src[i] = i+1;
 
-	array2d<double, row_major_t> Arm( aview2d_ex<double, row_major_t, id_ind, id_ind>(
-			src, get_extent(7, 8, row_major_t()), id_ind(5), id_ind(6)) );
-	array2d<double, column_major_t> Acm( aview2d_ex<double, column_major_t, id_ind, id_ind>(
-			src, get_extent(7, 8, column_major_t()), id_ind(5), id_ind(6)) );
+	array2d<double, row_major_t> Arm( aview2d_block<double, row_major_t>(src, get_extent(7, 8, row_major_t()), 5, 6) );
+	array2d<double, column_major_t> Acm( aview2d_block<double, column_major_t>(src, get_extent(7, 8, column_major_t()), 5, 6) );
+
+	// row
+
+	double r0_rm[6] = {9, 10, 11, 12, 13, 14};
+	double r0_cm[6] = {2, 9, 16, 23, 30, 37};
+
+	ASSERT_TRUE( array1d_equal( Arm.row(1), make_caview1d(r0_rm, 6) ) );
+	ASSERT_TRUE( array1d_equal( Acm.row(1), make_caview1d(r0_cm, 6) ) );
+
+	// row range
+
+	double r1_rm[4] = {10, 11, 12, 13};
+	double r1_cm[4] = {9, 16, 23, 30};
+
+	ASSERT_TRUE( array1d_equal( Arm.row(1, rgn_n(1, 4)), make_caview1d(r1_rm, 4) ) );
+	ASSERT_TRUE( array1d_equal( Acm.row(1, rgn_n(1, 4)), make_caview1d(r1_cm, 4) ) );
+
+	double r2_rm[3] = {9, 11, 13};
+	double r2_cm[3] = {2, 16, 30};
+
+	ASSERT_TRUE( array1d_equal( Arm.row(1, rgn_n(0, 3, 2)), make_caview1d(r2_rm, 3) ) );
+	ASSERT_TRUE( array1d_equal( Acm.row(1, rgn_n(0, 3, 2)), make_caview1d(r2_cm, 3) ) );
+
+	double r3_rm[3] = {11, 11, 11};
+	double r3_cm[3] = {16, 16, 16};
+
+	ASSERT_TRUE( array1d_equal( Arm.row(1, rep(2, 3)), make_caview1d(r3_rm, 3) ) );
+	ASSERT_TRUE( array1d_equal( Acm.row(1, rep(2, 3)), make_caview1d(r3_cm, 3) ) );
+
+	// column
+
+	double c0_rm[5] = {2, 10, 18, 26, 34};
+	double c0_cm[5] = {8, 9, 10, 11, 12};
+
+	ASSERT_TRUE( array1d_equal( Arm.column(1), make_caview1d(c0_rm, 5) ) );
+	ASSERT_TRUE( array1d_equal( Acm.column(1), make_caview1d(c0_cm, 5) ) );
+
+	// column range
+
+	double c1_rm[4] = {10, 18, 26, 34};
+	double c1_cm[4] = {9, 10, 11, 12};
+
+	ASSERT_TRUE( array1d_equal( Arm.column(1, rgn_n(1, 4)), make_caview1d(c1_rm, 4) ) );
+	ASSERT_TRUE( array1d_equal( Acm.column(1, rgn_n(1, 4)), make_caview1d(c1_cm, 4) ) );
+
+	double c2_rm[3] = {2, 18, 34};
+	double c2_cm[3] = {8, 10, 12};
+
+	ASSERT_TRUE( array1d_equal( Arm.column(1, rgn_n(0, 3, 2)), make_caview1d(c2_rm, 3) ) );
+	ASSERT_TRUE( array1d_equal( Acm.column(1, rgn_n(0, 3, 2)), make_caview1d(c2_cm, 3) ) );
+
+	double c3_rm[3] = {18, 18, 18};
+	double c3_cm[3] = {10, 10, 10};
+
+	ASSERT_TRUE( array1d_equal( Arm.column(1, rep(2, 3)), make_caview1d(c3_rm, 3) ) );
+	ASSERT_TRUE( array1d_equal( Acm.column(1, rep(2, 3)), make_caview1d(c3_cm, 3) ) );
+
+}
+
+
+TEST( Array2D, BlockSlices )
+{
+	double src[60];
+	for (int i = 0; i < 60; ++i) src[i] = i+1;
+
+	aview2d_block<double, row_major_t> Arm(src, get_extent(7, 8, row_major_t()), 5, 6);
+	aview2d_block<double, column_major_t> Acm(src, get_extent(7, 8, column_major_t()), 5, 6);
 
 	// row
 
@@ -918,10 +1097,88 @@ TEST( Array2D, SubViews )
 	double src0[60];
 	for (int i = 0; i < 60; ++i) src0[i] = i+1;
 
-	array2d<double, row_major_t> a0_rm( aview2d_ex<double, row_major_t, id_ind, id_ind>(
-			src0, get_extent(7, 8, row_major_t()), id_ind(5), id_ind(6)) );
-	array2d<double, column_major_t> a0_cm( aview2d_ex<double, column_major_t, id_ind, id_ind>(
-			src0, get_extent(7, 8, column_major_t()), id_ind(5), id_ind(6)) );
+	array2d<double, row_major_t> a0_rm( aview2d_block<double, row_major_t>(src0, get_extent(7, 8, row_major_t()), 5, 6) );
+	array2d<double, column_major_t> a0_cm( aview2d_block<double, column_major_t>(src0, get_extent(7, 8, column_major_t()), 5, 6) );
+
+	// (whole, whole)
+
+	double a0_rm_s0[] = {
+			1, 2, 3, 4, 5, 6,
+			9, 10, 11, 12, 13, 14,
+			17, 18, 19, 20, 21, 22,
+			25, 26, 27, 28, 29, 30,
+			33, 34, 35, 36, 37, 38
+	};
+
+	double a0_cm_s0[] = {
+			1, 2, 3, 4, 5,
+			8, 9, 10, 11, 12,
+			15, 16, 17, 18, 19,
+			22, 23, 24, 25, 26,
+			29, 30, 31, 32, 33,
+			36, 37, 38, 39, 40
+	};
+
+	ASSERT_TRUE( array2d_equal( a0_rm.V(whole(), whole()),  make_caview2d_rm(a0_rm_s0, 5, 6) ));
+	ASSERT_TRUE( array2d_equal( a0_cm.V(whole(), whole()),  make_caview2d_cm(a0_cm_s0, 5, 6) ));
+
+	// (range, whole)
+
+	double a0_rm_s1[] = {1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, 21, 22};
+	double a0_cm_s1[] = {1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24, 29, 30, 31, 36, 37, 38};
+
+	ASSERT_TRUE( array2d_equal( a0_rm.V(rgn(0, 3), whole()),  make_caview2d_rm(a0_rm_s1, 3, 6) ));
+	ASSERT_TRUE( array2d_equal( a0_cm.V(rgn(0, 3), whole()),  make_caview2d_cm(a0_cm_s1, 3, 6) ));
+
+	// (whole, range)
+
+	double a0_rm_s2[] = {2, 3, 4, 10, 11, 12, 18, 19, 20, 26, 27, 28, 34, 35, 36};
+	double a0_cm_s2[] = {8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26};
+
+	ASSERT_TRUE( array2d_equal( a0_rm.V(whole(), rgn(1, 4)),  make_caview2d_rm(a0_rm_s2, 5, 3) ));
+	ASSERT_TRUE( array2d_equal( a0_cm.V(whole(), rgn(1, 4)),  make_caview2d_cm(a0_cm_s2, 5, 3) ));
+
+	// (range, range)
+
+	double a0_rm_s3[] = {18, 19, 20, 21, 26, 27, 28, 29, 34, 35, 36, 37};
+	double a0_cm_s3[] = {10, 11, 12, 17, 18, 19, 24, 25, 26, 31, 32, 33};
+
+	ASSERT_TRUE( array2d_equal( a0_rm.V(rgn(2, 5), rgn(1, 5)),  make_caview2d_rm(a0_rm_s3, 3, 4) ));
+	ASSERT_TRUE( array2d_equal( a0_cm.V(rgn(2, 5), rgn(1, 5)),  make_caview2d_cm(a0_cm_s3, 3, 4) ));
+
+	// (range, step_range)
+
+	double a0_rm_s4[] = {18, 20, 22, 26, 28, 30, 34, 36, 38};
+	double a0_cm_s4[] = {10, 11, 12, 24, 25, 26, 38, 39, 40};
+
+	ASSERT_TRUE( array2d_equal(a0_rm.V(rgn(2, 5), rgn(1, 6, 2)),  make_caview2d_rm(a0_rm_s4, 3, 3) ));
+	ASSERT_TRUE( array2d_equal(a0_cm.V(rgn(2, 5), rgn(1, 6, 2)),  make_caview2d_cm(a0_cm_s4, 3, 3) ));
+
+	// (step_range, step_range)
+
+	double a0_rm_s5[] = {2, 4, 6, 18, 20, 22, 34, 36, 38};
+	double a0_cm_s5[] = {8, 10, 12, 22, 24, 26, 36, 38, 40};
+
+	ASSERT_TRUE( array2d_equal(a0_rm.V(rgn(0, 5, 2), rgn(1, 6, 2)), make_caview2d_rm(a0_rm_s5, 3, 3) ));
+	ASSERT_TRUE( array2d_equal(a0_cm.V(rgn(0, 5, 2), rgn(1, 6, 2)), make_caview2d_cm(a0_cm_s5, 3, 3) ));
+
+	// (step_range, rev_whole)
+
+	double a0_rm_s6[] = {6, 5, 4, 3, 2, 1, 22, 21, 20, 19, 18, 17, 38, 37, 36, 35, 34, 33};
+	double a0_cm_s6[] = {36, 38, 40, 29, 31, 33, 22, 24, 26, 15, 17, 19, 8, 10, 12, 1, 3, 5};
+
+	ASSERT_TRUE( array2d_equal(a0_rm.V(rgn(0, 5, 2), rev_whole()), make_caview2d_rm(a0_rm_s6, 3, 6) ));
+	ASSERT_TRUE( array2d_equal(a0_cm.V(rgn(0, 5, 2), rev_whole()), make_caview2d_cm(a0_cm_s6, 3, 6) ));
+}
+
+
+TEST( Array2D, BlockSubViews )
+{
+	double src0[60];
+	for (int i = 0; i < 60; ++i) src0[i] = i+1;
+
+	aview2d_block<double, row_major_t> a0_rm(src0, get_extent(7, 8, row_major_t()), 5, 6);
+	aview2d_block<double, column_major_t> a0_cm(src0, get_extent(7, 8, column_major_t()), 5, 6);
 
 	// (whole, whole)
 

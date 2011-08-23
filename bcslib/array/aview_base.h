@@ -407,6 +407,9 @@ namespace bcs
 	template<typename T, typename TOrd> class caview2d;
 	template<typename T, typename TOrd> class aview2d;
 
+	template<typename T, typename TOrd> class caview2d_block;
+	template<typename T, typename TOrd> class aview2d_block;
+
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1> class caview2d_ex;
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1> class aview2d_ex;
 
