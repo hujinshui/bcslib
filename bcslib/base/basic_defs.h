@@ -74,6 +74,24 @@ namespace bcs
 
 
 	/**
+	 * type selection
+	 */
+	template<bool B, typename T1, typename T2> struct tyselect;
+
+	template<typename T1, typename T2>
+	struct tyselect<true, T1, T2>
+	{
+		typedef T1 type;
+	};
+
+	template<typename T1, typename T2>
+	struct tyselect<false, T1, T2>
+	{
+		typedef T2 type;
+	};
+
+
+	/**
 	 *  Auxiliary class for static assertion
 	 */
 

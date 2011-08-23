@@ -27,15 +27,14 @@ namespace bcs
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
 
-		typedef array1d<T, Alloc> self_type;
-		typedef aview1d_base<self_type> view_nd_base;
-		typedef dense_aview_base<self_type> dview_base;
-		typedef aview_base<self_type> view_base;
+		static const bool is_dense = true;
+		static const bool is_continuous = true;
+		static const bool is_const_view = false;
 	};
 
 	template<typename T, class Alloc>
 	class array1d
-	: public dense_aview1d_base<array1d<T, Alloc> >
+	: public continuous_aview1d_base<array1d<T, Alloc> >
 	{
 	public:
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
@@ -70,7 +69,7 @@ namespace bcs
 		}
 
 		template<class Derived>
-		explicit array1d(const caview1d_base<Derived>& r)
+		explicit array1d(const dense_caview1d_base<Derived>& r)
 		: m_storage(r.size()), m_view(m_storage.pbase(), r.nelems())
 		{
 			copy(r.derived(), *this);
@@ -222,7 +221,7 @@ namespace bcs
 
 
 	template<class Derived>
-	inline array1d<typename Derived::value_type> clone_array(const caview1d_base<Derived>& a)
+	inline array1d<typename Derived::value_type> clone_array(const dense_caview1d_base<Derived>& a)
 	{
 		return array1d<typename Derived::value_type>(a);
 	}

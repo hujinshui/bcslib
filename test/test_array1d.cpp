@@ -43,6 +43,11 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d_base<bcs::caview1d_ex<double, id_ind> >,
 		bcs::caview1d_ex<double, id_ind> >::value) );
 
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::dense_caview1d_base<bcs::caview1d_ex<double, id_ind> >,
+		bcs::caview1d_ex<double, id_ind> >::value) );
+
+
 // aview1d_ex
 
 BCS_STATIC_ASSERT( (is_base_of<
@@ -61,6 +66,15 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview1d_base<bcs::aview1d_ex<double, id_ind> >,
 		bcs::aview1d_ex<double, id_ind> >::value) );
 
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::dense_caview1d_base<bcs::aview1d_ex<double, id_ind> >,
+		bcs::aview1d_ex<double, id_ind> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::dense_aview1d_base<bcs::aview1d_ex<double, id_ind> >,
+		bcs::aview1d_ex<double, id_ind> >::value) );
+
+
 // caview1d
 
 BCS_STATIC_ASSERT( (is_base_of<
@@ -68,15 +82,19 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
+		bcs::continuous_caview_base<bcs::caview1d<double> >,
+		bcs::caview1d<double> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d_base<bcs::caview1d<double> >,
 		bcs::caview1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_caview_base<bcs::caview1d<double> >,
+		bcs::dense_caview1d_base<bcs::caview1d<double> >,
 		bcs::caview1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_caview1d_base<bcs::caview1d<double> >,
+		bcs::continuous_caview1d_base<bcs::caview1d<double> >,
 		bcs::caview1d<double> >::value) );
 
 // aview1d
@@ -90,6 +108,14 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
+		bcs::continuous_caview_base<bcs::aview1d<double> >,
+		bcs::aview1d<double> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::continuous_aview_base<bcs::aview1d<double> >,
+		bcs::aview1d<double> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d_base<bcs::aview1d<double> >,
 		bcs::aview1d<double> >::value) );
 
@@ -98,19 +124,19 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_caview_base<bcs::aview1d<double> >,
-		bcs::aview1d<double> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_aview_base<bcs::aview1d<double> >,
-		bcs::aview1d<double> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_caview1d_base<bcs::aview1d<double> >,
 		bcs::aview1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview1d_base<bcs::aview1d<double> >,
+		bcs::aview1d<double> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::continuous_caview1d_base<bcs::aview1d<double> >,
+		bcs::aview1d<double> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::continuous_aview1d_base<bcs::aview1d<double> >,
 		bcs::aview1d<double> >::value) );
 
 // array1d
@@ -124,19 +150,19 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::array1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
+		bcs::continuous_caview_base<bcs::array1d<double> >,
+		bcs::array1d<double> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::continuous_aview_base<bcs::array1d<double> >,
+		bcs::array1d<double> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d_base<bcs::array1d<double> >,
 		bcs::array1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview1d_base<bcs::array1d<double> >,
-		bcs::array1d<double> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_caview_base<bcs::array1d<double> >,
-		bcs::array1d<double> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_aview_base<bcs::array1d<double> >,
 		bcs::array1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
@@ -146,6 +172,15 @@ BCS_STATIC_ASSERT( (is_base_of<
 BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview1d_base<bcs::array1d<double> >,
 		bcs::array1d<double> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::continuous_caview1d_base<bcs::array1d<double> >,
+		bcs::array1d<double> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::continuous_aview1d_base<bcs::array1d<double> >,
+		bcs::array1d<double> >::value) );
+
 
 
 // further checking (for syntax)
@@ -170,11 +205,11 @@ void syntax_check_arr1()
 	const dt& d2 = r2.derived();
 	dummy_a1(d2);
 
-	dense_caview_base<dt>& r3 = a;
+	continuous_caview_base<dt>& r3 = a;
 	const dt& d3 = r3.derived();
 	dummy_a1(d3);
 
-	dense_aview_base<dt>& r4 = a;
+	continuous_aview_base<dt>& r4 = a;
 	const dt& d4 = r4.derived();
 	dummy_a1(d4);
 
@@ -193,6 +228,14 @@ void syntax_check_arr1()
 	dense_aview1d_base<dt>& r8 = a;
 	const dt& d8 = r8.derived();
 	dummy_a1(d8);
+
+	continuous_caview1d_base<dt>& r9 = a;
+	const dt& d9 = r9.derived();
+	dummy_a1(d9);
+
+	continuous_aview1d_base<dt>& r10 = a;
+	const dt& d10 = r10.derived();
+	dummy_a1(d10);
 
 	dummy_a1(a.ndims());
 	dummy_a1(a.dim0());
@@ -234,7 +277,7 @@ bool array_integrity_test(const bcs::caview1d_base<Derived>& a)
 }
 
 template<class Derived>
-bool dense_array_integrity_test(const bcs::dense_caview1d_base<Derived>& a)
+bool cont_array_integrity_test(const bcs::continuous_caview1d_base<Derived>& a)
 {
 	if (!array_integrity_test(a)) return false;
 
@@ -255,7 +298,7 @@ bool dense_array_integrity_test(const bcs::dense_caview1d_base<Derived>& a)
 
 
 template<class Derived>
-bool elemwise_operation_test(bcs::aview1d_base<Derived>& a)
+bool elemwise_operation_test(bcs::dense_aview1d_base<Derived>& a)
 {
 	typedef typename Derived::value_type T;
 
@@ -306,18 +349,18 @@ TEST( Array1D, Aview1D )
 	aview1d<double> a1(src1, n1);
 
 	ASSERT_EQ(a1.dim0(), n1);
-	ASSERT_TRUE( dense_array_integrity_test(a1) );
+	ASSERT_TRUE( cont_array_integrity_test(a1) );
 	ASSERT_TRUE( array_equal(a1, src1, n1) );
 	ASSERT_TRUE( elemwise_operation_test(a1) );
 
 	aview1d<double> a2(a1);
 
 	ASSERT_EQ(a2.dim0(), n1);
-	ASSERT_TRUE( dense_array_integrity_test(a2) );
+	ASSERT_TRUE( cont_array_integrity_test(a2) );
 	ASSERT_TRUE( array_equal(a2, src1, n1) );
 
 	ASSERT_EQ( a1.pbase(), a2.pbase() );
-	ASSERT_TRUE( dense_array_integrity_test(a2) );
+	ASSERT_TRUE( cont_array_integrity_test(a2) );
 	ASSERT_TRUE( array_equal(a2, src1, n1) );
 	ASSERT_TRUE( elemwise_operation_test(a2) );
 }
@@ -335,7 +378,7 @@ TEST( Array1D, Array1D )
 
 	ASSERT_EQ(a0.dim0(), 0);
 	ASSERT_TRUE( a0.is_unique() );
-	ASSERT_TRUE( dense_array_integrity_test(a0) );
+	ASSERT_TRUE( cont_array_integrity_test(a0) );
 
 	array1d<double> a1(n1);
 
@@ -343,14 +386,14 @@ TEST( Array1D, Array1D )
 
 	ASSERT_EQ(a1.dim0(), n1);
 	ASSERT_TRUE( a1.is_unique() );
-	ASSERT_TRUE( dense_array_integrity_test(a1) );
+	ASSERT_TRUE( cont_array_integrity_test(a1) );
 	ASSERT_TRUE( array_equal(a1, src1, n1) );
 
 	array1d<double> a2(n2, v2);
 
 	ASSERT_EQ(a2.dim0(), n2);
 	ASSERT_TRUE( a2.is_unique() );
-	ASSERT_TRUE( dense_array_integrity_test(a2) );
+	ASSERT_TRUE( cont_array_integrity_test(a2) );
 	ASSERT_TRUE( array_equal(a2, src2, n2) );
 	ASSERT_TRUE( elemwise_operation_test(a2) );
 
@@ -358,7 +401,7 @@ TEST( Array1D, Array1D )
 
 	ASSERT_EQ(a3.dim0(), n1);
 	ASSERT_TRUE( a3.is_unique() );
-	ASSERT_TRUE( dense_array_integrity_test(a3) );
+	ASSERT_TRUE( cont_array_integrity_test(a3) );
 	ASSERT_TRUE( array_equal(a3, src1, n1) );
 	ASSERT_TRUE( elemwise_operation_test(a3) );
 
@@ -369,10 +412,10 @@ TEST( Array1D, Array1D )
 	ASSERT_FALSE( a4.is_unique() );
 	ASSERT_EQ( a4.pbase(), a3.pbase() );
 
-	ASSERT_TRUE( dense_array_integrity_test(a3) );
+	ASSERT_TRUE( cont_array_integrity_test(a3) );
 	ASSERT_TRUE( array_equal(a3, src1, n1) );
 
-	ASSERT_TRUE( dense_array_integrity_test(a4) );
+	ASSERT_TRUE( cont_array_integrity_test(a4) );
 	ASSERT_TRUE( array_equal(a4, src1, n1) );
 	ASSERT_TRUE( elemwise_operation_test(a4) );
 
@@ -385,10 +428,10 @@ TEST( Array1D, Array1D )
 	ASSERT_EQ(a3.dim0(), n1);
 	ASSERT_EQ(a4.dim0(), n1);
 
-	ASSERT_TRUE( dense_array_integrity_test(a3) );
+	ASSERT_TRUE( cont_array_integrity_test(a3) );
 	ASSERT_TRUE( array_equal(a3, src1, n1) );
 
-	ASSERT_TRUE( dense_array_integrity_test(a4) );
+	ASSERT_TRUE( cont_array_integrity_test(a4) );
 	ASSERT_TRUE( array_equal(a4, src1, n1) );
 
 	array1d<double> a5 = a1.deep_copy();
@@ -400,10 +443,10 @@ TEST( Array1D, Array1D )
 	ASSERT_EQ(a1.dim0(), n1);
 	ASSERT_EQ(a5.dim0(), n1);
 
-	ASSERT_TRUE( dense_array_integrity_test(a1) );
+	ASSERT_TRUE( cont_array_integrity_test(a1) );
 	ASSERT_TRUE( array_equal(a1, src1, n1) );
 
-	ASSERT_TRUE( dense_array_integrity_test(a5) );
+	ASSERT_TRUE( cont_array_integrity_test(a5) );
 	ASSERT_TRUE( array_equal(a5, src1, n1) );
 	ASSERT_TRUE( elemwise_operation_test(a5) );
 }

@@ -28,15 +28,14 @@ namespace bcs
 	{
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
-		typedef array2d<T, TOrd, Alloc> self_type;
-		typedef aview2d_base<self_type> view_nd_base;
-		typedef dense_aview_base<self_type> dview_base;
-		typedef aview_base<self_type> view_base;
+		static const bool is_dense = true;
+		static const bool is_continuous = true;
+		static const bool is_const_view = false;
 	};
 
 	template<typename T, typename TOrd, class Alloc>
 	class array2d
-	: public dense_aview2d_base<array2d<T, TOrd, Alloc> >
+	: public continuous_aview2d_base<array2d<T, TOrd, Alloc> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
@@ -76,7 +75,7 @@ namespace bcs
 		}
 
 		template<class Derived>
-		explicit array2d(const caview2d_base<Derived>& r)
+		explicit array2d(const dense_caview2d_base<Derived>& r)
 		: m_storage(r.size())
 		, m_view(m_storage.pbase(), r.nrows(), r.ncolumns())
 		{
@@ -303,7 +302,7 @@ namespace bcs
 
 	template<class Derived>
 	inline array2d<typename Derived::value_type, typename Derived::layout_order>
-	clone_array(const caview2d_base<Derived>& a)
+	clone_array(const dense_caview2d_base<Derived>& a)
 	{
 		return array2d<typename Derived::value_type, typename Derived::layout_order>(a);
 	}
@@ -317,7 +316,7 @@ namespace bcs
 
 	template<class Derived, class IndexSelector>
 	array1d<typename Derived::value_type>
-	select_elems(const caview2d_base<Derived>& a, const IndexSelector& I, const IndexSelector& J)
+	select_elems(const dense_caview2d_base<Derived>& a, const IndexSelector& I, const IndexSelector& J)
 	{
 		index_t n = (index_t)I.size();
 		check_arg(n == (index_t)J.size(), "Inconsistent selector sizes.");
@@ -336,7 +335,7 @@ namespace bcs
 
 	template<class Derived, class IndexSelector>
 	array2d<typename Derived::value_type, typename Derived::layout_order>
-	select_rows(const caview2d_base<Derived>& a, const IndexSelector& I)
+	select_rows(const dense_caview2d_base<Derived>& a, const IndexSelector& I)
 	{
 		typedef typename Derived::value_type T;
 		typedef typename Derived::layout_order TOrd;
@@ -376,7 +375,7 @@ namespace bcs
 
 	template<class Derived, class IndexSelector>
 	array2d<typename Derived::value_type, typename Derived::layout_order>
-	select_columns(const caview2d_base<Derived>& a, const IndexSelector& J)
+	select_columns(const dense_caview2d_base<Derived>& a, const IndexSelector& J)
 	{
 		typedef typename Derived::value_type T;
 		typedef typename Derived::layout_order TOrd;
@@ -416,7 +415,7 @@ namespace bcs
 
 	template<class Derived, class IndexSelectorI, class IndexSelectorJ>
 	array2d<typename Derived::value_type, typename Derived::layout_order>
-	select_rows_cols(const caview2d_base<Derived>& a, const IndexSelectorI& I, const IndexSelectorJ& J)
+	select_rows_cols(const dense_caview2d_base<Derived>& a, const IndexSelectorI& I, const IndexSelectorJ& J)
 	{
 		typedef typename Derived::value_type T;
 		typedef typename Derived::layout_order TOrd;
@@ -479,7 +478,7 @@ namespace bcs
 
 	template<class Derived>
 	inline array2d<typename Derived::value_type, typename Derived::layout_order>
-	transpose(const dense_caview2d_base<Derived>& a)
+	transpose(const continuous_caview2d_base<Derived>& a)
 	{
 		array2d<typename Derived::value_type, typename Derived::layout_order> r(a.ncolumns(), a.nrows());
 
