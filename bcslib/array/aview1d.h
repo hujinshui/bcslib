@@ -183,27 +183,25 @@ namespace bcs
 
 	// sub view extraction
 
-	template<class Derived, class IndexSelector>
-	inline caview1d_ex<typename Derived::value_type, typename indexer_map<IndexSelector>::type>
-	subview(const continuous_caview1d_base<Derived>& a, const IndexSelector& I)
+	namespace _detail
 	{
-		typedef caview1d_ex<typename Derived::value_type, typename indexer_map<IndexSelector>::type> ret_type;
-
-		index_t offset = indexer_map<IndexSelector>::get_offset(a.dim0(), I);
-		return ret_type(a.pbase() + offset,
-				indexer_map<IndexSelector>::get_indexer(a.dim0(), I));
+		template<typename T, class IndexSelector> struct subview_helper1d;
 	}
 
+	template<class Derived, class IndexSelector>
+	inline typename _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::cview_type
+	csubview(const continuous_caview1d_base<Derived>& a, const IndexSelector& I)
+	{
+		return _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::cview(
+				a.pbase(), a.dim0(), I);
+	}
 
 	template<class Derived, class IndexSelector>
-	inline aview1d_ex<typename Derived::value_type, typename indexer_map<IndexSelector>::type>
+	inline typename _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::view_type
 	subview(continuous_aview1d_base<Derived>& a, const IndexSelector& I)
 	{
-		typedef aview1d_ex<typename Derived::value_type, typename indexer_map<IndexSelector>::type> ret_type;
-
-		index_t offset = indexer_map<IndexSelector>::get_offset(a.dim0(), I);
-		return ret_type(a.pbase() + offset,
-				indexer_map<IndexSelector>::get_indexer(a.dim0(), I));
+		return _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::view(
+				a.pbase(), a.dim0(), I);
 	}
 
 
@@ -285,10 +283,10 @@ namespace bcs
 		}
 
 		template<class IndexSelector>
-		caview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
+		typename _detail::subview_helper1d<value_type, IndexSelector>::cview_type
 		V(const IndexSelector& I) const
 		{
-			return subview(*this, I);
+			return csubview(*this, I);
 		}
 
 	private:
@@ -393,14 +391,14 @@ namespace bcs
 		}
 
 		template<class IndexSelector>
-		caview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
+		typename _detail::subview_helper1d<value_type, IndexSelector>::cview_type
 		V(const IndexSelector& I) const
 		{
-			return subview(*this, I);
+			return csubview(*this, I);
 		}
 
 		template<class IndexSelector>
-		aview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
+		typename _detail::subview_helper1d<value_type, IndexSelector>::view_type
 		V(const IndexSelector& I)
 		{
 			return subview(*this, I);
@@ -413,7 +411,81 @@ namespace bcs
 	}; // end class aview1d
 
 
-	// convenient functions
+	/************************************
+	 *
+	 * sub-view helper implementation
+	 *
+	 ************************************/
+
+	namespace _detail
+	{
+		template<typename T, class IndexSelector>
+		struct subview_helper1d
+		{
+			typedef typename indexer_map<IndexSelector>::type sub_indexer_type;
+
+			typedef caview1d_ex<T, sub_indexer_type> cview_type;
+			typedef aview1d_ex<T, sub_indexer_type> view_type;
+
+			static cview_type cview(const T* pbase, index_t d0, const IndexSelector& I)
+			{
+				index_t offset = indexer_map<IndexSelector>::get_offset(d0, I);
+				return cview_type(pbase + offset,
+						indexer_map<IndexSelector>::get_indexer(d0, I));
+			}
+
+			static view_type view(T *pbase, index_t d0, const IndexSelector& I)
+			{
+				index_t offset = indexer_map<IndexSelector>::get_offset(d0, I);
+				return view_type(pbase + offset,
+						indexer_map<IndexSelector>::get_indexer(d0, I));
+			}
+		};
+
+
+		template<typename T>
+		struct subview_helper1d<T, whole>
+		{
+			typedef caview1d<T> cview_type;
+			typedef aview1d<T> view_type;
+
+			static cview_type cview(const T* pbase, index_t d0, whole)
+			{
+				return cview_type(pbase, d0);
+			}
+
+			static view_type view(T *pbase, index_t d0, whole)
+			{
+				return view_type(pbase, d0);
+			}
+		};
+
+
+		template<typename T>
+		struct subview_helper1d<T, range>
+		{
+			typedef caview1d<T> cview_type;
+			typedef aview1d<T> view_type;
+
+			static cview_type cview(const T* pbase, index_t d0, const range &rgn)
+			{
+				return cview_type(pbase + rgn.begin_index(), rgn.dim());
+			}
+
+			static view_type view(T *pbase, index_t d0, const range &rgn)
+			{
+				return view_type(pbase + rgn.begin_index(), rgn.dim());
+			}
+		};
+
+	}
+
+
+	/************************************
+	 *
+	 *  Convenient functions
+	 *
+	 ************************************/
 
 	template<typename T>
 	inline caview1d<T> make_caview1d(const T* data, index_t n)

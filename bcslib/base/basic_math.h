@@ -55,32 +55,31 @@ namespace bcs
 		// BCSLib's extras (for convenience)
 
 		template<typename T>
-		BCS_ENSURE_INLINE T sqr(T x)
+		inline BCS_ENSURE_INLINE T sqr(T x)
 		{
 			return x * x;
 		}
 
 		template<typename T>
-		BCS_ENSURE_INLINE T cube(T x)
+		inline BCS_ENSURE_INLINE T cube(T x)
 		{
 			return x * x * x;
 		}
 
 		template<typename T>
-		BCS_ENSURE_INLINE T rcp(T x)
+		inline BCS_ENSURE_INLINE T rcp(T x)
 		{
 			return T(1) / x;
 		}
 
 		template<typename T>
-		BCS_ENSURE_INLINE T rsqrt(T x)
+		inline BCS_ENSURE_INLINE T rsqrt(T x)
 		{
 			return T(1) / sqrt(x);
 		}
 
 		template<typename T>
-		BCS_ENSURE_INLINE T
-		clamp(T x, T lb, T ub)
+		inline BCS_ENSURE_INLINE T clamp(T x, T lb, T ub)
 		{
 			return x < lb ? lb : (x > ub ? ub : x);
 		}

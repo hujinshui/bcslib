@@ -193,17 +193,17 @@ namespace bcs
 		}
 
 		template<class IndexSelector>
-		caview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
+		typename _detail::subview_helper1d<value_type, IndexSelector>::cview_type
 		V(const IndexSelector& I) const
 		{
-			return m_view.V(I);
+			return csubview(*this, I);
 		}
 
 		template<class IndexSelector>
-		aview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
+		typename _detail::subview_helper1d<value_type, IndexSelector>::view_type
 		V(const IndexSelector& I)
 		{
-			return m_view.V(I);
+			return subview(*this, I);
 		}
 
 	private:

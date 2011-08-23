@@ -57,16 +57,15 @@ BASE_HEADERS = \
 
 ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/array/aview_base.h \
-	bcslib/array/details/aindex_details.h \
 	bcslib/array/aindex.h \
 	bcslib/array/aview1d_base.h \
 	bcslib/array/aview1d.h \
 	bcslib/array/aview1d_ops.h \
 	bcslib/array/array1d.h \
-	bcslib/array/details/aview2d_details.h \
 	bcslib/array/aview2d_base.h \
 	bcslib/array/aview2d.h \
 	bcslib/array/aview2d_ops.h \
+	bcslib/array/transpose2d.h \
 	bcslib/array/array2d.h
 	
 LINALG_HEADERS = $(ARRAY_BASIC_HEADERS) \

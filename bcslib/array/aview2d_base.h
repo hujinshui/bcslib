@@ -11,10 +11,18 @@
 
 #include <bcslib/array/aview_base.h>
 #include <bcslib/array/aindex.h>
-#include <bcslib/array/details/aview2d_details.h>
 
 namespace bcs
 {
+
+	typedef array_shape_t<2> extent2d_t;
+
+	inline extent2d_t BCS_ENSURE_INLINE make_extent2d(index_t m, index_t n)
+	{
+		return arr_shape(m, n);
+	}
+
+
 	template<class Derived>
 	class caview2d_base
 	: public tyselect<aview_traits<Derived>::is_continuous,
@@ -206,6 +214,11 @@ namespace bcs
 
 		// -- new --
 
+		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		{
+			return derived().base_extent();
+		}
+
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
 			return derived().operator()(i, j);
@@ -269,6 +282,11 @@ namespace bcs
 
 		// -- new --
 
+		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		{
+			return derived().base_extent();
+		}
+
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
 			return derived().operator()(i, j);
@@ -318,6 +336,11 @@ namespace bcs
 			return derived().shape();
 		}
 
+		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		{
+			return derived().base_extent();
+		}
+
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
 			return derived().dim0();
@@ -355,39 +378,16 @@ namespace bcs
 
 		// -- new --
 
-		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
+		typename aview_traits<Derived>::row_cview_type
 		row(index_t i) const
 		{
 			return derived().row(i);
 		}
 
-		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::row_range_cview_type
-		row(index_t i, const IndexSelector& rgn) const
-		{
-			return derived().row(i, rgn);
-		}
-
-		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
+		typename aview_traits<Derived>::column_cview_type
 		column(index_t i) const
 		{
 			return derived().column(i);
-		}
-
-		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::column_range_cview_type
-		column(index_t i, const IndexSelector& rgn) const
-		{
-			return derived().column(i, rgn);
-		}
-
-		template<class IndexSelector0, class IndexSelector1>
-		caview2d_ex<value_type, layout_order,
-			typename indexer_map<IndexSelector0>::type,
-			typename indexer_map<IndexSelector1>::type>
-		V(const IndexSelector0& I, const IndexSelector1& J) const
-		{
-			return derived().V(I, J);
 		}
 
 	}; // end class continuous_caview2d_base
@@ -424,6 +424,11 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
+		}
+
+		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		{
+			return derived().base_extent();
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
@@ -478,70 +483,28 @@ namespace bcs
 
 		// -- new --
 
-		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
+		typename aview_traits<Derived>::row_cview_type
 		row(index_t i) const
 		{
 			return derived().row(i);
 		}
 
-		typename _detail::slice_helper2d<value_type, layout_order>::row_view_type
+		typename aview_traits<Derived>::row_view_type
 		row(index_t i)
 		{
 			return derived().row(i);
 		}
 
-		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::row_range_cview_type
-		row(index_t i, const IndexSelector& rgn) const
-		{
-			return derived().row(i, rgn);
-		}
-
-		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::row_range_view_type
-		row(index_t i, const IndexSelector& rgn)
-		{
-			return derived().row(i, rgn);
-		}
-
-		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
+		typename aview_traits<Derived>::column_cview_type
 		column(index_t i) const
 		{
 			return derived().column(i);
 		}
 
-		typename _detail::slice_helper2d<value_type, layout_order>::column_view_type
+		typename aview_traits<Derived>::column_view_type
 		column(index_t i)
 		{
 			return derived().column(i);
-		}
-
-		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::column_range_cview_type
-		column(index_t i, const IndexSelector& rgn) const
-		{
-			return derived().column(i, rgn);
-		}
-
-		template<class IndexSelector>
-		typename _detail::slice_range_helper2d<value_type, layout_order, IndexSelector>::column_range_view_type
-		column(index_t i, const IndexSelector& rgn)
-		{
-			return derived().column(i, rgn);
-		}
-
-		template<class IndexSelector>
-		caview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
-		V(const IndexSelector& I) const
-		{
-			return derived().V(I);
-		}
-
-		template<class IndexSelector>
-		aview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
-		V(const IndexSelector& I)
-		{
-			return derived().V(I);
 		}
 
 	}; // end class continuous_aview2d_base
