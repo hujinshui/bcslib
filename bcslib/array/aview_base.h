@@ -237,7 +237,10 @@ namespace bcs
 
 
 	template<class Derived>
-	class dense_caview_base : public aview_traits<Derived>::view_base
+	class continuous_caview_base
+	: public tyselect<aview_traits<Derived>::is_const_view,
+	  	  caview_base<Derived>,
+	  	  aview_base<Derived> >::type
 	{
 	public:
 		BCS_CAVIEW_BASE_DEFS(Derived)
@@ -281,11 +284,11 @@ namespace bcs
 			return derived().operator[](i);
 		}
 
-	}; // end class dense_caview_base
+	}; // end class continuous_caview_base
 
 
 	template<class Derived>
-	class dense_aview_base : public dense_caview_base<Derived>
+	class continuous_aview_base : public continuous_caview_base<Derived>
 	{
 	public:
 		BCS_AVIEW_BASE_DEFS(Derived)
@@ -339,7 +342,7 @@ namespace bcs
 			return derived().operator[](i);
 		}
 
-	}; // end class dense_aview_base
+	}; // end class continuous_aview_base
 
 
 	/********************************************
@@ -349,25 +352,25 @@ namespace bcs
 	 ********************************************/
 
 	template<class Derived>
-	typename Derived::const_pointer begin(const dense_caview_base<Derived>& a)
+	typename Derived::const_pointer begin(const continuous_caview_base<Derived>& a)
 	{
 		return a.pbase();
 	}
 
 	template<class Derived>
-	typename Derived::pointer begin(dense_aview_base<Derived>& a)
+	typename Derived::pointer begin(continuous_aview_base<Derived>& a)
 	{
 		return a.pbase();
 	}
 
 	template<class Derived>
-	typename Derived::const_pointer end(const dense_caview_base<Derived>& a)
+	typename Derived::const_pointer end(const continuous_caview_base<Derived>& a)
 	{
 		return a.pbase() + a.size();
 	}
 
 	template<class Derived>
-	typename Derived::pointer end(dense_aview_base<Derived>& a)
+	typename Derived::pointer end(continuous_aview_base<Derived>& a)
 	{
 		return a.pbase() + a.size();
 	}
@@ -383,10 +386,10 @@ namespace bcs
 
 	// 1D
 
-	template<class Derived> class caview1d_base;
-	template<class Derived> class aview1d_base;
 	template<class Derived> class dense_caview1d_base;
 	template<class Derived> class dense_aview1d_base;
+	template<class Derived> class continuous_caview1d_base;
+	template<class Derived> class continuous_aview1d_base;
 
 	template<typename T> class caview1d;
 	template<typename T> class aview1d;
@@ -396,10 +399,10 @@ namespace bcs
 
 	// 2D
 
-	template<class Derived> class caview2d_base;
-	template<class Derived> class aview2d_base;
 	template<class Derived> class dense_caview2d_base;
 	template<class Derived> class dense_aview2d_base;
+	template<class Derived> class continuous_caview2d_base;
+	template<class Derived> class continuous_aview2d_base;
 
 	template<typename T, typename TOrd> class caview2d;
 	template<typename T, typename TOrd> class aview2d;

@@ -21,7 +21,7 @@ namespace bcs
 	// comparison
 
 	template<class LDerived, class RDerived>
-	inline bool is_equal(const dense_caview2d_base<LDerived>& lhs, const dense_caview2d_base<RDerived>& rhs)
+	inline bool is_equal(const continuous_caview2d_base<LDerived>& lhs, const continuous_caview2d_base<RDerived>& rhs)
 	{
 		return is_same_shape(lhs, rhs) && elements_equal(lhs.pbase(), rhs.pbase(), lhs.size());
 	}
@@ -31,7 +31,7 @@ namespace bcs
 	namespace _detail
 	{
 		template<class Derived>
-		inline void import_from(aview2d_base<Derived>& a, typename Derived::const_pointer src, row_major_t)
+		inline void import_from(dense_aview2d_base<Derived>& a, typename Derived::const_pointer src, row_major_t)
 		{
 			Derived& ad = a.derived();
 			index_t m = a.nrows();
@@ -47,7 +47,7 @@ namespace bcs
 		}
 
 		template<class Derived>
-		inline void import_from(aview2d_base<Derived>& a, typename Derived::const_pointer src, column_major_t)
+		inline void import_from(dense_aview2d_base<Derived>& a, typename Derived::const_pointer src, column_major_t)
 		{
 			Derived& ad = a.derived();
 			index_t m = a.nrows();
@@ -63,7 +63,7 @@ namespace bcs
 		}
 
 		template<class Derived>
-		inline void export_to(const caview2d_base<Derived>& a, typename Derived::pointer dst, row_major_t)
+		inline void export_to(const dense_caview2d_base<Derived>& a, typename Derived::pointer dst, row_major_t)
 		{
 			const Derived& ad = a.derived();
 			index_t m = a.nrows();
@@ -79,7 +79,7 @@ namespace bcs
 		}
 
 		template<class Derived>
-		inline void export_to(const caview2d_base<Derived>& a, typename Derived::pointer dst, column_major_t)
+		inline void export_to(const dense_caview2d_base<Derived>& a, typename Derived::pointer dst, column_major_t)
 		{
 			const Derived& ad = a.derived();
 			index_t m = a.nrows();
@@ -95,7 +95,7 @@ namespace bcs
 		}
 
 		template<class Derived>
-		inline void fill(aview2d_base<Derived>& a, const typename Derived::value_type& v, row_major_t)
+		inline void fill(dense_aview2d_base<Derived>& a, const typename Derived::value_type& v, row_major_t)
 		{
 			Derived& ad = a.derived();
 			index_t m = a.nrows();
@@ -111,7 +111,7 @@ namespace bcs
 		}
 
 		template<class Derived>
-		inline void fill(aview2d_base<Derived>& a, const typename Derived::value_type& v, column_major_t)
+		inline void fill(dense_aview2d_base<Derived>& a, const typename Derived::value_type& v, column_major_t)
 		{
 			Derived& ad = a.derived();
 			index_t m = a.nrows();
@@ -127,7 +127,7 @@ namespace bcs
 		}
 
 		template<class LDerived, class RDerived>
-		inline void copy(const caview2d_base<LDerived>& src, aview2d_base<RDerived>& dst, row_major_t)
+		inline void copy(const dense_caview2d_base<LDerived>& src, dense_aview2d_base<RDerived>& dst, row_major_t)
 		{
 			const LDerived& srcd = src.derived();
 			RDerived& dstd = dst.derived();
@@ -145,7 +145,7 @@ namespace bcs
 		}
 
 		template<class LDerived, class RDerived>
-		inline void copy(const caview2d_base<LDerived>& src, aview2d_base<RDerived>& dst, column_major_t)
+		inline void copy(const dense_caview2d_base<LDerived>& src, dense_aview2d_base<RDerived>& dst, column_major_t)
 		{
 			const LDerived& srcd = src.derived();
 			RDerived& dstd = dst.derived();
@@ -165,31 +165,31 @@ namespace bcs
 	}
 
 	template<class Derived>
-	inline void import_from(aview2d_base<Derived>& a, typename Derived::const_pointer src)
+	inline void import_from(dense_aview2d_base<Derived>& a, typename Derived::const_pointer src)
 	{
 		_detail::import_from(a, src, typename Derived::layout_order());
 	}
 
 	template<class Derived>
-	inline void import_from(dense_aview2d_base<Derived>& a, typename Derived::const_pointer src)
+	inline void import_from(continuous_aview2d_base<Derived>& a, typename Derived::const_pointer src)
 	{
 		copy_elements(src, a.pbase(), a.size());
 	}
 
 	template<class Derived>
-	inline void export_to(const caview2d_base<Derived>& a, typename Derived::pointer dst)
+	inline void export_to(const dense_caview2d_base<Derived>& a, typename Derived::pointer dst)
 	{
 		_detail::export_to(a, dst, typename Derived::layout_order());
 	}
 
 	template<class Derived>
-	inline void export_to(const dense_caview2d_base<Derived>& a, typename Derived::pointer dst)
+	inline void export_to(const continuous_caview2d_base<Derived>& a, typename Derived::pointer dst)
 	{
 		copy_elements(a.pbase(), dst, a.size());
 	}
 
 	template<class Derived>
-	inline void fill(aview2d_base<Derived>& a, const typename Derived::value_type& v)
+	inline void fill(dense_aview2d_base<Derived>& a, const typename Derived::value_type& v)
 	{
 		_detail::fill(a, v, typename Derived::layout_order());
 	}
@@ -198,7 +198,7 @@ namespace bcs
 	// copy
 
 	template<class LDerived, class RDerived>
-	inline void copy(const dense_caview2d_base<LDerived>& src, dense_aview2d_base<RDerived>& dst)
+	inline void copy(const continuous_caview2d_base<LDerived>& src, continuous_aview2d_base<RDerived>& dst)
 	{
 		BCS_STATIC_ASSERT( (has_same_layout_order<LDerived, RDerived>::value) );
 
@@ -207,7 +207,7 @@ namespace bcs
 	}
 
 	template<class LDerived, class RDerived>
-	inline void copy(const dense_caview2d_base<LDerived>& src, aview2d_base<RDerived>& dst)
+	inline void copy(const continuous_caview2d_base<LDerived>& src, dense_aview2d_base<RDerived>& dst)
 	{
 		BCS_STATIC_ASSERT( (has_same_layout_order<LDerived, RDerived>::value) );
 
@@ -216,7 +216,7 @@ namespace bcs
 	}
 
 	template<class LDerived, class RDerived>
-	inline void copy(const caview2d_base<LDerived>& src, dense_aview2d_base<RDerived>& dst)
+	inline void copy(const dense_caview2d_base<LDerived>& src, continuous_aview2d_base<RDerived>& dst)
 	{
 		BCS_STATIC_ASSERT( (has_same_layout_order<LDerived, RDerived>::value) );
 
@@ -225,7 +225,7 @@ namespace bcs
 	}
 
 	template<class LDerived, class RDerived>
-	inline void copy(const caview2d_base<LDerived>& src, aview2d_base<RDerived>& dst)
+	inline void copy(const dense_caview2d_base<LDerived>& src, dense_aview2d_base<RDerived>& dst)
 	{
 		BCS_STATIC_ASSERT( (has_same_layout_order<LDerived, RDerived>::value) );
 

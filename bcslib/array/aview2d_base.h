@@ -15,14 +15,15 @@
 
 namespace bcs
 {
-	/******************************************************
-	 *
-	 *  Basic concepts for 2D
-	 *
-	 ******************************************************/
-
 	template<class Derived>
-	class caview2d_base : public aview_traits<Derived>::dview_base
+	class caview2d_base
+	: public tyselect<aview_traits<Derived>::is_continuous,
+	  	  typename tyselect<aview_traits<Derived>::is_const_view,
+	  	  	  continuous_caview_base<Derived>,
+	  	  	  continuous_aview_base<Derived> >::type,
+	  	  typename tyselect<aview_traits<Derived>::is_const_view,
+	  	  	  caview_base<Derived>,
+	  	  	  aview_base<Derived> >::type>::type
 	{
 	public:
 		BCS_CAVIEW_BASE_DEFS(Derived)
@@ -74,11 +75,6 @@ namespace bcs
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
 			return derived().ncolumns();
-		}
-
-		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
-		{
-			return derived().operator()(i, j);
 		}
 
 	}; // end class caview2d_base
@@ -153,7 +149,144 @@ namespace bcs
 
 
 	template<class Derived>
-	class dense_caview2d_base : public aview_traits<Derived>::view_nd_base
+	class dense_caview2d_base
+	: public tyselect<aview_traits<Derived>::is_const_view,
+	  	  caview2d_base<Derived>,
+	  	  aview2d_base<Derived> >::type
+	{
+	public:
+		BCS_CAVIEW_BASE_DEFS(Derived)
+
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
+		// interfaces to be implemented by Derived
+
+		BCS_ENSURE_INLINE size_type size() const
+		{
+			return derived().size();
+		}
+
+		BCS_ENSURE_INLINE index_type nelems() const
+		{
+			return derived().nelems();
+		}
+
+		BCS_ENSURE_INLINE bool is_empty() const
+		{
+			return derived().is_empty();
+		}
+
+		BCS_ENSURE_INLINE shape_type shape() const
+		{
+			return derived().shape();
+		}
+
+		BCS_ENSURE_INLINE index_type dim0() const
+		{
+			return derived().dim0();
+		}
+
+		BCS_ENSURE_INLINE index_type dim1() const
+		{
+			return derived().dim1();
+		}
+
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return derived().nrows();
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return derived().ncolumns();
+		}
+
+		// -- new --
+
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
+		{
+			return derived().operator()(i, j);
+		}
+
+	}; // end class dense_caview2d_base
+
+
+	template<class Derived>
+	class dense_aview2d_base : public dense_caview2d_base<Derived>
+	{
+	public:
+		BCS_AVIEW_BASE_DEFS(Derived)
+
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
+		// interfaces to be implemented by Derived
+
+		BCS_ENSURE_INLINE size_type size() const
+		{
+			return derived().size();
+		}
+
+		BCS_ENSURE_INLINE index_type nelems() const
+		{
+			return derived().nelems();
+		}
+
+		BCS_ENSURE_INLINE bool is_empty() const
+		{
+			return derived().is_empty();
+		}
+
+		BCS_ENSURE_INLINE shape_type shape() const
+		{
+			return derived().shape();
+		}
+
+		BCS_ENSURE_INLINE index_type dim0() const
+		{
+			return derived().dim0();
+		}
+
+		BCS_ENSURE_INLINE index_type dim1() const
+		{
+			return derived().dim1();
+		}
+
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return derived().nrows();
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return derived().ncolumns();
+		}
+
+		// -- new --
+
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
+		{
+			return derived().operator()(i, j);
+		}
+
+		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
+		{
+			return derived().operator()(i, j);
+		}
+
+	}; // end class dense_aview2d_base
+
+
+	template<class Derived>
+	class continuous_caview2d_base
+	: public tyselect<aview_traits<Derived>::is_const_view,
+	  	  dense_caview2d_base<Derived>,
+	  	  dense_aview2d_base<Derived> >::type
 	{
 	public:
 		BCS_CAVIEW_BASE_DEFS(Derived)
@@ -257,11 +390,11 @@ namespace bcs
 			return derived().V(I, J);
 		}
 
-	}; // end class dense_caview2d_base
+	}; // end class continuous_caview2d_base
 
 
 	template<class Derived>
-	class dense_aview2d_base : public dense_caview2d_base<Derived>
+	class continuous_aview2d_base : public continuous_caview2d_base<Derived>
 	{
 	public:
 		BCS_AVIEW_BASE_DEFS(Derived)
@@ -411,7 +544,17 @@ namespace bcs
 			return derived().V(I);
 		}
 
-	}; // end class dense_aview2d_base
+	}; // end class continuous_aview2d_base
+
+
+	// convenient generic functions
+
+	template<class LDerived, class RDerived>
+	inline bool is_same_shape(const caview2d_base<LDerived>& lhs, const caview2d_base<RDerived>& rhs)
+	{
+		return lhs.dim0() == rhs.dim0() && lhs.dim1() == rhs.dim1();
+	}
+
 }
 
 #endif 

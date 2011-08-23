@@ -21,7 +21,7 @@ namespace bcs
 	// comparison
 
 	template<class LDerived, class RDerived>
-	inline bool is_equal(const dense_caview1d_base<LDerived>& lhs, const dense_caview1d_base<RDerived>& rhs)
+	inline bool is_equal(const continuous_caview1d_base<LDerived>& lhs, const continuous_caview1d_base<RDerived>& rhs)
 	{
 		return is_same_shape(lhs, rhs) && elements_equal(lhs.pbase(), rhs.pbase(), lhs.size());
 	}
@@ -29,7 +29,7 @@ namespace bcs
 	// import, export, fill
 
 	template<class Derived>
-	inline void import_from(aview1d_base<Derived>& a, typename Derived::const_pointer src)
+	inline void import_from(dense_aview1d_base<Derived>& a, typename Derived::const_pointer src)
 	{
 		Derived& ad = a.derived();
 		index_t n = a.nelems();
@@ -38,13 +38,13 @@ namespace bcs
 	}
 
 	template<class Derived>
-	inline void import_from(dense_aview1d_base<Derived>& a, typename Derived::const_pointer src)
+	inline void import_from(continuous_aview1d_base<Derived>& a, typename Derived::const_pointer src)
 	{
 		copy_elements(src, a.pbase(), a.size());
 	}
 
 	template<class Derived>
-	inline void export_to(const caview1d_base<Derived>& a, typename Derived::pointer dst)
+	inline void export_to(const dense_caview1d_base<Derived>& a, typename Derived::pointer dst)
 	{
 		const Derived& ad = a.derived();
 		index_t n = a.nelems();
@@ -53,14 +53,14 @@ namespace bcs
 	}
 
 	template<class Derived>
-	inline void export_to(const dense_caview1d_base<Derived>& a, typename Derived::pointer dst)
+	inline void export_to(const continuous_caview1d_base<Derived>& a, typename Derived::pointer dst)
 	{
 		copy_elements(a.pbase(), dst, a.size());
 	}
 
 
 	template<class Derived>
-	inline void fill(aview1d_base<Derived>& a, const typename Derived::value_type& v)
+	inline void fill(dense_aview1d_base<Derived>& a, const typename Derived::value_type& v)
 	{
 		Derived& ad = a.derived();
 		index_t n = a.nelems();
@@ -72,28 +72,28 @@ namespace bcs
 	// copy
 
 	template<class LDerived, class RDerived>
-	inline void copy(const dense_caview1d_base<LDerived>& src, dense_aview1d_base<RDerived>& dst)
+	inline void copy(const continuous_caview1d_base<LDerived>& src, continuous_aview1d_base<RDerived>& dst)
 	{
 		check_arg(is_same_shape(src, dst), "aview1d copy: the shapes of src and dst are inconsistent.");
 		copy_elements(src.pbase(), dst.pbase(), src.size());
 	}
 
 	template<class LDerived, class RDerived>
-	inline void copy(const dense_caview1d_base<LDerived>& src, aview1d_base<RDerived>& dst)
+	inline void copy(const continuous_caview1d_base<LDerived>& src, dense_aview1d_base<RDerived>& dst)
 	{
 		check_arg(is_same_shape(src, dst), "aview1d copy: the shapes of src and dst are inconsistent.");
 		import_from(dst, src.pbase());
 	}
 
 	template<class LDerived, class RDerived>
-	inline void copy(const caview1d_base<LDerived>& src, dense_aview1d_base<RDerived>& dst)
+	inline void copy(const dense_caview1d_base<LDerived>& src, continuous_aview1d_base<RDerived>& dst)
 	{
 		check_arg(is_same_shape(src, dst), "aview1d copy: the shapes of src and dst are inconsistent.");
 		export_to(src, dst.pbase());
 	}
 
 	template<class LDerived, class RDerived>
-	inline void copy(const caview1d_base<LDerived>& src, aview1d_base<RDerived>& dst)
+	inline void copy(const dense_caview1d_base<LDerived>& src, dense_aview1d_base<RDerived>& dst)
 	{
 		check_arg(is_same_shape(src, dst), "aview1d copy: the shapes of src and dst are inconsistent.");
 

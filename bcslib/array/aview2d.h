@@ -30,15 +30,14 @@ namespace bcs
 	{
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
-		typedef caview2d_ex<T, TOrd, TIndexer0, TIndexer1> self_type;
-		typedef caview2d_base<self_type> view_nd_base;
-		typedef caview_base<self_type> dview_base;
-		typedef caview_base<self_type> view_base;
+		static const bool is_dense = true;
+		static const bool is_continuous = false;
+		static const bool is_const_view = true;
 	};
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	class caview2d_ex
-	: public caview2d_base<caview2d_ex<T, TOrd, TIndexer0, TIndexer1> >
+	: public dense_caview2d_base<caview2d_ex<T, TOrd, TIndexer0, TIndexer1> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
@@ -149,15 +148,14 @@ namespace bcs
 	{
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
-		typedef aview2d_ex<T, TOrd, TIndexer0, TIndexer1> self_type;
-		typedef aview2d_base<self_type> view_nd_base;
-		typedef aview_base<self_type> dview_base;
-		typedef aview_base<self_type> view_base;
+		static const bool is_dense = true;
+		static const bool is_continuous = false;
+		static const bool is_const_view = false;
 	};
 
 	template<typename T, typename TOrd, class TIndexer0, class TIndexer1>
 	class aview2d_ex
-	: public aview2d_base<aview2d_ex<T, TOrd, TIndexer0, TIndexer1> >
+	: public dense_aview2d_base<aview2d_ex<T, TOrd, TIndexer0, TIndexer1> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
@@ -436,14 +434,13 @@ namespace bcs
 	{
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
-		typedef caview2d<T, TOrd> self_type;
-		typedef caview2d_base<self_type> view_nd_base;
-		typedef dense_caview_base<self_type> dview_base;
-		typedef caview_base<self_type> view_base;
+		static const bool is_dense = true;
+		static const bool is_continuous = true;
+		static const bool is_const_view = true;
 	};
 
 	template<typename T, typename TOrd>
-	class caview2d : public dense_caview2d_base<caview2d<T, TOrd> >
+	class caview2d : public continuous_caview2d_base<caview2d<T, TOrd> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
@@ -570,14 +567,13 @@ namespace bcs
 	{
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
-		typedef aview2d<T, TOrd> self_type;
-		typedef aview2d_base<self_type> view_nd_base;
-		typedef dense_aview_base<self_type> dview_base;
-		typedef aview_base<self_type> view_base;
+		static const bool is_dense = true;
+		static const bool is_continuous = true;
+		static const bool is_const_view = false;
 	};
 
 	template<typename T, typename TOrd>
-	class aview2d : public dense_aview2d_base<aview2d<T, TOrd> >
+	class aview2d : public continuous_aview2d_base<aview2d<T, TOrd> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
@@ -780,11 +776,7 @@ namespace bcs
 		return aview2d<T, column_major_t>(base, m, n);
 	}
 
-	template<class LDerived, class RDerived>
-	inline bool is_same_shape(const caview2d_base<LDerived>& lhs, const caview2d_base<RDerived>& rhs)
-	{
-		return lhs.dim0() == rhs.dim0() && lhs.dim1() == rhs.dim1();
-	}
+
 
 
 }

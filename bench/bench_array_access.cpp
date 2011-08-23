@@ -90,7 +90,7 @@ double time_dense1d_access(int nrepeats, const index_t nelems, const double *src
 double time_dense1d_access_via_base(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
 	caview1d<double> view(src, nelems);
-	caview1d_base<caview1d<double> >& viewb = view;
+	dense_caview1d_base<caview1d<double> >& viewb = view;
 
 	index_t n = (index_t)nelems;
 
@@ -309,9 +309,9 @@ double time_step2d_cm_access(int nrepeats, const index_t m, const index_t n, con
 }
 
 
-inline double sec_to_mps(const index_t n, double s)
+inline double sec_to_gbps(const index_t n, double s)
 {
-	return double(n) * 1.0e-6 / s;
+	return double(n) * sizeof(double) * 1.0e-9 / s;
 }
 
 int main(int argc, char *argv[])
@@ -391,23 +391,23 @@ int main(int argc, char *argv[])
 
 	std::printf("Elapsed time:\n");
 	std::printf("=================\n");
-	std::printf("\tcopy_memory:    %.2f MPS\n", sec_to_mps(N1d, e_copymem));
-	std::printf("\traw_for_loop:   %.2f MPS\n", sec_to_mps(N1d, e_rawloop));
+	std::printf("\tcopy_memory:    %.2f GB/s\n", sec_to_gbps(N1d, e_copymem));
+	std::printf("\traw_for_loop:   %.2f GB/s\n", sec_to_gbps(N1d, e_rawloop));
 	std::printf("\n");
-	std::printf("\tdense1d_export: %.2f MPS\n", sec_to_mps(N1d, e_dense1d_export));
-	std::printf("\tdense1d_access: %.2f MPS\n", sec_to_mps(N1d, e_dense1d_access));
-	std::printf("\tdense1d_access (via base): %.2f MPS\n", sec_to_mps(N1d, e_dense1d_access_b));
-	std::printf("\tstep1d_export:  %.2f MPS\n", sec_to_mps(N1d, e_step1d_export));
-	std::printf("\tstep1d_access:  %.2f MPS\n", sec_to_mps(N1d, e_step1d_access));
+	std::printf("\tdense1d_export: %.2f GB/s\n", sec_to_gbps(N1d, e_dense1d_export));
+	std::printf("\tdense1d_access: %.2f GB/s\n", sec_to_gbps(N1d, e_dense1d_access));
+	std::printf("\tdense1d_access (via base): %.2f GB/s\n", sec_to_gbps(N1d, e_dense1d_access_b));
+	std::printf("\tstep1d_export:  %.2f GB/s\n", sec_to_gbps(N1d, e_step1d_export));
+	std::printf("\tstep1d_access:  %.2f GB/s\n", sec_to_gbps(N1d, e_step1d_access));
 	std::printf("\n");
-	std::printf("\tdense2d_rm_export: %.2f MPS\n", sec_to_mps(N2d, e_dense2d_rm_export));
-	std::printf("\tdense2d_cm_export: %.2f MPS\n", sec_to_mps(N2d, e_dense2d_cm_export));
-	std::printf("\tdense2d_rm_access: %.2f MPS\n", sec_to_mps(N2d, e_dense2d_rm_access));
-	std::printf("\tdense2d_cm_access: %.2f MPS\n", sec_to_mps(N2d, e_dense2d_cm_access));
-	std::printf("\tstep2d_rm_export: %.2f MPS\n", sec_to_mps(N2d, e_step2d_rm_export));
-	std::printf("\tstep2d_cm_export: %.2f MPS\n", sec_to_mps(N2d, e_step2d_cm_export));
-	std::printf("\tstep2d_rm_access: %.2f MPS\n", sec_to_mps(N2d, e_step2d_rm_access));
-	std::printf("\tstep2d_cm_access: %.2f MPS\n", sec_to_mps(N2d, e_step2d_cm_access));
+	std::printf("\tdense2d_rm_export: %.2f GB/s\n", sec_to_gbps(N2d, e_dense2d_rm_export));
+	std::printf("\tdense2d_cm_export: %.2f GB/s\n", sec_to_gbps(N2d, e_dense2d_cm_export));
+	std::printf("\tdense2d_rm_access: %.2f GB/s\n", sec_to_gbps(N2d, e_dense2d_rm_access));
+	std::printf("\tdense2d_cm_access: %.2f GB/s\n", sec_to_gbps(N2d, e_dense2d_cm_access));
+	std::printf("\tstep2d_rm_export: %.2f GB/s\n", sec_to_gbps(N2d, e_step2d_rm_export));
+	std::printf("\tstep2d_cm_export: %.2f GB/s\n", sec_to_gbps(N2d, e_step2d_cm_export));
+	std::printf("\tstep2d_rm_access: %.2f GB/s\n", sec_to_gbps(N2d, e_step2d_rm_access));
+	std::printf("\tstep2d_cm_access: %.2f GB/s\n", sec_to_gbps(N2d, e_step2d_cm_access));
 	std::printf("\n");
 
 	delete[] src;

@@ -28,14 +28,13 @@ namespace bcs
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
 
-		typedef caview1d_ex<T, TIndexer> self_type;
-		typedef caview1d_base<self_type> view_nd_base;
-		typedef caview_base<self_type> dview_base;
-		typedef caview_base<self_type> view_base;
+		static const bool is_dense = true;
+		static const bool is_continuous = false;
+		static const bool is_const_view = true;
 	};
 
 	template<typename T, class TIndexer>
-	class caview1d_ex : public caview1d_base<caview1d_ex<T, TIndexer> >
+	class caview1d_ex : public dense_caview1d_base<caview1d_ex<T, TIndexer> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
@@ -99,15 +98,14 @@ namespace bcs
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
 
-		typedef aview1d_ex<T, TIndexer> self_type;
-		typedef aview1d_base<self_type> view_nd_base;
-		typedef aview_base<self_type> dview_base;
-		typedef aview_base<self_type> view_base;
+		static const bool is_dense = true;
+		static const bool is_continuous = false;
+		static const bool is_const_view = false;
 	};
 
 
 	template<typename T, class TIndexer>
-	class aview1d_ex : public aview1d_base<aview1d_ex<T, TIndexer> >
+	class aview1d_ex : public dense_aview1d_base<aview1d_ex<T, TIndexer> >
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
@@ -179,7 +177,7 @@ namespace bcs
 
 	/******************************************************
 	 *
-	 *  Dense views
+	 *  Continuous views
 	 *
 	 ******************************************************/
 
@@ -187,7 +185,7 @@ namespace bcs
 
 	template<class Derived, class IndexSelector>
 	inline caview1d_ex<typename Derived::value_type, typename indexer_map<IndexSelector>::type>
-	subview(const dense_caview1d_base<Derived>& a, const IndexSelector& I)
+	subview(const continuous_caview1d_base<Derived>& a, const IndexSelector& I)
 	{
 		typedef caview1d_ex<typename Derived::value_type, typename indexer_map<IndexSelector>::type> ret_type;
 
@@ -199,7 +197,7 @@ namespace bcs
 
 	template<class Derived, class IndexSelector>
 	inline aview1d_ex<typename Derived::value_type, typename indexer_map<IndexSelector>::type>
-	subview(dense_aview1d_base<Derived>& a, const IndexSelector& I)
+	subview(continuous_aview1d_base<Derived>& a, const IndexSelector& I)
 	{
 		typedef aview1d_ex<typename Derived::value_type, typename indexer_map<IndexSelector>::type> ret_type;
 
@@ -216,14 +214,13 @@ namespace bcs
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
 
-		typedef caview1d<T> self_type;
-		typedef caview1d_base<self_type> view_nd_base;
-		typedef dense_caview_base<self_type> dview_base;
-		typedef caview_base<self_type> view_base;
+		static const bool is_dense = true;
+		static const bool is_continuous = true;
+		static const bool is_const_view = true;
 	};
 
 	template<typename T>
-	class caview1d : public dense_caview1d_base<caview1d<T> >
+	class caview1d : public continuous_caview1d_base<caview1d<T> >
 	{
 	public:
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
@@ -306,14 +303,13 @@ namespace bcs
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
 
-		typedef aview1d<T> self_type;
-		typedef aview1d_base<self_type> view_nd_base;
-		typedef dense_aview_base<self_type> dview_base;
-		typedef aview_base<self_type> view_base;
+		static const bool is_dense = true;
+		static const bool is_continuous = true;
+		static const bool is_const_view = false;
 	};
 
 	template<typename T>
-	class aview1d : public dense_aview1d_base<aview1d<T> >
+	class aview1d : public continuous_aview1d_base<aview1d<T> >
 	{
 	public:
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
@@ -431,20 +427,14 @@ namespace bcs
 		return aview1d<T>(data, n);
 	}
 
-	template<class LDerived, class RDerived>
-	inline bool is_same_shape(const caview1d_base<LDerived>& lhs, const caview1d_base<RDerived>& rhs)
-	{
-		return lhs.dim0() == rhs.dim0();
-	}
-
 	template<class Derived>
-	inline caview1d<typename Derived::value_type> flatten(const dense_caview_base<Derived>& a)
+	inline caview1d<typename Derived::value_type> flatten(const continuous_caview_base<Derived>& a)
 	{
 		return caview1d<typename Derived::value_type>(a.pbase(), a.nelems());
 	}
 
 	template<class Derived>
-	inline aview1d<typename Derived::value_type> flatten(dense_aview_base<Derived>& a)
+	inline aview1d<typename Derived::value_type> flatten(continuous_aview_base<Derived>& a)
 	{
 		return caview1d<typename Derived::value_type>(a.pbase(), a.nelems());
 	}
