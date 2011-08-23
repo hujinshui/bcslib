@@ -25,21 +25,6 @@
 
 namespace bcs
 {
-	/**************************************************
-	 *
-	 *  layout order specific indexing implementation
-	 *
-	 **************************************************/
-
-	inline BCS_ENSURE_INLINE index_t sub2ind(const extent2d_t& extent, index_t i, index_t j, row_major_t)
-	{
-		return i * extent[1] + j;
-	}
-
-	inline BCS_ENSURE_INLINE index_t sub2ind(const extent2d_t& extent, index_t i, index_t j, column_major_t)
-	{
-		return i + extent[0] * j;
-	}
 
 	/******************************************************
 	 *
@@ -59,24 +44,24 @@ namespace bcs
 			typedef caview1d_ex<T, step_ind> column_cview_type;
 			typedef aview1d_ex<T, step_ind>  column_view_type;
 
-			static row_cview_type row_cview(const T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow)
+			static row_cview_type row_cview(const T* pbase, const row_extent& ext, index_t d0, index_t d1, index_t irow)
 			{
-				return caview1d<T>(pbase + irow * ext[1], d1);
+				return caview1d<T>(pbase + irow * ext.value, d1);
 			}
 
-			static row_view_type row_view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow)
+			static row_view_type row_view(T *pbase, const row_extent& ext, index_t d0, index_t d1, index_t irow)
 			{
-				return aview1d<T>(pbase + irow * ext[1], d1);
+				return aview1d<T>(pbase + irow * ext.value, d1);
 			}
 
-			static column_cview_type column_cview(const T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol)
+			static column_cview_type column_cview(const T* pbase, const row_extent& ext, index_t d0, index_t d1, index_t icol)
 			{
-				return caview1d_ex<T, step_ind>(pbase + icol, step_ind(d0, ext[1]));
+				return caview1d_ex<T, step_ind>(pbase + icol, step_ind(d0, ext.value));
 			}
 
-			static column_view_type column_view(T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol)
+			static column_view_type column_view(T* pbase, const row_extent& ext, index_t d0, index_t d1, index_t icol)
 			{
-				return aview1d_ex<T, step_ind>(pbase + icol, step_ind(d0, ext[1]));
+				return aview1d_ex<T, step_ind>(pbase + icol, step_ind(d0, ext.value));
 			}
 		};
 
@@ -89,24 +74,24 @@ namespace bcs
 			typedef caview1d_ex<T, step_ind> row_cview_type;
 			typedef aview1d_ex<T, step_ind>  row_view_type;
 
-			static row_cview_type row_cview(const T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow)
+			static row_cview_type row_cview(const T* pbase, const column_extent& ext, index_t d0, index_t d1, index_t irow)
 			{
-				return caview1d_ex<T, step_ind>(pbase + irow, step_ind(d1, ext[0]));
+				return caview1d_ex<T, step_ind>(pbase + irow, step_ind(d1, ext.value));
 			}
 
-			static row_view_type row_view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow)
+			static row_view_type row_view(T *pbase, const column_extent& ext, index_t d0, index_t d1, index_t irow)
 			{
-				return aview1d_ex<T, step_ind>(pbase + irow, step_ind(d1, ext[0]));
+				return aview1d_ex<T, step_ind>(pbase + irow, step_ind(d1, ext.value));
 			}
 
-			static column_cview_type column_cview(const T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol)
+			static column_cview_type column_cview(const T* pbase, const column_extent& ext, index_t d0, index_t d1, index_t icol)
 			{
-				return caview1d<T>(pbase + icol * ext[0], d0);
+				return caview1d<T>(pbase + icol * ext.value, d0);
 			}
 
-			static column_view_type column_view(T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol)
+			static column_view_type column_view(T* pbase, const column_extent& ext, index_t d0, index_t d1, index_t icol)
 			{
-				return aview1d<T>(pbase + icol * ext[0], d0);
+				return aview1d<T>(pbase + icol * ext.value, d0);
 			}
 		};
 
@@ -120,15 +105,15 @@ namespace bcs
 			typedef caview1d_ex<T, typename indexer_map<TRange>::type> cview_type;
 			typedef aview1d_ex<T, typename indexer_map<TRange>::type>  view_type;
 
-			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
+			static cview_type cview(const T *pbase, const row_extent& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
 			{
-				return cview_type(pbase + ext[1] * irow + indexer_map<TRange>::get_offset(d1, rgn),
+				return cview_type(pbase + ext.value * irow + indexer_map<TRange>::get_offset(d1, rgn),
 						indexer_map<TRange>::get_indexer(d1, rgn));
 			}
 
-			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
+			static view_type view(T *pbase, const row_extent& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
 			{
-				return view_type(pbase + ext[1] * irow + indexer_map<TRange>::get_offset(d1, rgn),
+				return view_type(pbase + ext.value * irow + indexer_map<TRange>::get_offset(d1, rgn),
 						indexer_map<TRange>::get_indexer(d1, rgn));
 			}
 		};
@@ -139,14 +124,14 @@ namespace bcs
 			typedef caview1d<T> cview_type;
 			typedef aview1d<T>  view_type;
 
-			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, whole)
+			static cview_type cview(const T *pbase, const row_extent& ext, index_t d0, index_t d1, index_t irow, whole)
 			{
-				return cview_type(pbase + ext[1] * irow, d1);
+				return cview_type(pbase + ext.value * irow, d1);
 			}
 
-			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, whole)
+			static view_type view(T *pbase, const row_extent& ext, index_t d0, index_t d1, index_t irow, whole)
 			{
-				return view_type(pbase + ext[1] * irow, d1);
+				return view_type(pbase + ext.value * irow, d1);
 			}
 		};
 
@@ -156,14 +141,14 @@ namespace bcs
 			typedef caview1d<T> cview_type;
 			typedef aview1d<T>  view_type;
 
-			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, const range& rgn)
+			static cview_type cview(const T *pbase, const row_extent& ext, index_t d0, index_t d1, index_t irow, const range& rgn)
 			{
-				return cview_type(pbase + ext[1] * irow + rgn.begin_index(), rgn.dim());
+				return cview_type(pbase + ext.value * irow + rgn.begin_index(), rgn.dim());
 			}
 
-			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, const range& rgn)
+			static view_type view(T *pbase, const row_extent& ext, index_t d0, index_t d1, index_t irow, const range& rgn)
 			{
-				return view_type(pbase + ext[1] * irow + rgn.begin_index(), rgn.dim());
+				return view_type(pbase + ext.value * irow + rgn.begin_index(), rgn.dim());
 			}
 		};
 
@@ -174,16 +159,16 @@ namespace bcs
 			typedef caview1d_ex<T, typename indexer_map<TRange>::stepped_type> cview_type;
 			typedef aview1d_ex<T, typename indexer_map<TRange>::stepped_type>  view_type;
 
-			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
+			static cview_type cview(const T *pbase, const row_extent& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
 			{
-				return cview_type(pbase + ext[1] * indexer_map<TRange>::get_offset(d0, rgn) + icol,
-						indexer_map<TRange>::get_stepped_indexer(d0, ext[1], rgn));
+				return cview_type(pbase + ext.value * indexer_map<TRange>::get_offset(d0, rgn) + icol,
+						indexer_map<TRange>::get_stepped_indexer(d0, ext.value, rgn));
 			}
 
-			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
+			static view_type view(T *pbase, const row_extent& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
 			{
-				return view_type(pbase + ext[1] * indexer_map<TRange>::get_offset(d0, rgn) + icol,
-						indexer_map<TRange>::get_stepped_indexer(d0, ext[1], rgn));
+				return view_type(pbase + ext.value * indexer_map<TRange>::get_offset(d0, rgn) + icol,
+						indexer_map<TRange>::get_stepped_indexer(d0, ext.value, rgn));
 			}
 		};
 
@@ -194,16 +179,16 @@ namespace bcs
 			typedef caview1d_ex<T, typename indexer_map<TRange>::stepped_type> cview_type;
 			typedef aview1d_ex<T, typename indexer_map<TRange>::stepped_type>  view_type;
 
-			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
+			static cview_type cview(const T *pbase, const column_extent& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
 			{
-				return cview_type(pbase + ext[0] * indexer_map<TRange>::get_offset(d1, rgn) + irow,
-						indexer_map<TRange>::get_stepped_indexer(d1, ext[0], rgn));
+				return cview_type(pbase + ext.value * indexer_map<TRange>::get_offset(d1, rgn) + irow,
+						indexer_map<TRange>::get_stepped_indexer(d1, ext.value, rgn));
 			}
 
-			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
+			static view_type view(T *pbase, const column_extent& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
 			{
-				return view_type(pbase + ext[0] * indexer_map<TRange>::get_offset(d1, rgn) + irow,
-						indexer_map<TRange>::get_stepped_indexer(d1, ext[0], rgn));
+				return view_type(pbase + ext.value * indexer_map<TRange>::get_offset(d1, rgn) + irow,
+						indexer_map<TRange>::get_stepped_indexer(d1, ext.value, rgn));
 			}
 		};
 
@@ -213,15 +198,15 @@ namespace bcs
 			typedef caview1d_ex<T, typename indexer_map<TRange>::type> cview_type;
 			typedef aview1d_ex<T, typename indexer_map<TRange>::type>  view_type;
 
-			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
+			static cview_type cview(const T *pbase, const column_extent& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
 			{
-				return cview_type(pbase + ext[0] * icol + indexer_map<TRange>::get_offset(d0, rgn),
+				return cview_type(pbase + ext.value * icol + indexer_map<TRange>::get_offset(d0, rgn),
 						indexer_map<TRange>::get_indexer(d0, rgn));
 			}
 
-			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
+			static view_type view(T *pbase, const column_extent& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
 			{
-				return view_type(pbase + ext[0] * icol + indexer_map<TRange>::get_offset(d0, rgn),
+				return view_type(pbase + ext.value * icol + indexer_map<TRange>::get_offset(d0, rgn),
 						indexer_map<TRange>::get_indexer(d0, rgn));
 			}
 		};
@@ -232,14 +217,14 @@ namespace bcs
 			typedef caview1d<T> cview_type;
 			typedef aview1d<T>  view_type;
 
-			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, whole)
+			static cview_type cview(const T *pbase, const column_extent& ext, index_t d0, index_t d1, index_t icol, whole)
 			{
-				return cview_type(pbase + ext[0] * icol, d0);
+				return cview_type(pbase + ext.value * icol, d0);
 			}
 
-			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, whole)
+			static view_type view(T *pbase, const column_extent& ext, index_t d0, index_t d1, index_t icol, whole)
 			{
-				return view_type(pbase + ext[0] * icol, d0);
+				return view_type(pbase + ext.value * icol, d0);
 			}
 		};
 
@@ -249,14 +234,14 @@ namespace bcs
 			typedef caview1d<T> cview_type;
 			typedef aview1d<T>  view_type;
 
-			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, const range& rgn)
+			static cview_type cview(const T *pbase, const column_extent& ext, index_t d0, index_t d1, index_t icol, const range& rgn)
 			{
-				return cview_type(pbase + ext[0] * icol + rgn.begin_index(), rgn.dim());
+				return cview_type(pbase + ext.value * icol + rgn.begin_index(), rgn.dim());
 			}
 
-			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, const range& rgn)
+			static view_type view(T *pbase, const column_extent& ext, index_t d0, index_t d1, index_t icol, const range& rgn)
 			{
-				return view_type(pbase + ext[0] * icol + rgn.begin_index(), rgn.dim());
+				return view_type(pbase + ext.value * icol + rgn.begin_index(), rgn.dim());
 			}
 		};
 	}
@@ -383,11 +368,13 @@ namespace bcs
 
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
+		typedef typename extent_of<layout_order>::type base_extent_type;
 		typedef TIndexer0 indexer0_type;
 		typedef TIndexer1 indexer1_type;
 
 	public:
-		caview2d_ex(const_pointer pbase, const extent2d_t& base_ext, const indexer0_type& indexer0, const indexer1_type& indexer1)
+		caview2d_ex(const_pointer pbase, const base_extent_type& base_ext,
+				const indexer0_type& indexer0, const indexer1_type& indexer1)
 		: m_pbase(pbase)
 		, m_base_ext(base_ext)
 		, m_d0(indexer0.dim())
@@ -443,7 +430,7 @@ namespace bcs
 			return arr_shape(m_d0, m_d1);
 		}
 
-		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		BCS_ENSURE_INLINE base_extent_type base_extent() const
 		{
 			return m_base_ext;
 		}
@@ -456,11 +443,11 @@ namespace bcs
 	private:
 		index_type offset(index_type i, index_type j) const
 		{
-			return sub2ind(m_base_ext, m_indexer0[i], m_indexer1[j], TOrd());
+			return m_base_ext.sub2ind(m_indexer0[i], m_indexer1[j]);
 		}
 
 		const_pointer m_pbase;
-		extent2d_t m_base_ext;
+		base_extent_type m_base_ext;
 		index_t m_d0;
 		index_t m_d1;
 		indexer0_type m_indexer0;
@@ -493,9 +480,11 @@ namespace bcs
 
 		typedef TIndexer0 indexer0_type;
 		typedef TIndexer1 indexer1_type;
+		typedef typename extent_of<layout_order>::type base_extent_type;
 
 	public:
-		aview2d_ex(pointer pbase, const extent2d_t& base_ext, const indexer0_type& indexer0, const indexer1_type& indexer1)
+		aview2d_ex(pointer pbase, const base_extent_type& base_ext,
+				const indexer0_type& indexer0, const indexer1_type& indexer1)
 		: m_pbase(pbase)
 		, m_base_ext(base_ext)
 		, m_d0(indexer0.dim())
@@ -557,7 +546,7 @@ namespace bcs
 			return arr_shape(m_d0, m_d1);
 		}
 
-		BCS_ENSURE_INLINE shape_type base_extent() const
+		BCS_ENSURE_INLINE base_extent_type base_extent() const
 		{
 			return m_base_ext;
 		}
@@ -575,11 +564,11 @@ namespace bcs
 	private:
 		index_type offset(index_type i, index_type j) const
 		{
-			return sub2ind(m_base_ext, m_indexer0[i], m_indexer1[j], TOrd());
+			return m_base_ext.sub2ind(m_indexer0[i], m_indexer1[j]);
 		}
 
 		pointer m_pbase;
-		extent2d_t m_base_ext;
+		base_extent_type m_base_ext;
 		index_t m_d0;
 		index_t m_d1;
 		indexer0_type m_indexer0;
@@ -656,14 +645,16 @@ namespace bcs
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 
+		typedef typename extent_of<TOrd>::type base_extent_type;
+
 	public:
 		caview2d(const_pointer pbase, index_type m, index_type n)
-		: m_pbase(pbase), m_ext(make_extent2d(m, n))
+		: m_pbase(pbase), m_d0(m), m_d1(n)
 		{
 		}
 
 		caview2d(const_pointer pbase, const shape_type& shape)
-		: m_pbase(pbase), m_ext(shape)
+		: m_pbase(pbase), m_d0(shape[0]), m_d1(shape[1])
 		{
 		}
 
@@ -690,12 +681,12 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return m_ext[0];
+			return m_d0;
 		}
 
 		BCS_ENSURE_INLINE index_type dim1() const
 		{
-			return m_ext[1];
+			return m_d1;
 		}
 
 		BCS_ENSURE_INLINE index_type nrows() const
@@ -713,9 +704,9 @@ namespace bcs
 			return arr_shape(dim0(), dim1());
 		}
 
-		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		BCS_ENSURE_INLINE base_extent_type base_extent() const
 		{
-			return m_ext;
+			return get_extent(m_d0, m_d1, TOrd());
 		}
 
 	public:
@@ -731,7 +722,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
-			return m_pbase[sub2ind(m_ext, i, j, TOrd())];
+			return m_pbase[sub2ind(m_d0, m_d1, i, j, TOrd())];
 		}
 
 	public:
@@ -768,7 +759,8 @@ namespace bcs
 
 	private:
 		const_pointer m_pbase;
-		extent2d_t m_ext;
+		index_t m_d0;
+		index_t m_d1;
 
 	}; // end class caview2d
 
@@ -793,14 +785,16 @@ namespace bcs
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 
+		typedef typename extent_of<TOrd>::type base_extent_type;
+
 	public:
 		aview2d(pointer pbase, index_type m, index_type n)
-		: m_pbase(pbase), m_ext(make_extent2d(m, n))
+		: m_pbase(pbase), m_d0(m), m_d1(n)
 		{
 		}
 
 		aview2d(pointer pbase, const shape_type& shape)
-		: m_pbase(pbase), m_ext(shape)
+		: m_pbase(pbase), m_d0(shape[0]), m_d1(shape[1])
 		{
 		}
 
@@ -832,12 +826,12 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return m_ext[0];
+			return m_d0;
 		}
 
 		BCS_ENSURE_INLINE index_type dim1() const
 		{
-			return m_ext[1];
+			return m_d1;
 		}
 
 		BCS_ENSURE_INLINE index_type nrows() const
@@ -855,9 +849,9 @@ namespace bcs
 			return arr_shape(dim0(), dim1());
 		}
 
-		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		BCS_ENSURE_INLINE base_extent_type base_extent() const
 		{
-			return m_ext;
+			return get_extent(m_d0, m_d1, TOrd());
 		}
 
 	public:
@@ -883,12 +877,12 @@ namespace bcs
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
-			return m_pbase[sub2ind(m_ext, i, j, TOrd())];
+			return m_pbase[sub2ind(m_d0, m_d1, i, j, TOrd())];
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
 		{
-			return m_pbase[sub2ind(m_ext, i, j, TOrd())];
+			return m_pbase[sub2ind(m_d0, m_d1, i, j, TOrd())];
 		}
 
 	public:
@@ -956,7 +950,8 @@ namespace bcs
 
 	private:
 		pointer m_pbase;
-		extent2d_t m_ext;
+		index_t m_d0;
+		index_t m_d1;
 
 	}; // end class aview2d
 
@@ -977,25 +972,27 @@ namespace bcs
 			typedef caview2d_ex<T, TOrd, sindexer0_t, sindexer1_t> cview_type;
 			typedef aview2d_ex<T, TOrd, sindexer0_t, sindexer1_t> view_type;
 
-			static cview_type cview(const T *pbase, const extent2d_t& base_ext, index_t d0, index_t d1,
+			typedef typename extent_of<TOrd>::type extent_t;
+
+			static cview_type cview(const T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
 					const IndexSelector0& I, const IndexSelector1& J)
 			{
 				index_t i0 = indexer_map<IndexSelector0>::get_offset(d0, I);
 				index_t j0 = indexer_map<IndexSelector1>::get_offset(d1, J);
 
-				const T *p0 = pbase + sub2ind(base_ext, i0, j0, TOrd());
+				const T *p0 = pbase + base_ext.sub2ind(i0, j0);
 				return cview_type(p0, base_ext,
 						indexer_map<IndexSelector0>::get_indexer(d0, I),
 						indexer_map<IndexSelector1>::get_indexer(d1, J));
 			}
 
-			static view_type view(T *pbase, const extent2d_t& base_ext, index_t d0, index_t d1,
+			static view_type view(T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
 					const IndexSelector0& I, const IndexSelector1& J)
 			{
 				index_t i0 = indexer_map<IndexSelector0>::get_offset(d0, I);
 				index_t j0 = indexer_map<IndexSelector1>::get_offset(d1, J);
 
-				T *p0 = pbase + sub2ind(base_ext, i0, j0, TOrd());
+				T *p0 = pbase + base_ext.sub2ind(i0, j0);
 				return view_type(p0, base_ext,
 						indexer_map<IndexSelector0>::get_indexer(d0, I),
 						indexer_map<IndexSelector1>::get_indexer(d1, J));
@@ -1034,6 +1031,33 @@ namespace bcs
 		return aview2d<T, column_major_t>(base, m, n);
 	}
 
+	template<typename T, class TIndexer0, class TIndexer1>
+	inline caview2d_ex<T, row_major_t, TIndexer0, TIndexer1> make_caview2d_ex_rm(
+			const T *base, index_t m, index_t n, const TIndexer0& idx0, const TIndexer1& idx1)
+	{
+		return caview2d_ex<T, row_major_t, TIndexer0, TIndexer1>(base, get_extent(m, n, row_major_t()), idx0, idx1);
+	}
+
+	template<typename T, class TIndexer0, class TIndexer1>
+	inline aview2d_ex<T, row_major_t, TIndexer0, TIndexer1> make_aview2d_ex_rm(
+			T *base, index_t m, index_t n, const TIndexer0& idx0, const TIndexer1& idx1)
+	{
+		return aview2d_ex<T, row_major_t, TIndexer0, TIndexer1>(base, get_extent(m, n, row_major_t()), idx0, idx1);
+	}
+
+	template<typename T, class TIndexer0, class TIndexer1>
+	inline caview2d_ex<T, column_major_t, TIndexer0, TIndexer1> make_caview2d_ex_cm(
+			const T *base, index_t m, index_t n, const TIndexer0& idx0, const TIndexer1& idx1)
+	{
+		return caview2d_ex<T, column_major_t, TIndexer0, TIndexer1>(base, get_extent(m, n, column_major_t()), idx0, idx1);
+	}
+
+	template<typename T, class TIndexer0, class TIndexer1>
+	inline aview2d_ex<T, column_major_t, TIndexer0, TIndexer1> make_aview2d_ex_cm(
+			T *base, index_t m, index_t n, const TIndexer0& idx0, const TIndexer1& idx1)
+	{
+		return aview2d_ex<T, column_major_t, TIndexer0, TIndexer1>(base, get_extent(m, n, column_major_t()), idx0, idx1);
+	}
 }
 
 #endif

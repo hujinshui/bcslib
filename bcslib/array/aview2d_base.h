@@ -15,13 +15,60 @@
 namespace bcs
 {
 
-	typedef array_shape_t<2> extent2d_t;
+	// extents & index calculation
 
-	inline extent2d_t BCS_ENSURE_INLINE make_extent2d(index_t m, index_t n)
+	struct row_extent
 	{
-		return arr_shape(m, n);
+		index_t value;
+		explicit row_extent(const index_t& v) : value(v) { }
+
+		BCS_ENSURE_INLINE index_t sub2ind(index_t i, index_t j) const
+		{
+			return i * value + j;
+		}
+	};
+
+	struct column_extent
+	{
+		index_t value;
+		explicit column_extent(const index_t& v) : value(v) { }
+
+		BCS_ENSURE_INLINE index_t sub2ind(index_t i, index_t j) const
+		{
+			return i + value * j;
+		}
+	};
+
+	template<typename TOrd> struct extent_of;
+	template<> struct extent_of<row_major_t> { typedef row_extent type; };
+	template<> struct extent_of<column_major_t> { typedef column_extent type; };
+
+	inline BCS_ENSURE_INLINE
+	index_t sub2ind(index_t m0, index_t n0, index_t i, index_t j, row_major_t)
+	{
+		return i * n0 + j;
 	}
 
+	inline BCS_ENSURE_INLINE
+	index_t sub2ind(index_t m0, index_t n0, index_t i, index_t j, column_major_t)
+	{
+		return i + m0 * j;
+	}
+
+	inline BCS_ENSURE_INLINE
+	row_extent get_extent(index_t m0, index_t n0, row_major_t)
+	{
+		return row_extent(n0);
+	}
+
+	inline BCS_ENSURE_INLINE
+	column_extent get_extent(index_t m0, index_t n0, column_major_t)
+	{
+		return column_extent(m0);
+	}
+
+
+	// concept interfaces
 
 	template<class Derived>
 	class caview2d_base
@@ -214,7 +261,7 @@ namespace bcs
 
 		// -- new --
 
-		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
 		{
 			return derived().base_extent();
 		}
@@ -282,7 +329,7 @@ namespace bcs
 
 		// -- new --
 
-		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
 		{
 			return derived().base_extent();
 		}
@@ -336,7 +383,7 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
 		{
 			return derived().base_extent();
 		}
@@ -426,7 +473,7 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
 		{
 			return derived().base_extent();
 		}

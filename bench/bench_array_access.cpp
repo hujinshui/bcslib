@@ -110,7 +110,7 @@ double time_dense1d_access_via_base(int nrepeats, const index_t nelems, const do
 
 double time_step1d_export(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
-	caview1d_ex<double, step_ind> view(src, step_ind(nelems, 2));
+	caview1d_ex<double, step_ind> view(src, step_ind(nelems, 1));
 
 	export_to(view, buf);
 
@@ -126,7 +126,7 @@ double time_step1d_export(int nrepeats, const index_t nelems, const double *src,
 
 double time_step1d_access(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
-	caview1d_ex<double, step_ind> view(src, step_ind(nelems, 2));
+	caview1d_ex<double, step_ind> view(src, step_ind(nelems, 1));
 
 	index_t n = (index_t)nelems;
 
@@ -225,8 +225,8 @@ double time_dense2d_cm_access(int nrepeats, const index_t m, const index_t n, co
 
 double time_step2d_rm_export(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d_ex<double, row_major_t, step_ind, step_ind> view(
-			src, make_extent2d(2*m, 2*n), step_ind(m, 2), step_ind(n,2));
+	caview2d_ex<double, row_major_t, step_ind, step_ind> view =
+			make_caview2d_ex_rm(src, m, n, step_ind(m, 1), step_ind(n, 1));
 
 	export_to(view, buf);
 
@@ -242,8 +242,8 @@ double time_step2d_rm_export(int nrepeats, const index_t m, const index_t n, con
 
 double time_step2d_cm_export(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d_ex<double, column_major_t, step_ind, step_ind> view(
-			src, make_extent2d(2*m, 2*n), step_ind(m, 2), step_ind(n,2));
+	caview2d_ex<double, column_major_t, step_ind, step_ind> view =
+			make_caview2d_ex_cm(src, m, n, step_ind(m, 1), step_ind(n, 1));
 
 	export_to(view, buf);
 
@@ -260,8 +260,8 @@ double time_step2d_cm_export(int nrepeats, const index_t m, const index_t n, con
 
 double time_step2d_rm_access(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d_ex<double, row_major_t, step_ind, step_ind> view(
-			src, make_extent2d(2*m, 2*n), step_ind(m, 2), step_ind(n,2));
+	caview2d_ex<double, row_major_t, step_ind, step_ind> view =
+			make_caview2d_ex_rm(src, m, n, step_ind(m, 1), step_ind(n, 1));
 
 	index_t d0 = m;
 	index_t d1 = n;
@@ -285,8 +285,8 @@ double time_step2d_rm_access(int nrepeats, const index_t m, const index_t n, con
 
 double time_step2d_cm_access(int nrepeats, const index_t m, const index_t n, const double *src, double *buf)
 {
-	caview2d_ex<double, column_major_t, step_ind, step_ind> view(
-			src, make_extent2d(2*m, 2*n), step_ind(m, 2), step_ind(n,2));
+	caview2d_ex<double, column_major_t, step_ind, step_ind> view =
+			make_caview2d_ex_cm(src, m, n, step_ind(m, 1), step_ind(n, 1));
 
 	index_t d0 = m;
 	index_t d1 = n;
