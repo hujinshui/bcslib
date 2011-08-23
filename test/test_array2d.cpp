@@ -651,9 +651,12 @@ TEST( Array2D, Aview2DExRowMajor )
 	double src[36];
 	for (int i = 0; i < 36; ++i) src[i] = i+1;
 
+	row_extent bext = get_extent(5, 6, row_major_t());
+	ASSERT_EQ( bext.value, 6 );
+
 	// id x id
 
-	aview2d_ex<double, row_major_t, id_ind, id_ind> a0(src, make_extent2d(5, 6), id_ind(2), id_ind(3));
+	aview2d_ex<double, row_major_t, id_ind, id_ind> a0(src, bext, id_ind(2), id_ind(3));
 	double r0[] = {1, 2, 3, 7, 8, 9};
 
 	ASSERT_EQ(a0.dim0(), 2);
@@ -664,7 +667,7 @@ TEST( Array2D, Aview2DExRowMajor )
 
 	// id x step
 
-	aview2d_ex<double, row_major_t, id_ind, step_ind> a1(src, make_extent2d(5, 6), id_ind(2), step_ind(3, 2));
+	aview2d_ex<double, row_major_t, id_ind, step_ind> a1(src, bext, id_ind(2), step_ind(3, 2));
 	double r1[] = {1, 3, 5, 7, 9, 11};
 
 	ASSERT_EQ(a1.dim0(), 2);
@@ -675,7 +678,7 @@ TEST( Array2D, Aview2DExRowMajor )
 
 	// step x step
 
-	aview2d_ex<double, row_major_t, step_ind, step_ind> a2(src, make_extent2d(5, 6), step_ind(2, 2), step_ind(3, 2));
+	aview2d_ex<double, row_major_t, step_ind, step_ind> a2(src, bext, step_ind(2, 2), step_ind(3, 2));
 	double r2[] = {1, 3, 5, 13, 15, 17};
 
 	ASSERT_EQ(a2.dim0(), 2);
@@ -686,7 +689,7 @@ TEST( Array2D, Aview2DExRowMajor )
 
 	// step x rep
 
-	aview2d_ex<double, row_major_t, step_ind, rep_ind> a3(src, make_extent2d(5, 6), step_ind(2, 2), rep_ind(3));
+	aview2d_ex<double, row_major_t, step_ind, rep_ind> a3(src, bext, step_ind(2, 2), rep_ind(3));
 	double r3[] = {1, 1, 1, 13, 13, 13};
 
 	ASSERT_EQ(a3.dim0(), 2);
@@ -697,7 +700,7 @@ TEST( Array2D, Aview2DExRowMajor )
 
 	// rep x rep
 
-	aview2d_ex<double, row_major_t, rep_ind, rep_ind> a4(src, make_extent2d(5, 6), rep_ind(2), rep_ind(3));
+	aview2d_ex<double, row_major_t, rep_ind, rep_ind> a4(src, bext, rep_ind(2), rep_ind(3));
 	double r4[] = {1, 1, 1, 1, 1, 1};
 
 	ASSERT_EQ(a4.dim0(), 2);
@@ -713,9 +716,12 @@ TEST( Array2D, Aview2DExColumnMajor )
 	double src[36];
 	for (int i = 0; i < 36; ++i) src[i] = i+1;
 
+	column_extent bext = get_extent(5, 6, column_major_t());
+	ASSERT_EQ( bext.value, 5 );
+
 	// id x id
 
-	aview2d_ex<double, column_major_t, id_ind, id_ind> a0(src, make_extent2d(5, 6), id_ind(2), id_ind(3));
+	aview2d_ex<double, column_major_t, id_ind, id_ind> a0(src, bext, id_ind(2), id_ind(3));
 	double r0[] = {1, 2, 6, 7, 11, 12};
 
 	ASSERT_EQ(a0.dim0(), 2);
@@ -726,7 +732,7 @@ TEST( Array2D, Aview2DExColumnMajor )
 
 	// id x step
 
-	aview2d_ex<double, column_major_t, id_ind, step_ind> a1(src, make_extent2d(5, 6), id_ind(2), step_ind(3, 2));
+	aview2d_ex<double, column_major_t, id_ind, step_ind> a1(src, bext, id_ind(2), step_ind(3, 2));
 	double r1[] = {1, 2, 11, 12, 21, 22};
 
 	ASSERT_EQ(a1.dim0(), 2);
@@ -737,7 +743,7 @@ TEST( Array2D, Aview2DExColumnMajor )
 
 	// step x step
 
-	aview2d_ex<double, column_major_t, step_ind, step_ind> a2(src, make_extent2d(5, 6), step_ind(2, 2), step_ind(3, 2));
+	aview2d_ex<double, column_major_t, step_ind, step_ind> a2(src, bext, step_ind(2, 2), step_ind(3, 2));
 	double r2[] = {1, 3, 11, 13, 21, 23};
 
 	ASSERT_EQ(a2.dim0(), 2);
@@ -748,7 +754,7 @@ TEST( Array2D, Aview2DExColumnMajor )
 
 	// step x rep
 
-	aview2d_ex<double, column_major_t, step_ind, rep_ind> a3(src, make_extent2d(5, 6), step_ind(2, 2), rep_ind(3));
+	aview2d_ex<double, column_major_t, step_ind, rep_ind> a3(src, bext, step_ind(2, 2), rep_ind(3));
 	double r3[] = {1, 3, 1, 3, 1, 3};
 
 	ASSERT_EQ(a3.dim0(), 2);
@@ -759,7 +765,7 @@ TEST( Array2D, Aview2DExColumnMajor )
 
 	// rep x rep
 
-	aview2d_ex<double, column_major_t, rep_ind, rep_ind> a4(src, make_extent2d(5, 6), rep_ind(2), rep_ind(3));
+	aview2d_ex<double, column_major_t, rep_ind, rep_ind> a4(src, bext, rep_ind(2), rep_ind(3));
 	double r4[] = {1, 1, 1, 1, 1, 1};
 
 	ASSERT_EQ(a4.dim0(), 2);
@@ -781,7 +787,7 @@ TEST( Array2D, Array2DClone )
 	ASSERT_TRUE( a1_rm.pbase() != view1_rm.pbase() );
 	ASSERT_TRUE( array2d_equal(a1_rm, view1_rm) );
 
-	aview2d_ex<double, row_major_t, step_ind, step_ind> view2_rm(src, make_extent2d(4, 5), step_ind(2, 2), step_ind(3, 2));
+	aview2d_ex<double, row_major_t, step_ind, step_ind> view2_rm = make_aview2d_ex_rm(src, 4, 5, step_ind(2, 2), step_ind(3, 2));
 	array2d<double, row_major_t> a2_rm = clone_array(view2_rm);
 
 	double a2_rm_s[6] = {1, 3, 5, 11, 13, 15};
@@ -795,7 +801,7 @@ TEST( Array2D, Array2DClone )
 	ASSERT_TRUE( a1_cm.pbase() != view1_cm.pbase() );
 	ASSERT_TRUE( array2d_equal(a1_cm, view1_cm) );
 
-	aview2d_ex<double, column_major_t, step_ind, step_ind> view2_cm(src, make_extent2d(4, 5), step_ind(2, 2), step_ind(3, 2));
+	aview2d_ex<double, column_major_t, step_ind, step_ind> view2_cm = make_aview2d_ex_cm(src, 4, 5, step_ind(2, 2), step_ind(3, 2));
 	array2d<double, column_major_t> a2_cm = clone_array(view2_cm);
 
 	double a2_cm_s[6] = {1, 3, 9, 11, 17, 19};
@@ -809,8 +815,10 @@ TEST( Array2D, Slices )
 	double src[60];
 	for (int i = 0; i < 60; ++i) src[i] = i+1;
 
-	array2d<double, row_major_t> Arm( aview2d_ex<double, row_major_t, id_ind, id_ind>(src, make_extent2d(7, 8), id_ind(5), id_ind(6)) );
-	array2d<double, column_major_t> Acm( aview2d_ex<double, column_major_t, id_ind, id_ind>(src, make_extent2d(7, 8), id_ind(5), id_ind(6)) );
+	array2d<double, row_major_t> Arm( aview2d_ex<double, row_major_t, id_ind, id_ind>(
+			src, get_extent(7, 8, row_major_t()), id_ind(5), id_ind(6)) );
+	array2d<double, column_major_t> Acm( aview2d_ex<double, column_major_t, id_ind, id_ind>(
+			src, get_extent(7, 8, column_major_t()), id_ind(5), id_ind(6)) );
 
 	// row
 
@@ -876,8 +884,10 @@ TEST( Array2D, SubViews )
 	double src0[60];
 	for (int i = 0; i < 60; ++i) src0[i] = i+1;
 
-	array2d<double, row_major_t> a0_rm( aview2d_ex<double, row_major_t, id_ind, id_ind>(src0, make_extent2d(7, 8), id_ind(5), id_ind(6)) );
-	array2d<double, column_major_t> a0_cm( aview2d_ex<double, column_major_t, id_ind, id_ind>(src0, make_extent2d(7, 8), id_ind(5), id_ind(6)) );
+	array2d<double, row_major_t> a0_rm( aview2d_ex<double, row_major_t, id_ind, id_ind>(
+			src0, get_extent(7, 8, row_major_t()), id_ind(5), id_ind(6)) );
+	array2d<double, column_major_t> a0_cm( aview2d_ex<double, column_major_t, id_ind, id_ind>(
+			src0, get_extent(7, 8, column_major_t()), id_ind(5), id_ind(6)) );
 
 	// (whole, whole)
 
@@ -973,8 +983,8 @@ TEST( Array2D, ViewCopy )
 
 	aview2d<double, row_major_t> a0_rm(a0_buf, m, n);
 	aview2d<double, row_major_t> a1_rm(a1_buf, m, n);
-	aview2d_ex<double, row_major_t, step_ind, step_ind> e2_rm(e2_buf, make_extent2d(2*m, 2*n), step_ind(m, 2), step_ind(n, 2));
-	aview2d_ex<double, row_major_t, step_ind, step_ind> e3_rm(e3_buf, make_extent2d(2*m, 2*n), step_ind(m, 2), step_ind(n, 2));
+	aview2d_ex<double, row_major_t, step_ind, step_ind> e2_rm = make_aview2d_ex_rm(e2_buf, 2*m, 2*n, step_ind(m, 2), step_ind(n, 2));
+	aview2d_ex<double, row_major_t, step_ind, step_ind> e3_rm = make_aview2d_ex_rm(e3_buf, 2*m, 2*n, step_ind(m, 2), step_ind(n, 2));
 	aview2d<double, row_major_t> a4_rm(a4_buf, m, n);
 
 	copy(a0_rm, a1_rm);
@@ -998,8 +1008,8 @@ TEST( Array2D, ViewCopy )
 
 	aview2d<double, column_major_t> a0_cm(a0_buf, m, n);
 	aview2d<double, column_major_t> a1_cm(a1_buf, m, n);
-	aview2d_ex<double, column_major_t, step_ind, step_ind> e2_cm(e2_buf, make_extent2d(2*m, 2*n), step_ind(m, 2), step_ind(n, 2));
-	aview2d_ex<double, column_major_t, step_ind, step_ind> e3_cm(e3_buf, make_extent2d(2*m, 2*n), step_ind(m, 2), step_ind(n, 2));
+	aview2d_ex<double, column_major_t, step_ind, step_ind> e2_cm = make_aview2d_ex_cm(e2_buf, 2*m, 2*n, step_ind(m, 2), step_ind(n, 2));
+	aview2d_ex<double, column_major_t, step_ind, step_ind> e3_cm = make_aview2d_ex_cm(e3_buf, 2*m, 2*n, step_ind(m, 2), step_ind(n, 2));
 	aview2d<double, column_major_t> a4_cm(a4_buf, m, n);
 
 	copy(a0_cm, a1_cm);
