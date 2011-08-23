@@ -31,10 +31,12 @@ namespace bcs
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
 		static const bool is_dense = true;
+		static const bool is_block = true;
 		static const bool is_continuous = true;
 		static const bool is_const_view = false;
 
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
+		BCS_AVIEW_FLATTEN_TYPEDEFS(T)
 	};
 
 	template<typename T, typename TOrd, class Alloc>
@@ -45,6 +47,7 @@ namespace bcs
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
+		BCS_AVIEW_FLATTEN_TYPEDEFS(T)
 
 		typedef typename extent_of<TOrd>::type base_extent_type;
 
@@ -289,6 +292,16 @@ namespace bcs
 		V(const TRange0& I, const TRange1& J)
 		{
 			return m_view.V(I, J);
+		}
+
+		flatten_cview_type flatten() const
+		{
+			return m_view.flatten();
+		}
+
+		flatten_view_type flatten()
+		{
+			return m_view.flatten();
 		}
 
 	private:

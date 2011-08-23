@@ -512,4 +512,9 @@ namespace bcs
 	}
 }
 
+#define BCS_AVIEW_FLATTEN_TYPEDEFS(T) \
+	typedef caview1d<T> flatten_cview_type; \
+	typedef aview1d<T> flatten_view_type;
+
+
 #endif
