@@ -16,8 +16,275 @@
 #include <bcslib/array/aview2d_base.h>
 #include <bcslib/array/aview1d.h>
 
+#define BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd) \
+	typedef typename bcs::_detail::slice_helper2d<T, TOrd>::row_cview_type row_cview_type; \
+	typedef typename bcs::_detail::slice_helper2d<T, TOrd>::row_view_type row_view_type; \
+	typedef typename bcs::_detail::slice_helper2d<T, TOrd>::column_cview_type column_cview_type; \
+	typedef typename bcs::_detail::slice_helper2d<T, TOrd>::column_view_type column_view_type;
+
+
 namespace bcs
 {
+	/**************************************************
+	 *
+	 *  layout order specific indexing implementation
+	 *
+	 **************************************************/
+
+	inline BCS_ENSURE_INLINE index_t sub2ind(const extent2d_t& extent, index_t i, index_t j, row_major_t)
+	{
+		return i * extent[1] + j;
+	}
+
+	inline BCS_ENSURE_INLINE index_t sub2ind(const extent2d_t& extent, index_t i, index_t j, column_major_t)
+	{
+		return i + extent[0] * j;
+	}
+
+	/******************************************************
+	 *
+	 *  Slice-views
+	 *
+	 ******************************************************/
+
+	namespace _detail
+	{
+		template<typename T, typename TOrd> struct slice_helper2d;
+
+		template<typename T>
+		struct slice_helper2d<T, row_major_t>
+		{
+			typedef caview1d<T> row_cview_type;
+			typedef aview1d<T>  row_view_type;
+			typedef caview1d_ex<T, step_ind> column_cview_type;
+			typedef aview1d_ex<T, step_ind>  column_view_type;
+
+			static row_cview_type row_cview(const T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow)
+			{
+				return caview1d<T>(pbase + irow * ext[1], d1);
+			}
+
+			static row_view_type row_view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow)
+			{
+				return aview1d<T>(pbase + irow * ext[1], d1);
+			}
+
+			static column_cview_type column_cview(const T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol)
+			{
+				return caview1d_ex<T, step_ind>(pbase + icol, step_ind(d0, ext[1]));
+			}
+
+			static column_view_type column_view(T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol)
+			{
+				return aview1d_ex<T, step_ind>(pbase + icol, step_ind(d0, ext[1]));
+			}
+		};
+
+
+		template<typename T>
+		struct slice_helper2d<T, column_major_t>
+		{
+			typedef caview1d<T> column_cview_type;
+			typedef aview1d<T>  column_view_type;
+			typedef caview1d_ex<T, step_ind> row_cview_type;
+			typedef aview1d_ex<T, step_ind>  row_view_type;
+
+			static row_cview_type row_cview(const T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow)
+			{
+				return caview1d_ex<T, step_ind>(pbase + irow, step_ind(d1, ext[0]));
+			}
+
+			static row_view_type row_view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow)
+			{
+				return aview1d_ex<T, step_ind>(pbase + irow, step_ind(d1, ext[0]));
+			}
+
+			static column_cview_type column_cview(const T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol)
+			{
+				return caview1d<T>(pbase + icol * ext[0], d0);
+			}
+
+			static column_view_type column_view(T* pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol)
+			{
+				return aview1d<T>(pbase + icol * ext[0], d0);
+			}
+		};
+
+
+		template<typename T, typename TOrd, class TRange> struct slice_row_range_helper2d;
+		template<typename T, typename TOrd, class TRange> struct slice_col_range_helper2d;
+
+		template<typename T, class TRange>
+		struct slice_row_range_helper2d<T, row_major_t, TRange>
+		{
+			typedef caview1d_ex<T, typename indexer_map<TRange>::type> cview_type;
+			typedef aview1d_ex<T, typename indexer_map<TRange>::type>  view_type;
+
+			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
+			{
+				return cview_type(pbase + ext[1] * irow + indexer_map<TRange>::get_offset(d1, rgn),
+						indexer_map<TRange>::get_indexer(d1, rgn));
+			}
+
+			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
+			{
+				return view_type(pbase + ext[1] * irow + indexer_map<TRange>::get_offset(d1, rgn),
+						indexer_map<TRange>::get_indexer(d1, rgn));
+			}
+		};
+
+		template<typename T, class TRange>
+		struct slice_col_range_helper2d<T, row_major_t, TRange>
+		{
+			typedef caview1d_ex<T, typename indexer_map<TRange>::stepped_type> cview_type;
+			typedef aview1d_ex<T, typename indexer_map<TRange>::stepped_type>  view_type;
+
+			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
+			{
+				return cview_type(pbase + ext[1] * indexer_map<TRange>::get_offset(d0, rgn) + icol,
+						indexer_map<TRange>::get_stepped_indexer(d0, ext[1], rgn));
+			}
+
+			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
+			{
+				return view_type(pbase + ext[1] * indexer_map<TRange>::get_offset(d0, rgn) + icol,
+						indexer_map<TRange>::get_stepped_indexer(d0, ext[1], rgn));
+			}
+		};
+
+
+		template<typename T, class TRange>
+		struct slice_row_range_helper2d<T, column_major_t, TRange>
+		{
+			typedef caview1d_ex<T, typename indexer_map<TRange>::stepped_type> cview_type;
+			typedef aview1d_ex<T, typename indexer_map<TRange>::stepped_type>  view_type;
+
+			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
+			{
+				return cview_type(pbase + ext[0] * indexer_map<TRange>::get_offset(d1, rgn) + irow,
+						indexer_map<TRange>::get_stepped_indexer(d1, ext[0], rgn));
+			}
+
+			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t irow, const TRange& rgn)
+			{
+				return view_type(pbase + ext[0] * indexer_map<TRange>::get_offset(d1, rgn) + irow,
+						indexer_map<TRange>::get_stepped_indexer(d1, ext[0], rgn));
+			}
+		};
+
+		template<typename T, class TRange>
+		struct slice_col_range_helper2d<T, column_major_t, TRange>
+		{
+			typedef caview1d_ex<T, typename indexer_map<TRange>::type> cview_type;
+			typedef aview1d_ex<T, typename indexer_map<TRange>::type>  view_type;
+
+			static cview_type cview(const T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
+			{
+				return cview_type(pbase + ext[0] * icol + indexer_map<TRange>::get_offset(d0, rgn),
+						indexer_map<TRange>::get_indexer(d0, rgn));
+			}
+
+			static view_type view(T *pbase, const extent2d_t& ext, index_t d0, index_t d1, index_t icol, const TRange& rgn)
+			{
+				return view_type(pbase + ext[0] * icol + indexer_map<TRange>::get_offset(d0, rgn),
+						indexer_map<TRange>::get_indexer(d0, rgn));
+			}
+		};
+	}
+
+	template<class Derived>
+	inline typename _detail::slice_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order>::row_cview_type
+	row_view(const dense_caview2d_base<Derived>& a, index_t irow)
+	{
+		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
+		return helper::row_cview(a.pbase(), a.base_extent(), a.dim0(), a.dim1(), irow);
+	}
+
+	template<class Derived>
+	inline typename _detail::slice_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order>::row_view_type
+	row_view(dense_aview2d_base<Derived>& a, index_t irow)
+	{
+		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
+		return helper::row_view(a.pbase(), a.base_extent(), a.dim0(), a.dim1(), irow);
+	}
+
+	template<class Derived>
+	inline typename _detail::slice_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order>::column_cview_type
+	column_view(const dense_caview2d_base<Derived>& a, index_t icol)
+	{
+		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
+		return helper::column_cview(a.pbase(), a.base_extent(), a.dim0(), a.dim1(), icol);
+	}
+
+	template<class Derived>
+	inline typename _detail::slice_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order>::column_view_type
+	column_view(dense_aview2d_base<Derived>& a, index_t icol)
+	{
+		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
+		return helper::column_view(a.pbase(), a.base_extent(), a.dim0(), a.dim1(), icol);
+	}
+
+
+	template<class Derived, class TRange>
+	inline typename _detail::slice_row_range_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order,
+		TRange>::cview_type
+	row_view(const dense_caview2d_base<Derived>& a, index_t irow, const TRange& rgn)
+	{
+		typedef _detail::slice_row_range_helper2d<typename Derived::value_type,
+				typename Derived::layout_order, TRange> helper;
+
+		return helper::cview(a.pbase(), a.base_extent(), a.dim0(), a.dim1(), irow, rgn);
+	}
+
+	template<class Derived, class TRange>
+	inline typename _detail::slice_row_range_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order,
+		TRange>::view_type
+	row_view(dense_aview2d_base<Derived>& a, index_t irow, const TRange& rgn)
+	{
+		typedef _detail::slice_row_range_helper2d<typename Derived::value_type,
+				typename Derived::layout_order, TRange> helper;
+
+		return helper::view(a.pbase(), a.base_extent(), a.dim0(), a.dim1(), irow, rgn);
+	}
+
+	template<class Derived, class TRange>
+	inline typename _detail::slice_col_range_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order,
+		TRange>::cview_type
+	column_view(const dense_caview2d_base<Derived>& a, index_t icol, const TRange& rgn)
+	{
+		typedef _detail::slice_col_range_helper2d<typename Derived::value_type,
+				typename Derived::layout_order, TRange> helper;
+
+		return helper::cview(a.pbase(), a.base_extent(), a.dim0(), a.dim1(), icol, rgn);
+	}
+
+	template<class Derived, class TRange>
+	inline typename _detail::slice_col_range_helper2d<
+		typename Derived::value_type,
+		typename Derived::layout_order,
+		TRange>::view_type
+	column_view(dense_aview2d_base<Derived>& a, index_t icol, const TRange& rgn)
+	{
+		typedef _detail::slice_col_range_helper2d<typename Derived::value_type,
+				typename Derived::layout_order, TRange> helper;
+
+		return helper::view(a.pbase(), a.base_extent(), a.dim0(), a.dim1(), icol, rgn);
+	}
+
 
 	/******************************************************
 	 *
@@ -50,9 +317,9 @@ namespace bcs
 		typedef TIndexer1 indexer1_type;
 
 	public:
-		caview2d_ex(const_pointer pbase, index_t base_d0, index_t base_d1, const indexer0_type& indexer0, const indexer1_type& indexer1)
+		caview2d_ex(const_pointer pbase, const extent2d_t& base_ext, const indexer0_type& indexer0, const indexer1_type& indexer1)
 		: m_pbase(pbase)
-		, m_idxcore(base_d0, base_d1)
+		, m_base_ext(base_ext)
 		, m_d0(indexer0.dim())
 		, m_d1(indexer1.dim())
 		, m_indexer0(indexer0)
@@ -101,24 +368,14 @@ namespace bcs
 			return m_d1;
 		}
 
-		BCS_ENSURE_INLINE index_type base_dim0() const
-		{
-			return m_idxcore.base_dim0();
-		}
-
-		BCS_ENSURE_INLINE index_type base_dim1() const
-		{
-			return m_idxcore.base_dim1();
-		}
-
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return arr_shape(m_d0, m_d1);
 		}
 
-		BCS_ENSURE_INLINE shape_type base_shape() const
+		BCS_ENSURE_INLINE extent2d_t base_extent() const
 		{
-			return m_idxcore.base_shape();
+			return m_base_ext;
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
@@ -129,11 +386,11 @@ namespace bcs
 	private:
 		index_type offset(index_type i, index_type j) const
 		{
-			return m_idxcore.offset(m_indexer0[i], m_indexer1[j]);
+			return sub2ind(m_base_ext, m_indexer0[i], m_indexer1[j], TOrd());
 		}
 
 		const_pointer m_pbase;
-		_detail::index_core2d<layout_order> m_idxcore;
+		extent2d_t m_base_ext;
 		index_t m_d0;
 		index_t m_d1;
 		indexer0_type m_indexer0;
@@ -168,9 +425,9 @@ namespace bcs
 		typedef TIndexer1 indexer1_type;
 
 	public:
-		aview2d_ex(pointer pbase, index_t base_d0, index_t base_d1, const indexer0_type& indexer0, const indexer1_type& indexer1)
+		aview2d_ex(pointer pbase, const extent2d_t& base_ext, const indexer0_type& indexer0, const indexer1_type& indexer1)
 		: m_pbase(pbase)
-		, m_idxcore(base_d0, base_d1)
+		, m_base_ext(base_ext)
 		, m_d0(indexer0.dim())
 		, m_d1(indexer1.dim())
 		, m_indexer0(indexer0)
@@ -181,7 +438,7 @@ namespace bcs
 		operator caview2d_ex<T, TOrd, TIndexer0, TIndexer1>() const
 		{
 			return caview2d_ex<T, TOrd, TIndexer0, TIndexer1>(
-					m_pbase, base_dim0(), base_dim1(), m_indexer0, m_indexer1);
+					m_pbase, m_base_ext, m_indexer0, m_indexer1);
 		}
 
 	public:
@@ -225,24 +482,14 @@ namespace bcs
 			return m_d1;
 		}
 
-		BCS_ENSURE_INLINE index_type base_dim0() const
-		{
-			return m_idxcore.base_dim0();
-		}
-
-		BCS_ENSURE_INLINE index_type base_dim1() const
-		{
-			return m_idxcore.base_dim1();
-		}
-
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return arr_shape(m_d0, m_d1);
 		}
 
-		BCS_ENSURE_INLINE shape_type base_shape() const
+		BCS_ENSURE_INLINE shape_type base_extent() const
 		{
-			return m_idxcore.base_shape();
+			return m_base_ext;
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
@@ -258,17 +505,20 @@ namespace bcs
 	private:
 		index_type offset(index_type i, index_type j) const
 		{
-			return m_idxcore.offset(m_indexer0[i], m_indexer1[j]);
+			return sub2ind(m_base_ext, m_indexer0[i], m_indexer1[j], TOrd());
 		}
 
 		pointer m_pbase;
-		_detail::index_core2d<layout_order> m_idxcore;
+		extent2d_t m_base_ext;
 		index_t m_d0;
 		index_t m_d1;
 		indexer0_type m_indexer0;
 		indexer1_type m_indexer1;
 
 	}; // end class aview2d_ex
+
+
+
 
 
 	/******************************************************
@@ -294,7 +544,7 @@ namespace bcs
 		index_t i0 = indexer_map<IndexSelector0>::get_offset(a.dim0(), I);
 		index_t j0 = indexer_map<IndexSelector1>::get_offset(a.dim1(), J);
 
-		return ret_type(&(a(i0, j0)), a.dim0(), a.dim1(),
+		return ret_type(&(a(i0, j0)), make_extent2d(a.dim0(), a.dim1()),
 				indexer_map<IndexSelector0>::get_indexer(a.dim0(), I),
 				indexer_map<IndexSelector1>::get_indexer(a.dim1(), J));
 	}
@@ -316,110 +566,9 @@ namespace bcs
 		index_t i0 = indexer_map<IndexSelector0>::get_offset(a.dim0(), I);
 		index_t j0 = indexer_map<IndexSelector1>::get_offset(a.dim1(), J);
 
-		return ret_type(&(a(i0, j0)), a.dim0(), a.dim1(),
+		return ret_type(&(a(i0, j0)), make_extent2d(a.dim0(), a.dim1()),
 				indexer_map<IndexSelector0>::get_indexer(a.dim0(), I),
 				indexer_map<IndexSelector1>::get_indexer(a.dim1(), J));
-	}
-
-	template<class Derived>
-	inline typename _detail::slice_helper2d<
-		typename Derived::value_type,
-		typename Derived::layout_order>::row_cview_type
-	row_view(const dense_caview2d_base<Derived>& a, index_t irow)
-	{
-		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
-		return helper::row_cview(a.pbase(), a.dim0(), a.dim1(), irow);
-	}
-
-	template<class Derived>
-	inline typename _detail::slice_helper2d<
-		typename Derived::value_type,
-		typename Derived::layout_order>::row_view_type
-	row_view(dense_aview2d_base<Derived>& a, index_t irow)
-	{
-		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
-		return helper::row_view(a.pbase(), a.dim0(), a.dim1(), irow);
-	}
-
-	template<class Derived>
-	inline typename _detail::slice_helper2d<
-		typename Derived::value_type,
-		typename Derived::layout_order>::column_cview_type
-	column_view(const dense_caview2d_base<Derived>& a, index_t icol)
-	{
-		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
-		return helper::column_cview(a.pbase(), a.dim0(), a.dim1(), icol);
-	}
-
-	template<class Derived>
-	inline typename _detail::slice_helper2d<
-		typename Derived::value_type,
-		typename Derived::layout_order>::column_view_type
-	column_view(dense_aview2d_base<Derived>& a, index_t icol)
-	{
-		typedef _detail::slice_helper2d<typename Derived::value_type, typename Derived::layout_order> helper;
-		return helper::column_view(a.pbase(), a.dim0(), a.dim1(), icol);
-	}
-
-
-	template<class Derived, class TRange>
-	inline typename _detail::slice_range_helper2d<
-		typename Derived::value_type,
-		typename Derived::layout_order,
-		TRange>::row_range_cview_type
-	row_view(const dense_caview2d_base<Derived>& a, index_t irow, const TRange& rgn)
-	{
-		typedef _detail::slice_range_helper2d<
-				typename Derived::value_type,
-				typename Derived::layout_order,
-				TRange> helper;
-
-		return helper::row_range_cview(a.pbase(), a.dim0(), a.dim1(), irow, rgn);
-	}
-
-	template<class Derived, class TRange>
-	inline typename _detail::slice_range_helper2d<
-		typename Derived::value_type,
-		typename Derived::layout_order,
-		TRange>::row_range_view_type
-	row_view(dense_aview2d_base<Derived>& a, index_t irow, const TRange& rgn)
-	{
-		typedef _detail::slice_range_helper2d<
-				typename Derived::value_type,
-				typename Derived::layout_order,
-				TRange> helper;
-
-		return helper::row_range_view(a.pbase(), a.dim0(), a.dim1(), irow, rgn);
-	}
-
-	template<class Derived, class TRange>
-	inline typename _detail::slice_range_helper2d<
-		typename Derived::value_type,
-		typename Derived::layout_order,
-		TRange>::column_range_cview_type
-	column_view(const dense_caview2d_base<Derived>& a, index_t icol, const TRange& rgn)
-	{
-		typedef _detail::slice_range_helper2d<
-				typename Derived::value_type,
-				typename Derived::layout_order,
-				TRange> helper;
-
-		return helper::column_range_cview(a.pbase(), a.dim0(), a.dim1(), icol, rgn);
-	}
-
-	template<class Derived, class TRange>
-	inline typename _detail::slice_range_helper2d<
-		typename Derived::value_type,
-		typename Derived::layout_order,
-		TRange>::column_range_view_type
-	column_view(dense_aview2d_base<Derived>& a, index_t icol, const TRange& rgn)
-	{
-		typedef _detail::slice_range_helper2d<
-				typename Derived::value_type,
-				typename Derived::layout_order,
-				TRange> helper;
-
-		return helper::column_range_view(a.pbase(), a.dim0(), a.dim1(), icol, rgn);
 	}
 
 
@@ -437,6 +586,8 @@ namespace bcs
 		static const bool is_dense = true;
 		static const bool is_continuous = true;
 		static const bool is_const_view = true;
+
+		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 	};
 
 	template<typename T, typename TOrd>
@@ -445,15 +596,16 @@ namespace bcs
 	public:
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
+		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 
 	public:
 		caview2d(const_pointer pbase, index_type m, index_type n)
-		: m_pbase(pbase), m_idxcore(m, n)
+		: m_pbase(pbase), m_ext(make_extent2d(m, n))
 		{
 		}
 
 		caview2d(const_pointer pbase, const shape_type& shape)
-		: m_pbase(pbase), m_idxcore(shape[0], shape[1])
+		: m_pbase(pbase), m_ext(shape)
 		{
 		}
 
@@ -470,7 +622,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return m_idxcore.base_nelems();
+			return dim0() * dim1();
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
@@ -480,12 +632,12 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return m_idxcore.base_dim0();
+			return m_ext[0];
 		}
 
 		BCS_ENSURE_INLINE index_type dim1() const
 		{
-			return m_idxcore.base_dim1();
+			return m_ext[1];
 		}
 
 		BCS_ENSURE_INLINE index_type nrows() const
@@ -500,7 +652,12 @@ namespace bcs
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return m_idxcore.base_shape();
+			return arr_shape(dim0(), dim1());
+		}
+
+		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		{
+			return m_ext;
 		}
 
 	public:
@@ -516,31 +673,29 @@ namespace bcs
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
-			return m_pbase[m_idxcore.offset(i, j)];
+			return m_pbase[sub2ind(m_ext, i, j, TOrd())];
 		}
 
 	public:
-		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
-		row(index_t i) const
+		row_cview_type row(index_t i) const
 		{
 			return row_view(*this, i);
 		}
 
 		template<class TRange>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_cview_type
+		typename _detail::slice_row_range_helper2d<value_type, layout_order, TRange>::cview_type
 		row(index_t i, const TRange& rgn) const
 		{
 			return row_view(*this, i, rgn);
 		}
 
-		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
-		column(index_t i) const
+		column_cview_type column(index_t i) const
 		{
 			return column_view(*this, i);
 		}
 
 		template<class TRange>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_cview_type
+		typename _detail::slice_col_range_helper2d<value_type, layout_order, TRange>::view_type
 		column(index_t i, const TRange& rgn) const
 		{
 			return column_view(*this, i, rgn);
@@ -557,7 +712,7 @@ namespace bcs
 
 	private:
 		const_pointer m_pbase;
-		_detail::index_core2d<layout_order> m_idxcore;
+		extent2d_t m_ext;
 
 	}; // end class caview2d
 
@@ -570,6 +725,8 @@ namespace bcs
 		static const bool is_dense = true;
 		static const bool is_continuous = true;
 		static const bool is_const_view = false;
+
+		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 	};
 
 	template<typename T, typename TOrd>
@@ -578,15 +735,16 @@ namespace bcs
 	public:
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
+		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 
 	public:
 		aview2d(pointer pbase, index_type m, index_type n)
-		: m_pbase(pbase), m_idxcore(m, n)
+		: m_pbase(pbase), m_ext(make_extent2d(m, n))
 		{
 		}
 
 		aview2d(pointer pbase, const shape_type& shape)
-		: m_pbase(pbase), m_idxcore(shape[0], shape[1])
+		: m_pbase(pbase), m_ext(shape)
 		{
 		}
 
@@ -608,7 +766,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return m_idxcore.base_nelems();
+			return dim0() * dim1();
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
@@ -618,12 +776,12 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return m_idxcore.base_dim0();
+			return m_ext[0];
 		}
 
 		BCS_ENSURE_INLINE index_type dim1() const
 		{
-			return m_idxcore.base_dim1();
+			return m_ext[1];
 		}
 
 		BCS_ENSURE_INLINE index_type nrows() const
@@ -638,7 +796,12 @@ namespace bcs
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return m_idxcore.base_shape();
+			return arr_shape(dim0(), dim1());
+		}
+
+		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		{
+			return m_ext;
 		}
 
 	public:
@@ -664,62 +827,58 @@ namespace bcs
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
-			return m_pbase[m_idxcore.offset(i, j)];
+			return m_pbase[sub2ind(m_ext, i, j, TOrd())];
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
 		{
-			return m_pbase[m_idxcore.offset(i, j)];
+			return m_pbase[sub2ind(m_ext, i, j, TOrd())];
 		}
 
 	public:
-		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
-		row(index_t i) const
+		row_cview_type row(index_t i) const
 		{
 			return row_view(*this, i);
 		}
 
-		typename _detail::slice_helper2d<value_type, layout_order>::row_view_type
-		row(index_t i)
+		row_view_type row(index_t i)
 		{
 			return row_view(*this, i);
+		}
+
+		column_cview_type column(index_t i) const
+		{
+			return column_view(*this, i);
+		}
+
+		column_view_type column(index_t i)
+		{
+			return column_view(*this, i);
 		}
 
 		template<class TRange>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_cview_type
+		typename _detail::slice_row_range_helper2d<value_type, layout_order, TRange>::cview_type
 		row(index_t i, const TRange& rgn) const
 		{
 			return row_view(*this, i, rgn);
 		}
 
 		template<class TRange>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_view_type
+		typename _detail::slice_row_range_helper2d<value_type, layout_order, TRange>::view_type
 		row(index_t i, const TRange& rgn)
 		{
 			return row_view(*this, i, rgn);
 		}
 
-		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
-		column(index_t i) const
-		{
-			return column_view(*this, i);
-		}
-
-		typename _detail::slice_helper2d<value_type, layout_order>::column_view_type
-		column(index_t i)
-		{
-			return column_view(*this, i);
-		}
-
 		template<class TRange>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_cview_type
+		typename _detail::slice_col_range_helper2d<value_type, layout_order, TRange>::cview_type
 		column(index_t i, const TRange& rgn) const
 		{
 			return column_view(*this, i, rgn);
 		}
 
 		template<class TRange>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_view_type
+		typename _detail::slice_col_range_helper2d<value_type, layout_order, TRange>::view_type
 		column(index_t i, const TRange& rgn)
 		{
 			return column_view(*this, i, rgn);
@@ -745,7 +904,7 @@ namespace bcs
 
 	private:
 		pointer m_pbase;
-		_detail::index_core2d<layout_order> m_idxcore;
+		extent2d_t m_ext;
 
 	}; // end class aview2d
 
@@ -775,9 +934,6 @@ namespace bcs
 	{
 		return aview2d<T, column_major_t>(base, m, n);
 	}
-
-
-
 
 }
 

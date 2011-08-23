@@ -16,6 +16,8 @@
 #include <bcslib/array/aview2d.h>
 #include <bcslib/array/aview2d_ops.h>
 #include <bcslib/array/array1d.h>
+
+#include <bcslib/array/transpose2d.h>
 #include <cmath>
 
 namespace bcs
@@ -31,6 +33,8 @@ namespace bcs
 		static const bool is_dense = true;
 		static const bool is_continuous = true;
 		static const bool is_const_view = false;
+
+		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 	};
 
 	template<typename T, typename TOrd, class Alloc>
@@ -40,6 +44,7 @@ namespace bcs
 	public:
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
+		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 
 		typedef shared_block<T, Alloc> storage_type;
 		typedef aview2d<T, TOrd> view_type;
@@ -185,6 +190,11 @@ namespace bcs
 			return m_view.shape();
 		}
 
+		BCS_ENSURE_INLINE extent2d_t base_extent() const
+		{
+			return m_view.base_extent();
+		}
+
 	public:
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
@@ -217,56 +227,52 @@ namespace bcs
 		}
 
 	public:
-		typename _detail::slice_helper2d<value_type, layout_order>::row_cview_type
-		row(index_t i) const
+		row_cview_type row(index_t i) const
 		{
 			return m_view.row(i);
 		}
 
-		typename _detail::slice_helper2d<value_type, layout_order>::row_view_type
-		row(index_t i)
+		row_view_type row(index_t i)
 		{
 			return m_view.row(i);
+		}
+
+		column_cview_type column(index_t i) const
+		{
+			return m_view.column(i);
+		}
+
+		column_view_type column(index_t i)
+		{
+			return m_view.column(i);
 		}
 
 		template<class TRange>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_cview_type
+		typename _detail::slice_row_range_helper2d<value_type, layout_order, TRange>::cview_type
 		row(index_t i, const TRange& rgn) const
 		{
-			return m_view.row(i, rgn);
+			return row_view(*this, i, rgn);
 		}
 
 		template<class TRange>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::row_range_view_type
+		typename _detail::slice_row_range_helper2d<value_type, layout_order, TRange>::view_type
 		row(index_t i, const TRange& rgn)
 		{
-			return m_view.row(i, rgn);
-		}
-
-		typename _detail::slice_helper2d<value_type, layout_order>::column_cview_type
-		column(index_t i) const
-		{
-			return m_view.column(i);
-		}
-
-		typename _detail::slice_helper2d<value_type, layout_order>::column_view_type
-		column(index_t i)
-		{
-			return m_view.column(i);
+			return row_view(*this, i, rgn);
 		}
 
 		template<class TRange>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_cview_type
+		typename _detail::slice_col_range_helper2d<value_type, layout_order, TRange>::cview_type
 		column(index_t i, const TRange& rgn) const
 		{
-			return m_view.column(i, rgn);
+			return column_view(*this, i, rgn);
 		}
 
 		template<class TRange>
-		typename _detail::slice_range_helper2d<value_type, layout_order, TRange>::column_range_view_type
+		typename _detail::slice_col_range_helper2d<value_type, layout_order, TRange>::view_type
 		column(index_t i, const TRange& rgn)
 		{
-			return m_view.column(i, rgn);
+			return column_view(*this, i, rgn);
 		}
 
 		template<class TRange0, class TRange1>

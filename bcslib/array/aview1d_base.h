@@ -269,15 +269,6 @@ namespace bcs
 			return derived().operator()(i);
 		}
 
-		// -- new --
-
-		template<class IndexSelector>
-		caview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
-		V(const IndexSelector& I) const
-		{
-			return derived().V(I);
-		}
-
 	}; // end class continuous_caview1d_base
 
 
@@ -347,22 +338,6 @@ namespace bcs
 		BCS_ENSURE_INLINE reference operator() (index_type i)
 		{
 			return derived().operator()(i);
-		}
-
-		// -- new --
-
-		template<class IndexSelector>
-		caview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
-		V(const IndexSelector& I) const
-		{
-			return derived().V(I);
-		}
-
-		template<class IndexSelector>
-		aview1d_ex<value_type, typename indexer_map<IndexSelector>::type>
-		V(const IndexSelector& I)
-		{
-			return derived().V(I);
 		}
 
 	}; // end class continuous_aview1d_base
