@@ -276,18 +276,14 @@ namespace bcs
 		}
 
 		template<class TRange0, class TRange1>
-		caview2d_ex<value_type, layout_order,
-			typename indexer_map<TRange0>::type,
-			typename indexer_map<TRange1>::type>
+		typename _detail::subview_helper2d<T, TOrd, TRange0, TRange1>::cview_type
 		V(const TRange0& I, const TRange1& J) const
 		{
 			return m_view.V(I, J);
 		}
 
 		template<class TRange0, class TRange1>
-		aview2d_ex<value_type, layout_order,
-			typename indexer_map<TRange0>::type,
-			typename indexer_map<TRange1>::type>
+		typename _detail::subview_helper2d<T, TOrd, TRange0, TRange1>::view_type
 		V(const TRange0& I, const TRange1& J)
 		{
 			return m_view.V(I, J);

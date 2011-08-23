@@ -670,7 +670,6 @@ TEST( Array2D, Aview2DExRowMajor )
 	ASSERT_EQ(a1.dim0(), 2);
 	ASSERT_EQ(a1.dim1(), 3);
 	ASSERT_TRUE( array_integrity_test(a1) );
-	print_array2d(a1, "%g ");
 	ASSERT_TRUE( array2d_equal(a1, make_caview2d_rm(r1, 2, 3)) );
 	ASSERT_TRUE( elemwise_operation_test(a1) );
 
