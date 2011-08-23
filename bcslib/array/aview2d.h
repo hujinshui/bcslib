@@ -353,6 +353,7 @@ namespace bcs
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
 		static const bool is_dense = true;
+		static const bool is_block = false;
 		static const bool is_continuous = false;
 		static const bool is_const_view = true;
 	};
@@ -463,6 +464,7 @@ namespace bcs
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
 		static const bool is_dense = true;
+		static const bool is_block = false;
 		static const bool is_continuous = false;
 		static const bool is_const_view = false;
 	};
@@ -631,10 +633,12 @@ namespace bcs
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
 		static const bool is_dense = true;
+		static const bool is_block = true;
 		static const bool is_continuous = true;
 		static const bool is_const_view = true;
 
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
+		BCS_AVIEW_FLATTEN_TYPEDEFS(T)
 	};
 
 	template<typename T, typename TOrd>
@@ -644,6 +648,7 @@ namespace bcs
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
+		BCS_AVIEW_FLATTEN_TYPEDEFS(T)
 
 		typedef typename extent_of<TOrd>::type base_extent_type;
 
@@ -757,6 +762,11 @@ namespace bcs
 			return csubview(*this, I, J);
 		}
 
+		flatten_cview_type flatten() const
+		{
+			return flatten_cview_type(pbase(), nelems());
+		}
+
 	private:
 		const_pointer m_pbase;
 		index_t m_d0;
@@ -771,10 +781,12 @@ namespace bcs
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
 		static const bool is_dense = true;
+		static const bool is_block = true;
 		static const bool is_continuous = true;
 		static const bool is_const_view = false;
 
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
+		BCS_AVIEW_FLATTEN_TYPEDEFS(T)
 	};
 
 	template<typename T, typename TOrd>
@@ -784,6 +796,7 @@ namespace bcs
 		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
+		BCS_AVIEW_FLATTEN_TYPEDEFS(T)
 
 		typedef typename extent_of<TOrd>::type base_extent_type;
 
@@ -946,6 +959,16 @@ namespace bcs
 		V(const TRange0& I, const TRange1& J)
 		{
 			return subview(*this, I, J);
+		}
+
+		flatten_cview_type flatten() const
+		{
+			return flatten_cview_type(pbase(), nelems());
+		}
+
+		flatten_view_type flatten()
+		{
+			return flatten_view_type(pbase(), nelems());
 		}
 
 	private:

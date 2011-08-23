@@ -348,7 +348,7 @@ namespace bcs
 
 
 	template<class Derived>
-	class continuous_caview2d_base
+	class block_caview2d_base
 	: public tyselect<aview_traits<Derived>::is_const_view,
 	  	  dense_caview2d_base<Derived>,
 	  	  dense_aview2d_base<Derived> >::type
@@ -437,11 +437,11 @@ namespace bcs
 			return derived().column(i);
 		}
 
-	}; // end class continuous_caview2d_base
+	}; // end class block_caview2d_base
 
 
 	template<class Derived>
-	class continuous_aview2d_base : public continuous_caview2d_base<Derived>
+	class block_aview2d_base : public block_caview2d_base<Derived>
 	{
 	public:
 		BCS_AVIEW_BASE_DEFS(Derived)
@@ -552,6 +552,234 @@ namespace bcs
 		column(index_t i)
 		{
 			return derived().column(i);
+		}
+
+	}; // end class block_aview2d_base
+
+
+	template<class Derived>
+	class continuous_caview2d_base
+	: public tyselect<aview_traits<Derived>::is_const_view,
+	  	  block_caview2d_base<Derived>,
+	  	  block_aview2d_base<Derived> >::type
+	{
+	public:
+		BCS_CAVIEW_BASE_DEFS(Derived)
+
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
+		// interfaces to be implemented by Derived
+
+		BCS_ENSURE_INLINE size_type size() const
+		{
+			return derived().size();
+		}
+
+		BCS_ENSURE_INLINE index_type nelems() const
+		{
+			return derived().nelems();
+		}
+
+		BCS_ENSURE_INLINE bool is_empty() const
+		{
+			return derived().is_empty();
+		}
+
+		BCS_ENSURE_INLINE shape_type shape() const
+		{
+			return derived().shape();
+		}
+
+		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
+		{
+			return derived().base_extent();
+		}
+
+		BCS_ENSURE_INLINE index_type dim0() const
+		{
+			return derived().dim0();
+		}
+
+		BCS_ENSURE_INLINE index_type dim1() const
+		{
+			return derived().dim1();
+		}
+
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return derived().nrows();
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return derived().ncolumns();
+		}
+
+		BCS_ENSURE_INLINE const_pointer pbase() const
+		{
+			return derived().pbase();
+		}
+
+		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
+		{
+			return derived().operator[](i);
+		}
+
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
+		{
+			return derived().operator()(i, j);
+		}
+
+		typename aview_traits<Derived>::row_cview_type
+		row(index_t i) const
+		{
+			return derived().row(i);
+		}
+
+		typename aview_traits<Derived>::column_cview_type
+		column(index_t i) const
+		{
+			return derived().column(i);
+		}
+
+		// -- new --
+
+		typename aview_traits<Derived>::flatten_cview_type
+		flatten() const
+		{
+			return derived().flatten();
+		}
+
+	}; // end class continuous_caview2d_base
+
+
+	template<class Derived>
+	class continuous_aview2d_base : public continuous_caview2d_base<Derived>
+	{
+	public:
+		BCS_AVIEW_BASE_DEFS(Derived)
+
+		BCS_ENSURE_INLINE dim_num_t ndims() const
+		{
+			return num_dimensions;
+		}
+
+		// interfaces to be implemented by Derived
+
+		BCS_ENSURE_INLINE size_type size() const
+		{
+			return derived().size();
+		}
+
+		BCS_ENSURE_INLINE index_type nelems() const
+		{
+			return derived().nelems();
+		}
+
+		BCS_ENSURE_INLINE bool is_empty() const
+		{
+			return derived().is_empty();
+		}
+
+		BCS_ENSURE_INLINE shape_type shape() const
+		{
+			return derived().shape();
+		}
+
+		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
+		{
+			return derived().base_extent();
+		}
+
+		BCS_ENSURE_INLINE index_type dim0() const
+		{
+			return derived().dim0();
+		}
+
+		BCS_ENSURE_INLINE index_type dim1() const
+		{
+			return derived().dim1();
+		}
+
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return derived().nrows();
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return derived().ncolumns();
+		}
+
+		BCS_ENSURE_INLINE const_pointer pbase() const
+		{
+			return derived().pbase();
+		}
+
+		BCS_ENSURE_INLINE pointer pbase()
+		{
+			return derived().pbase();
+		}
+
+		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
+		{
+			return derived().operator[](i);
+		}
+
+		BCS_ENSURE_INLINE reference operator[](index_type i)
+		{
+			return derived().operator[](i);
+		}
+
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
+		{
+			return derived().operator()(i, j);
+		}
+
+		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
+		{
+			return derived().operator()(i, j);
+		}
+
+		typename aview_traits<Derived>::row_cview_type
+		row(index_t i) const
+		{
+			return derived().row(i);
+		}
+
+		typename aview_traits<Derived>::row_view_type
+		row(index_t i)
+		{
+			return derived().row(i);
+		}
+
+		typename aview_traits<Derived>::column_cview_type
+		column(index_t i) const
+		{
+			return derived().column(i);
+		}
+
+		typename aview_traits<Derived>::column_view_type
+		column(index_t i)
+		{
+			return derived().column(i);
+		}
+
+		// -- new --
+
+		typename aview_traits<Derived>::flatten_cview_type
+		flatten() const
+		{
+			return derived().flatten();
+		}
+
+		typename aview_traits<Derived>::flatten_view_type
+		flatten()
+		{
+			return derived().flatten();
 		}
 
 	}; // end class continuous_aview2d_base

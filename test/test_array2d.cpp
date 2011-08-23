@@ -100,6 +100,10 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
+		bcs::block_caview2d_base<bcs::caview2d<double, row_major_t> >,
+		bcs::caview2d<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::continuous_caview2d_base<bcs::caview2d<double, row_major_t> >,
 		bcs::caview2d<double, row_major_t> >::value) );
 
@@ -138,6 +142,14 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
+		bcs::block_caview2d_base<bcs::aview2d<double, row_major_t> >,
+		bcs::aview2d<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::block_aview2d_base<bcs::aview2d<double, row_major_t> >,
+		bcs::aview2d<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
 		bcs::continuous_caview2d_base<bcs::aview2d<double, row_major_t> >,
 		bcs::aview2d<double, row_major_t> >::value) );
 
@@ -145,7 +157,7 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::continuous_aview2d_base<bcs::aview2d<double, row_major_t> >,
 		bcs::aview2d<double, row_major_t> >::value) );
 
-// aview2d
+// array2d
 
 BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview_base<bcs::array2d<double, row_major_t> >,
@@ -177,6 +189,14 @@ BCS_STATIC_ASSERT( (is_base_of<
 
 BCS_STATIC_ASSERT( (is_base_of<
 		bcs::dense_aview2d_base<bcs::array2d<double, row_major_t> >,
+		bcs::array2d<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::block_caview2d_base<bcs::array2d<double, row_major_t> >,
+		bcs::array2d<double, row_major_t> >::value) );
+
+BCS_STATIC_ASSERT( (is_base_of<
+		bcs::block_aview2d_base<bcs::array2d<double, row_major_t> >,
 		bcs::array2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
@@ -233,13 +253,21 @@ void syntax_check_arr2()
 	const dt& d8 = r8.derived();
 	dummy_a2(d8);
 
-	continuous_caview2d_base<dt>& r9 = a;
+	block_caview2d_base<dt>& r9 = a;
 	const dt& d9 = r9.derived();
 	dummy_a2(d9);
 
-	continuous_aview2d_base<dt>& r10 = a;
+	block_aview2d_base<dt>& r10 = a;
 	const dt& d10 = r10.derived();
 	dummy_a2(d10);
+
+	continuous_caview2d_base<dt>& r11 = a;
+	const dt& d11 = r11.derived();
+	dummy_a2(d11);
+
+	continuous_aview2d_base<dt>& r12 = a;
+	const dt& d12 = r12.derived();
+	dummy_a2(d12);
 
 	dummy_a2(a.ndims());
 	dummy_a2(a.dim0());
@@ -297,7 +325,7 @@ bool array_integrity_test(const bcs::caview2d_base<Derived>& a)
 }
 
 template<class Derived>
-bool cont_array_integrity_test(const bcs::dense_caview2d_base<Derived>& a)
+bool cont_array_integrity_test(const bcs::continuous_caview2d_base<Derived>& a)
 {
 	if (!array_integrity_test(a)) return false;
 
@@ -308,6 +336,11 @@ bool cont_array_integrity_test(const bcs::dense_caview2d_base<Derived>& a)
 		if (a.pbase() != &(a[0])) return false;
 	}
 
+	typename Derived::flatten_cview_type fview = a.flatten();
+
+	if (fview.pbase() != a.pbase()) return false;
+	if (fview.nelems() != m * n) return false;
+
 	for (index_t i = 0; i < m; ++i)
 	{
 		for (index_t j = 0; j < n; ++j)
@@ -316,6 +349,7 @@ bool cont_array_integrity_test(const bcs::dense_caview2d_base<Derived>& a)
 
 			if (&(a(i, j)) != &(a[idx])) return false;
 			if (a(i, j) != a[idx]) return false;
+			if (a[idx] != fview[idx]) return false;
 		}
 	}
 
