@@ -349,7 +349,7 @@ namespace bcs
 
 	namespace _detail
 	{
-		template<typename T, typename TOrd, class IndexSelector0, class IndexSelector1>
+		template<typename T, typename TOrd, bool IsCont, class IndexSelector0, class IndexSelector1>
 		struct subview_helper2d;
 	}
 
@@ -357,12 +357,14 @@ namespace bcs
 	inline typename _detail::subview_helper2d<
 		typename Derived::value_type,
 		typename Derived::layout_order,
+		aview_traits<Derived>::is_continuous,
 		IndexSelector0, IndexSelector1>::cview_type
 	csubview(const block_caview2d_base<Derived>& a, const IndexSelector0& I, const IndexSelector1& J)
 	{
 		return _detail::subview_helper2d<
 				typename Derived::value_type,
 				typename Derived::layout_order,
+				aview_traits<Derived>::is_continuous,
 				IndexSelector0, IndexSelector1>::cview(
 						a.pbase(), a.base_extent(), a.dim0(), a.dim1(), I, J);
 	}
@@ -371,12 +373,14 @@ namespace bcs
 	inline typename _detail::subview_helper2d<
 		typename Derived::value_type,
 		typename Derived::layout_order,
+		aview_traits<Derived>::is_continuous,
 		IndexSelector0, IndexSelector1>::view_type
 	subview(block_aview2d_base<Derived>& a, const IndexSelector0& I, const IndexSelector1& J)
 	{
 		return _detail::subview_helper2d<
 				typename Derived::value_type,
 				typename Derived::layout_order,
+				aview_traits<Derived>::is_continuous,
 				IndexSelector0, IndexSelector1>::view(
 						a.pbase(), a.base_extent(), a.dim0(), a.dim1(), I, J);
 	}
@@ -539,6 +543,11 @@ namespace bcs
 		}
 
 		operator caview2d_ex<T, TOrd, TIndexer0, TIndexer1>() const
+		{
+			return cview();
+		}
+
+		caview2d_ex<T, TOrd, TIndexer0, TIndexer1> cview() const
 		{
 			return caview2d_ex<T, TOrd, TIndexer0, TIndexer1>(
 					m_pbase, m_base_ext, m_indexer0, m_indexer1);
@@ -749,7 +758,7 @@ namespace bcs
 		}
 
 		template<class TRange0, class TRange1>
-		typename _detail::subview_helper2d<T, TOrd, TRange0, TRange1>::cview_type
+		typename _detail::subview_helper2d<T, TOrd, false, TRange0, TRange1>::cview_type
 		V(const TRange0& I, const TRange1& J) const
 		{
 			return csubview(*this, I, J);
@@ -796,6 +805,16 @@ namespace bcs
 		aview2d_block(pointer pbase, const base_extent_type& base_ext, const shape_type& shape)
 		: m_pbase(pbase), m_base_ext(base_ext), m_d0(shape[0]), m_d1(shape[1])
 		{
+		}
+
+		operator caview2d_block<T, TOrd>() const
+		{
+			return cview();
+		}
+
+		caview2d_block<T, TOrd> cview() const
+		{
+			return caview2d_block<T, TOrd>(m_pbase, m_base_ext, m_d0, m_d1);
 		}
 
 	public:
@@ -920,14 +939,14 @@ namespace bcs
 		}
 
 		template<class TRange0, class TRange1>
-		typename _detail::subview_helper2d<T, TOrd, TRange0, TRange1>::cview_type
+		typename _detail::subview_helper2d<T, TOrd, false, TRange0, TRange1>::cview_type
 		V(const TRange0& I, const TRange1& J) const
 		{
 			return csubview(*this, I, J);
 		}
 
 		template<class TRange0, class TRange1>
-		typename _detail::subview_helper2d<T, TOrd, TRange0, TRange1>::view_type
+		typename _detail::subview_helper2d<T, TOrd, false, TRange0, TRange1>::view_type
 		V(const TRange0& I, const TRange1& J)
 		{
 			return subview(*this, I, J);
@@ -1078,7 +1097,7 @@ namespace bcs
 		}
 
 		template<class TRange0, class TRange1>
-		typename _detail::subview_helper2d<T, TOrd, TRange0, TRange1>::cview_type
+		typename _detail::subview_helper2d<T, TOrd, true, TRange0, TRange1>::cview_type
 		V(const TRange0& I, const TRange1& J) const
 		{
 			return csubview(*this, I, J);
@@ -1134,6 +1153,11 @@ namespace bcs
 		}
 
 		operator caview2d<T, TOrd>() const
+		{
+			return cview();
+		}
+
+		caview2d<T, TOrd> cview() const
 		{
 			return caview2d<T, TOrd>(m_pbase, dim0(), dim1());
 		}
@@ -1270,14 +1294,14 @@ namespace bcs
 		}
 
 		template<class TRange0, class TRange1>
-		typename _detail::subview_helper2d<T, TOrd, TRange0, TRange1>::cview_type
+		typename _detail::subview_helper2d<T, TOrd, true, TRange0, TRange1>::cview_type
 		V(const TRange0& I, const TRange1& J) const
 		{
 			return csubview(*this, I, J);
 		}
 
 		template<class TRange0, class TRange1>
-		typename _detail::subview_helper2d<T, TOrd, TRange0, TRange1>::view_type
+		typename _detail::subview_helper2d<T, TOrd, true, TRange0, TRange1>::view_type
 		V(const TRange0& I, const TRange1& J)
 		{
 			return subview(*this, I, J);
@@ -1309,7 +1333,7 @@ namespace bcs
 
 	namespace _detail
 	{
-		template<typename T, typename TOrd, class IndexSelector0, class IndexSelector1>
+		template<typename T, typename TOrd, bool IsCont, class IndexSelector0, class IndexSelector1>
 		struct subview_helper2d
 		{
 			typedef typename indexer_map<IndexSelector0>::type sindexer0_t;
@@ -1343,6 +1367,162 @@ namespace bcs
 						indexer_map<IndexSelector1>::get_indexer(d1, J));
 			}
 		};
+
+
+		template<typename T, typename TOrd>
+		struct subview_helper2d<T, TOrd, false, whole, whole>
+		{
+			typedef caview2d_block<T, TOrd> cview_type;
+			typedef aview2d_block<T, TOrd> view_type;
+
+			typedef typename extent_of<TOrd>::type extent_t;
+
+			static cview_type cview(const T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					whole, whole)
+			{
+				return cview_type(pbase, base_ext, d0, d1);
+			}
+
+			static view_type view(T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					whole, whole)
+			{
+				return view_type(pbase, base_ext, d0, d1);
+			}
+		};
+
+		template<typename T, typename TOrd>
+		struct subview_helper2d<T, TOrd, true, whole, whole>
+		{
+			typedef caview2d<T, TOrd> cview_type;
+			typedef aview2d<T, TOrd> view_type;
+
+			typedef typename extent_of<TOrd>::type extent_t;
+
+			static cview_type cview(const T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					whole, whole)
+			{
+				return cview_type(pbase, d0, d1);
+			}
+
+			static view_type view(T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					whole, whole)
+			{
+				return view_type(pbase, d0, d1);
+			}
+		};
+
+
+		template<typename T, typename TOrd, bool IsCont>
+		struct subview_helper2d<T, TOrd, IsCont, whole, range>
+		{
+			typedef caview2d_block<T, TOrd> cview_type;
+			typedef aview2d_block<T, TOrd> view_type;
+
+			typedef typename extent_of<TOrd>::type extent_t;
+
+			static cview_type cview(const T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					whole, const range& J)
+			{
+				return cview_type(pbase + base_ext.sub2ind(0, J.begin_index()), base_ext, d0, J.dim());
+			}
+
+			static view_type view(T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					whole, const range& J)
+			{
+				return view_type(pbase + base_ext.sub2ind(0, J.begin_index()), base_ext, d0, J.dim());
+			}
+		};
+
+
+		template<typename T>
+		struct subview_helper2d<T, column_major_t, true, whole, range>
+		{
+			typedef caview2d<T, column_major_t> cview_type;
+			typedef aview2d<T, column_major_t> view_type;
+
+			typedef column_extent extent_t;
+
+			static cview_type cview(const T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					whole, const range& J)
+			{
+				return cview_type(pbase + d0 * J.begin_index(), d0, J.dim());
+			}
+
+			static view_type view(T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					whole, const range& J)
+			{
+				return view_type(pbase + d0 * J.begin_index(), d0, J.dim());
+			}
+		};
+
+
+		template<typename T, typename TOrd, bool IsCont>
+		struct subview_helper2d<T, TOrd, IsCont, range, whole>
+		{
+			typedef caview2d_block<T, TOrd> cview_type;
+			typedef aview2d_block<T, TOrd> view_type;
+
+			typedef typename extent_of<TOrd>::type extent_t;
+
+			static cview_type cview(const T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					const range& I, whole)
+			{
+				return cview_type(pbase + base_ext.sub2ind(I.begin_index(), 0), base_ext, I.dim(), d1);
+			}
+
+			static view_type view(T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					const range& I, whole)
+			{
+				return view_type(pbase + base_ext.sub2ind(I.begin_index(), 0), base_ext, I.dim(), d1);
+			}
+		};
+
+
+		template<typename T>
+		struct subview_helper2d<T, row_major_t, true, range, whole>
+		{
+			typedef caview2d<T, row_major_t> cview_type;
+			typedef aview2d<T, row_major_t> view_type;
+
+			typedef row_extent extent_t;
+
+			static cview_type cview(const T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					const range& I, whole)
+			{
+				return cview_type(pbase + I.begin_index() * d1, I.dim(), d1);
+			}
+
+			static view_type view(T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					const range& I, whole)
+			{
+				return view_type(pbase + I.begin_index() * d1, I.dim(), d1);
+			}
+		};
+
+
+		template<typename T, typename TOrd, bool IsCont>
+		struct subview_helper2d<T, TOrd, IsCont, range, range>
+		{
+			typedef caview2d_block<T, TOrd> cview_type;
+			typedef aview2d_block<T, TOrd> view_type;
+
+			typedef typename extent_of<TOrd>::type extent_t;
+
+			static cview_type cview(const T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					const range& I, const range& J)
+			{
+				return cview_type(pbase + base_ext.sub2ind(I.begin_index(), J.begin_index()),
+						base_ext, I.dim(), J.dim());
+			}
+
+			static view_type view(T *pbase, const extent_t& base_ext, index_t d0, index_t d1,
+					const range& I, const range& J)
+			{
+				return view_type(pbase + base_ext.sub2ind(I.begin_index(), J.begin_index()),
+						base_ext, I.dim(), J.dim());
+			}
+		};
+
 	}
 
 
