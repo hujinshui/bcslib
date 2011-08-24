@@ -268,6 +268,7 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::array2d<double, row_major_t> >::value) );
 
 
+// further syntax checking
 
 template<typename T>
 void dummy_a2(const T& ) { }
@@ -349,6 +350,84 @@ void syntax_check_arr2()
 
 	do_on_view2(a);
 }
+
+// syntax checking for subviews
+
+void only_accept_blk_views_rm(const caview2d_block<double, row_major_t>& a) { }
+void only_accept_blk_views_cm(const caview2d_block<double, column_major_t>& a) { }
+
+void only_accept_cont_views_rm(const caview2d<double, row_major_t>& a) { }
+void only_accept_cont_views_cm(const caview2d<double, column_major_t>& a) { }
+
+void syntax_check_arr2_subview()
+{
+	caview2d_block<double, row_major_t> cb_rm(BCS_NULL, row_extent(0), 0, 0);
+	aview2d_block<double, row_major_t> bv_rm(BCS_NULL, row_extent(0), 0, 0);
+
+	only_accept_blk_views_rm(cb_rm);
+	only_accept_blk_views_rm(bv_rm);
+
+	only_accept_blk_views_rm(cb_rm.V(whole(), whole()));
+	only_accept_blk_views_rm(cb_rm.V(rgn(0, 0), whole()));
+	only_accept_blk_views_rm(cb_rm.V(whole(), rgn(0, 0)));
+	only_accept_blk_views_rm(cb_rm.V(rgn(0, 0), rgn(0, 0)));
+
+	only_accept_blk_views_rm(bv_rm.V(whole(), whole()));
+	only_accept_blk_views_rm(bv_rm.V(rgn(0, 0), whole()));
+	only_accept_blk_views_rm(bv_rm.V(whole(), rgn(0, 0)));
+	only_accept_blk_views_rm(bv_rm.V(rgn(0, 0), rgn(0, 0)));
+
+	caview2d_block<double, column_major_t> cb_cm(BCS_NULL, column_extent(0), 0, 0);
+	aview2d_block<double, column_major_t> bv_cm(BCS_NULL, column_extent(0), 0, 0);
+
+	only_accept_blk_views_cm(cb_cm);
+	only_accept_blk_views_cm(bv_cm);
+
+	only_accept_blk_views_cm(cb_cm.V(whole(), whole()));
+	only_accept_blk_views_cm(cb_cm.V(rgn(0, 0), whole()));
+	only_accept_blk_views_cm(cb_cm.V(whole(), rgn(0, 0)));
+	only_accept_blk_views_cm(cb_cm.V(rgn(0, 0), rgn(0, 0)));
+
+	only_accept_blk_views_cm(bv_cm.V(whole(), whole()));
+	only_accept_blk_views_cm(bv_cm.V(rgn(0, 0), whole()));
+	only_accept_blk_views_cm(bv_cm.V(whole(), rgn(0, 0)));
+	only_accept_blk_views_cm(bv_cm.V(rgn(0, 0), rgn(0, 0)));
+
+	caview2d<double, row_major_t> cv_rm(BCS_NULL, 0, 0);
+	aview2d<double, row_major_t> av_rm(BCS_NULL, 0, 0);
+	array2d<double, row_major_t> arr_rm(0, 0);
+
+	only_accept_cont_views_rm(cv_rm);
+	only_accept_cont_views_rm(av_rm);
+	only_accept_cont_views_rm(arr_rm);
+
+	only_accept_cont_views_rm(cv_rm.V(whole(), whole()));
+	only_accept_cont_views_rm(av_rm.V(whole(), whole()));
+	only_accept_cont_views_rm(arr_rm.V(whole(), whole()));
+
+	only_accept_cont_views_rm(cv_rm.V(rgn(0, 0), whole()));
+	only_accept_cont_views_rm(av_rm.V(rgn(0, 0), whole()));
+	only_accept_cont_views_rm(arr_rm.V(rgn(0, 0), whole()));
+
+	caview2d<double, column_major_t> cv_cm(BCS_NULL, 0, 0);
+	aview2d<double, column_major_t> av_cm(BCS_NULL, 0, 0);
+	array2d<double, column_major_t> arr_cm(0, 0);
+
+	only_accept_cont_views_cm(cv_cm);
+	only_accept_cont_views_cm(av_cm);
+	only_accept_cont_views_cm(arr_cm);
+
+	only_accept_cont_views_cm(cv_cm.V(whole(), whole()));
+	only_accept_cont_views_cm(av_cm.V(whole(), whole()));
+	only_accept_cont_views_cm(arr_cm.V(whole(), whole()));
+
+	only_accept_cont_views_cm(cv_cm.V(whole(), rgn(0, 0)));
+	only_accept_cont_views_cm(av_cm.V(whole(), rgn(0, 0)));
+	only_accept_cont_views_cm(arr_cm.V(whole(), rgn(0, 0)));
+}
+
+
+
 
 
 /************************************************
