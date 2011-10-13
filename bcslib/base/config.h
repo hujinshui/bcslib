@@ -32,7 +32,7 @@
 
 #elif (defined(__GNUC__))
 	#if (defined(__clang__))
-		#if ((__clang_major__ < 2) || (__clang_minor__ < 1))
+		#if ((__clang_major__ < 2) || (__clang_major__ == 2 && __clang_minor__ < 1))
 			#error CLANG of version lower than 2.1.0 is not supported
 		#endif
 		#define BCSLIB_COMPILER BCSLIB_CLANG
