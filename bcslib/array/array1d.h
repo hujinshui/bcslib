@@ -26,15 +26,12 @@ namespace bcs
 	struct aview_traits<array1d<T, Alloc> >
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
-
-		static const bool is_dense = true;
-		static const bool is_continuous = true;
-		static const bool is_const_view = false;
 	};
 
 	template<typename T, class Alloc>
 	class array1d
-	: public continuous_aview1d_base<array1d<T, Alloc> >
+	: public IConstAView1D<array1d<T, Alloc>, T, continuous_form>
+	, public IAView1D<array1d<T, Alloc>, T, continuous_form>
 	{
 	public:
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
@@ -69,7 +66,7 @@ namespace bcs
 		}
 
 		template<class Derived>
-		explicit array1d(const dense_caview1d_base<Derived>& r)
+		explicit array1d(const IConstAView1D<Derived, T, regular_form>& r)
 		: m_storage(r.size()), m_view(m_storage.pbase(), r.nelems())
 		{
 			copy(r.derived(), *this);
@@ -220,8 +217,8 @@ namespace bcs
 	}
 
 
-	template<class Derived>
-	inline array1d<typename Derived::value_type> clone_array(const dense_caview1d_base<Derived>& a)
+	template<class Derived, typename T>
+	inline array1d<T> clone_array(const IConstAView1D<Derived, T, regular_form>& a)
 	{
 		return array1d<typename Derived::value_type>(a);
 	}
@@ -233,8 +230,8 @@ namespace bcs
 	 *
 	 ******************************************************/
 
-	template<class Derived>
-	inline array1d<index_t> find(const caview1d_base<Derived>& B)
+	template<class Derived, typename T>
+	inline array1d<index_t> find(const IConstAView1D<Derived, T, regular_form>& B)
 	{
 		index_t n = B.dim0();
 
@@ -263,12 +260,9 @@ namespace bcs
 
 	// select elements from 1D array
 
-	template<class Derived, class IndexSelector>
-	inline array1d<typename Derived::value_type>
-	select_elems(const caview1d_base<Derived>& a, const IndexSelector& inds)
+	template<class Derived, typename T, class IndexSelector>
+	inline array1d<T> select_elems(const IConstAView1D<Derived, T, regular_form>& a, const IndexSelector& inds)
 	{
-		typedef typename Derived::value_type T;
-
 		const Derived& ad = a.derived();
 
 		index_t n = (index_t)inds.size();

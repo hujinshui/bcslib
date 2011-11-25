@@ -129,7 +129,10 @@ def get_compiler_version(name):
 		if len(rout) > 0:
 			terms = rout.strip().split()
 			if len(terms) >= 3:
-				return ver2tuple(terms[2])
+				if terms[0] == "Apple":
+					return ver2tuple(terms[3])
+				else:
+					return ver2tuple(terms[2])
 				
 		report_err('Failed to get the version of clang++')
 			

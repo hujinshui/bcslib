@@ -27,14 +27,10 @@ namespace bcs
 	struct aview_traits<caview1d_ex<T, TIndexer> >
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
-
-		static const bool is_dense = true;
-		static const bool is_continuous = false;
-		static const bool is_const_view = true;
 	};
 
 	template<typename T, class TIndexer>
-	class caview1d_ex : public dense_caview1d_base<caview1d_ex<T, TIndexer> >
+	class caview1d_ex : public IConstAView1D<caview1d_ex<T, TIndexer>, T, regular_form>
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
@@ -44,7 +40,7 @@ namespace bcs
 
 	public:
 		caview1d_ex(const_pointer pbase, const indexer_type& indexer)
-		: m_pbase(pbase), m_d0(indexer.dim()), m_indexer(indexer)
+		: m_pbase(const_cast<pointer>(pbase)), m_d0(indexer.dim()), m_indexer(indexer)
 		{
 		}
 
@@ -85,8 +81,8 @@ namespace bcs
 			return m_pbase[m_indexer[i]];
 		}
 
-	private:
-		const_pointer m_pbase;
+	protected:
+		pointer m_pbase;
 		index_type m_d0;
 		indexer_type m_indexer;
 
@@ -97,15 +93,11 @@ namespace bcs
 	struct aview_traits<aview1d_ex<T, TIndexer> >
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
-
-		static const bool is_dense = true;
-		static const bool is_continuous = false;
-		static const bool is_const_view = false;
 	};
 
 
 	template<typename T, class TIndexer>
-	class aview1d_ex : public dense_aview1d_base<aview1d_ex<T, TIndexer> >
+	class aview1d_ex : public caview1d_ex<T, TIndexer>, public IAView1D<aview1d_ex<T, TIndexer>, T, regular_form>
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
@@ -116,13 +108,8 @@ namespace bcs
 
 	public:
 		aview1d_ex(pointer pbase, const indexer_type& indexer)
-		: m_pbase(pbase), m_d0(indexer.dim()), m_indexer(indexer)
+		: caview1d_ex<T, TIndexer>(pbase, indexer)
 		{
-		}
-
-		operator caview1d_ex<T, TIndexer>() const
-		{
-			return caview1d_ex<T, TIndexer>(m_pbase, m_indexer);
 		}
 
 	public:
@@ -139,38 +126,33 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return m_d0;
+			return this->m_d0;
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return m_d0 == 0;
+			return this->m_d0 == 0;
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return m_d0;
+			return this->m_d0;
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return arr_shape(m_d0);
+			return arr_shape(this->m_d0);
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_t i) const
 		{
-			return m_pbase[m_indexer[i]];
+			return this->m_pbase[this->m_indexer[i]];
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i)
 		{
-			return m_pbase[m_indexer[i]];
+			return this->m_pbase[this->m_indexer[i]];
 		}
-
-	private:
-		pointer m_pbase;
-		index_type m_d0;
-		indexer_type m_indexer;
 
 	}; // end class aview1d_ex
 
@@ -188,17 +170,17 @@ namespace bcs
 		template<typename T, class IndexSelector> struct subview_helper1d;
 	}
 
-	template<class Derived, class IndexSelector>
-	inline typename _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::cview_type
-	csubview(const continuous_caview1d_base<Derived>& a, const IndexSelector& I)
+	template<class Derived, typename T, class IndexSelector>
+	inline typename _detail::subview_helper1d<T, IndexSelector>::cview_type
+	csubview(const IConstAView1D<Derived, T, continuous_form>& a, const IndexSelector& I)
 	{
 		return _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::cview(
 				a.pbase(), a.dim0(), I);
 	}
 
-	template<class Derived, class IndexSelector>
-	inline typename _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::view_type
-	subview(continuous_aview1d_base<Derived>& a, const IndexSelector& I)
+	template<class Derived, typename T, class IndexSelector>
+	inline typename _detail::subview_helper1d<T, IndexSelector>::view_type
+	subview(IAView1D<Derived, T, continuous_form>& a, const IndexSelector& I)
 	{
 		return _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::view(
 				a.pbase(), a.dim0(), I);
@@ -211,14 +193,10 @@ namespace bcs
 	struct aview_traits<caview1d<T> >
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
-
-		static const bool is_dense = true;
-		static const bool is_continuous = true;
-		static const bool is_const_view = true;
 	};
 
 	template<typename T>
-	class caview1d : public continuous_caview1d_base<caview1d<T> >
+	class caview1d : public IConstAView1D<caview1d<T>, T, continuous_form>
 	{
 	public:
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
@@ -289,7 +267,7 @@ namespace bcs
 			return csubview(*this, I);
 		}
 
-	private:
+	protected:
 		pointer m_pbase;
 		index_type m_d0;
 
@@ -300,32 +278,23 @@ namespace bcs
 	struct aview_traits<aview1d<T> >
 	{
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
-
-		static const bool is_dense = true;
-		static const bool is_continuous = true;
-		static const bool is_const_view = false;
 	};
 
 	template<typename T>
-	class aview1d : public continuous_aview1d_base<aview1d<T> >
+	class aview1d : public caview1d<T>, public IAView1D<aview1d<T>, T, continuous_form>
 	{
 	public:
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
 
 	public:
 		aview1d(pointer pbase, index_type n)
-		: m_pbase(pbase), m_d0(n)
+		: caview1d<T>(pbase, n)
 		{
 		}
 
 		aview1d(pointer pbase, const shape_type& shape)
-		: m_pbase(pbase), m_d0(shape[0])
+		: caview1d<T>(pbase, shape)
 		{
-		}
-
-		operator caview1d<T>() const
-		{
-			return caview1d<T>(pbase(), dim0());
 		}
 
 	public:
@@ -342,52 +311,52 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return m_d0;
+			return this->m_d0;
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return m_d0 == 0;
+			return this->m_d0 == 0;
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
-			return m_d0;
+			return this->m_d0;
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return arr_shape(m_d0);
+			return arr_shape(this->m_d0);
 		}
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
-			return m_pbase;
+			return this->m_pbase;
 		}
 
 		BCS_ENSURE_INLINE pointer pbase()
 		{
-			return m_pbase;
+			return this->m_pbase;
 		}
 
 		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
 		{
-			return m_pbase[i];
+			return this->m_pbase[i];
 		}
 
 		BCS_ENSURE_INLINE reference operator[](index_type i)
 		{
-			return m_pbase[i];
+			return this->m_pbase[i];
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i) const
 		{
-			return m_pbase[i];
+			return this->m_pbase[i];
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i)
 		{
-			return m_pbase[i];
+			return this->m_pbase[i];
 		}
 
 		template<class IndexSelector>
@@ -403,10 +372,6 @@ namespace bcs
 		{
 			return subview(*this, I);
 		}
-
-	private:
-		pointer m_pbase;
-		index_type m_d0;
 
 	}; // end class aview1d
 
@@ -499,22 +464,7 @@ namespace bcs
 		return aview1d<T>(data, n);
 	}
 
-	template<class Derived>
-	inline caview1d<typename Derived::value_type> flatten(const continuous_caview_base<Derived>& a)
-	{
-		return caview1d<typename Derived::value_type>(a.pbase(), a.nelems());
-	}
-
-	template<class Derived>
-	inline aview1d<typename Derived::value_type> flatten(continuous_aview_base<Derived>& a)
-	{
-		return caview1d<typename Derived::value_type>(a.pbase(), a.nelems());
-	}
 }
-
-#define BCS_AVIEW_FLATTEN_TYPEDEFS(T) \
-	typedef caview1d<T> flatten_cview_type; \
-	typedef aview1d<T> flatten_view_type;
 
 
 #endif
