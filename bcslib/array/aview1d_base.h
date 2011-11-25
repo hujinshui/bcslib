@@ -15,25 +15,16 @@
 namespace bcs
 {
 
-	template<class Derived>
-	class caview1d_base
-	: public tyselect<aview_traits<Derived>::is_continuous,
-	  	  typename tyselect<aview_traits<Derived>::is_const_view,
-	  	  	  continuous_caview_base<Derived>,
-	  	  	  continuous_aview_base<Derived> >::type,
-	  	  typename tyselect<aview_traits<Derived>::is_const_view,
-	  	  	  caview_base<Derived>,
-	  	  	  aview_base<Derived> >::type>::type
+	template<class Derived, typename T>
+	class IConstAView1DBase
 	{
 	public:
-		BCS_CAVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived);
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -55,28 +46,23 @@ namespace bcs
 			return derived().shape();
 		}
 
-		// -- new --
-
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
 			return derived().dim0();
 		}
+	};
 
-	}; // end class dense_caview1d_base
 
-
-	template<class Derived>
-	class aview1d_base : public caview1d_base<Derived>
+	template<class Derived, typename T>
+	class IAView1DBase
 	{
 	public:
-		BCS_AVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived);
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -98,32 +84,26 @@ namespace bcs
 			return derived().shape();
 		}
 
-		// -- new --
-
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
 			return derived().dim0();
 		}
-
-	}; // end class aview1d_base
-
+	};
 
 
-	template<class Derived>
-	class dense_caview1d_base
-	: public tyselect<aview_traits<Derived>::is_const_view,
-	  	  caview1d_base<Derived>,
-	  	  aview1d_base<Derived> >::type
+
+	template<class Derived, typename T>
+	class IConstAView1D<Derived, T, regular_form> : public IConstAView1DBase<Derived, T>
 	{
 	public:
-		BCS_CAVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived);
+
+		// base interfaces
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -150,28 +130,27 @@ namespace bcs
 			return derived().dim0();
 		}
 
-		// -- new --
+		// new interfaces
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i) const
 		{
 			return derived().operator()(i);
 		}
+	};
 
-	}; // end class dense_caview1d_base
 
-
-	template<class Derived>
-	class dense_aview1d_base : public dense_caview1d_base<Derived>
+	template<class Derived, typename T>
+	class IAView1D<Derived, T, regular_form> : public IAView1DBase<Derived, T>
 	{
 	public:
-		BCS_AVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived);
+
+		// base interfaces
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -198,7 +177,7 @@ namespace bcs
 			return derived().dim0();
 		}
 
-		// -- new --
+		// new interfaces
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i) const
 		{
@@ -209,25 +188,19 @@ namespace bcs
 		{
 			return derived().operator()(i);
 		}
+	};
 
-	}; // end class dense_aview1d_base
 
-
-	template<class Derived>
-	class continuous_caview1d_base
-	: public tyselect<aview_traits<Derived>::is_const_view,
-	  	  dense_caview1d_base<Derived>,
-	  	  dense_aview1d_base<Derived> >::type
+	template<class Derived, typename T>
+	class IConstAView1D<Derived, T, continuous_form> : public IConstAView1D<Derived, T, regular_form>
 	{
 	public:
-		BCS_CAVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived)
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().dims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -253,6 +226,8 @@ namespace bcs
 		{
 			return derived().dim0();
 		}
+
+		// new interfaces
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
@@ -272,18 +247,16 @@ namespace bcs
 	}; // end class continuous_caview1d_base
 
 
-	template<class Derived>
-	class continuous_aview1d_base : public continuous_caview1d_base<Derived>
+	template<class Derived, typename T>
+	class IAView1D<Derived, T, continuous_form> : public IAView1D<Derived, T, regular_form>
 	{
 	public:
-		BCS_AVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived)
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -309,6 +282,8 @@ namespace bcs
 		{
 			return derived().dim0();
 		}
+
+		// new interfaces
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
@@ -345,8 +320,8 @@ namespace bcs
 
 	// convenient generic functions
 
-	template<class LDerived, class RDerived>
-	inline bool is_same_shape(const caview1d_base<LDerived>& lhs, const caview1d_base<RDerived>& rhs)
+	template<class LDerived, typename LT, class RDerived, typename RT>
+	inline bool is_same_shape(const IConstAView1DBase<LDerived, LT>& lhs, const IConstAView1DBase<RDerived, RT>& rhs)
 	{
 		return lhs.dim0() == rhs.dim0();
 	}
