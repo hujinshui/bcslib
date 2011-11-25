@@ -22,8 +22,8 @@ namespace bcs
 
 	template<class LDerived, class RDerived, typename T>
 	inline bool is_equal(
-			const IConstAView1D<LDerived, T, continuous_form>& a,
-			const IConstAView1D<RDerived, T, continuous_form>& b)
+			const IConstContinuousAView1D<LDerived, T>& a,
+			const IConstContinuousAView1D<RDerived, T>& b)
 	{
 		return is_same_shape(a, b) && elements_equal(a.pbase(), b.pbase(), a.size());
 	}
@@ -31,7 +31,7 @@ namespace bcs
 	// import, export, fill
 
 	template<class Derived, typename T>
-	inline void import_from(IAView1D<Derived, T, regular_form>& a, const T *src)
+	inline void import_from(IRegularAView1D<Derived, T>& a, const T *src)
 	{
 		Derived& ad = a.derived();
 		index_t n = a.nelems();
@@ -40,13 +40,13 @@ namespace bcs
 	}
 
 	template<class Derived, typename T>
-	inline void import_from(IAView1D<Derived, T, continuous_form>& a, const T *src)
+	inline void import_from(IContinuousAView1D<Derived, T>& a, const T *src)
 	{
 		copy_elements(src, a.pbase(), a.size());
 	}
 
 	template<class Derived, typename T>
-	inline void export_to(const IConstAView1D<Derived, T, regular_form>& a, T *dst)
+	inline void export_to(const IConstRegularAView1D<Derived, T>& a, T *dst)
 	{
 		const Derived& ad = a.derived();
 		index_t n = a.nelems();
@@ -55,14 +55,14 @@ namespace bcs
 	}
 
 	template<class Derived, typename T>
-	inline void export_to(const IConstAView1D<Derived, T, continuous_form>& a, T *dst)
+	inline void export_to(const IConstContinuousAView1D<Derived, T>& a, T *dst)
 	{
 		copy_elements(a.pbase(), dst, a.size());
 	}
 
 
 	template<class Derived, typename T>
-	inline void fill(IAView1D<Derived, T, regular_form>& a, const T& v)
+	inline void fill(IRegularAView1D<Derived, T>& a, const T& v)
 	{
 		Derived& ad = a.derived();
 		index_t n = a.nelems();
@@ -74,7 +74,7 @@ namespace bcs
 	// copy
 
 	template<class LDerived, class RDerived, typename T>
-	inline void copy(const IConstAView1D<LDerived, T, continuous_form>& src, IAView1D<RDerived, T, continuous_form>& dst)
+	inline void copy(const IConstContinuousAView1D<LDerived, T>& src, IContinuousAView1D<RDerived, T>& dst)
 	{
 		const LDerived& sd = src.derived();
 		RDerived& rd = dst.derived();
@@ -84,7 +84,7 @@ namespace bcs
 	}
 
 	template<class LDerived, class RDerived, typename T>
-	inline void copy(const IConstAView1D<LDerived, T, continuous_form>& src, IAView1D<RDerived, T, regular_form>& dst)
+	inline void copy(const IConstContinuousAView1D<LDerived, T>& src, IRegularAView1D<RDerived, T>& dst)
 	{
 		const LDerived& sd = src.derived();
 		RDerived& rd = dst.derived();
@@ -94,7 +94,7 @@ namespace bcs
 	}
 
 	template<class LDerived, class RDerived, typename T>
-	inline void copy(const IConstAView1D<LDerived, T, regular_form>& src, IAView1D<RDerived, T, continuous_form>& dst)
+	inline void copy(const IConstRegularAView1D<LDerived, T>& src, IContinuousAView1D<RDerived, T>& dst)
 	{
 		const LDerived& sd = src.derived();
 		RDerived& rd = dst.derived();
@@ -104,7 +104,7 @@ namespace bcs
 	}
 
 	template<class LDerived, class RDerived, typename T>
-	inline void copy(const IConstAView1D<LDerived, T, regular_form>& src, IAView1D<RDerived, T, regular_form>& dst)
+	inline void copy(const IConstRegularAView1D<LDerived, T>& src, IRegularAView1D<RDerived, T>& dst)
 	{
 		const LDerived& sd = src.derived();
 		RDerived& rd = dst.derived();

@@ -30,7 +30,7 @@ namespace bcs
 	};
 
 	template<typename T, class TIndexer>
-	class caview1d_ex : public IConstAView1D<caview1d_ex<T, TIndexer>, T, regular_form>
+	class caview1d_ex : public IConstRegularAView1D<caview1d_ex<T, TIndexer>, T>
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
@@ -97,7 +97,7 @@ namespace bcs
 
 
 	template<typename T, class TIndexer>
-	class aview1d_ex : public caview1d_ex<T, TIndexer>, public IAView1D<aview1d_ex<T, TIndexer>, T, regular_form>
+	class aview1d_ex : public caview1d_ex<T, TIndexer>, public IRegularAView1D<aview1d_ex<T, TIndexer>, T>
 	{
 	public:
 		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
@@ -172,7 +172,7 @@ namespace bcs
 
 	template<class Derived, typename T, class IndexSelector>
 	inline typename _detail::subview_helper1d<T, IndexSelector>::cview_type
-	csubview(const IConstAView1D<Derived, T, continuous_form>& a, const IndexSelector& I)
+	csubview(const IConstContinuousAView1D<Derived, T>& a, const IndexSelector& I)
 	{
 		return _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::cview(
 				a.pbase(), a.dim0(), I);
@@ -180,7 +180,7 @@ namespace bcs
 
 	template<class Derived, typename T, class IndexSelector>
 	inline typename _detail::subview_helper1d<T, IndexSelector>::view_type
-	subview(IAView1D<Derived, T, continuous_form>& a, const IndexSelector& I)
+	subview(IContinuousAView1D<Derived, T>& a, const IndexSelector& I)
 	{
 		return _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::view(
 				a.pbase(), a.dim0(), I);
@@ -196,7 +196,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	class caview1d : public IConstAView1D<caview1d<T>, T, continuous_form>
+	class caview1d : public IConstContinuousAView1D<caview1d<T>, T>
 	{
 	public:
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
@@ -281,7 +281,7 @@ namespace bcs
 	};
 
 	template<typename T>
-	class aview1d : public caview1d<T>, public IAView1D<aview1d<T>, T, continuous_form>
+	class aview1d : public caview1d<T>, public IContinuousAView1D<aview1d<T>, T>
 	{
 	public:
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)

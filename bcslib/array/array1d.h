@@ -30,8 +30,8 @@ namespace bcs
 
 	template<typename T, class Alloc>
 	class array1d
-	: public IConstAView1D<array1d<T, Alloc>, T, continuous_form>
-	, public IAView1D<array1d<T, Alloc>, T, continuous_form>
+	: public IConstContinuousAView1D<array1d<T, Alloc>, T>
+	, public IContinuousAView1D<array1d<T, Alloc>, T>
 	{
 	public:
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
@@ -66,7 +66,7 @@ namespace bcs
 		}
 
 		template<class Derived>
-		explicit array1d(const IConstAView1D<Derived, T, regular_form>& r)
+		explicit array1d(const IConstRegularAView1D<Derived, T>& r)
 		: m_storage(r.size()), m_view(m_storage.pbase(), r.nelems())
 		{
 			copy(r.derived(), *this);
@@ -218,7 +218,7 @@ namespace bcs
 
 
 	template<class Derived, typename T>
-	inline array1d<T> clone_array(const IConstAView1D<Derived, T, regular_form>& a)
+	inline array1d<T> clone_array(const IConstRegularAView1D<Derived, T>& a)
 	{
 		return array1d<typename Derived::value_type>(a);
 	}
@@ -231,7 +231,7 @@ namespace bcs
 	 ******************************************************/
 
 	template<class Derived, typename T>
-	inline array1d<index_t> find(const IConstAView1D<Derived, T, regular_form>& B)
+	inline array1d<index_t> find(const IConstRegularAView1D<Derived, T>& B)
 	{
 		index_t n = B.dim0();
 
@@ -261,7 +261,7 @@ namespace bcs
 	// select elements from 1D array
 
 	template<class Derived, typename T, class IndexSelector>
-	inline array1d<T> select_elems(const IConstAView1D<Derived, T, regular_form>& a, const IndexSelector& inds)
+	inline array1d<T> select_elems(const IConstRegularAView1D<Derived, T>& a, const IndexSelector& inds)
 	{
 		const Derived& ad = a.derived();
 
