@@ -93,7 +93,7 @@ namespace bcs
 
 
 	template<class Derived, typename T>
-	class IConstAView1D<Derived, T, regular_form> : public IConstAView1DBase<Derived, T>
+	class IConstRegularAView1D : public IConstAView1DBase<Derived, T>
 	{
 	public:
 		BCS_AVIEW_INTERFACE_DEFS(Derived);
@@ -140,7 +140,7 @@ namespace bcs
 
 
 	template<class Derived, typename T>
-	class IAView1D<Derived, T, regular_form> : public IAView1DBase<Derived, T>
+	class IRegularAView1D : public IAView1DBase<Derived, T>
 	{
 	public:
 		BCS_AVIEW_INTERFACE_DEFS(Derived);
@@ -192,7 +192,7 @@ namespace bcs
 
 
 	template<class Derived, typename T>
-	class IConstAView1D<Derived, T, continuous_form> : public IConstAView1D<Derived, T, regular_form>
+	class IConstContinuousAView1D : public IConstRegularAView1D<Derived, T>
 	{
 	public:
 		BCS_AVIEW_INTERFACE_DEFS(Derived)
@@ -248,7 +248,7 @@ namespace bcs
 
 
 	template<class Derived, typename T>
-	class IAView1D<Derived, T, continuous_form> : public IAView1D<Derived, T, regular_form>
+	class IContinuousAView1D : public IRegularAView1D<Derived, T>
 	{
 	public:
 		BCS_AVIEW_INTERFACE_DEFS(Derived)

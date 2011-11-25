@@ -127,11 +127,6 @@ namespace bcs
 	 *
 	 ********************************************/
 
-	struct sparse_form { };
-	struct regular_form { };
-	struct block_form { };
-	struct continuous_form { };
-
 	struct layout_1d_t { };
 	struct row_major_t { };
 	struct column_major_t { };
@@ -151,8 +146,10 @@ namespace bcs
 
 	template<class Derived, typename T> class IConstAView1DBase;
 	template<class Derived, typename T> class IAView1DBase;
-	template<class Derived, typename T, typename Form> class IConstAView1D;
-	template<class Derived, typename T, typename Form> class IAView1D;
+	template<class Derived, typename T> class IConstRegularAView1D;
+	template<class Derived, typename T> class IRegularAView1D;
+	template<class Derived, typename T> class IConstContinuousAView1D;
+	template<class Derived, typename T> class IContinuousAView1D;
 
 	template<typename T> class caview1d;
 	template<typename T> class aview1d;

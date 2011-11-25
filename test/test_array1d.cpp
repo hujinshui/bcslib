@@ -40,7 +40,7 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d_ex<double, id_ind> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IConstAView1D<bcs::caview1d_ex<double, id_ind>, double, regular_form>,
+		bcs::IConstRegularAView1D<bcs::caview1d_ex<double, id_ind>, double>,
 		bcs::caview1d_ex<double, id_ind> >::value) );
 
 
@@ -55,7 +55,7 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview1d_ex<double, id_ind> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IAView1D<bcs::aview1d_ex<double, id_ind>, double, regular_form>,
+		bcs::IRegularAView1D<bcs::aview1d_ex<double, id_ind>, double>,
 		bcs::aview1d_ex<double, id_ind> >::value) );
 
 // caview1d
@@ -65,11 +65,11 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::caview1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IConstAView1D<bcs::caview1d<double>, double, regular_form>,
+		bcs::IConstRegularAView1D<bcs::caview1d<double>, double>,
 		bcs::caview1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IConstAView1D<bcs::caview1d<double>, double, continuous_form>,
+		bcs::IConstContinuousAView1D<bcs::caview1d<double>, double>,
 		bcs::caview1d<double> >::value) );
 
 
@@ -84,11 +84,11 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::aview1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IAView1D<bcs::aview1d<double>, double, regular_form>,
+		bcs::IRegularAView1D<bcs::aview1d<double>, double>,
 		bcs::aview1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IAView1D<bcs::aview1d<double>, double, continuous_form>,
+		bcs::IContinuousAView1D<bcs::aview1d<double>, double>,
 		bcs::aview1d<double> >::value) );
 
 
@@ -99,11 +99,11 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::array1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IConstAView1D<bcs::array1d<double>, double, regular_form>,
+		bcs::IConstRegularAView1D<bcs::array1d<double>, double>,
 		bcs::array1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IConstAView1D<bcs::array1d<double>, double, continuous_form>,
+		bcs::IConstContinuousAView1D<bcs::array1d<double>, double>,
 		bcs::array1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
@@ -111,11 +111,11 @@ BCS_STATIC_ASSERT( (is_base_of<
 		bcs::array1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IAView1D<bcs::array1d<double>, double, regular_form>,
+		bcs::IRegularAView1D<bcs::array1d<double>, double>,
 		bcs::array1d<double> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IAView1D<bcs::array1d<double>, double, continuous_form>,
+		bcs::IContinuousAView1D<bcs::array1d<double>, double>,
 		bcs::array1d<double> >::value) );
 
 
@@ -127,7 +127,7 @@ BCS_STATIC_ASSERT( (is_base_of<
  ************************************************/
 
 template<class Derived, typename T>
-bool array_integrity_test(const bcs::IConstAView1D<Derived, T, regular_form>& a)
+bool array_integrity_test(const bcs::IConstRegularAView1D<Derived, T>& a)
 {
 	index_t n = a.dim0();
 
@@ -141,7 +141,7 @@ bool array_integrity_test(const bcs::IConstAView1D<Derived, T, regular_form>& a)
 }
 
 template<class Derived, typename T>
-bool cont_array_integrity_test(const bcs::IConstAView1D<Derived, T, continuous_form>& a)
+bool cont_array_integrity_test(const bcs::IConstContinuousAView1D<Derived, T>& a)
 {
 	if (!array_integrity_test(a)) return false;
 
@@ -161,7 +161,7 @@ bool cont_array_integrity_test(const bcs::IConstAView1D<Derived, T, continuous_f
 }
 
 template<class Derived, typename T>
-bool elemwise_operation_test(bcs::IAView1D<Derived, T, regular_form>& a)
+bool elemwise_operation_test(bcs::IRegularAView1D<Derived, T>& a)
 {
 	index_t n = a.nelems();
 	block<T> blk(a.size());
