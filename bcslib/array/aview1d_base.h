@@ -244,7 +244,7 @@ namespace bcs
 			return derived().operator()(i);
 		}
 
-	}; // end class continuous_caview1d_base
+	};
 
 
 	template<class Derived, typename T>
@@ -315,7 +315,7 @@ namespace bcs
 			return derived().operator()(i);
 		}
 
-	}; // end class continuous_aview1d_base
+	};
 
 
 	// convenient generic functions

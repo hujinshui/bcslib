@@ -12,8 +12,12 @@
 #include <bcslib/array/aview_base.h>
 #include <bcslib/array/aindex.h>
 
+
 namespace bcs
 {
+	template<typename T> class caview1d;
+	template<typename T> class aview1d;
+
 
 	// extents & index calculation
 
@@ -70,25 +74,16 @@ namespace bcs
 
 	// concept interfaces
 
-	template<class Derived>
-	class caview2d_base
-	: public tyselect<aview_traits<Derived>::is_continuous,
-	  	  typename tyselect<aview_traits<Derived>::is_const_view,
-	  	  	  continuous_caview_base<Derived>,
-	  	  	  continuous_aview_base<Derived> >::type,
-	  	  typename tyselect<aview_traits<Derived>::is_const_view,
-	  	  	  caview_base<Derived>,
-	  	  	  aview_base<Derived> >::type>::type
+	template<class Derived, typename T, typename TOrd>
+	class IConstAView2DBase
 	{
 	public:
-		BCS_CAVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived)
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -109,8 +104,6 @@ namespace bcs
 		{
 			return derived().shape();
 		}
-
-		// -- new --
 
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
@@ -135,15 +128,15 @@ namespace bcs
 	}; // end class caview2d_base
 
 
-	template<class Derived>
-	class aview2d_base : public caview2d_base<Derived>
+	template<class Derived, typename T, typename TOrd>
+	class IAView2DBase
 	{
 	public:
-		BCS_AVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived)
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
 
 		// interfaces to be implemented by Derived
@@ -203,21 +196,16 @@ namespace bcs
 	}; // end class aview2d_base
 
 
-	template<class Derived>
-	class dense_caview2d_base
-	: public tyselect<aview_traits<Derived>::is_const_view,
-	  	  caview2d_base<Derived>,
-	  	  aview2d_base<Derived> >::type
+	template<class Derived, typename T, typename TOrd>
+	class IConstRegularAView2D : public IConstAView2DBase<Derived, T, TOrd>
 	{
 	public:
-		BCS_CAVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived)
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -274,18 +262,16 @@ namespace bcs
 	}; // end class dense_caview2d_base
 
 
-	template<class Derived>
-	class dense_aview2d_base : public dense_caview2d_base<Derived>
+	template<class Derived, typename T, typename TOrd>
+	class IRegularAView2D : public IAView2DBase<Derived, T, TOrd>
 	{
 	public:
-		BCS_AVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived)
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -347,21 +333,16 @@ namespace bcs
 	}; // end class dense_aview2d_base
 
 
-	template<class Derived>
-	class block_caview2d_base
-	: public tyselect<aview_traits<Derived>::is_const_view,
-	  	  dense_caview2d_base<Derived>,
-	  	  dense_aview2d_base<Derived> >::type
+	template<class Derived, typename T, typename TOrd>
+	class IConstBlockAView2D : public IConstRegularAView2D<Derived, T, TOrd>
 	{
 	public:
-		BCS_CAVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived)
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -435,18 +416,16 @@ namespace bcs
 	}; // end class block_caview2d_base
 
 
-	template<class Derived>
-	class block_aview2d_base : public block_caview2d_base<Derived>
+	template<class Derived, typename T, typename TOrd>
+	class IBlockAView2D : public IRegularAView2D<Derived, T, TOrd>
 	{
 	public:
-		BCS_AVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived)
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -542,21 +521,16 @@ namespace bcs
 	}; // end class block_aview2d_base
 
 
-	template<class Derived>
-	class continuous_caview2d_base
-	: public tyselect<aview_traits<Derived>::is_const_view,
-	  	  block_caview2d_base<Derived>,
-	  	  block_aview2d_base<Derived> >::type
+	template<class Derived, typename T, typename TOrd>
+	class IConstContinuousAView2D : public IConstBlockAView2D<Derived, T, TOrd>
 	{
 	public:
-		BCS_CAVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived)
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -602,6 +576,8 @@ namespace bcs
 		{
 			return derived().ncolumns();
 		}
+
+		// -- new --
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
@@ -630,29 +606,24 @@ namespace bcs
 			return derived().column(i);
 		}
 
-		// -- new --
-
-		typename aview_traits<Derived>::flatten_cview_type
-		flatten() const
+		caview1d<T> flatten() const
 		{
 			return derived().flatten();
 		}
 
-	}; // end class continuous_caview2d_base
+	};
 
 
-	template<class Derived>
-	class continuous_aview2d_base : public continuous_caview2d_base<Derived>
+	template<class Derived, typename T, typename TOrd>
+	class IContinuousAView2D : public IBlockAView2D<Derived, T, TOrd>
 	{
 	public:
-		BCS_AVIEW_BASE_DEFS(Derived)
+		BCS_AVIEW_INTERFACE_DEFS(Derived)
 
 		BCS_ENSURE_INLINE dim_num_t ndims() const
 		{
-			return num_dimensions;
+			return derived().ndims();
 		}
-
-		// interfaces to be implemented by Derived
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
@@ -698,6 +669,8 @@ namespace bcs
 		{
 			return derived().ncolumns();
 		}
+
+		// -- new --
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
@@ -753,27 +726,25 @@ namespace bcs
 			return derived().column(i);
 		}
 
-		// -- new --
-
-		typename aview_traits<Derived>::flatten_cview_type
-		flatten() const
+		caview1d<T> flatten() const
 		{
 			return derived().flatten();
 		}
 
-		typename aview_traits<Derived>::flatten_view_type
-		flatten()
+		aview1d<T> flatten()
 		{
 			return derived().flatten();
 		}
 
-	}; // end class continuous_aview2d_base
+	};
 
 
 	// convenient generic functions
 
-	template<class LDerived, class RDerived>
-	inline bool is_same_shape(const caview2d_base<LDerived>& lhs, const caview2d_base<RDerived>& rhs)
+	template<class LDerived, typename LT, class RDerived, typename RT, typename TOrd>
+	inline bool is_same_shape(
+			const IConstAView2DBase<LDerived, LT, TOrd>& lhs,
+			const IConstAView2DBase<RDerived, RT, TOrd>& rhs)
 	{
 		return lhs.dim0() == rhs.dim0() && lhs.dim1() == rhs.dim1();
 	}

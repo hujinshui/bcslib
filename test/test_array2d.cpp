@@ -49,307 +49,135 @@ template class bcs::array2d<double, column_major_t>;
 
 // caview2d_ex
 
+
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview_base<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >,
+		bcs::IConstAView2DBase<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind>, double, row_major_t>,
 		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview2d_base<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >,
-		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_caview2d_base<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >,
+		bcs::IConstRegularAView2D<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind>, double, row_major_t>,
 		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
 
 // aview2d_ex
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
+		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind>,
 		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::aview_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
+		bcs::IAView2DBase<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind>, double, row_major_t>,
 		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview2d_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
-		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::aview2d_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
-		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_caview2d_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
-		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_aview2d_base<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >,
+		bcs::IRegularAView2D<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind>, double, row_major_t>,
 		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
 
 
 // caview2d_block
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview_base<bcs::caview2d_block<double, row_major_t> >,
+		bcs::IConstAView2DBase<bcs::caview2d_block<double, row_major_t>, double, row_major_t>,
 		bcs::caview2d_block<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview2d_base<bcs::caview2d_block<double, row_major_t> >,
+		bcs::IConstRegularAView2D<bcs::caview2d_block<double, row_major_t>, double, row_major_t>,
 		bcs::caview2d_block<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_caview2d_base<bcs::caview2d_block<double, row_major_t> >,
+		bcs::IConstBlockAView2D<bcs::caview2d_block<double, row_major_t>, double, row_major_t>,
 		bcs::caview2d_block<double, row_major_t> >::value) );
 
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::block_caview2d_base<bcs::caview2d_block<double, row_major_t> >,
-		bcs::caview2d_block<double, row_major_t> >::value) );
 
 // aview2d_block
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::caview2d_block<double, row_major_t>,
 		bcs::aview2d_block<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::aview_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::IAView2DBase<bcs::aview2d_block<double, row_major_t>, double, row_major_t>,
 		bcs::aview2d_block<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview2d_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::IRegularAView2D<bcs::aview2d_block<double, row_major_t>, double, row_major_t>,
 		bcs::aview2d_block<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::aview2d_base<bcs::aview2d_block<double, row_major_t> >,
-		bcs::aview2d_block<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_caview2d_base<bcs::aview2d_block<double, row_major_t> >,
-		bcs::aview2d_block<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_aview2d_base<bcs::aview2d_block<double, row_major_t> >,
-		bcs::aview2d_block<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::block_caview2d_base<bcs::aview2d_block<double, row_major_t> >,
-		bcs::aview2d_block<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::block_aview2d_base<bcs::aview2d_block<double, row_major_t> >,
+		bcs::IBlockAView2D<bcs::aview2d_block<double, row_major_t>, double, row_major_t>,
 		bcs::aview2d_block<double, row_major_t> >::value) );
 
 
 // caview2d
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview_base<bcs::caview2d<double, row_major_t> >,
+		bcs::IConstAView2DBase<bcs::caview2d<double, row_major_t>, double, row_major_t>,
 		bcs::caview2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::continuous_caview_base<bcs::caview2d<double, row_major_t> >,
+		bcs::IConstRegularAView2D<bcs::caview2d<double, row_major_t>, double, row_major_t>,
 		bcs::caview2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview2d_base<bcs::caview2d<double, row_major_t> >,
+		bcs::IConstBlockAView2D<bcs::caview2d<double, row_major_t>, double, row_major_t>,
 		bcs::caview2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_caview2d_base<bcs::caview2d<double, row_major_t> >,
-		bcs::caview2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::block_caview2d_base<bcs::caview2d<double, row_major_t> >,
-		bcs::caview2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::continuous_caview2d_base<bcs::caview2d<double, row_major_t> >,
+		bcs::IConstContinuousAView2D<bcs::caview2d<double, row_major_t>, double, row_major_t>,
 		bcs::caview2d<double, row_major_t> >::value) );
 
 // aview2d
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview_base<bcs::aview2d<double, row_major_t> >,
+		bcs::IAView2DBase<bcs::aview2d<double, row_major_t>, double, row_major_t>,
 		bcs::aview2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::aview_base<bcs::aview2d<double, row_major_t> >,
+		bcs::IRegularAView2D<bcs::aview2d<double, row_major_t>, double, row_major_t>,
 		bcs::aview2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::continuous_caview_base<bcs::aview2d<double, row_major_t> >,
+		bcs::IBlockAView2D<bcs::aview2d<double, row_major_t>, double, row_major_t>,
 		bcs::aview2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::continuous_aview_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview2d_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::aview2d_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_caview2d_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_aview2d_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::block_caview2d_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::block_aview2d_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::continuous_caview2d_base<bcs::aview2d<double, row_major_t> >,
-		bcs::aview2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::continuous_aview2d_base<bcs::aview2d<double, row_major_t> >,
+		bcs::IContinuousAView2D<bcs::aview2d<double, row_major_t>, double, row_major_t>,
 		bcs::aview2d<double, row_major_t> >::value) );
 
 // array2d
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview_base<bcs::array2d<double, row_major_t> >,
+		bcs::IConstAView2DBase<bcs::array2d<double, row_major_t>, double, row_major_t>,
 		bcs::array2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::aview_base<bcs::array2d<double, row_major_t> >,
+		bcs::IConstRegularAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
 		bcs::array2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::continuous_caview_base<bcs::array2d<double, row_major_t> >,
+		bcs::IConstBlockAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
 		bcs::array2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::continuous_aview_base<bcs::array2d<double, row_major_t> >,
+		bcs::IConstContinuousAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
 		bcs::array2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::caview2d_base<bcs::array2d<double, row_major_t> >,
+		bcs::IAView2DBase<bcs::array2d<double, row_major_t>, double, row_major_t>,
 		bcs::array2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::aview2d_base<bcs::array2d<double, row_major_t> >,
+		bcs::IRegularAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
 		bcs::array2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_caview2d_base<bcs::array2d<double, row_major_t> >,
+		bcs::IBlockAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
 		bcs::array2d<double, row_major_t> >::value) );
 
 BCS_STATIC_ASSERT( (is_base_of<
-		bcs::dense_aview2d_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::block_caview2d_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::block_aview2d_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::continuous_caview2d_base<bcs::array2d<double, row_major_t> >,
-		bcs::array2d<double, row_major_t> >::value) );
-
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::continuous_aview2d_base<bcs::array2d<double, row_major_t> >,
+		bcs::IContinuousAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
 		bcs::array2d<double, row_major_t> >::value) );
 
 
-// further syntax checking
-
-template<typename T>
-void dummy_a2(const T& ) { }
-
-inline void do_on_view2(const caview2d<double, column_major_t>& v) { }
-
-void syntax_check_arr2()
-{
-	typedef bcs::array2d<double, column_major_t> dt;
-
-	dt a(3, 5);
-	const dt& ca = a;
-
-	caview_base<dt>& r1 = a;
-	const dt& d1 = r1.derived();
-	dummy_a2(d1);
-
-	aview_base<dt>& r2 = a;
-	const dt& d2 = r2.derived();
-	dummy_a2(d2);
-
-	continuous_caview_base<dt>& r3 = a;
-	const dt& d3 = r3.derived();
-	dummy_a2(d3);
-
-	continuous_aview_base<dt>& r4 = a;
-	const dt& d4 = r4.derived();
-	dummy_a2(d4);
-
-	caview2d_base<dt>& r5 = a;
-	const dt& d5 = r5.derived();
-	dummy_a2(d5);
-
-	aview2d_base<dt>& r6 = a;
-	const dt& d6 = r6.derived();
-	dummy_a2(d6);
-
-	dense_caview2d_base<dt>& r7 = a;
-	const dt& d7 = r7.derived();
-	dummy_a2(d7);
-
-	dense_aview2d_base<dt>& r8 = a;
-	const dt& d8 = r8.derived();
-	dummy_a2(d8);
-
-	block_caview2d_base<dt>& r9 = a;
-	const dt& d9 = r9.derived();
-	dummy_a2(d9);
-
-	block_aview2d_base<dt>& r10 = a;
-	const dt& d10 = r10.derived();
-	dummy_a2(d10);
-
-	continuous_caview2d_base<dt>& r11 = a;
-	const dt& d11 = r11.derived();
-	dummy_a2(d11);
-
-	continuous_aview2d_base<dt>& r12 = a;
-	const dt& d12 = r12.derived();
-	dummy_a2(d12);
-
-	dummy_a2(a.ndims());
-	dummy_a2(a.dim0());
-	dummy_a2(a.dim1());
-	dummy_a2(a.nrows());
-	dummy_a2(a.ncolumns());
-	dummy_a2(a.size());
-	dummy_a2(a.nelems());
-	dummy_a2(a.shape());
-	dummy_a2(a.pbase());
-	dummy_a2(a(0, 0));
-	dummy_a2(a[0]);
-	dummy_a2(ca(0, 0));
-	dummy_a2(ca[0]);
-	dummy_a2(begin(a));
-	dummy_a2(end(a));
-	dummy_a2(begin(ca));
-	dummy_a2(end(ca));
-
-	do_on_view2(a);
-}
 
 // syntax checking for subviews
 
@@ -428,26 +256,29 @@ void syntax_check_arr2_subview()
 
 
 
-
-
 /************************************************
  *
  *  Auxiliary functions
  *
  ************************************************/
 
-template<class Derived>
-inline index_t sub2ind(const caview2d_base<Derived>& a, index_t i, index_t j)
+template<class Derived, typename T>
+inline index_t sub2ind(const IConstAView2DBase<Derived, T, row_major_t>& a, index_t i, index_t j)
 {
-	index_t m = a.nrows();
 	index_t n = a.ncolumns();
-
-	return is_same<typename Derived::layout_order, row_major_t>::value ?
-			(i * n + j) : (i + j * m);
+	return i * n + j;
 }
 
-template<class Derived>
-bool array_integrity_test(const bcs::caview2d_base<Derived>& a)
+template<class Derived, typename T>
+inline index_t sub2ind(const IConstAView2DBase<Derived, T, column_major_t>& a, index_t i, index_t j)
+{
+	index_t m = a.nrows();
+	return i + j * m;
+}
+
+
+template<class Derived, typename T, typename TOrd>
+bool array_integrity_test(const bcs::IConstRegularAView2D<Derived, T, TOrd>& a)
 {
 	index_t m = a.dim0();
 	index_t n = a.dim1();
@@ -463,8 +294,8 @@ bool array_integrity_test(const bcs::caview2d_base<Derived>& a)
 	return true;
 }
 
-template<class Derived>
-bool cont_array_integrity_test(const bcs::continuous_caview2d_base<Derived>& a)
+template<class Derived, typename T, typename TOrd>
+bool cont_array_integrity_test(const bcs::IConstContinuousAView2D<Derived, T, TOrd>& a)
 {
 	if (!array_integrity_test(a)) return false;
 
@@ -475,7 +306,7 @@ bool cont_array_integrity_test(const bcs::continuous_caview2d_base<Derived>& a)
 		if (a.pbase() != &(a[0])) return false;
 	}
 
-	typename Derived::flatten_cview_type fview = a.flatten();
+	caview1d<T> fview = a.flatten();
 
 	if (fview.pbase() != a.pbase()) return false;
 	if (fview.nelems() != m * n) return false;
@@ -496,30 +327,30 @@ bool cont_array_integrity_test(const bcs::continuous_caview2d_base<Derived>& a)
 }
 
 
-template<class Derived>
-bool elemwise_operation_test(bcs::dense_aview2d_base<Derived>& a)
+template<class Derived, typename T, typename TOrd>
+bool elemwise_operation_test(bcs::IRegularAView2D<Derived, T, TOrd>& a)
 {
-	typedef typename Derived::value_type T;
-
 	index_t m = a.nrows();
 	index_t n = a.ncolumns();
 	block<T> blk(a.size());
 	const T *b = blk.pbase();
 
+	Derived& ad = a.derived();
+
 	// export
-	export_to(a, blk.pbase());
+	export_to(ad, blk.pbase());
 
 	for (index_t i = 0; i < m; ++i)
 	{
 		for (index_t j = 0; j < n; ++j)
 		{
-			if (b[sub2ind(a, i, j)] != a(i, j)) return false;
+			if (b[sub2ind(ad, i, j)] != a(i, j)) return false;
 		}
 	}
 
 	// fill
 	T v = T(123);
-	fill(a, v);
+	fill(ad, v);
 
 	for (index_t i = 0; i < m; ++i)
 	{
@@ -530,13 +361,13 @@ bool elemwise_operation_test(bcs::dense_aview2d_base<Derived>& a)
 	}
 
 	// import
-	import_from(a, blk.pbase());
+	import_from(ad, blk.pbase());
 
 	for (index_t i = 0; i < m; ++i)
 	{
 		for (index_t j = 0; j < n; ++j)
 		{
-			if (a(i, j) != b[sub2ind(a, i, j)]) return false;
+			if (a(i, j) != b[sub2ind(ad, i, j)]) return false;
 		}
 	}
 
