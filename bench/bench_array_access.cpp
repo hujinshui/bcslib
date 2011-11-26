@@ -90,7 +90,7 @@ double time_dense1d_access(int nrepeats, const index_t nelems, const double *src
 double time_dense1d_access_via_base(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
 	caview1d<double> view(src, nelems);
-	dense_caview1d_base<caview1d<double> >& viewb = view;
+	IConstRegularAView1D<caview1d<double>, double>& viewb = view;
 
 	index_t n = (index_t)nelems;
 

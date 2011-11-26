@@ -131,6 +131,11 @@ namespace bcs
 	struct row_major_t { };
 	struct column_major_t { };
 
+	template<class T> struct is_layout_order { static const bool value = false; };
+	template<> struct is_layout_order<layout_1d_t> { static const bool value = true; };
+	template<> struct is_layout_order<row_major_t> { static const bool value = true; };
+	template<> struct is_layout_order<column_major_t> { static const bool value = true; };
+
 
 	/********************************************
 	 *
@@ -158,6 +163,15 @@ namespace bcs
 	template<typename T, class TIndexer> class aview1d_ex;
 
 	// 2D
+
+	template<class Derived, typename T, typename TOrd> class IConstAView2DBase;
+	template<class Derived, typename T, typename TOrd> class IAView2DBase;
+	template<class Derived, typename T, typename TOrd> class IConstRegularAView2D;
+	template<class Derived, typename T, typename TOrd> class IRegularAView2D;
+	template<class Derived, typename T, typename TOrd> class IConstBlockAView2D;
+	template<class Derived, typename T, typename TOrd> class IBlockAView2D;
+	template<class Derived, typename T, typename TOrd> class IConstContinuousAView2D;
+	template<class Derived, typename T, typename TOrd> class IContinuousAView2D;
 
 	template<typename T, typename TOrd> class caview2d;
 	template<typename T, typename TOrd> class aview2d;
