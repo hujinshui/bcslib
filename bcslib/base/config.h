@@ -29,6 +29,7 @@
 	#define BCSLIB_COMPILER BCSLIB_MSVC
 
 	#define BCS_PLATFORM_INTERFACE BCS_WINDOWS_INTERFACE
+	#define USE_C1X_STDLIB
 
 #elif (defined(__GNUC__))
 	#if (defined(__clang__))

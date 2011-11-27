@@ -10,18 +10,25 @@
 #pragma once
 #endif
 
+#ifndef BCSLIB_TR1_IMPORTS_H_
+#define BCSLIB_TR1_IMPORTS_H_
+
 #include <bcslib/base/config.h>
 #include <bcslib/base/basic_defs.h>
 
+#ifdef USE_C1X_STDLIB
+#include <type_traits>
+#include <tuple>
+#include <array>
+#include <memory>
+#define BCS_TR1 std
+#else
 #include <tr1/type_traits>
 #include <tr1/tuple>
 #include <tr1/array>
 #include <tr1/memory>
-
-#ifndef BCSLIB_TR1_IMPORTS_H_
-#define BCSLIB_TR1_IMPORTS_H_
-
 #define BCS_TR1 std::tr1
+#endif
 
 namespace bcs
 {
