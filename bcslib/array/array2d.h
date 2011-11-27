@@ -42,6 +42,7 @@ namespace bcs
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 
+		typedef typename aview2d_slice_extent<TOrd>::type slice_extent_type;
 		typedef shared_block<T, Alloc> storage_type;
 		typedef aview2d<T, TOrd> view_type;
 
@@ -184,6 +185,11 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return m_view.shape();
+		}
+
+		BCS_ENSURE_INLINE slice_extent_type slice_extent() const
+		{
+			return m_view.slice_extent();
 		}
 
 		BCS_ENSURE_INLINE index_type lead_dim() const

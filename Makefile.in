@@ -63,6 +63,7 @@ ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/array/aview1d_ops.h \
 	bcslib/array/array1d.h \
 	bcslib/array/aview2d_base.h \
+	bcslib/array/aview2d_slices.h \
 	bcslib/array/aview2d.h \
 	bcslib/array/aview2d_ops.h \
 	bcslib/array/transpose2d.h \

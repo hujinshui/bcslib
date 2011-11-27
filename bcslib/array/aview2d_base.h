@@ -18,39 +18,68 @@ namespace bcs
 	template<typename T> class caview1d;
 	template<typename T> class aview1d;
 
+	// extents and index calculation
 
-	// index calculation
-
-	template<typename TOrd> struct index2d;
-
-	template<>
-	struct index2d<row_major_t>
+	class row_extent
 	{
-		BCS_ENSURE_INLINE static index_t sub2ind(index_t ldim, index_t i, index_t j)
+	public:
+		explicit row_extent(index_t d) : m_dim(d) { }
+
+		BCS_ENSURE_INLINE index_t dim() const
 		{
-			return i * ldim + j;
+			return m_dim;
 		}
 
-		BCS_ENSURE_INLINE static index_t get_lead_dim(index_t m, index_t n)
+		BCS_ENSURE_INLINE index_t sub2ind(index_t i, index_t j) const
 		{
-			return n;
+			return i * m_dim + j;
 		}
+
+		BCS_ENSURE_INLINE static row_extent from_base_dims(index_t m, index_t n)
+		{
+			return row_extent(n);
+		}
+
+	private:
+		index_t m_dim;
 	};
 
 
-	template<>
-	struct index2d<column_major_t>
+	class column_extent
 	{
-		BCS_ENSURE_INLINE static index_t sub2ind(index_t ldim, index_t i, index_t j)
+	public:
+		explicit column_extent(index_t d) : m_dim(d) { }
+
+		BCS_ENSURE_INLINE index_t dim() const
 		{
-			return i + j * ldim;
+			return m_dim;
 		}
 
-		BCS_ENSURE_INLINE static index_t get_lead_dim(index_t m, index_t n)
+		BCS_ENSURE_INLINE index_t sub2ind(index_t i, index_t j) const
 		{
-			return m;
+			return i + j * m_dim;
 		}
 
+		BCS_ENSURE_INLINE static column_extent from_base_dims(index_t m, index_t n)
+		{
+			return column_extent(m);
+		}
+
+	private:
+		index_t m_dim;
+	};
+
+
+	template<typename TOrd> struct aview2d_slice_extent;
+
+	template<> struct aview2d_slice_extent<row_major_t>
+	{
+		typedef row_extent type;
+	};
+
+	template<> struct aview2d_slice_extent<column_major_t>
+	{
+		typedef column_extent type;
 	};
 
 
@@ -143,8 +172,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		// -- new --
-
 		BCS_ENSURE_INLINE index_type dim0() const
 		{
 			return derived().dim0();
@@ -163,16 +190,6 @@ namespace bcs
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
 			return derived().ncolumns();
-		}
-
-		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
-		{
-			return derived().operator()(i, j);
-		}
-
-		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
-		{
-			return derived().operator()(i, j);
 		}
 
 	}; // end class aview2d_base
@@ -229,7 +246,11 @@ namespace bcs
 			return derived().ncolumns();
 		}
 
-		// -- new --
+
+		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
+		{
+			return derived().slice_extent();
+		}
 
 		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
@@ -295,7 +316,11 @@ namespace bcs
 			return derived().ncolumns();
 		}
 
-		// -- new --
+
+		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
+		{
+			return derived().slice_extent();
+		}
 
 		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
@@ -346,6 +371,12 @@ namespace bcs
 			return derived().shape();
 		}
 
+
+		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
+		{
+			return derived().slice_extent();
+		}
+
 		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
 			return derived().lead_dim();
@@ -380,8 +411,6 @@ namespace bcs
 		{
 			return derived().operator()(i, j);
 		}
-
-		// -- new --
 
 		typename aview_traits<Derived>::row_cview_type
 		row(index_t i) const
@@ -429,6 +458,12 @@ namespace bcs
 			return derived().shape();
 		}
 
+
+		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
+		{
+			return derived().slice_extent();
+		}
+
 		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
 			return derived().lead_dim();
@@ -473,8 +508,6 @@ namespace bcs
 		{
 			return derived().operator()(i, j);
 		}
-
-		// -- new --
 
 		typename aview_traits<Derived>::row_cview_type
 		row(index_t i) const
@@ -534,6 +567,11 @@ namespace bcs
 			return derived().shape();
 		}
 
+		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
+		{
+			return derived().slice_extent();
+		}
+
 		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
 			return derived().lead_dim();
@@ -558,8 +596,6 @@ namespace bcs
 		{
 			return derived().ncolumns();
 		}
-
-		// -- new --
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
@@ -627,6 +663,11 @@ namespace bcs
 			return derived().shape();
 		}
 
+		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
+		{
+			return derived().slice_extent();
+		}
+
 		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
 			return derived().lead_dim();
@@ -651,8 +692,6 @@ namespace bcs
 		{
 			return derived().ncolumns();
 		}
-
-		// -- new --
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
