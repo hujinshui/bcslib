@@ -28,40 +28,40 @@ namespace bcs { namespace matlab {
 
 		// size info
 
-		size_t ndims() const
+		index_t ndims() const
 		{
-			return (size_t)mxGetNumberOfDimensions(m_pa);
+			return (index_t)mxGetNumberOfDimensions(m_pa);
 		}
 
-		size_t nrows() const
+		index_t nrows() const
 		{
-			return (size_t)mxGetM(m_pa);
+			return (index_t)mxGetM(m_pa);
 		}
 
-		size_t ncolumns() const
+		index_t ncolumns() const
 		{
-			return (size_t)mxGetN(m_pa);
+			return (index_t)mxGetN(m_pa);
 		}
 
-		void get_dims(size_t *dims) const
+		void get_dims(index_t *dims) const
 		{
-			size_t nd = ndims();
+			index_t nd = ndims();
 			const mwSize *ret = mxGetDimensions(m_pa);
 
-			for (size_t i = 0; i < nd; ++i)
+			for (index_t i = 0; i < nd; ++i)
 			{
-				dims[i] = ret[i];
+				dims[i] = (index_t)ret[i];
 			}
 		}
 
-		size_t element_size() const
+		index_t element_size() const
 		{
-			return mxGetElementSize(m_pa);
+			return (index_t)mxGetElementSize(m_pa);
 		}
 
-		size_t nelems() const
+		index_t nelems() const
 		{
-			return (size_t)mxGetNumberOfElements(m_pa);
+			return (index_t)mxGetNumberOfElements(m_pa);
 		}
 
 		bool is_empty() const
@@ -227,9 +227,9 @@ namespace bcs { namespace matlab {
 
 		// struct related
 
-		size_t nfields() const
+		index_t nfields() const
 		{
-			return (size_t)mxGetNumberOfFields(m_pa);
+			return (index_t)mxGetNumberOfFields(m_pa);
 		}
 
 		const char* field_name(int fieldnum) const
@@ -255,7 +255,7 @@ namespace bcs { namespace matlab {
 
 		// cell related
 
-		size_t ncells() const
+		index_t ncells() const
 		{
 			return nelems();
 		}
@@ -362,76 +362,19 @@ namespace bcs { namespace matlab {
 	// functions for creating matlab arrays
 
 	template<typename T>
-	inline marray create_marray(size_t m, size_t n)
+	inline marray create_marray(index_t m, index_t n)
 	{
 		return mxCreateNumericMatrix((mwSize)m, (mwSize)n,
 				mtype_traits<T>::class_id, mxREAL);
 	}
 
 	template<>
-	inline marray create_marray<bool>(size_t m, size_t n)
+	inline marray create_marray<bool>(index_t m, index_t n)
 	{
 		return mxCreateLogicalMatrix((mwSize)m, (mwSize)n);
 	}
 
-	template<typename T>
-	inline marray create_marray(size_t ndim, const size_t *dims)
-	{
-		const size_t ndim0 = 8;
-		mwSize _dims[ndim0];
-
-		mwSize *pdims = 0;
-		if (ndim <= ndim0)
-		{
-			pdims = _dims;
-		}
-		else
-		{
-			pdims = new mwSize[ndim];
-		}
-
-		for (size_t i = 0; i < ndim; ++i) pdims[i] = (mwSize)dims[i];
-
-		mxArray *mx = mxCreateNumericArray((mwSize)ndim, pdims,
-				mtype_traits<T>::class_id, mxREAL);
-
-		if (ndim > ndim0)
-		{
-			delete[] pdims;
-		}
-
-		return mx;
-	}
-
-	template<>
-	inline marray create_marray<bool>(size_t ndim, const size_t *dims)
-	{
-		const size_t ndim0 = 8;
-		mwSize _dims[ndim0];
-
-		mwSize *pdims = 0;
-		if (ndim <= ndim0)
-		{
-			pdims = _dims;
-		}
-		else
-		{
-			pdims = new mwSize[ndim];
-		}
-
-		for (size_t i = 0; i < ndim; ++i) pdims[i] = (mwSize)dims[i];
-
-		mxArray *mx = mxCreateLogicalArray((mwSize)ndim, pdims);
-
-		if (ndim > ndim0)
-		{
-			delete[] pdims;
-		}
-
-		return mx;
-	}
-
-	inline marray create_mchar_array(size_t m, size_t n)
+	inline marray create_mchar_array(index_t m, index_t n)
 	{
 		mwSize dims[2];
 		dims[0] = (mwSize)m;
@@ -459,17 +402,17 @@ namespace bcs { namespace matlab {
 		return mA;
 	}
 
-	inline marray create_mstruct(size_t nfields, const char **fieldnames)
+	inline marray create_mstruct(index_t nfields, const char **fieldnames)
 	{
 		return mxCreateStructMatrix(1, 1, (int)nfields, fieldnames);
 	}
 
-	inline marray create_mstruct_array(size_t m, size_t n, size_t nfields, const char **fieldnames)
+	inline marray create_mstruct_array(index_t m, index_t n, index_t nfields, const char **fieldnames)
 	{
 		return mxCreateStructMatrix((mwSize)m, (mwSize)n, (int)nfields, fieldnames);
 	}
 
-	inline marray create_mcell_array(size_t m, size_t n)
+	inline marray create_mcell_array(index_t m, index_t n)
 	{
 		return mxCreateCellMatrix((mwSize)m, (mwSize)n);
 	}
