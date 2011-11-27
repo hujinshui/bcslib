@@ -6,57 +6,34 @@
  * @author Dahua Lin
  */
 
-#include <bcslib/test/test_units.h>
-#include <bcslib/test/test_array_aux.h>
+#include "bcs_test_basics.h"
 
 #include <bcslib/array/array1d.h>
 #include <bcslib/array/array2d.h>
-#include <bcslib/array/generic_blas.h>
-#include <bcslib/array/mat_times.h>
+#include <bcslib/array/aview_blas.h>
 
 using namespace bcs;
 using namespace bcs::test;
 
-BCS_TEST_CASE( test_blas_level1 )
+TEST( AViewBLAS, Level1 )
 {
 	// prepare data
 
-	const size_t N = 6;
+	const index_t N = 6;
 	double x1d_src[N] = {3, -4, 5, -6, 8, 2};
 	double x2d_src[N] = {1, 2, 3, 4, 5, 6};
 	float  x1f_src[N] = {3, -4, 5, -6, 8, 2};
 	float  x2f_src[N] = {1, 2, 3, 4, 5, 6};
-	const size_t m = 2;
-	const size_t n = 3;
 
-	caview1d<double> x1d = get_aview1d(x1d_src, N);
-	caview1d<double> x2d = get_aview1d(x2d_src, N);
-	caview1d<float>  x1f = get_aview1d(x1f_src, N);
-	caview1d<float>  x2f = get_aview1d(x2f_src, N);
-
-	caview2d<double, row_major_t> X1d_rm = get_aview2d_rm(x1d_src, m, n);
-	caview2d<double, row_major_t> X2d_rm = get_aview2d_rm(x2d_src, m, n);
-	caview2d<float,  row_major_t> X1f_rm = get_aview2d_rm(x1f_src, m, n);
-	caview2d<float,  row_major_t> X2f_rm = get_aview2d_rm(x2f_src, m, n);
-
-	caview2d<double, column_major_t> X1d_cm = get_aview2d_cm(x1d_src, m, n);
-	caview2d<double, column_major_t> X2d_cm = get_aview2d_cm(x2d_src, m, n);
-	caview2d<float,  column_major_t> X1f_cm = get_aview2d_cm(x1f_src, m, n);
-	caview2d<float,  column_major_t> X2f_cm = get_aview2d_cm(x2f_src, m, n);
+	caview1d<double> x1d = make_aview1d(x1d_src, N);
+	caview1d<double> x2d = make_aview1d(x2d_src, N);
+	caview1d<float>  x1f = make_aview1d(x1f_src, N);
+	caview1d<float>  x2f = make_aview1d(x2f_src, N);
 
 	array1d<double> y1d(N);
 	array1d<float>  y1f(N);
-	array2d<double, row_major_t> Y1d_rm(m, n);
-	array2d<float,  row_major_t> Y1f_rm(m, n);
-	array2d<double, column_major_t> Y1d_cm(m, n);
-	array2d<float,  column_major_t> Y1f_cm(m, n);
-
 	array1d<double> y2d(N);
 	array1d<float>  y2f(N);
-	array2d<double, row_major_t> Y2d_rm(m, n);
-	array2d<float,  row_major_t> Y2f_rm(m, n);
-	array2d<double, column_major_t> Y2d_cm(m, n);
-	array2d<float,  column_major_t> Y2f_cm(m, n);
 
 	double td = 1e-14;
 	float  tf = 1e-6f;
@@ -66,12 +43,8 @@ BCS_TEST_CASE( test_blas_level1 )
 	double asum_rd = 28.0;
 	float  asum_rf = 28.0f;
 
-	BCS_CHECK_APPROX_( blas::asum(x1d),    asum_rd, td );
-	BCS_CHECK_APPROX_( blas::asum(x1f),    asum_rf, tf );
-	BCS_CHECK_APPROX_( blas::asum(X1d_rm), asum_rd, td );
-	BCS_CHECK_APPROX_( blas::asum(X1f_rm), asum_rf, tf );
-	BCS_CHECK_APPROX_( blas::asum(X1d_cm), asum_rd, td );
-	BCS_CHECK_APPROX_( blas::asum(X1f_cm), asum_rf, tf );
+	ASSERT_NEAR( blas::asum(x1d),    asum_rd, td );
+	ASSERT_NEAR( blas::asum(x1f),    asum_rf, tf );
 
 	// axpy
 
@@ -81,35 +54,21 @@ BCS_TEST_CASE( test_blas_level1 )
 	double ad = 2.0;
 	float  af = 2.0f;
 
-	y1d << x2d; blas::axpy(x1d, y1d, ad);
-	BCS_CHECK( array_view_equal(y1d, axpy_rd, N) );
+	copy(x2d, y1d);
+	blas::axpy(x1d, y1d, ad);
+	ASSERT_TRUE( array1d_equal(y1d, make_aview1d(axpy_rd, N)) );
 
-	y1f << x2f; blas::axpy(x1f, y1f, af);
-	BCS_CHECK( array_view_equal(y1f, axpy_rf, N) );
-
-	Y1d_rm << X2d_rm; blas::axpy(X1d_rm, Y1d_rm, ad);
-	BCS_CHECK( array_view_equal(Y1d_rm, axpy_rd, m, n) );
-
-	Y1f_rm << X2f_rm; blas::axpy(X1f_rm, Y1f_rm, af);
-	BCS_CHECK( array_view_equal(Y1f_rm, axpy_rf, m, n) );
-
-	Y1d_cm << X2d_cm; blas::axpy(X1d_cm, Y1d_cm, ad);
-	BCS_CHECK( array_view_equal(Y1d_cm, axpy_rd, m, n) );
-
-	Y1f_cm << X2f_cm; blas::axpy(X1f_cm, Y1f_cm, af);
-	BCS_CHECK( array_view_equal(Y1f_cm, axpy_rf, m, n) );
+	copy(x2f, y1f);
+	blas::axpy(x1f, y1f, af);
+	ASSERT_TRUE( array1d_equal(y1f, make_aview1d(axpy_rf, N)) );
 
 	// dot
 
 	double dot_rd = 38.0;
 	float  dot_rf = 38.0f;
 
-	BCS_CHECK_APPROX_( blas::dot(x1d, x2d), dot_rd, td );
-	BCS_CHECK_APPROX_( blas::dot(x1f, x2f), dot_rf, tf );
-	BCS_CHECK_APPROX_( blas::dot(X1d_rm, X2d_rm), dot_rd, td );
-	BCS_CHECK_APPROX_( blas::dot(X1f_rm, X2f_rm), dot_rf, tf );
-	BCS_CHECK_APPROX_( blas::dot(X1d_cm, X2d_cm), dot_rd, td );
-	BCS_CHECK_APPROX_( blas::dot(X1f_cm, X2f_cm), dot_rf, tf );
+	ASSERT_NEAR( blas::dot(x1d, x2d), dot_rd, td );
+	ASSERT_NEAR( blas::dot(x1f, x2f), dot_rf, tf );
 
 	// rot
 
@@ -121,30 +80,20 @@ BCS_TEST_CASE( test_blas_level1 )
 	double rot_bd[N] = {-7, 16, -9, 26, -14, 6};
 	float  rot_bf[N] = {-7, 16, -9, 26, -14, 6};
 
-	y1d << x1d; y2d << x2d; blas::rot(y1d, y2d, cd, sd);
-	BCS_CHECK( array_view_equal(y1d, rot_ad, N) );
-	BCS_CHECK( array_view_equal(y2d, rot_bd, N) );
+	copy(x1d, y1d);
+	copy(x2d, y2d);
+	blas::rot(y1d, y2d, cd, sd);
+	ASSERT_TRUE( array1d_equal(y1d, make_aview1d(rot_ad, N) ));
+	ASSERT_TRUE( array1d_equal(y2d, make_aview1d(rot_bd, N) ));
 
-	y1f << x1f; y2f << x2f; blas::rot(y1f, y2f, cf, sf);
-	BCS_CHECK( array_view_equal(y1f, rot_af, N) );
-	BCS_CHECK( array_view_equal(y2f, rot_bf, N) );
+	copy(x1f, y1f);
+	copy(x2f, y2f);
+	blas::rot(y1f, y2f, cf, sf);
+	ASSERT_TRUE( array1d_equal(y1f, make_aview1d(rot_af, N) ));
+	ASSERT_TRUE( array1d_equal(y2f, make_aview1d(rot_bf, N) ));
 
-	Y1d_rm << X1d_rm; Y2d_rm << X2d_rm; blas::rot(Y1d_rm, Y2d_rm, cd, sd);
-	BCS_CHECK( array_view_equal(Y1d_rm, rot_ad, m, n) );
-	BCS_CHECK( array_view_equal(Y2d_rm, rot_bd, m, n) );
-
-	Y1f_rm << X1f_rm; Y2f_rm << X2f_rm; blas::rot(Y1f_rm, Y2f_rm, cf, sf);
-	BCS_CHECK( array_view_equal(Y1f_rm, rot_af, m, n) );
-	BCS_CHECK( array_view_equal(Y2f_rm, rot_bf, m, n) );
-
-	Y1d_cm << X1d_cm; Y2d_cm << X2d_cm; blas::rot(Y1d_cm, Y2d_cm, cd, sd);
-	BCS_CHECK( array_view_equal(Y1d_cm, rot_ad, m, n) );
-	BCS_CHECK( array_view_equal(Y2d_cm, rot_bd, m, n) );
-
-	Y1f_cm << X1f_cm; Y2f_cm << X2f_cm; blas::rot(Y1f_cm, Y2f_cm, cf, sf);
-	BCS_CHECK( array_view_equal(Y1f_cm, rot_af, m, n) );
-	BCS_CHECK( array_view_equal(Y2f_cm, rot_bf, m, n) );
 }
+
 
 
 // Auxiliary functions for BLAS Level 2
@@ -155,7 +104,7 @@ array2d<T, TOrd> _make_symmetric(const caview2d<T, TOrd>& A)
 	check_arg(A.dim0() == A.dim1());
 	index_t n = A.dim0();
 
-	array2d<T, TOrd> S((size_t)n, (size_t)n);
+	array2d<T, TOrd> S(n, n);
 	for (index_t i = 0; i < n; ++i)
 	{
 		for (index_t j = 0; j < n; ++j)
@@ -174,7 +123,7 @@ array1d<T> _compute_mv(const caview2d<T, TOrd>& A, const caview1d<T>& x, const c
 	index_t n = A.dim1();
 	index_t nr = (trans == 'N' || trans == 'n') ? m : n;
 
-	array1d<T> r((size_t)nr);
+	array1d<T> r(nr);
 	if (trans == 'N' || trans == 'n')
 	{
 		for (index_t i = 0; i < m; ++i)
@@ -205,7 +154,7 @@ array2d<T, TOrd> _compute_rank1_update(const caview2d<T, TOrd>& A, const caview1
 	index_t m = A.dim0();
 	index_t n = A.dim1();
 
-	array2d<T, TOrd> U((size_t)m, (size_t)n);
+	array2d<T, TOrd> U(m, n);
 	for (index_t i = 0; i < m; ++i)
 	{
 		for (index_t j = 0; j < n; ++j)
@@ -219,7 +168,7 @@ array2d<T, TOrd> _compute_rank1_update(const caview2d<T, TOrd>& A, const caview1
 
 
 template<typename T, typename TOrd>
-bool verify_gemv(const caview2d<T, TOrd>& A, const caview1d<T>& x, const caview1d<T>& y0, T alpha, T beta, char trans)
+bool verify_gemv(const caview2d<T, TOrd>& A, const caview1d<T>& x, const caview1d<T>& y0, T alpha, T beta, char trans, T tol)
 {
 	// compute ground-truth in a slow but safe way
 
@@ -228,16 +177,16 @@ bool verify_gemv(const caview2d<T, TOrd>& A, const caview1d<T>& x, const caview1
 	// use gemv to compute
 
 	array1d<T> y(y0.nelems(), y0.pbase());
-	blas::gemv(A, x, y, trans, alpha, beta);
+	blas::gemv(A, trans, x, y, alpha, beta);
 
 	// test
 
-	return array_view_approx(y, r);
+	return array_approx(y, r, y.nelems(), tol);
 }
 
 
 template<typename T, typename TOrd>
-bool verify_ger(const caview2d<T, TOrd>& A0, const caview1d<T>& x, const caview1d<T>& y, T alpha)
+bool verify_ger(const caview2d<T, TOrd>& A0, const caview1d<T>& x, const caview1d<T>& y, T alpha, T tol)
 {
 	// compute ground-truth
 
@@ -250,30 +199,30 @@ bool verify_ger(const caview2d<T, TOrd>& A0, const caview1d<T>& x, const caview1
 
 	// test
 
-	return array_view_approx(A, R);
+	return array_approx(A, R, A.nelems(), tol);
 }
 
 
 template<typename T, typename TOrd>
-bool verify_symv(const caview2d<T, TOrd>& A, const caview1d<T>& x, const caview1d<T>& y0, T alpha, T beta)
+bool verify_symv(const caview2d<T, TOrd>& A, const caview1d<T>& x, const caview1d<T>& y0, T alpha, T beta, T tol)
 {
 	// compute ground-truth in a slow but safe way
 
 	array2d<T, TOrd> As = _make_symmetric(A);
-	array1d<T> r = _compute_mv(As, x, y0, alpha, beta, 'N');
+	array1d<T> r = _compute_mv(As.cview(), x, y0, alpha, beta, 'N');
 
 	// use symv to compute
 
 	array1d<T> y(y0.nelems(), y0.pbase());
-	blas::symv(As, x, y, alpha, beta);
+	blas::symv(As, 'U', x, y, alpha, beta);
 
 	// test
 
-	return array_view_approx(y, r);
+	return array_approx(y, r, y.nelems(), tol);
 }
 
 
-BCS_TEST_CASE( test_blas_level2 )
+TEST( AViewBLAS, Level2 )
 {
 	// prepare data
 
@@ -292,166 +241,171 @@ BCS_TEST_CASE( test_blas_level2 )
 	float xsrc_f[Nv] = {2, 4, 3, 5};
 	float ysrc_f[Nv] = {1, 7, 4, 2};
 
-	caview2d<double, row_major_t> A1_d_rm = get_aview2d_rm(asrc_d, m1, n1);
-	caview2d<float,  row_major_t> A1_f_rm = get_aview2d_rm(asrc_f, m1, n1);
-	caview2d<double, row_major_t> A2_d_rm = get_aview2d_rm(asrc_d, m2, n2);
-	caview2d<float,  row_major_t> A2_f_rm = get_aview2d_rm(asrc_f, m2, n2);
-	caview2d<double, row_major_t> As_d_rm = get_aview2d_rm(asrc_d, m1, m1);
-	caview2d<float,  row_major_t> As_f_rm = get_aview2d_rm(asrc_f, m1, m1);
+	caview2d<double, row_major_t> A1_d_rm = make_aview2d_rm(asrc_d, m1, n1);
+	caview2d<float,  row_major_t> A1_f_rm = make_aview2d_rm(asrc_f, m1, n1);
+	caview2d<double, row_major_t> A2_d_rm = make_aview2d_rm(asrc_d, m2, n2);
+	caview2d<float,  row_major_t> A2_f_rm = make_aview2d_rm(asrc_f, m2, n2);
+	caview2d<double, row_major_t> As_d_rm = make_aview2d_rm(asrc_d, m1, m1);
+	caview2d<float,  row_major_t> As_f_rm = make_aview2d_rm(asrc_f, m1, m1);
 
-	caview2d<double, column_major_t> A1_d_cm = get_aview2d_cm(asrc_d, m1, n1);
-	caview2d<float,  column_major_t> A1_f_cm = get_aview2d_cm(asrc_f, m1, n1);
-	caview2d<double, column_major_t> A2_d_cm = get_aview2d_cm(asrc_d, m2, n2);
-	caview2d<float,  column_major_t> A2_f_cm = get_aview2d_cm(asrc_f, m2, n2);
-	caview2d<double, column_major_t> As_d_cm = get_aview2d_cm(asrc_d, m1, m1);
-	caview2d<float,  column_major_t> As_f_cm = get_aview2d_cm(asrc_f, m1, m1);
+	caview2d<double, column_major_t> A1_d_cm = make_aview2d_cm(asrc_d, m1, n1);
+	caview2d<float,  column_major_t> A1_f_cm = make_aview2d_cm(asrc_f, m1, n1);
+	caview2d<double, column_major_t> A2_d_cm = make_aview2d_cm(asrc_d, m2, n2);
+	caview2d<float,  column_major_t> A2_f_cm = make_aview2d_cm(asrc_f, m2, n2);
+	caview2d<double, column_major_t> As_d_cm = make_aview2d_cm(asrc_d, m1, m1);
+	caview2d<float,  column_major_t> As_f_cm = make_aview2d_cm(asrc_f, m1, m1);
 
-	caview1d<double> x1_d = get_aview1d(xsrc_d, n1);
-	caview1d<float>  x1_f = get_aview1d(xsrc_f, n1);
-	caview1d<double> x2_d = get_aview1d(xsrc_d, n2);
-	caview1d<float>  x2_f = get_aview1d(xsrc_f, n2);
+	caview1d<double> x1_d = make_aview1d(xsrc_d, n1);
+	caview1d<float>  x1_f = make_aview1d(xsrc_f, n1);
+	caview1d<double> x2_d = make_aview1d(xsrc_d, n2);
+	caview1d<float>  x2_f = make_aview1d(xsrc_f, n2);
 
-	caview1d<double> y1_d = get_aview1d(ysrc_d, m1);
-	caview1d<float>  y1_f = get_aview1d(ysrc_f, m1);
-	caview1d<double> y2_d = get_aview1d(ysrc_d, m2);
-	caview1d<float>  y2_f = get_aview1d(ysrc_f, m2);
+	caview1d<double> y1_d = make_aview1d(ysrc_d, m1);
+	caview1d<float>  y1_f = make_aview1d(ysrc_f, m1);
+	caview1d<double> y2_d = make_aview1d(ysrc_d, m2);
+	caview1d<float>  y2_f = make_aview1d(ysrc_f, m2);
 
 	double alpha_d, beta_d;
 	float  alpha_f, beta_f;
+
+	double tol_d = 1e-12;
+	float tol_f = 1e-6f;
 
 	// gemv
 
 	alpha_d = 1; beta_d = 0;
 	alpha_f = 1; beta_f = 0;
 
-	BCS_CHECK( verify_gemv(A1_d_cm, x1_d, y1_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A1_d_cm, x2_d, y2_d, alpha_d, beta_d, 'T') );
-	BCS_CHECK( verify_gemv(A2_d_cm, x2_d, y2_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A2_d_cm, x1_d, y1_d, alpha_d, beta_d, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_d_cm, x1_d, y1_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A1_d_cm, x2_d, y2_d, alpha_d, beta_d, 'T', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_cm, x2_d, y2_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_cm, x1_d, y1_d, alpha_d, beta_d, 'T', tol_d) );
 
-	BCS_CHECK( verify_gemv(A1_d_rm, x1_d, y1_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A1_d_rm, x2_d, y2_d, alpha_d, beta_d, 'T') );
-	BCS_CHECK( verify_gemv(A2_d_rm, x2_d, y2_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A2_d_rm, x1_d, y1_d, alpha_d, beta_d, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_d_rm, x1_d, y1_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A1_d_rm, x2_d, y2_d, alpha_d, beta_d, 'T', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_rm, x2_d, y2_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_rm, x1_d, y1_d, alpha_d, beta_d, 'T', tol_d) );
 
-	BCS_CHECK( verify_gemv(A1_f_cm, x1_f, y1_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A1_f_cm, x2_f, y2_f, alpha_f, beta_f, 'T') );
-	BCS_CHECK( verify_gemv(A2_f_cm, x2_f, y2_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A2_f_cm, x1_f, y1_f, alpha_f, beta_f, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_f_cm, x1_f, y1_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A1_f_cm, x2_f, y2_f, alpha_f, beta_f, 'T', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_cm, x2_f, y2_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_cm, x1_f, y1_f, alpha_f, beta_f, 'T', tol_f) );
 
-	BCS_CHECK( verify_gemv(A1_f_rm, x1_f, y1_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A1_f_rm, x2_f, y2_f, alpha_f, beta_f, 'T') );
-	BCS_CHECK( verify_gemv(A2_f_rm, x2_f, y2_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A2_f_rm, x1_f, y1_f, alpha_f, beta_f, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_f_rm, x1_f, y1_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A1_f_rm, x2_f, y2_f, alpha_f, beta_f, 'T', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_rm, x2_f, y2_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_rm, x1_f, y1_f, alpha_f, beta_f, 'T', tol_f) );
 
 	alpha_d = 2; beta_d = 0;
 	alpha_f = 2; beta_f = 0;
 
-	BCS_CHECK( verify_gemv(A1_d_cm, x1_d, y1_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A1_d_cm, x2_d, y2_d, alpha_d, beta_d, 'T') );
-	BCS_CHECK( verify_gemv(A2_d_cm, x2_d, y2_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A2_d_cm, x1_d, y1_d, alpha_d, beta_d, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_d_cm, x1_d, y1_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A1_d_cm, x2_d, y2_d, alpha_d, beta_d, 'T', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_cm, x2_d, y2_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_cm, x1_d, y1_d, alpha_d, beta_d, 'T', tol_d) );
 
-	BCS_CHECK( verify_gemv(A1_d_rm, x1_d, y1_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A1_d_rm, x2_d, y2_d, alpha_d, beta_d, 'T') );
-	BCS_CHECK( verify_gemv(A2_d_rm, x2_d, y2_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A2_d_rm, x1_d, y1_d, alpha_d, beta_d, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_d_rm, x1_d, y1_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A1_d_rm, x2_d, y2_d, alpha_d, beta_d, 'T', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_rm, x2_d, y2_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_rm, x1_d, y1_d, alpha_d, beta_d, 'T', tol_d) );
 
-	BCS_CHECK( verify_gemv(A1_f_cm, x1_f, y1_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A1_f_cm, x2_f, y2_f, alpha_f, beta_f, 'T') );
-	BCS_CHECK( verify_gemv(A2_f_cm, x2_f, y2_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A2_f_cm, x1_f, y1_f, alpha_f, beta_f, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_f_cm, x1_f, y1_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A1_f_cm, x2_f, y2_f, alpha_f, beta_f, 'T', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_cm, x2_f, y2_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_cm, x1_f, y1_f, alpha_f, beta_f, 'T', tol_f) );
 
-	BCS_CHECK( verify_gemv(A1_f_rm, x1_f, y1_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A1_f_rm, x2_f, y2_f, alpha_f, beta_f, 'T') );
-	BCS_CHECK( verify_gemv(A2_f_rm, x2_f, y2_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A2_f_rm, x1_f, y1_f, alpha_f, beta_f, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_f_rm, x1_f, y1_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A1_f_rm, x2_f, y2_f, alpha_f, beta_f, 'T', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_rm, x2_f, y2_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_rm, x1_f, y1_f, alpha_f, beta_f, 'T', tol_f) );
 
 	alpha_d = 2; beta_d = 0.5;
 	alpha_f = 2; beta_f = 0.5;
 
-	BCS_CHECK( verify_gemv(A1_d_cm, x1_d, y1_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A1_d_cm, x2_d, y2_d, alpha_d, beta_d, 'T') );
-	BCS_CHECK( verify_gemv(A2_d_cm, x2_d, y2_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A2_d_cm, x1_d, y1_d, alpha_d, beta_d, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_d_cm, x1_d, y1_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A1_d_cm, x2_d, y2_d, alpha_d, beta_d, 'T', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_cm, x2_d, y2_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_cm, x1_d, y1_d, alpha_d, beta_d, 'T', tol_d) );
 
-	BCS_CHECK( verify_gemv(A1_d_rm, x1_d, y1_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A1_d_rm, x2_d, y2_d, alpha_d, beta_d, 'T') );
-	BCS_CHECK( verify_gemv(A2_d_rm, x2_d, y2_d, alpha_d, beta_d, 'N') );
-	BCS_CHECK( verify_gemv(A2_d_rm, x1_d, y1_d, alpha_d, beta_d, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_d_rm, x1_d, y1_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A1_d_rm, x2_d, y2_d, alpha_d, beta_d, 'T', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_rm, x2_d, y2_d, alpha_d, beta_d, 'N', tol_d) );
+	ASSERT_TRUE( verify_gemv(A2_d_rm, x1_d, y1_d, alpha_d, beta_d, 'T', tol_d) );
 
-	BCS_CHECK( verify_gemv(A1_f_cm, x1_f, y1_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A1_f_cm, x2_f, y2_f, alpha_f, beta_f, 'T') );
-	BCS_CHECK( verify_gemv(A2_f_cm, x2_f, y2_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A2_f_cm, x1_f, y1_f, alpha_f, beta_f, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_f_cm, x1_f, y1_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A1_f_cm, x2_f, y2_f, alpha_f, beta_f, 'T', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_cm, x2_f, y2_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_cm, x1_f, y1_f, alpha_f, beta_f, 'T', tol_f) );
 
-	BCS_CHECK( verify_gemv(A1_f_rm, x1_f, y1_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A1_f_rm, x2_f, y2_f, alpha_f, beta_f, 'T') );
-	BCS_CHECK( verify_gemv(A2_f_rm, x2_f, y2_f, alpha_f, beta_f, 'N') );
-	BCS_CHECK( verify_gemv(A2_f_rm, x1_f, y1_f, alpha_f, beta_f, 'T') );
+	ASSERT_TRUE( verify_gemv(A1_f_rm, x1_f, y1_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A1_f_rm, x2_f, y2_f, alpha_f, beta_f, 'T', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_rm, x2_f, y2_f, alpha_f, beta_f, 'N', tol_f) );
+	ASSERT_TRUE( verify_gemv(A2_f_rm, x1_f, y1_f, alpha_f, beta_f, 'T', tol_f) );
+
 
 	// ger
 
 	alpha_d = 1;
 	alpha_f = 1;
 
-	BCS_CHECK( verify_ger(A1_d_cm, y1_d, x1_d, alpha_d) );
-	BCS_CHECK( verify_ger(A2_d_cm, y2_d, x2_d, alpha_d) );
+	ASSERT_TRUE( verify_ger(A1_d_cm, y1_d, x1_d, alpha_d, tol_d) );
+	ASSERT_TRUE( verify_ger(A2_d_cm, y2_d, x2_d, alpha_d, tol_d) );
 
-	BCS_CHECK( verify_ger(A1_d_rm, y1_d, x1_d, alpha_d) );
-	BCS_CHECK( verify_ger(A2_d_rm, y2_d, x2_d, alpha_d) );
+	ASSERT_TRUE( verify_ger(A1_d_rm, y1_d, x1_d, alpha_d, tol_d) );
+	ASSERT_TRUE( verify_ger(A2_d_rm, y2_d, x2_d, alpha_d, tol_d) );
 
-	BCS_CHECK( verify_ger(A1_f_cm, y1_f, x1_f, alpha_f) );
-	BCS_CHECK( verify_ger(A2_f_cm, y2_f, x2_f, alpha_f) );
+	ASSERT_TRUE( verify_ger(A1_f_cm, y1_f, x1_f, alpha_f, tol_f) );
+	ASSERT_TRUE( verify_ger(A2_f_cm, y2_f, x2_f, alpha_f, tol_f) );
 
-	BCS_CHECK( verify_ger(A1_f_rm, y1_f, x1_f, alpha_f) );
-	BCS_CHECK( verify_ger(A2_f_rm, y2_f, x2_f, alpha_f) );
+	ASSERT_TRUE( verify_ger(A1_f_rm, y1_f, x1_f, alpha_f, tol_f) );
+	ASSERT_TRUE( verify_ger(A2_f_rm, y2_f, x2_f, alpha_f, tol_f) );
 
 	alpha_d = 2;
 	alpha_f = 2;
 
-	BCS_CHECK( verify_ger(A1_d_cm, y1_d, x1_d, alpha_d) );
-	BCS_CHECK( verify_ger(A2_d_cm, y2_d, x2_d, alpha_d) );
+	ASSERT_TRUE( verify_ger(A1_d_cm, y1_d, x1_d, alpha_d, tol_d) );
+	ASSERT_TRUE( verify_ger(A2_d_cm, y2_d, x2_d, alpha_d, tol_d) );
 
-	BCS_CHECK( verify_ger(A1_d_rm, y1_d, x1_d, alpha_d) );
-	BCS_CHECK( verify_ger(A2_d_rm, y2_d, x2_d, alpha_d) );
+	ASSERT_TRUE( verify_ger(A1_d_rm, y1_d, x1_d, alpha_d, tol_d) );
+	ASSERT_TRUE( verify_ger(A2_d_rm, y2_d, x2_d, alpha_d, tol_d) );
 
-	BCS_CHECK( verify_ger(A1_f_cm, y1_f, x1_f, alpha_f) );
-	BCS_CHECK( verify_ger(A2_f_cm, y2_f, x2_f, alpha_f) );
+	ASSERT_TRUE( verify_ger(A1_f_cm, y1_f, x1_f, alpha_f, tol_f) );
+	ASSERT_TRUE( verify_ger(A2_f_cm, y2_f, x2_f, alpha_f, tol_f) );
 
-	BCS_CHECK( verify_ger(A1_f_rm, y1_f, x1_f, alpha_f) );
-	BCS_CHECK( verify_ger(A2_f_rm, y2_f, x2_f, alpha_f) );
+	ASSERT_TRUE( verify_ger(A1_f_rm, y1_f, x1_f, alpha_f, tol_f) );
+	ASSERT_TRUE( verify_ger(A2_f_rm, y2_f, x2_f, alpha_f, tol_f) );
 
 	// symv
 
 	alpha_d = 1; beta_d = 0;
 	alpha_f = 1; beta_f = 0;
 
-	BCS_CHECK( verify_symv(As_d_cm, x2_d, y1_d, alpha_d, beta_d) );
-	BCS_CHECK( verify_symv(As_d_rm, x2_d, y1_d, alpha_d, beta_d) );
+	ASSERT_TRUE( verify_symv(As_d_cm, x2_d, y1_d, alpha_d, beta_d, tol_d) );
+	ASSERT_TRUE( verify_symv(As_d_rm, x2_d, y1_d, alpha_d, beta_d, tol_d) );
 
-	BCS_CHECK( verify_symv(As_f_cm, x2_f, y1_f, alpha_f, beta_f) );
-	BCS_CHECK( verify_symv(As_f_rm, x2_f, y1_f, alpha_f, beta_f) );
+	ASSERT_TRUE( verify_symv(As_f_cm, x2_f, y1_f, alpha_f, beta_f, tol_f) );
+	ASSERT_TRUE( verify_symv(As_f_rm, x2_f, y1_f, alpha_f, beta_f, tol_f) );
 
 	alpha_d = 2; beta_d = 0;
 	alpha_f = 2; beta_f = 0;
 
-	BCS_CHECK( verify_symv(As_d_cm, x2_d, y1_d, alpha_d, beta_d) );
-	BCS_CHECK( verify_symv(As_d_rm, x2_d, y1_d, alpha_d, beta_d) );
+	ASSERT_TRUE( verify_symv(As_d_cm, x2_d, y1_d, alpha_d, beta_d, tol_d) );
+	ASSERT_TRUE( verify_symv(As_d_rm, x2_d, y1_d, alpha_d, beta_d, tol_d) );
 
-	BCS_CHECK( verify_symv(As_f_cm, x2_f, y1_f, alpha_f, beta_f) );
-	BCS_CHECK( verify_symv(As_f_rm, x2_f, y1_f, alpha_f, beta_f) );
+	ASSERT_TRUE( verify_symv(As_f_cm, x2_f, y1_f, alpha_f, beta_f, tol_f) );
+	ASSERT_TRUE( verify_symv(As_f_rm, x2_f, y1_f, alpha_f, beta_f, tol_f) );
 
 	alpha_d = 2; beta_d = 0.5;
 	alpha_f = 2; beta_f = 0.5;
 
-	BCS_CHECK( verify_symv(As_d_cm, x2_d, y1_d, alpha_d, beta_d) );
-	BCS_CHECK( verify_symv(As_d_rm, x2_d, y1_d, alpha_d, beta_d) );
+	ASSERT_TRUE( verify_symv(As_d_cm, x2_d, y1_d, alpha_d, beta_d, tol_d) );
+	ASSERT_TRUE( verify_symv(As_d_rm, x2_d, y1_d, alpha_d, beta_d, tol_d) );
 
-	BCS_CHECK( verify_symv(As_f_cm, x2_f, y1_f, alpha_f, beta_f) );
-	BCS_CHECK( verify_symv(As_f_rm, x2_f, y1_f, alpha_f, beta_f) );
+	ASSERT_TRUE( verify_symv(As_f_cm, x2_f, y1_f, alpha_f, beta_f, tol_f) );
+	ASSERT_TRUE( verify_symv(As_f_rm, x2_f, y1_f, alpha_f, beta_f, tol_f) );
 
 }
+
 
 
 // Auxiliary functions for BLAS level 3
@@ -463,10 +417,10 @@ array2d<T, TOrd> _compute_mm(
 		const caview2d<T, TOrd>& C, T alpha, T beta, char transa, char transb)
 {
 
-	std::unique_ptr<array2d<T, TOrd> > pOpA( transa == 'N' || transa == 'n' ?
+	array2d<T, TOrd>* pOpA( transa == 'N' || transa == 'n' ?
 			new array2d<T, TOrd>(clone_array(A)) : new array2d<T, TOrd>(transpose(A)) );
 
-	std::unique_ptr<array2d<T, TOrd> > pOpB( transb == 'N' || transb == 'n' ?
+	array2d<T, TOrd>* pOpB( transb == 'N' || transb == 'n' ?
 			new array2d<T, TOrd>(clone_array(B)) : new array2d<T, TOrd>(transpose(B)) );
 
 	const array2d<T, TOrd>& OpA = *pOpA;
@@ -479,7 +433,7 @@ array2d<T, TOrd> _compute_mm(
 	index_t k = OpA.dim1();
 	index_t n = OpB.dim1();
 
-	array2d<T, TOrd> R((size_t)m, (size_t)n);
+	array2d<T, TOrd> R(m, n);
 
 	for (index_t i = 0; i < m; ++i)
 	{
@@ -494,6 +448,9 @@ array2d<T, TOrd> _compute_mm(
 		}
 	}
 
+	delete pOpA;
+	delete pOpB;
+
 	return R;
 }
 
@@ -502,7 +459,7 @@ template<typename T, typename TOrd>
 bool verify_gemm(
 		const caview2d<T, TOrd>& A,
 		const caview2d<T, TOrd>& B,
-		const caview2d<T, TOrd>& C0, T alpha, T beta, char transa, char transb)
+		const caview2d<T, TOrd>& C0, T alpha, T beta, char transa, char transb, T tol)
 {
 	// compute ground-truth
 
@@ -511,34 +468,37 @@ bool verify_gemm(
 	// use gemm to compute
 
 	array2d<T, TOrd> C = clone_array(C0);
-	blas::gemm(A, B, C, transa, transb, alpha, beta);
+	blas::gemm(A, transa, B, transb, C, alpha, beta);
 
 	// test
-	return array_view_approx(C, R);
+	return array_approx(C, R, C.nelems(), tol);
 }
 
 
 template<typename T, typename TOrd>
 bool verify_gemm_(TOrd, const T *src_a, const T *src_b, const T *src_c,
-		size_t m, size_t n, size_t k, T alpha, T beta, char transa, char transb)
+		index_t m, index_t n, index_t k, T alpha, T beta, char transa, char transb, T tol)
 {
-	size_t ma, na, mb, nb;
+	index_t ma, na, mb, nb;
 
 	if (transa == 'N' || transa == 'n') { ma = m; na = k; } else { ma = k; na = m; }
 	if (transb == 'N' || transb == 'n') { mb = k; nb = n; } else { mb = n; nb = k; }
 
-	caview2d<T, TOrd> A(src_a, (index_t)ma, (index_t)na, ma, na);
-	caview2d<T, TOrd> B(src_b, (index_t)mb, (index_t)nb, mb, nb);
-	caview2d<T, TOrd> C(src_c, (index_t)m, (index_t)n, m, n);
+	caview2d<T, TOrd> A(src_a, ma, na);
+	caview2d<T, TOrd> B(src_b, mb, nb);
+	caview2d<T, TOrd> C(src_c, m, n);
 
-	return verify_gemm(A, B, C, alpha, beta, transa, transb);
+	return verify_gemm(A, B, C, alpha, beta, transa, transb, tol);
 }
 
 
 
-BCS_TEST_CASE( test_blas_level3 )
+TEST( AViewBLAS, Level3 )
 {
 	// gemm
+
+	double tol_d = 1.0e-12;
+	float tol_f = 1.0e-6f;
 
 	const size_t N = 20;
 	double src_a_d[N] = {7, 4, 9, 3, 9, 3, 5, 8, 10, 1, 12, 10, 6, 5, 6, 4, 7, 7, 10, 9};
@@ -559,132 +519,132 @@ BCS_TEST_CASE( test_blas_level3 )
 
 	// cm double
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T', tol_d) );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T', tol_d) );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T', tol_d) );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T', tol_d) );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T', tol_d) );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T', tol_d) );
 
 	// cm float
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T', tol_f) );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T', tol_f) );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T', tol_f) );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T', tol_f) );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T', tol_f) );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T', tol_f) );
 
 	// rm double
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T', tol_d) );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T', tol_d) );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T', tol_d) );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T', tol_d) );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T', tol_d) );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N', tol_d) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T', tol_d) );
 
 	// rm float
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T', tol_f) );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T', tol_f) );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T', tol_f) );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T', tol_f) );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T', tol_f) );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T') );
-
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N', tol_f) );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T', tol_f) );
+/*
 	// alpha = 2, beta = 0.5
 
 	alpha_d = 2.0;  beta_d = 0.5;
@@ -692,448 +652,135 @@ BCS_TEST_CASE( test_blas_level3 )
 
 	// cm double
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T') );
 
 	// cm float
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(column_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T') );
 
 	// rm double
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 4, 5, alpha_d, beta_d, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 3, 5, 4, alpha_d, beta_d, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 3, 5, alpha_d, beta_d, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 4, 5, 3, alpha_d, beta_d, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 3, 4, alpha_d, beta_d, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_d, src_b_d, src_c_d, 5, 4, 3, alpha_d, beta_d, 'T', 'T') );
 
 	// rm float
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 4, 5, alpha_f, beta_f, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 3, 5, 4, alpha_f, beta_f, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 3, 5, alpha_f, beta_f, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 4, 5, 3, alpha_f, beta_f, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 3, 4, alpha_f, beta_f, 'T', 'T') );
 
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N') );
-	BCS_CHECK( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T') );
-
-}
-
-
-// Auxiliary functions for testing mat-vec
-
-template<typename T, typename TOrd>
-bool verify_mat_vec_times(TOrd, const T *src_a, const T *src_x, size_t m, size_t n, bool transa, bool switch_side)
-{
-	const caview2d<T, TOrd> a(src_a, (index_t)m, (index_t)n, m, n);
-
-	if (!switch_side)
-	{
-		if (!transa)
-		{
-			caview1d<T> x(src_x, n);
-			array1d<T> y = mtimes(a, x);
-			array1d<T> y0(m, T(0));
-			array1d<T> r = _compute_mv(a, x, y0, T(1), T(0), 'N');
-
-			return array_view_approx(y, r);
-		}
-		else
-		{
-			caview1d<T> x(src_x, m);
-			array1d<T> y = mtimes(a.Tp(), x);
-			array1d<T> y0(n, T(0));
-			array1d<T> r = _compute_mv(a, x, y0, T(1), T(0), 'T');
-
-			return array_view_approx(y, r);
-		}
-	}
-	else
-	{
-		if (!transa)
-		{
-			caview1d<T> x(src_x, m);
-			array1d<T> y = mtimes(x, a);
-			array1d<T> y0(n, T(0));
-			array1d<T> r = _compute_mv(a, x, y0, T(1), T(0), 'T');
-
-			return array_view_approx(y, r);
-		}
-		else
-		{
-			caview1d<T> x(src_x, n);
-			array1d<T> y = mtimes(x, a.Tp());
-			array1d<T> y0(m, T(0));
-			array1d<T> r = _compute_mv(a, x, y0, T(1), T(0), 'N');
-
-			return array_view_approx(y, r);
-		}
-	}
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'N', 'T') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'N') );
+	ASSERT_TRUE( verify_gemm_(row_major_t(), src_a_f, src_b_f, src_c_f, 5, 4, 3, alpha_f, beta_f, 'T', 'T') );
+*/
 }
 
 
 
-BCS_TEST_CASE( test_mat_vec_times )
-{
-	// prepare data
-
-	const size_t N = 12;
-	const size_t Nv = 4;
-
-	double asrc_d[N] = {12, 2, 5, 8, 7, 1, 3, 4, 6, 5, 3, 10};
-	double xsrc_d[Nv] = {2, 4, 3, 5};
-
-	float asrc_f[N] = {12, 2, 5, 8, 7, 1, 3, 4, 6, 5, 3, 10};
-	float xsrc_f[Nv] = {2, 4, 3, 5};
-
-	// test
-
-	// double
-
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 3, 4, false, false) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 3, 4, false, true) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 3, 4, true,  false) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 3, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 4, 3, false, false) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 4, 3, false, true) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 4, 3, true,  false) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_d, xsrc_d, 4, 3, true,  true) );
-
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 3, 4, false, false) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 3, 4, false, true) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 3, 4, true,  false) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 3, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 4, 3, false, false) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 4, 3, false, true) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 4, 3, true,  false) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_d, xsrc_d, 4, 3, true,  true) );
-
-	// float
-
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 3, 4, false, false) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 3, 4, false, true) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 3, 4, true,  false) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 3, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 4, 3, false, false) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 4, 3, false, true) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 4, 3, true,  false) );
-	BCS_CHECK( verify_mat_vec_times(row_major_t(), asrc_f, xsrc_f, 4, 3, true,  true) );
-
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 3, 4, false, false) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 3, 4, false, true) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 3, 4, true,  false) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 3, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 4, 3, false, false) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 4, 3, false, true) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 4, 3, true,  false) );
-	BCS_CHECK( verify_mat_vec_times(column_major_t(), asrc_f, xsrc_f, 4, 3, true,  true) );
-}
-
-
-// Auxiliary function for verifying mat-mat times
-
-template<typename T, typename TOrd>
-bool verify_mat_mat_times(TOrd, const T *src_a, const T *src_b, size_t m, size_t k, size_t n, bool transa, bool transb)
-{
-	size_t ma, na, mb, nb;
-	if (!transa) { ma = m; na = k; } else { ma = k; na = m; }
-	if (!transb) { mb = k; nb = n; } else { mb = n; nb = k; }
-
-	caview2d<T, TOrd> a(src_a, (index_t)ma, (index_t)na, ma, na);
-	caview2d<T, TOrd> b(src_b, (index_t)mb, (index_t)nb, mb, nb);
-
-	array2d<T, TOrd> z(m, n, T(0));
-
-	if (!transa)
-	{
-		if (!transb)
-		{
-			array2d<T, TOrd> c = mtimes(a, b);
-			array2d<T, TOrd> r = _compute_mm(a, b, z, T(1), T(0), 'N', 'N');
-			return array_view_approx(c, r);
-		}
-		else
-		{
-			array2d<T, TOrd> c = mtimes(a, b.Tp());
-			array2d<T, TOrd> r = _compute_mm(a, b, z, T(1), T(0), 'N', 'T');
-			return array_view_approx(c, r);
-		}
-	}
-	else
-	{
-		if (!transb)
-		{
-			array2d<T, TOrd> c = mtimes(a.Tp(), b);
-			array2d<T, TOrd> r = _compute_mm(a, b, z, T(1), T(0), 'T', 'N');
-			return array_view_approx(c, r);
-		}
-		else
-		{
-			array2d<T, TOrd> c = mtimes(a.Tp(), b.Tp());
-			array2d<T, TOrd> r = _compute_mm(a, b, z, T(1), T(0), 'T', 'T');
-			return array_view_approx(c, r);
-		}
-	}
-}
-
-
-BCS_TEST_CASE( test_mat_mat_times )
-{
-	// prepare data
-
-	const size_t N = 20;
-	double src_a_d[N] = {7, 4, 9, 3, 9, 3, 5, 8, 10, 1, 12, 10, 6, 5, 6, 4, 7, 7, 10, 9};
-	double src_b_d[N] = {8, 5, 10, 7, 5, 12, 11, 7, 8, 8, 3, 4, 6, 3, 11, 3, 3, 2, 3, 6};
-
-	float src_a_f[N] = {7, 4, 9, 3, 9, 3, 5, 8, 10, 1, 12, 10, 6, 5, 6, 4, 7, 7, 10, 9};
-	float src_b_f[N] = {8, 5, 10, 7, 5, 12, 11, 7, 8, 8, 3, 4, 6, 3, 11, 3, 3, 2, 3, 6};
-
-	// test
-
-	// double
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 4, 5, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 4, 5, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 4, 5, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 4, 5, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 5, 4, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 5, 4, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 5, 4, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 3, 5, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 3, 5, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 3, 5, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 3, 5, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 3, 5, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 5, 3, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 5, 3, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 5, 3, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 4, 5, 3, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 3, 4, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 3, 4, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 3, 4, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 3, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 4, 3, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 4, 3, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 4, 3, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_d, src_b_d, 5, 4, 3, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 4, 5, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 4, 5, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 4, 5, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 4, 5, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 5, 4, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 5, 4, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 5, 4, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 3, 5, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 3, 5, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 3, 5, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 3, 5, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 3, 5, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 5, 3, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 5, 3, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 5, 3, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 4, 5, 3, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 3, 4, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 3, 4, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 3, 4, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 3, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 4, 3, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 4, 3, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 4, 3, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_d, src_b_d, 5, 4, 3, true,  true) );
-
-
-	// float
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 4, 5, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 4, 5, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 4, 5, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 4, 5, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 5, 4, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 5, 4, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 5, 4, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 3, 5, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 3, 5, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 3, 5, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 3, 5, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 3, 5, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 5, 3, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 5, 3, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 5, 3, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 4, 5, 3, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 3, 4, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 3, 4, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 3, 4, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 3, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 4, 3, false, false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 4, 3, false, true) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 4, 3, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(row_major_t(), src_a_f, src_b_f, 5, 4, 3, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 4, 5, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 4, 5, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 4, 5, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 4, 5, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 5, 4, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 5, 4, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 5, 4, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 3, 5, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 3, 5, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 3, 5, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 3, 5, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 3, 5, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 5, 3, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 5, 3, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 5, 3, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 4, 5, 3, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 3, 4, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 3, 4, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 3, 4, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 3, 4, true,  true) );
-
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 4, 3, false, false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 4, 3, false, true) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 4, 3, true,  false) );
-	BCS_CHECK( verify_mat_mat_times(column_major_t(), src_a_f, src_b_f, 5, 4, 3, true,  true) );
-
-}
-
-
-test_suite* test_array_blas_suite()
-{
-	test_suite *tsuite = new test_suite( "test_array_blas" );
-
-	tsuite->add( new test_blas_level1() );
-	tsuite->add( new test_blas_level2() );
-	tsuite->add( new test_blas_level3() );
-	tsuite->add( new test_mat_vec_times() );
-	tsuite->add( new test_mat_mat_times() );
-
-	return tsuite;
-}
 
 
