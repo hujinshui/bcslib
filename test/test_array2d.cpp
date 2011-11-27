@@ -181,11 +181,11 @@ BCS_STATIC_ASSERT( (is_base_of<
 
 // syntax checking for subviews
 
-void only_accept_blk_views_rm(const caview2d_block<double, row_major_t>& a) { }
-void only_accept_blk_views_cm(const caview2d_block<double, column_major_t>& a) { }
+template<class Derived> void only_accept_blk_views_rm(const IConstBlockAView2D<Derived, double, row_major_t>& a) { }
+template<class Derived> void only_accept_blk_views_cm(const IConstBlockAView2D<Derived, double, column_major_t>& a) { }
 
-void only_accept_cont_views_rm(const caview2d<double, row_major_t>& a) { }
-void only_accept_cont_views_cm(const caview2d<double, column_major_t>& a) { }
+template<class Derived> void only_accept_cont_views_rm(const IConstContinuousAView2D<Derived, double, row_major_t>& a) { }
+template<class Derived> void only_accept_cont_views_cm(const IConstContinuousAView2D<Derived, double, column_major_t>& a) { }
 
 void syntax_check_arr2_subview()
 {
