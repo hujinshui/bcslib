@@ -189,8 +189,8 @@ void only_accept_cont_views_cm(const caview2d<double, column_major_t>& a) { }
 
 void syntax_check_arr2_subview()
 {
-	caview2d_block<double, row_major_t> cb_rm(BCS_NULL, row_extent(0), 0, 0);
-	aview2d_block<double, row_major_t> bv_rm(BCS_NULL, row_extent(0), 0, 0);
+	caview2d_block<double, row_major_t> cb_rm(BCS_NULL, 0, 0, 0);
+	aview2d_block<double, row_major_t> bv_rm(BCS_NULL, 0, 0, 0);
 
 	only_accept_blk_views_rm(cb_rm);
 	only_accept_blk_views_rm(bv_rm);
@@ -205,8 +205,8 @@ void syntax_check_arr2_subview()
 	only_accept_blk_views_rm(bv_rm.V(whole(), rgn(0, 0)));
 	only_accept_blk_views_rm(bv_rm.V(rgn(0, 0), rgn(0, 0)));
 
-	caview2d_block<double, column_major_t> cb_cm(BCS_NULL, column_extent(0), 0, 0);
-	aview2d_block<double, column_major_t> bv_cm(BCS_NULL, column_extent(0), 0, 0);
+	caview2d_block<double, column_major_t> cb_cm(BCS_NULL, 0, 0, 0);
+	aview2d_block<double, column_major_t> bv_cm(BCS_NULL, 0, 0, 0);
 
 	only_accept_blk_views_cm(cb_cm);
 	only_accept_blk_views_cm(bv_cm);
@@ -435,7 +435,7 @@ TEST( Array2D, Aview2DColumnMajor )
 TEST( Array2D, Aview2DBlockRowMajor )
 {
 	double src[12] = {3, 4, 5, 1, 2, 7, 8, 9, 0, 3, 7, 6};
-	row_extent bext(4);
+	index_t bext = 4;
 	index_t m = 2;
 	index_t n = 3;
 
@@ -445,7 +445,7 @@ TEST( Array2D, Aview2DBlockRowMajor )
 
 	ASSERT_EQ(a1.dim0(), m);
 	ASSERT_EQ(a1.dim1(), n);
-	ASSERT_EQ(a1.base_extent().value, 4);
+	ASSERT_EQ(a1.lead_dim(), 4);
 	ASSERT_TRUE( array_integrity_test(a1) );
 	ASSERT_TRUE( array2d_equal(a1, make_aview2d_rm(ref, m, n)) );
 	ASSERT_TRUE( elemwise_operation_test(a1) );
@@ -454,7 +454,7 @@ TEST( Array2D, Aview2DBlockRowMajor )
 
 	ASSERT_EQ(a2.dim0(), m);
 	ASSERT_EQ(a2.dim1(), n);
-	ASSERT_EQ(a1.base_extent().value, 4);
+	ASSERT_EQ(a1.lead_dim(), 4);
 	ASSERT_TRUE( array_integrity_test(a2) );
 	ASSERT_TRUE( array2d_equal(a2, make_aview2d_rm(ref, m, n)) );
 
@@ -464,7 +464,7 @@ TEST( Array2D, Aview2DBlockRowMajor )
 TEST( Array2D, Aview2DBlockColumnMajor )
 {
 	double src[12] = {3, 4, 5, 1, 2, 7, 8, 9, 0, 3, 7, 6};
-	column_extent bext(3);
+	index_t bext = 3;
 	index_t m = 2;
 	index_t n = 3;
 
@@ -474,7 +474,7 @@ TEST( Array2D, Aview2DBlockColumnMajor )
 
 	ASSERT_EQ(a1.dim0(), m);
 	ASSERT_EQ(a1.dim1(), n);
-	ASSERT_EQ(a1.base_extent().value, 3);
+	ASSERT_EQ(a1.lead_dim(), 3);
 	ASSERT_TRUE( array_integrity_test(a1) );
 	ASSERT_TRUE( array2d_equal(a1, make_aview2d_cm(ref, m, n)) );
 	ASSERT_TRUE( elemwise_operation_test(a1) );
@@ -483,7 +483,7 @@ TEST( Array2D, Aview2DBlockColumnMajor )
 
 	ASSERT_EQ(a2.dim0(), m);
 	ASSERT_EQ(a2.dim1(), n);
-	ASSERT_EQ(a1.base_extent().value, 3);
+	ASSERT_EQ(a1.lead_dim(), 3);
 	ASSERT_TRUE( array_integrity_test(a2) );
 	ASSERT_TRUE( array2d_equal(a2, make_aview2d_cm(ref, m, n)) );
 
@@ -709,8 +709,8 @@ TEST( Array2D, Aview2DExRowMajor )
 	double src[36];
 	for (int i = 0; i < 36; ++i) src[i] = i+1;
 
-	row_extent bext = get_extent(5, 6, row_major_t());
-	ASSERT_EQ( bext.value, 6 );
+	index_t bext = index2d<row_major_t>::get_lead_dim(5, 6);
+	ASSERT_EQ( bext, 6 );
 
 	// id x id
 
@@ -774,8 +774,8 @@ TEST( Array2D, Aview2DExColumnMajor )
 	double src[36];
 	for (int i = 0; i < 36; ++i) src[i] = i+1;
 
-	column_extent bext = get_extent(5, 6, column_major_t());
-	ASSERT_EQ( bext.value, 5 );
+	index_t bext = index2d<column_major_t>::get_lead_dim(5, 6);
+	ASSERT_EQ( bext, 5 );
 
 	// id x id
 
@@ -873,8 +873,8 @@ TEST( Array2D, Slices )
 	double src[60];
 	for (int i = 0; i < 60; ++i) src[i] = i+1;
 
-	array2d<double, row_major_t> Arm( aview2d_block<double, row_major_t>(src, get_extent(7, 8, row_major_t()), 5, 6) );
-	array2d<double, column_major_t> Acm( aview2d_block<double, column_major_t>(src, get_extent(7, 8, column_major_t()), 5, 6) );
+	array2d<double, row_major_t> Arm( aview2d_block<double, row_major_t>(src, index2d<row_major_t>::get_lead_dim(7, 8), 5, 6) );
+	array2d<double, column_major_t> Acm( aview2d_block<double, column_major_t>(src, index2d<column_major_t>::get_lead_dim(7, 8), 5, 6) );
 
 	// row
 
@@ -940,8 +940,8 @@ TEST( Array2D, BlockSlices )
 	double src[60];
 	for (int i = 0; i < 60; ++i) src[i] = i+1;
 
-	aview2d_block<double, row_major_t> Arm(src, get_extent(7, 8, row_major_t()), 5, 6);
-	aview2d_block<double, column_major_t> Acm(src, get_extent(7, 8, column_major_t()), 5, 6);
+	aview2d_block<double, row_major_t> Arm(src, index2d<row_major_t>::get_lead_dim(7, 8), 5, 6);
+	aview2d_block<double, column_major_t> Acm(src, index2d<column_major_t>::get_lead_dim(7, 8), 5, 6);
 
 	// row
 
@@ -1007,8 +1007,8 @@ TEST( Array2D, SubViews )
 	double src0[60];
 	for (int i = 0; i < 60; ++i) src0[i] = i+1;
 
-	array2d<double, row_major_t> a0_rm( aview2d_block<double, row_major_t>(src0, get_extent(7, 8, row_major_t()), 5, 6) );
-	array2d<double, column_major_t> a0_cm( aview2d_block<double, column_major_t>(src0, get_extent(7, 8, column_major_t()), 5, 6) );
+	array2d<double, row_major_t> a0_rm( aview2d_block<double, row_major_t>(src0, index2d<row_major_t>::get_lead_dim(7, 8), 5, 6) );
+	array2d<double, column_major_t> a0_cm( aview2d_block<double, column_major_t>(src0, index2d<column_major_t>::get_lead_dim(7, 8), 5, 6) );
 
 	// (whole, whole)
 
@@ -1087,8 +1087,8 @@ TEST( Array2D, BlockSubViews )
 	double src0[60];
 	for (int i = 0; i < 60; ++i) src0[i] = i+1;
 
-	aview2d_block<double, row_major_t> a0_rm(src0, get_extent(7, 8, row_major_t()), 5, 6);
-	aview2d_block<double, column_major_t> a0_cm(src0, get_extent(7, 8, column_major_t()), 5, 6);
+	aview2d_block<double, row_major_t> a0_rm(src0, index2d<row_major_t>::get_lead_dim(7, 8), 5, 6);
+	aview2d_block<double, column_major_t> a0_cm(src0, index2d<column_major_t>::get_lead_dim(7, 8), 5, 6);
 
 	// (whole, whole)
 

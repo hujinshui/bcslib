@@ -19,57 +19,39 @@ namespace bcs
 	template<typename T> class aview1d;
 
 
-	// extents & index calculation
+	// index calculation
 
-	struct row_extent
+	template<typename TOrd> struct index2d;
+
+	template<>
+	struct index2d<row_major_t>
 	{
-		index_t value;
-		explicit row_extent(const index_t& v) : value(v) { }
-
-		BCS_ENSURE_INLINE index_t sub2ind(index_t i, index_t j) const
+		BCS_ENSURE_INLINE static index_t sub2ind(index_t ldim, index_t i, index_t j)
 		{
-			return i * value + j;
+			return i * ldim + j;
+		}
+
+		BCS_ENSURE_INLINE static index_t get_lead_dim(index_t m, index_t n)
+		{
+			return n;
 		}
 	};
 
-	struct column_extent
-	{
-		index_t value;
-		explicit column_extent(const index_t& v) : value(v) { }
 
-		BCS_ENSURE_INLINE index_t sub2ind(index_t i, index_t j) const
+	template<>
+	struct index2d<column_major_t>
+	{
+		BCS_ENSURE_INLINE static index_t sub2ind(index_t ldim, index_t i, index_t j)
 		{
-			return i + value * j;
+			return i + j * ldim;
 		}
+
+		BCS_ENSURE_INLINE static index_t get_lead_dim(index_t m, index_t n)
+		{
+			return m;
+		}
+
 	};
-
-	template<typename TOrd> struct extent_of;
-	template<> struct extent_of<row_major_t> { typedef row_extent type; };
-	template<> struct extent_of<column_major_t> { typedef column_extent type; };
-
-	inline BCS_ENSURE_INLINE
-	index_t sub2ind(index_t m0, index_t n0, index_t i, index_t j, row_major_t)
-	{
-		return i * n0 + j;
-	}
-
-	inline BCS_ENSURE_INLINE
-	index_t sub2ind(index_t m0, index_t n0, index_t i, index_t j, column_major_t)
-	{
-		return i + m0 * j;
-	}
-
-	inline BCS_ENSURE_INLINE
-	row_extent get_extent(index_t m0, index_t n0, row_major_t)
-	{
-		return row_extent(n0);
-	}
-
-	inline BCS_ENSURE_INLINE
-	column_extent get_extent(index_t m0, index_t n0, column_major_t)
-	{
-		return column_extent(m0);
-	}
 
 
 	// concept interfaces
@@ -249,9 +231,9 @@ namespace bcs
 
 		// -- new --
 
-		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
+		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
-			return derived().base_extent();
+			return derived().lead_dim();
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
@@ -315,9 +297,9 @@ namespace bcs
 
 		// -- new --
 
-		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
+		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
-			return derived().base_extent();
+			return derived().lead_dim();
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
@@ -364,9 +346,9 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
+		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
-			return derived().base_extent();
+			return derived().lead_dim();
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
@@ -447,9 +429,9 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
+		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
-			return derived().base_extent();
+			return derived().lead_dim();
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
@@ -552,9 +534,9 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
+		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
-			return derived().base_extent();
+			return derived().lead_dim();
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const
@@ -645,9 +627,9 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE typename extent_of<layout_order>::type base_extent() const
+		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
-			return derived().base_extent();
+			return derived().lead_dim();
 		}
 
 		BCS_ENSURE_INLINE index_type dim0() const

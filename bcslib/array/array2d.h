@@ -42,8 +42,6 @@ namespace bcs
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 
-		typedef typename extent_of<TOrd>::type base_extent_type;
-
 		typedef shared_block<T, Alloc> storage_type;
 		typedef aview2d<T, TOrd> view_type;
 
@@ -188,9 +186,9 @@ namespace bcs
 			return m_view.shape();
 		}
 
-		BCS_ENSURE_INLINE base_extent_type base_extent() const
+		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
-			return m_view.base_extent();
+			return m_view.lead_dim();
 		}
 
 	public:
