@@ -237,7 +237,7 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0)
 		{
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_DGEMV(&trans, &m, &n, &alpha, a.pbase(), &lda, x.pbase(), &incx, &beta, y.pbase(), &incy);
@@ -255,7 +255,7 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0)
 		{
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_SGEMV(&trans, &m, &n, &alpha, a.pbase(), &lda, x.pbase(), &incx, &beta, y.pbase(), &incy);
@@ -275,7 +275,7 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0)
 		{
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_DGEMV(&trans, &m, &n, &alpha, a.pbase(), &lda, x.pbase(), &incx, &beta, y.pbase(), &incy);
@@ -295,7 +295,7 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0)
 		{
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_SGEMV(&trans, &m, &n, &alpha, a.pbase(), &lda, x.pbase(), &incx, &beta, y.pbase(), &incy);
@@ -316,7 +316,7 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0)
 		{
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_DGER(&m, &n, &alpha, x.pbase(), &incx, y.pbase(), &incy, a.pbase(), &lda);
@@ -334,7 +334,7 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0)
 		{
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_SGER(&m, &n, &alpha, x.pbase(), &incx, y.pbase(), &incy, a.pbase(), &lda);
@@ -353,7 +353,7 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0)
 		{
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_DGER(&m, &n, &alpha, y.pbase(), &incx, x.pbase(), &incy, a.pbase(), &lda);
@@ -372,7 +372,7 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0)
 		{
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_SGER(&m, &n, &alpha, y.pbase(), &incx, x.pbase(), &incy, a.pbase(), &lda);
@@ -410,7 +410,7 @@ namespace bcs { namespace blas {
 
 		if (n > 0)
 		{
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_DSYMV(&uplo, &n, &alpha, a.pbase(), &lda, x.pbase(), &incx, &beta, y.pbase(), &incy);
@@ -429,7 +429,7 @@ namespace bcs { namespace blas {
 
 		if (n > 0)
 		{
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_SSYMV(&uplo, &n, &alpha, a.pbase(), &lda, x.pbase(), &incx, &beta, y.pbase(), &incy);
@@ -449,7 +449,7 @@ namespace bcs { namespace blas {
 		if (n > 0)
 		{
 			uplo = (uplo == 'U' ? 'L' : 'U');
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_DSYMV(&uplo, &n, &alpha, a.pbase(), &lda, x.pbase(), &incx, &beta, y.pbase(), &incy);
@@ -469,7 +469,7 @@ namespace bcs { namespace blas {
 		if (n > 0)
 		{
 			uplo = (uplo == 'U' ? 'L' : 'U');
-			int lda = (int)a.base_extent().value;
+			int lda = (int)a.lead_dim();
 			int incx = 1;
 			int incy = 1;
 			BCS_SSYMV(&uplo, &n, &alpha, a.pbase(), &lda, x.pbase(), &incx, &beta, y.pbase(), &incy);
@@ -527,9 +527,9 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0 && k > 0)
 		{
-			int lda = (int)a.base_extent().value;
-			int ldb = (int)b.base_extent().value;
-			int ldc = (int)c.base_extent().value;
+			int lda = (int)a.lead_dim();
+			int ldb = (int)b.lead_dim();
+			int ldc = (int)c.lead_dim();
 
 			BCS_DGEMM(&transa, &transb, &m, &n, &k, &alpha, a.pbase(), &lda, b.pbase(), &ldb, &beta, c.pbase(), &ldc);
 		}
@@ -546,9 +546,9 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0 && k > 0)
 		{
-			int lda = (int)a.base_extent().value;
-			int ldb = (int)b.base_extent().value;
-			int ldc = (int)c.base_extent().value;
+			int lda = (int)a.lead_dim();
+			int ldb = (int)b.lead_dim();
+			int ldc = (int)c.lead_dim();
 
 			BCS_SGEMM(&transa, &transb, &m, &n, &k, &alpha, a.pbase(), &lda, b.pbase(), &ldb, &beta, c.pbase(), &ldc);
 		}
@@ -565,9 +565,9 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0 && k > 0)
 		{
-			int lda = (int)a.base_extent().value;
-			int ldb = (int)b.base_extent().value;
-			int ldc = (int)c.base_extent().value;
+			int lda = (int)a.lead_dim();
+			int ldb = (int)b.lead_dim();
+			int ldc = (int)c.lead_dim();
 
 			BCS_DGEMM(&transb, &transa, &n, &m, &k, &alpha, b.pbase(), &ldb, a.pbase(), &lda, &beta, c.pbase(), &ldc);
 		}
@@ -584,9 +584,9 @@ namespace bcs { namespace blas {
 
 		if (m > 0 && n > 0 && k > 0)
 		{
-			int lda = (int)a.base_extent().value;
-			int ldb = (int)b.base_extent().value;
-			int ldc = (int)c.base_extent().value;
+			int lda = (int)a.lead_dim();
+			int ldb = (int)b.lead_dim();
+			int ldc = (int)c.lead_dim();
 
 			BCS_SGEMM(&transb, &transa, &n, &m, &k, &alpha, b.pbase(), &ldb, a.pbase(), &lda, &beta, c.pbase(), &ldc);
 		}
