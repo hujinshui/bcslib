@@ -103,23 +103,21 @@ namespace bcs {  namespace matlab {
 
 	// to matlab vector
 
-	template<class Derived>
-	inline marray to_matlab_row(const dense_caview1d_base<Derived>& v)
+	template<class Derived, typename T>
+	inline marray to_matlab_row(const IConstRegularAView1D<Derived, T>& v)
 	{
-		typedef typename Derived::value_type T;
-		marray a = create_marray<T>(1, v.size());
+		marray a = create_marray<T>(1, v.nelems());
 		aview1d<T> dst = view1d<T>(a);
-		copy(v, dst);
+		copy(v.derived(), dst);
 		return a;
 	}
 
-	template<class Derived>
-	inline marray to_matlab_column(const dense_caview1d_base<Derived>& v)
+	template<class Derived, typename T>
+	inline marray to_matlab_column(const IConstRegularAView1D<Derived, T>& v)
 	{
-		typedef typename Derived::value_type T;
-		marray a = create_marray<T>(v.size(), 1);
+		marray a = create_marray<T>(v.nelems(), 1);
 		aview1d<T> dst = view1d<T>(a);
-		copy(v, dst);
+		copy(v.derived(), dst);
 		return a;
 	}
 
@@ -127,53 +125,52 @@ namespace bcs {  namespace matlab {
 	template<typename T>
 	inline marray to_matlab_row(const std::vector<T>& v)
 	{
-		size_t n = v.size();
+		index_t n = (index_t)v.size();
 		marray a = create_marray<T>(1, n);
-		copy_elements(&(v[0]), a.data<T>(), n);
+		copy_elements(&(v[0]), a.data<T>(), (size_t)n);
 		return a;
 	}
 
 	template<typename T>
 	inline marray to_matlab_column(const std::vector<T>& v)
 	{
-		size_t n = v.size();
+		index_t n = (index_t)v.size();
 		marray a = create_marray<T>(n, 1);
-		copy_elements(&(v[0]), a.data<T>(), n);
+		copy_elements(&(v[0]), a.data<T>(), (size_t)n);
 		return a;
 	}
 
 
 	template<typename TIter>
-	inline marray to_matlab_row(TIter first, size_t n)
+	inline marray to_matlab_row(TIter first, index_t n)
 	{
 		typedef typename std::iterator_traits<TIter>::value_type T;
 
 		marray a = create_marray<T>(1, n);
 		T *pa = a.data<T>();
-		for (size_t i = 0; i < n; ++i) *(pa++) = *(first++);
+		for (index_t i = 0; i < n; ++i) *(pa++) = *(first++);
 		return a;
 	}
 
 	template<typename TIter>
-	inline marray to_matlab_column(TIter first, size_t n)
+	inline marray to_matlab_column(TIter first, index_t n)
 	{
 		typedef typename std::iterator_traits<TIter>::value_type T;
 
 		marray a = create_marray<T>(n, 1);
 		T *pa = a.data<T>();
-		for (size_t i = 0; i < n; ++i) *(pa++) = *(first++);
+		for (index_t i = 0; i < n; ++i) *(pa++) = *(first++);
 		return a;
 	}
 
 	// to matlab matrix
 
-	template<class Derived>
-	marray to_matlab_matrix(const dense_caview2d_base<Derived>& v)
+	template<class Derived, typename T>
+	marray to_matlab_matrix(const IConstRegularAView2D<Derived, T, column_major_t>& v)
 	{
-		typedef typename Derived::value_type T;
-		marray a = create_marray<T>((size_t)v.nrows(), (size_t)v.ncolumns());
+		marray a = create_marray<T>(v.nrows(), v.ncolumns());
 		aview2d<T, column_major_t> dst = view2d<T>(a);
-		copy(v, dst);
+		copy(v.derived(), dst);
 		return a;
 	}
 
