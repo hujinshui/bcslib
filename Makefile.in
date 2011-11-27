@@ -70,9 +70,7 @@ ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	
 LINALG_HEADERS = $(ARRAY_BASIC_HEADERS) \
 	bcslib/extern/blas_select.h \
-	bcslib/array/blas_base.h \
-	bcslib/array/generic_blas.h \
-	bcslib/array/mat_times.h
+	bcslib/array/aview_blas.h
 	
 CUDA_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/cuda/cuda_base.h \
@@ -115,7 +113,8 @@ test_basics: $(TEST_BIN_DIR)/test_basics
 .PHONY: bench_array	
 
 test_array: \
-	$(TEST_BIN_DIR)/test_array_basics
+	$(TEST_BIN_DIR)/test_array_basics \
+	$(TEST_BIN_DIR)/test_linalg_intel
 	
 test_array_pending: \
 	$(TEST_BIN_DIR)/test_array_comp \
@@ -174,11 +173,10 @@ $(TEST_BIN_DIR)/test_array_basics: $(ARRAY_BASIC_HEADERS) $(TEST_ARRAY_BASICS_SO
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_ARRAY_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
 	
 TEST_LINALG_SOURCES = \
-	test/test_linalg.cpp \
 	test/test_array_blas.cpp
 
 $(TEST_BIN_DIR)/test_linalg_intel: $(LINALG_HEADERS) $(ARRAY_TEST_HEADERS) $(TEST_LINALG_SOURCES)
-	$(CXX) $(CXXFLAGS) $(INTEL_FLAGS) $(TEST_LINALG_SOURCES) -o $@
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(INTEL_FLAGS) $(TEST_LINALG_SOURCES) $(MAIN_TEST_POST) -o $@
 
 # array bench
 
