@@ -362,17 +362,17 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type out_degree(const vertex_type& v) const
 		{
-			return derived().degree(v);
+			return derived().out_degree(v);
 		}
 
 		BCS_ENSURE_INLINE neighbor_iterator out_neighbors_begin(const vertex_type& v) const
 		{
-			return derived().neighbors_begin();
+			return derived().out_neighbors_begin(v);
 		}
 
 		BCS_ENSURE_INLINE neighbor_iterator out_neighbors_end(const vertex_type& v) const
 		{
-			return derived().neighbors_end();
+			return derived().out_neighbors_end(v);
 		}
 	};
 
@@ -430,27 +430,27 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type out_degree(const vertex_type& v) const
 		{
-			return derived().degree(v);
+			return derived().out_degree(v);
 		}
 
 		BCS_ENSURE_INLINE neighbor_iterator out_neighbors_begin(const vertex_type& v) const
 		{
-			return derived().neighbors_begin();
+			return derived().out_neighbors_begin(v);
 		}
 
 		BCS_ENSURE_INLINE neighbor_iterator out_neighbors_end(const vertex_type& v) const
 		{
-			return derived().neighbors_end();
+			return derived().out_neighbors_end(v);
 		}
 
 		BCS_ENSURE_INLINE incident_edge_iterator out_edges_begin(const vertex_type& v) const
 		{
-			return derived().out_edges_begin();
+			return derived().out_edges_begin(v);
 		}
 
 		BCS_ENSURE_INLINE incident_edge_iterator out_edges_end(const vertex_type& v) const
 		{
-			return derived().out_edges_end();
+			return derived().out_edges_end(v);
 		}
 	};
 

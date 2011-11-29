@@ -8,7 +8,7 @@
 
 #include <bcslib/graph/gedgelist_view.h>
 #include <bcslib/graph/ginclist_view.h>
-#include <array1d.h>
+#include <bcslib/array/array1d.h>
 
 #ifndef BCSLIB_GINCLIST_H_
 #define BCSLIB_GINCLIST_H_
@@ -38,7 +38,7 @@ namespace bcs
 
 	public:
 		template<typename TIter>
-		ginclist(index_type nv, index_type ne, bool is_directed, Iter edges)
+		ginclist(index_type nv, index_type ne, bool is_directed, TIter vertex_pairs)
 		: m_ma(is_directed ? ne : 2 * ne)
 		, m_edges((index_t)m_ma)
 		, m_neighbors((index_t)m_ma)
@@ -49,7 +49,7 @@ namespace bcs
 				m_edges.pbase(), m_neighbors.pbase(), m_inc_edges.pbase(),
 				m_degrees.pbase(), m_offsets.pbase())
 		{
-			_init_fields(edges);
+			_init_fields(vertex_pairs);
 		}
 
 
@@ -65,19 +65,23 @@ namespace bcs
 		}
 
 		ginclist(const gedgelist_view<TInt>& g)
-		: m_ma(is_directed ? g.nedges() : 2 * g.nedges())
+		: m_ma(g.is_directed() ? g.nedges() : 2 * g.nedges())
 		, m_edges((index_t)m_ma)
 		, m_neighbors((index_t)m_ma)
 		, m_inc_edges((index_t)m_ma)
 		, m_degrees((index_t)g.nvertices())
 		, m_offsets((index_t)g.nvertices())
-		, m_view(g.nvertices(), g.nedges(), is_directed,
+		, m_view(g.nvertices(), g.nedges(), g.is_directed(),
 				m_edges.pbase(), m_neighbors.pbase(), m_inc_edges.pbase(),
 				m_degrees.pbase(), m_offsets.pbase())
 		{
 			_init_fields(g.vertex_pairs_begin());
 		}
 
+		const view_type& view() const
+		{
+			return m_view;
+		}
 
 	public:
 		BCS_ENSURE_INLINE index_type nvertices() const
@@ -147,7 +151,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE incident_edge_iterator out_edges_end(const vertex_type& v) const
 		{
-			return m_view.out_edges_begin(v);
+			return m_view.out_edges_end(v);
 		}
 
 	private:
@@ -162,7 +166,7 @@ namespace bcs
 			index_type *temp = new index_type[n];
 
 			augment_edgelist(m, is_directed, edges, m_edges.pbase());
-			prepare_ginclist_arrays(n, m, m_edges.pbase(),
+			prepare_ginclist_arrays(n, (index_type)m_ma, m_edges.pbase(),
 					m_neighbors.pbase(), m_inc_edges.pbase(), m_degrees.pbase(), m_offsets.pbase(), temp);
 
 			delete[] temp;
