@@ -231,7 +231,8 @@ $(TEST_BIN_DIR)/stest_cuda_elemacc: $(CUDA_BASIC_HEADERS) test/stest_cuda_elemac
 # Graph tests
 
 TEST_GRAPH_BASICS_SOURCES = \
-	test/test_gview_base.cpp
+	test/test_gview_base.cpp \
+	test/test_gedgelist.cpp
 	
 $(TEST_BIN_DIR)/test_graph_basics: $(GRAPH_BASIC_HEADERS) $(TEST_GRAPH_BASICS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_GRAPH_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@

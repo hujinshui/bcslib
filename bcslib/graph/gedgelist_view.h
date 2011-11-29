@@ -61,9 +61,19 @@ namespace bcs
 			return natural_vertex_iterator<TInt>::get_default();
 		}
 
+		BCS_ENSURE_INLINE vertex_iterator vertices_end() const
+		{
+			return natural_vertex_iterator<TInt>::from_id(m_nv + BCS_GRAPH_ENTITY_IDBASE);
+		}
+
 		BCS_ENSURE_INLINE edge_iterator edges_begin() const
 		{
 			return natural_edge_iterator<TInt>::get_default();
+		}
+
+		BCS_ENSURE_INLINE edge_iterator edges_end() const
+		{
+			return natural_edge_iterator<TInt>::from_id(m_ne + BCS_GRAPH_ENTITY_IDBASE);
 		}
 
 		BCS_ENSURE_INLINE const vertex_type& source(const edge_type& e) const
@@ -76,9 +86,14 @@ namespace bcs
 			return m_edges[e.index()].t;
 		}
 
-		BCS_ENSURE_INLINE const gvertex_pair<TInt> *edges_begin() const
+		BCS_ENSURE_INLINE const gvertex_pair<TInt>* vertex_pairs_begin() const
 		{
 			return m_edges;
+		}
+
+		BCS_ENSURE_INLINE const gvertex_pair<TInt>* vertex_pairs_end() const
+		{
+			return m_edges + m_ne;
 		}
 
 	private:
