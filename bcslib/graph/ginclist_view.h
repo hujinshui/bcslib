@@ -105,9 +105,19 @@ namespace bcs
 			return natural_vertex_iterator<TInt>::get_default();
 		}
 
+		BCS_ENSURE_INLINE vertex_iterator vertices_end() const
+		{
+			return natural_vertex_iterator<TInt>::from_id(m_nv + BCS_GRAPH_ENTITY_IDBASE);
+		}
+
 		BCS_ENSURE_INLINE edge_iterator edges_begin() const
 		{
 			return natural_edge_iterator<TInt>::get_default();
+		}
+
+		BCS_ENSURE_INLINE vertex_iterator edges_end() const
+		{
+			return natural_vertex_iterator<TInt>::from_id(m_ne + BCS_GRAPH_ENTITY_IDBASE);
 		}
 
 		BCS_ENSURE_INLINE const vertex_type& source(const edge_type& e) const
@@ -127,12 +137,26 @@ namespace bcs
 
 		BCS_ENSURE_INLINE neighbor_iterator out_neighbors_begin(const vertex_type& v) const
 		{
-			return m_neighbors + m_offsets[v.index()];
+			index_type vi = v.index();
+			return m_neighbors + m_offsets[vi];
+		}
+
+		BCS_ENSURE_INLINE neighbor_iterator out_neighbors_end(const vertex_type& v) const
+		{
+			index_type vi = v.index();
+			return m_neighbors + m_offsets[vi] + m_degrees[vi];
 		}
 
 		BCS_ENSURE_INLINE incident_edge_iterator out_edges_begin(const vertex_type& v) const
 		{
-			return m_inc_edges + m_offsets[v.index()];
+			index_type vi = v.index();
+			return m_inc_edges + m_offsets[vi];
+		}
+
+		BCS_ENSURE_INLINE incident_edge_iterator out_edges_end(const vertex_type& v) const
+		{
+			index_type vi = v.index();
+			return m_inc_edges + m_offsets[vi] + m_degrees[vi];
 		}
 
 	private:

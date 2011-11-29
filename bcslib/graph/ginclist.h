@@ -75,7 +75,7 @@ namespace bcs
 				m_edges.pbase(), m_neighbors.pbase(), m_inc_edges.pbase(),
 				m_degrees.pbase(), m_offsets.pbase())
 		{
-			_init_fields(g.edges_begin());
+			_init_fields(g.vertex_pairs_begin());
 		}
 
 
@@ -97,12 +97,22 @@ namespace bcs
 
 		BCS_ENSURE_INLINE vertex_iterator vertices_begin() const
 		{
-			return natural_vertex_iterator<TInt>::get_default();
+			return m_view.vertices_begin();
+		}
+
+		BCS_ENSURE_INLINE vertex_iterator vertices_end() const
+		{
+			return m_view.vertices_end();
 		}
 
 		BCS_ENSURE_INLINE edge_iterator edges_begin() const
 		{
-			return natural_edge_iterator<TInt>::get_default();
+			return m_view.edges_begin();
+		}
+
+		BCS_ENSURE_INLINE edge_iterator edges_end() const
+		{
+			return m_view.edges_end();
 		}
 
 		BCS_ENSURE_INLINE const vertex_type& source(const edge_type& e) const
@@ -125,7 +135,17 @@ namespace bcs
 			return m_view.out_neighbors_begin(v);
 		}
 
+		BCS_ENSURE_INLINE neighbor_iterator out_neighbors_end(const vertex_type& v) const
+		{
+			return m_view.out_neighbors_end(v);
+		}
+
 		BCS_ENSURE_INLINE incident_edge_iterator out_edges_begin(const vertex_type& v) const
+		{
+			return m_view.out_edges_begin(v);
+		}
+
+		BCS_ENSURE_INLINE incident_edge_iterator out_edges_end(const vertex_type& v) const
 		{
 			return m_view.out_edges_begin(v);
 		}
