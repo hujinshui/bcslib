@@ -115,9 +115,9 @@ namespace bcs
 			return natural_edge_iterator<TInt>::get_default();
 		}
 
-		BCS_ENSURE_INLINE vertex_iterator edges_end() const
+		BCS_ENSURE_INLINE edge_iterator edges_end() const
 		{
-			return natural_vertex_iterator<TInt>::from_id(m_ne + BCS_GRAPH_ENTITY_IDBASE);
+			return natural_edge_iterator<TInt>::from_id(m_ne + BCS_GRAPH_ENTITY_IDBASE);
 		}
 
 		BCS_ENSURE_INLINE const vertex_type& source(const edge_type& e) const
@@ -174,7 +174,7 @@ namespace bcs
 	}; // end class ginclist_view
 
 
-	template<typename TInt, typename TIterSrc, typename TIterDst>
+	template<typename TInt, typename TIterSrc>
 	void augment_edgelist(TInt m, bool is_directed, TIterSrc src_edges, gvertex_pair<TInt>* edges)
 	{
 		if (is_directed)
@@ -223,13 +223,13 @@ namespace bcs
 
 		for (TInt i = 0; i < n; ++i) temp[i] = 0;
 
-		for (TInt i = 0; i < n; ++i)
+		for (TInt i = 0; i < m; ++i)
 		{
 			const gvertex_pair<TInt>& e = edges[i];
 			TInt si = e.s.index();
 			TInt j = offsets[si] + (temp[si]++);
-			neighbors[j] = e.s;
-			inc_edges[j] = e;
+			neighbors[j] = e.t;
+			inc_edges[j].id = i + BCS_GRAPH_ENTITY_IDBASE;
 		}
 	}
 

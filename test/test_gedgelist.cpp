@@ -28,9 +28,11 @@ BCS_STATIC_ASSERT( (is_base_of<
 typedef gvertex<gint> vertex_t;
 typedef gedge<gint> edge_t;
 typedef gvertex_pair<gint> vertex_pair_t;
-typedef bcs::gedgelist_view<gint> gedgelist_view_t;
 typedef natural_vertex_iterator<gint> viter;
 typedef natural_edge_iterator<gint> eiter;
+
+typedef bcs::gedgelist_view<gint> gedgelist_view_t;
+
 
 // auxiliary
 
@@ -65,6 +67,7 @@ bool gedgelist_verify_edge_ends(const IGraphEdgeList<Derived>& G, const vertex_p
 	return true;
 }
 
+// test cases
 
 TEST( GEdgeList, ViewBasics )
 {
