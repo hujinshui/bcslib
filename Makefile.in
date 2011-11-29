@@ -78,6 +78,12 @@ CUDA_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/cuda/cuda_vec.h \
 	bcslib/cuda/cuda_mat.h \
 	bcslib/cuda/cuda_texture.h
+	
+GRAPH_BASIC_HEADERS = $(BASE_HEADERS) \
+	bcslib/graph/gview_base.h \
+	bcslib/graph/gedgelist_view.h \
+	bcslib/graph/ginclist_view.h \
+	bcslib/graph/ginclist.h
 
 
 #---------- Target groups -------------------
@@ -86,7 +92,7 @@ CUDA_BASIC_HEADERS = $(BASE_HEADERS) \
 all: test bench
 
 .PHONY: test
-test: test_basics test_array test_cuda
+test: test_basics test_array test_cuda test_graph
 
 .PHONY: bench
 bench: bench_array
@@ -133,6 +139,14 @@ bench_array: \
 test_cuda: \
 	$(TEST_BIN_DIR)/test_cuda_basics \
 	$(TEST_BIN_DIR)/stest_cuda_elemacc
+
+
+#------ Graph tests (declaration) -----------
+
+.PHONY: test_graph
+
+test_graph: \
+	$(TEST_BIN_DIR)/test_graph_basics
 
 
 
@@ -206,5 +220,21 @@ $(TEST_BIN_DIR)/test_cuda_basics: $(CUDA_BASIC_HEADERS) $(TEST_CUDA_BASICS_SOURC
 
 $(TEST_BIN_DIR)/stest_cuda_elemacc: $(CUDA_BASIC_HEADERS) test/stest_cuda_elemacc.cu
 	$(CUDA_CC) $(CUDA_FLAGS) test/stest_cuda_elemacc.cu -o $@
+
+
+#----------------------------------------------------------
+#
+#   Graph test & bench
+#
+#----------------------------------------------------------
+
+# Graph tests
+
+TEST_GRAPH_BASICS_SOURCES = \
+	test/test_gview_base.cpp
+	
+$(TEST_BIN_DIR)/test_graph_basics: $(GRAPH_BASIC_HEADERS) $(TEST_GRAPH_BASICS_SOURCES)
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_GRAPH_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
+
 
 
