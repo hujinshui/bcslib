@@ -92,7 +92,7 @@ GRAPH_BASIC_HEADERS = $(BASE_HEADERS) \
 all: test bench
 
 .PHONY: test
-test: test_basics test_array test_cuda test_graph
+test: test_basics test_array test_graph
 
 .PHONY: bench
 bench: bench_array
@@ -120,8 +120,7 @@ test_basics: $(TEST_BIN_DIR)/test_basics
 .PHONY: bench_array	
 
 test_array: \
-	$(TEST_BIN_DIR)/test_array_basics \
-	$(TEST_BIN_DIR)/test_linalg_intel
+	$(TEST_BIN_DIR)/test_array_basics
 	
 test_array_pending: \
 	$(TEST_BIN_DIR)/test_array_comp \
