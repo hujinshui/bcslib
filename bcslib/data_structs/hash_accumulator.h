@@ -10,13 +10,11 @@
 #define BCSLIB_HASH_ACCUMULATOR_H
 
 #include <bcslib/base/basic_defs.h>
+#include <bcslib/base/tr1_imports.h>
 #include <functional>
-#include <unordered_map>
 
 namespace bcs
 {
-
-	using std::hash;
 
 	template<typename TKey, typename TValue, typename Hasher=hash<TKey> >
 	class hash_accumulator
@@ -26,7 +24,7 @@ namespace bcs
 		typedef TValue value_type;
 		typedef Hasher hasher;
 
-		typedef std::unordered_map<key_type, value_type, hasher> map_type;
+		typedef unordered_map<key_type, value_type, hasher> map_type;
 		typedef typename map_type::size_type size_type;
 		typedef typename map_type::const_iterator const_iterator;
 		typedef typename map_type::iterator iterator;
