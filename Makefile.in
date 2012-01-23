@@ -74,7 +74,9 @@ LINALG_HEADERS = $(ARRAY_BASIC_HEADERS) \
 	bcslib/array/aview_blas.h
 	
 DATASTRUCT_BASIC_HEADERS = $(BASE_HEADERS) \
-	bcslib/data_structs/binary_heap.h
+	bcslib/data_structs/hash_accumulator.h \
+	bcslib/data_structs/binary_heap.h \
+	bcslib/data_structs/disjoint_sets.h
 	
 CUDA_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/cuda/cuda_base.h \
@@ -221,7 +223,8 @@ $(BENCH_BIN_DIR)/bench_array_calc_intel: $(ARRAY_COMP_HEADERS) bench/bench_array
 # Data structure tests
 
 TEST_DATASTRUCT_BASICS_SOURCES = \
-	test/test_binary_heap.cpp
+	test/test_binary_heap.cpp \
+	test/test_disjoint_sets.cpp
 
 $(TEST_BIN_DIR)/test_data_struct_basics: $(DATASTRUCT_BASIC_HEADERS) $(TEST_DATASTRUCT_BASICS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_DATASTRUCT_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
