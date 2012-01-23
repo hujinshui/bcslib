@@ -73,6 +73,9 @@ LINALG_HEADERS = $(ARRAY_BASIC_HEADERS) \
 	bcslib/extern/blas_select.h \
 	bcslib/array/aview_blas.h
 	
+DATASTRUCT_BASIC_HEADERS = $(BASE_HEADERS) \
+	bcslib/data_structs/binary_heap.h
+	
 CUDA_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/cuda/cuda_base.h \
 	bcslib/cuda/cuda_vec.h \
@@ -92,7 +95,7 @@ GRAPH_BASIC_HEADERS = $(BASE_HEADERS) \
 all: test bench
 
 .PHONY: test
-test: test_basics test_array test_graph
+test: test_basics test_array test_data_structs test_graph
 
 .PHONY: bench
 bench: bench_array
@@ -129,6 +132,14 @@ test_array_pending: \
 
 bench_array: \
 	$(BENCH_BIN_DIR)/bench_array_access
+	
+	
+#------ Data struct tests (declaration) -----------	
+	
+.PHONY: test_data_structs
+
+test_data_structs: \
+	$(TEST_BIN_DIR)/test_data_struct_basics	
 	
 	
 #------ CUDA tests (declaration) -----------
@@ -199,6 +210,21 @@ $(BENCH_BIN_DIR)/bench_array_access: $(ARRAY_BASIC_HEADERS) bench/bench_array_ac
 			
 $(BENCH_BIN_DIR)/bench_array_calc_intel: $(ARRAY_COMP_HEADERS) bench/bench_array_calc.cpp
 	$(CXX) $(CXXFLAGS) $(INTEL_FLAGS) $(OFLAGS) bench/bench_array_calc.cpp -o $@
+
+
+#----------------------------------------------------------
+#
+#   Data structure test & bench
+#
+#----------------------------------------------------------
+
+# Data structure tests
+
+TEST_DATASTRUCT_BASICS_SOURCES = \
+	test/test_binary_heap.cpp
+
+$(TEST_BIN_DIR)/test_data_struct_basics: $(DATASTRUCT_BASIC_HEADERS) $(TEST_DATASTRUCT_BASICS_SOURCES)
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_DATASTRUCT_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
 
 
 #----------------------------------------------------------

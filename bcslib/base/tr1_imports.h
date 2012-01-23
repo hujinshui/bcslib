@@ -21,12 +21,16 @@
 #include <tuple>
 #include <array>
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 #define BCS_TR1 std
 #else
 #include <tr1/type_traits>
 #include <tr1/tuple>
 #include <tr1/array>
 #include <tr1/memory>
+#include <tr1/unordered_map>
+#include <tr1/unordered_set>
 #define BCS_TR1 std::tr1
 #endif
 
@@ -91,6 +95,15 @@ namespace bcs
 	// shared_ptr
 
 	using BCS_TR1::shared_ptr;
+
+	// hash container
+
+	using BCS_TR1::unordered_map;
+	using BCS_TR1::unordered_multimap;
+	using BCS_TR1::unordered_set;
+	using BCS_TR1::unordered_multiset;
+
+	using BCS_TR1::hash;
 
 }
 
