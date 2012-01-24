@@ -9,6 +9,7 @@
 
 #include "bcs_test_basics.h"
 #include <bcslib/array/array1d.h>
+#include <bcslib/array/amap.h>
 
 using namespace bcs;
 using namespace bcs::test;
@@ -26,6 +27,17 @@ template class bcs::aview1d_ex<double, rep_ind>;
 template class bcs::caview1d<double>;
 template class bcs::aview1d<double>;
 template class bcs::array1d<double>;
+
+struct SimpleKey
+{
+	index_t i;
+	index_t index() const { return i; }
+};
+
+template class bcs::caview_map<SimpleKey, double>;
+template class bcs::aview_map<SimpleKey, double>;
+template class bcs::array_map<SimpleKey, double>;
+
 
 /************************************************
  *
