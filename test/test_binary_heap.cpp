@@ -65,6 +65,12 @@ int verify_heap_basics(binary_heap<T>& heap)
 		return 1;
 	}
 
+	if (n > 0)
+	{
+		if (elements[heap.top_index()] != heap.top_value())
+			return false;
+	}
+
 	for (size_t v = 1; v <= n; ++v)
 	{
 		typename tree_t::handle nd(v);
@@ -136,8 +142,9 @@ TEST( BinaryHeap, MakeHeap )
 
 	vec_t V0;
 	heap_t H0(V0);
+	H0.make_heap();
 
-	ASSERT_EQ( H0.size(), 0 );
+	ASSERT_EQ( 0, H0.size() );
 	ASSERT_EQ( 0, verify_heap_basics(H0) );
 	ASSERT_TRUE( verify_binary_min_heap(H0) );
 
@@ -146,9 +153,10 @@ TEST( BinaryHeap, MakeHeap )
 
 	vec_t V1;
 	V1.push_back(101);
-	heap_t H1(V1, true);
+	heap_t H1(V1);
+	H1.make_heap();
 
-	ASSERT_EQ( H1.size(), 1 );
+	ASSERT_EQ( 1, H1.size() );
 	ASSERT_EQ( 0, verify_heap_basics(H1) );
 	ASSERT_TRUE( verify_binary_min_heap(H1) );
 
@@ -163,10 +171,11 @@ TEST( BinaryHeap, MakeHeap )
 			V5.push_back(std::rand() % 100);
 		}
 
-		heap_t H5(V5, true);
+		heap_t H5(V5);
+		H5.make_heap();
 
-		ASSERT_EQ(H5.size(), 5);
-		ASSERT_EQ(0, verify_heap_basics(H5) );
+		ASSERT_EQ( 5, H5.size() );
+		ASSERT_EQ( 0, verify_heap_basics(H5) );
 		ASSERT_TRUE( verify_binary_min_heap(H5) );
 	}
 
@@ -180,10 +189,11 @@ TEST( BinaryHeap, MakeHeap )
 			V6.push_back(std::rand() % 100);
 		}
 
-		heap_t H6(V6, true);
+		heap_t H6(V6);
+		H6.make_heap();
 
-		ASSERT_EQ(H6.size(), 6);
-		ASSERT_EQ(0, verify_heap_basics(H6) );
+		ASSERT_EQ( 6, H6.size());
+		ASSERT_EQ( 0, verify_heap_basics(H6) );
 		ASSERT_TRUE( verify_binary_min_heap(H6) );
 	}
 
@@ -197,10 +207,11 @@ TEST( BinaryHeap, MakeHeap )
 			V7.push_back(std::rand() % 100);
 		}
 
-		heap_t H7(V7, true);
+		heap_t H7(V7);
+		H7.make_heap();
 
-		ASSERT_EQ(H7.size(), 7);
-		ASSERT_EQ(0, verify_heap_basics(H7) );
+		ASSERT_EQ( 7, H7.size());
+		ASSERT_EQ( 0, verify_heap_basics(H7) );
 		ASSERT_TRUE( verify_binary_min_heap(H7) );
 
 	}
@@ -216,10 +227,11 @@ TEST( BinaryHeap, MakeHeap )
 			V9.push_back(std::rand() % 100);
 		}
 
-		heap_t H9(V9, true);
+		heap_t H9(V9);
+		H9.make_heap();
 
-		ASSERT_EQ(H9.size(), 9);
-		ASSERT_EQ(0, verify_heap_basics(H9) );
+		ASSERT_EQ( 9, H9.size());
+		ASSERT_EQ( 0, verify_heap_basics(H9) );
 		ASSERT_TRUE( verify_binary_min_heap(H9) );
 	}
 
@@ -235,22 +247,32 @@ TEST( BinaryHeap, MakeHeap )
 		}
 
 		heap_t H9(V9);
-		ASSERT_EQ(H9.size(), 0);
-		ASSERT_EQ(0, verify_heap_basics(H9) );
+		ASSERT_EQ( 0, H9.size());
+		ASSERT_EQ( 0, verify_heap_basics(H9) );
 		ASSERT_TRUE( verify_binary_min_heap(H9) );
 
 		size_t inds[5] = {1, 3, 4, 6, 7};
 		H9.make_heap(inds, inds+5);
 
-		ASSERT_EQ(H9.size(), 5);
-		ASSERT_EQ(0, verify_heap_basics(H9) );
+		ASSERT_FALSE( H9.in_heap(0) );
+		ASSERT_TRUE ( H9.in_heap(1) );
+		ASSERT_FALSE( H9.in_heap(2) );
+		ASSERT_TRUE ( H9.in_heap(3) );
+		ASSERT_TRUE ( H9.in_heap(4) );
+		ASSERT_FALSE( H9.in_heap(5) );
+		ASSERT_TRUE ( H9.in_heap(6) );
+		ASSERT_TRUE ( H9.in_heap(7) );
+		ASSERT_FALSE( H9.in_heap(8) );
+
+		ASSERT_EQ( 5, H9.size() );
+		ASSERT_EQ( 0, verify_heap_basics(H9) );
 		ASSERT_TRUE( verify_binary_min_heap(H9) );
 	}
 
 }
 
 
-TEST( BinaryHeap, EnrollAndPop )
+TEST( BinaryHeap, InsertAndDelete )
 {
 	size_t nr = 100;
 	size_t N = 50;
@@ -270,10 +292,10 @@ TEST( BinaryHeap, EnrollAndPop )
 		heap_t H(V);
 		for (size_t j = 0; j < N; ++j)
 		{
-			H.enroll(j);
+			H.insert(j);
 
-			ASSERT_EQ(H.size(), j+1);
-			ASSERT_EQ(0, verify_heap_basics(H) );
+			ASSERT_EQ( j+1, H.size());
+			ASSERT_EQ( 0, verify_heap_basics(H) );
 			ASSERT_TRUE( verify_binary_min_heap(H) );
 		}
 
@@ -284,13 +306,14 @@ TEST( BinaryHeap, EnrollAndPop )
 		{
 			if (j > 0)
 			{
-				ASSERT_TRUE( H.root() >= prev_v );
+				ASSERT_TRUE( H.top_value() >= prev_v );
 			}
-			prev_v = H.root();
+			prev_v = H.top_value();
+			ASSERT_EQ( prev_v, V[H.top_index()] );
 
-			H.pop_root();
-			ASSERT_EQ( H.size(), N-(j+1) );
-			ASSERT_EQ(0, verify_heap_basics(H) );
+			H.delete_top();
+			ASSERT_EQ( N-(j+1), H.size() );
+			ASSERT_EQ( 0, verify_heap_basics(H) );
 			ASSERT_TRUE( verify_binary_min_heap(H) );
 		}
 	}
@@ -311,10 +334,11 @@ TEST( BinaryHeap, Update )
 		{
 			V.push_back(std::rand() % 100);
 		}
-		heap_t H(V, true);
+		heap_t H(V);
+		H.make_heap();
 
-		ASSERT_EQ(N, H.size());
-		ASSERT_EQ(0, verify_heap_basics(H) );
+		ASSERT_EQ( N, H.size() );
+		ASSERT_EQ( 0, verify_heap_basics(H) );
 		ASSERT_TRUE( verify_binary_min_heap(H) );
 
 		for (size_t j = 0; j < nc; ++j)
@@ -323,11 +347,11 @@ TEST( BinaryHeap, Update )
 			int v = std::rand() % 100;
 
 			update_element(V, H, idx, v);
-			ASSERT_EQ(V[idx], v);
-			ASSERT_EQ(H.get_by_node(H.node(idx)), v);
+			ASSERT_EQ( v, V[idx] );
+			ASSERT_EQ( v, H.get_by_node(H.node(idx)) );
 
-			ASSERT_EQ(N, H.size());
-			ASSERT_EQ(0, verify_heap_basics(H) );
+			ASSERT_EQ( N, H.size() );
+			ASSERT_EQ( 0, verify_heap_basics(H) );
 			ASSERT_TRUE( verify_binary_min_heap(H) );
 		}
 	}
