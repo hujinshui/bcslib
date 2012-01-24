@@ -89,6 +89,9 @@ GRAPH_BASIC_HEADERS = $(BASE_HEADERS) \
 	bcslib/graph/gedgelist_view.h \
 	bcslib/graph/ginclist_view.h \
 	bcslib/graph/ginclist.h
+	
+GRAPH_ALGORITHM_HEADERS = $(GRAPH_BASIC_HEADERS) \
+	bcslib/graph/graph_traversal.h
 
 
 #---------- Target groups -------------------
@@ -158,7 +161,8 @@ test_cuda: \
 .PHONY: test_graph
 
 test_graph: \
-	$(TEST_BIN_DIR)/test_graph_basics
+	$(TEST_BIN_DIR)/test_graph_basics \
+	$(TEST_BIN_DIR)/test_graph_algorithms
 
 
 
@@ -263,8 +267,12 @@ TEST_GRAPH_BASICS_SOURCES = \
 	test/test_gedgelist.cpp \
 	test/test_ginclist.cpp
 	
+TEST_GRAPH_ALGORITHMS_SOURCES = \
+	test/test_graph_traversal.cpp
+	
 $(TEST_BIN_DIR)/test_graph_basics: $(GRAPH_BASIC_HEADERS) $(TEST_GRAPH_BASICS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_GRAPH_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
 
-
+$(TEST_BIN_DIR)/test_graph_algorithms: $(GRAPH_ALGORITHM_HEADERS) $(TEST_GRAPH_ALGORITHMS_SOURCES)
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_GRAPH_ALGORITHMS_SOURCES) $(MAIN_TEST_POST) -o $@
 
