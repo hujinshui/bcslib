@@ -71,11 +71,6 @@ namespace bcs
 			return m_view.is_empty();
 		}
 
-		const_reference operator[] (size_type i) const
-		{
-			return m_view[(index_t)i];
-		}
-
 		const_iterator begin() const
 		{
 			return m_view.pbase();
@@ -147,16 +142,6 @@ namespace bcs
 		bool empty() const
 		{
 			return m_view.is_empty();
-		}
-
-		const_reference operator[] (size_type i) const
-		{
-			return m_view[(index_t)i];
-		}
-
-		reference operator[] (size_type i)
-		{
-			return m_view[(index_t)i];
 		}
 
 		const_iterator begin() const
@@ -259,16 +244,6 @@ namespace bcs
 		bool empty() const
 		{
 			return m_arr.is_empty();
-		}
-
-		const_reference operator[] (size_type i) const
-		{
-			return m_arr[(index_t)i];
-		}
-
-		reference operator[] (size_type i)
-		{
-			return m_arr[(index_t)i];
 		}
 
 		const_iterator begin() const
