@@ -84,7 +84,7 @@ namespace bcs
 	public:
 		// key based access
 
-		const_reference operator() (const key_type& key) const
+		const_reference operator[] (const key_type& key) const
 		{
 			return m_view[key_to_index<key_type>::to_index(key)];
 		}
@@ -167,12 +167,12 @@ namespace bcs
 	public:
 		// key based access
 
-		const_reference operator() (const key_type& key) const
+		const_reference operator[] (const key_type& key) const
 		{
 			return m_view[key_to_index<key_type>::to_index(key)];
 		}
 
-		reference operator() (const key_type& key)
+		reference operator[] (const key_type& key)
 		{
 			return m_view[key_to_index<key_type>::to_index(key)];
 		}
@@ -221,7 +221,7 @@ namespace bcs
 
 		cview_type cview() const
 		{
-			return m_arr.view();
+			return m_arr.cview();
 		}
 
 	public:
@@ -269,12 +269,12 @@ namespace bcs
 	public:
 		// key based access
 
-		const_reference operator() (const key_type& key) const
+		const_reference operator[] (const key_type& key) const
 		{
 			return m_arr[key_to_index<key_type>::to_index(key)];
 		}
 
-		reference operator() (const key_type& key)
+		reference operator[] (const key_type& key)
 		{
 			return m_arr[key_to_index<key_type>::to_index(key)];
 		}
