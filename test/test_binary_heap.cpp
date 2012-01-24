@@ -16,6 +16,7 @@ using namespace bcs::test;
 
 // Explicit instantiation for syntax checking
 
+template class bcs::consecutive_binary_tree<int>;
 template class bcs::binary_heap<int>;
 
 typedef std::vector<int> vec_t;
@@ -48,10 +49,11 @@ void print_heap(const heap_t& H, bool print_vec = false)
 
 
 template<typename T>
-bool verify_heap_basics(binary_heap<T>& heap)
+int verify_heap_basics(binary_heap<T>& heap)
 {
-	const std::vector<size_t>& btree = heap.tree_array();
-	const std::vector<size_t>& node_map = heap.node_map();
+	typedef typename binary_heap<T>::tree_type tree_t;
+	const tree_t& btree = heap.tree();
+	const typename binary_heap<T>::node_map_type& node_map = heap.node_map();
 	const std::vector<T>& elements = heap.elements();
 
 	size_t ne = elements.size();
@@ -59,30 +61,35 @@ bool verify_heap_basics(binary_heap<T>& heap)
 
 	if (!( n <= ne && n == btree.size() && ne == node_map.size() ))
 	{
-		return false;
+		std::printf("btree size = %d, node_map size = %d\n", (int)btree.size(), (int)node_map.size());
+		return 1;
 	}
 
 	for (size_t v = 1; v <= n; ++v)
 	{
-		size_t i = btree[v-1];
-		if (node_map[i] != v) return false;
+		typename tree_t::handle nd(v);
+		size_t i = btree(v);
+		if (node_map[i] != nd) return 2;
 	}
 
+	size_t c = 0;
 	for (size_t i = 0; i < ne; ++i)
 	{
-		size_t v = node_map[i];
-		if (v > 0)
+		typename tree_t::handle v = node_map[i];
+		if (v.non_nil())
 		{
-			if (!heap.is_in_heap(i)) return false;
-			if (btree[v-1] != i) return false;
+			if (!heap.in_heap(i)) return 3;
+			if (btree(v) != i) return 4;
+			++ c;
 		}
 		else
 		{
-			if (heap.is_in_heap(i)) return false;
+			if (heap.in_heap(i)) return 5;
 		}
 	}
+	if (c != n) return 6;
 
-	return true;
+	return 0;
 }
 
 
@@ -131,7 +138,7 @@ TEST( BinaryHeap, MakeHeap )
 	heap_t H0(V0);
 
 	ASSERT_EQ( H0.size(), 0 );
-	ASSERT_TRUE( verify_heap_basics(H0) );
+	ASSERT_EQ( 0, verify_heap_basics(H0) );
 	ASSERT_TRUE( verify_binary_min_heap(H0) );
 
 
@@ -139,10 +146,10 @@ TEST( BinaryHeap, MakeHeap )
 
 	vec_t V1;
 	V1.push_back(101);
-	heap_t H1(V1);
+	heap_t H1(V1, true);
 
 	ASSERT_EQ( H1.size(), 1 );
-	ASSERT_TRUE( verify_heap_basics(H1) );
+	ASSERT_EQ( 0, verify_heap_basics(H1) );
 	ASSERT_TRUE( verify_binary_min_heap(H1) );
 
 	// five-element heap
@@ -156,12 +163,11 @@ TEST( BinaryHeap, MakeHeap )
 			V5.push_back(std::rand() % 100);
 		}
 
-		heap_t H5(V5);
+		heap_t H5(V5, true);
 
 		ASSERT_EQ(H5.size(), 5);
-		ASSERT_TRUE( verify_heap_basics(H5) );
+		ASSERT_EQ(0, verify_heap_basics(H5) );
 		ASSERT_TRUE( verify_binary_min_heap(H5) );
-
 	}
 
 	// six-element heap
@@ -174,10 +180,10 @@ TEST( BinaryHeap, MakeHeap )
 			V6.push_back(std::rand() % 100);
 		}
 
-		heap_t H6(V6);
+		heap_t H6(V6, true);
 
 		ASSERT_EQ(H6.size(), 6);
-		ASSERT_TRUE( verify_heap_basics(H6) );
+		ASSERT_EQ(0, verify_heap_basics(H6) );
 		ASSERT_TRUE( verify_binary_min_heap(H6) );
 	}
 
@@ -191,10 +197,10 @@ TEST( BinaryHeap, MakeHeap )
 			V7.push_back(std::rand() % 100);
 		}
 
-		heap_t H7(V7);
+		heap_t H7(V7, true);
 
 		ASSERT_EQ(H7.size(), 7);
-		ASSERT_TRUE( verify_heap_basics(H7) );
+		ASSERT_EQ(0, verify_heap_basics(H7) );
 		ASSERT_TRUE( verify_binary_min_heap(H7) );
 
 	}
@@ -210,48 +216,81 @@ TEST( BinaryHeap, MakeHeap )
 			V9.push_back(std::rand() % 100);
 		}
 
-		heap_t H9(V9);
+		heap_t H9(V9, true);
 
 		ASSERT_EQ(H9.size(), 9);
-		ASSERT_TRUE( verify_heap_basics(H9) );
+		ASSERT_EQ(0, verify_heap_basics(H9) );
+		ASSERT_TRUE( verify_binary_min_heap(H9) );
+	}
+
+
+	// nine-element partial heap
+
+	for (int i = 0; i < nr; ++i)
+	{
+		vec_t V9;
+		for (int j = 0; j < 9; ++j)
+		{
+			V9.push_back(std::rand() % 100);
+		}
+
+		heap_t H9(V9);
+		ASSERT_EQ(H9.size(), 0);
+		ASSERT_EQ(0, verify_heap_basics(H9) );
+		ASSERT_TRUE( verify_binary_min_heap(H9) );
+
+		size_t inds[5] = {1, 3, 4, 6, 7};
+		H9.make_heap(inds, inds+5);
+
+		ASSERT_EQ(H9.size(), 5);
+		ASSERT_EQ(0, verify_heap_basics(H9) );
 		ASSERT_TRUE( verify_binary_min_heap(H9) );
 	}
 
 }
 
 
-
-TEST( BinaryHeap, PushAndPop )
+TEST( BinaryHeap, EnrollAndPop )
 {
 	size_t nr = 100;
 	size_t N = 50;
 
 	for (size_t i = 0; i < nr; ++i)
 	{
-		vec_t V;
-		heap_t H(V);
+		// prepare elements
 
+		vec_t V;
 		for (size_t j = 0; j < N; ++j)
 		{
-			H.push(std::rand() % 100);
+			V.push_back(std::rand() % 100);
+		}
+
+		// gradual enroll
+
+		heap_t H(V);
+		for (size_t j = 0; j < N; ++j)
+		{
+			H.enroll(j);
 
 			ASSERT_EQ(H.size(), j+1);
-			ASSERT_TRUE( verify_heap_basics(H) );
+			ASSERT_EQ(0, verify_heap_basics(H) );
 			ASSERT_TRUE( verify_binary_min_heap(H) );
 		}
+
+		// gradual pop
 
 		int prev_v = 0;
 		for (size_t j = 0; j < N; ++j)
 		{
 			if (j > 0)
 			{
-				ASSERT_TRUE( H.top() >= prev_v );
+				ASSERT_TRUE( H.root() >= prev_v );
 			}
-			prev_v = H.top();
+			prev_v = H.root();
 
-			H.pop();
+			H.pop_root();
 			ASSERT_EQ( H.size(), N-(j+1) );
-			ASSERT_TRUE( verify_heap_basics(H) );
+			ASSERT_EQ(0, verify_heap_basics(H) );
 			ASSERT_TRUE( verify_binary_min_heap(H) );
 		}
 	}
@@ -272,10 +311,10 @@ TEST( BinaryHeap, Update )
 		{
 			V.push_back(std::rand() % 100);
 		}
-		heap_t H(V);
+		heap_t H(V, true);
 
-		ASSERT_EQ(H.size(), N);
-		ASSERT_TRUE( verify_heap_basics(H) );
+		ASSERT_EQ(N, H.size());
+		ASSERT_EQ(0, verify_heap_basics(H) );
 		ASSERT_TRUE( verify_binary_min_heap(H) );
 
 		for (size_t j = 0; j < nc; ++j)
@@ -283,11 +322,12 @@ TEST( BinaryHeap, Update )
 			size_t idx = (size_t)std::rand() % N;
 			int v = std::rand() % 100;
 
-			H.set(idx, v);
-			ASSERT_EQ(H.get(idx), v);
+			update_element(V, H, idx, v);
+			ASSERT_EQ(V[idx], v);
+			ASSERT_EQ(H.get_by_node(H.node(idx)), v);
 
-			ASSERT_EQ(H.size(), N);
-			ASSERT_TRUE( verify_heap_basics(H) );
+			ASSERT_EQ(N, H.size());
+			ASSERT_EQ(0, verify_heap_basics(H) );
 			ASSERT_TRUE( verify_binary_min_heap(H) );
 		}
 	}
