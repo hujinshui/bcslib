@@ -14,7 +14,7 @@
 #define GRAPH_TRAVERSAL_H_
 
 #include <bcslib/graph/gview_base.h>
-#include <bcslib/array/array1d.h>
+#include <bcslib/array/amap.h>
 #include <vector>
 #include <stack>
 #include <queue>
@@ -61,7 +61,7 @@ namespace bcs
 
 		gvisit_status status(const vertex_type& v) const
 		{
-			return m_status[v.index()];
+			return m_status(v);
 		}
 
 		bool is_ended() const
@@ -75,7 +75,7 @@ namespace bcs
 			if (status(v) < GVISIT_DISCOVERED)
 			{
 				visitor.seed(v);
-				m_status[v.index()] = GVISIT_DISCOVERED;
+				m_status(v) = GVISIT_DISCOVERED;
 				add_neighbors(v, visitor);
 			}
 		}
@@ -106,19 +106,19 @@ namespace bcs
 
 				if (status(u) < GVISIT_DISCOVERED)
 				{
-					m_status[u.index()] = GVISIT_DISCOVERED;
+					m_status(u) = GVISIT_DISCOVERED;
 					visitor.discover(v, u);
 					m_queue.push(u);
 				}
 			}
 
-			m_status[v.index()] = GVISIT_FINISHED;
+			m_status(v) = GVISIT_FINISHED;
 			visitor.finish(v);
 		}
 
 	private:
 		const IGraphAdjacencyList<Derived>& m_graph;
-		array1d<gvisit_status> m_status;
+		array_map<vertex_type, gvisit_status> m_status;
 		std::queue<vertex_type> m_queue;
 	};
 
@@ -191,7 +191,7 @@ namespace bcs
 
 		gvisit_status status(const vertex_type& v) const
 		{
-			return m_status[v.index()];
+			return m_status(v);
 		}
 
 		bool is_ended() const
@@ -233,7 +233,7 @@ namespace bcs
 			}
 			else
 			{
-				m_status[e.v.index()] = GVISIT_FINISHED;
+				m_status(e.v) = GVISIT_FINISHED;
 				visitor.finish(e.v);
 				m_stack.pop();
 
@@ -250,7 +250,7 @@ namespace bcs
 		template<class Visitor>
 		bool add_discovered(const vertex_type &v, Visitor& visitor)
 		{
-			m_status[v.index()] = GVISIT_DISCOVERED;
+			m_status(v) = GVISIT_DISCOVERED;
 
 			entry e;
 			e.v = v;
@@ -264,7 +264,7 @@ namespace bcs
 			}
 			else
 			{
-				m_status[v.index()] = GVISIT_FINISHED;
+				m_status(v) = GVISIT_FINISHED;
 				visitor.finish(v);
 				return false;
 			}
@@ -272,7 +272,7 @@ namespace bcs
 
 	private:
 		const IGraphAdjacencyList<Derived>& m_graph;
-		array1d<gvisit_status> m_status;
+		array_map<vertex_type, gvisit_status> m_status;
 		std::stack<entry> m_stack;
 	};
 
