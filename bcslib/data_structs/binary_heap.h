@@ -137,7 +137,7 @@ namespace bcs
 		typedef typename container_type::iterator iterator;
 		typedef typename container_type::const_iterator const_iterator;
 
-		typedef cbtree_node handle;
+		typedef cbtree_node node_type;
 
 	public:
 		size_type size() const
@@ -186,12 +186,12 @@ namespace bcs
 			return m_nodes.back();
 		}
 
-		const_reference operator() (handle node) const
+		const_reference operator() (node_type node) const
 		{
 			return m_nodes[node.index()];
 		}
 
-		reference operator() (handle node)
+		reference operator() (node_type node)
 		{
 			return m_nodes[node.index()];
 		}
@@ -217,39 +217,39 @@ namespace bcs
 		}
 
 	public:
-		handle root() const
+		node_type root() const
 		{
 			return 1;
 		}
 
-		handle back() const
+		node_type back() const
 		{
 			return size();
 		}
 
-		handle last_parent() const
+		node_type last_parent() const
 		{
 			return size() >> 1;
 		}
 
-		handle parent(handle v) const
+		node_type parent(node_type v) const
 		{
 			return v.id >> 1;
 		}
 
-		handle left_child(handle v) const
+		node_type left_child(node_type v) const
 		{
 			size_type id = v.id << 1;
 			return id <= size() ? id : 0;
 		}
 
-		handle right_child(handle v) const
+		node_type right_child(node_type v) const
 		{
 			size_type id = v.id << 1;
 			return id < size() ? id + 1 : 0;
 		}
 
-		void get_children(handle v, handle& lc, handle& rc) const
+		void get_children(node_type v, node_type& lc, node_type& rc) const
 		{
 			size_type id = v.id << 1;
 			size_type s = size();
@@ -271,7 +271,7 @@ namespace bcs
 			}
 		}
 
-		bool is_non_root(handle v) const
+		bool is_non_root(node_type v) const
 		{
 			return v.id > 1;
 		}
@@ -300,7 +300,7 @@ namespace bcs
 		typedef typename value_map_type::const_reference const_reference;
 
 		typedef consecutive_binary_tree<key_type> tree_type;
-		typedef typename tree_type::handle node_type;
+		typedef typename tree_type::node_type node_type;
 
 	public:
 		binary_heap(const value_map_type& value_map,
