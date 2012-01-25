@@ -21,20 +21,20 @@ TEST( DisjointSetForest, Init )
 	disjoint_set_forest s0(0);
 
 	ASSERT_EQ(s0.size(), 0);
-	ASSERT_EQ(s0.nclasses(), 0);
+	ASSERT_EQ(s0.ncomponents(), 0);
 
 	disjoint_set_forest s1(1);
 
 	ASSERT_EQ(s1.size(), 1);
 	ASSERT_EQ(s1.parent(0), 0);
 	ASSERT_EQ(s1.rank(0), 0);
-	ASSERT_EQ(s1.nclasses(), 1);
+	ASSERT_EQ(s1.ncomponents(), 1);
 
 	size_t n = 10;
 	disjoint_set_forest s2(n);
 
 	ASSERT_EQ(s2.size(), n);
-	ASSERT_EQ(s2.nclasses(), n);
+	ASSERT_EQ(s2.ncomponents(), n);
 
 	for (size_t x = 0; x < n; ++x)
 	{
@@ -48,7 +48,7 @@ TEST( DisjointSetForest, JoinAndCompress )
 {
 	disjoint_set_forest s(16);
 	ASSERT_EQ(s.size(), 16);
-	ASSERT_EQ(s.nclasses(), 16);
+	ASSERT_EQ(s.ncomponents(), 16);
 
 	for (size_t x = 0; x < 16; ++x)
 	{
@@ -63,7 +63,7 @@ TEST( DisjointSetForest, JoinAndCompress )
 	}
 
 	ASSERT_EQ(s.size(), 16);
-	ASSERT_EQ(s.nclasses(), 8);
+	ASSERT_EQ(s.ncomponents(), 8);
 
 	for (size_t x = 0; x < 16; ++x)
 	{
@@ -86,7 +86,7 @@ TEST( DisjointSetForest, JoinAndCompress )
 	s.join(0, 2);
 
 	ASSERT_EQ(s.size(), 16);
-	ASSERT_EQ(s.nclasses(), 7);
+	ASSERT_EQ(s.ncomponents(), 7);
 	ASSERT_EQ(s.rank(1), 1);
 	ASSERT_EQ(s.rank(3), 2 );
 
@@ -105,7 +105,7 @@ TEST( DisjointSetForest, JoinAndCompress )
 	s.join(1, 5);
 
 	ASSERT_EQ(s.size(), 16);
-	ASSERT_EQ(s.nclasses(), 6);
+	ASSERT_EQ(s.ncomponents(), 6);
 	ASSERT_EQ(s.rank(3), 2 );
 	ASSERT_EQ(s.rank(5), 1);
 
@@ -128,7 +128,7 @@ TEST( DisjointSetForest, JoinAndCompress )
 	s.join(7, 2);
 
 	ASSERT_EQ(s.size(), 16);
-	ASSERT_EQ(s.nclasses(), 5);
+	ASSERT_EQ(s.ncomponents(), 5);
 	ASSERT_EQ(s.rank(7), 1);
 	ASSERT_EQ(s.rank(3), 2 );
 
@@ -155,7 +155,7 @@ TEST( DisjointSetForest, JoinAndCompress )
 	s.join(9, 11);
 
 	ASSERT_EQ(s.size(), 16);
-	ASSERT_EQ(s.nclasses(), 4);
+	ASSERT_EQ(s.ncomponents(), 4);
 	ASSERT_EQ(s.rank(9), 1);
 	ASSERT_EQ(s.rank(11), 2 );
 
@@ -174,7 +174,7 @@ TEST( DisjointSetForest, JoinAndCompress )
 	s.join(3, 8);
 
 	ASSERT_EQ(s.size(), 16);
-	ASSERT_EQ(s.nclasses(), 3);
+	ASSERT_EQ(s.ncomponents(), 3);
 	ASSERT_EQ(s.rank(3), 2);
 	ASSERT_EQ(s.rank(11), 3);
 
@@ -209,7 +209,7 @@ TEST( DisjointSetForest, JoinAndCompress )
 	s.compress_all();
 
 	ASSERT_EQ(s.size(), 16);
-	ASSERT_EQ(s.nclasses(), 3);
+	ASSERT_EQ(s.ncomponents(), 3);
 
 	ASSERT_TRUE( s.rank(0) == 0 && s.parent(0) == 11 && s.trace_root(0) == 11 );
 	ASSERT_TRUE( s.rank(1) == 0 && s.parent(1) == 11 && s.trace_root(1) == 11 );
