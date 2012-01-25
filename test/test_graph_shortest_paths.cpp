@@ -36,8 +36,6 @@ template class dijkstra_traverser<graph_t, dist_t, edge_dist_map_t, vertex_dist_
 typedef dijkstra_traverser<graph_t, dist_t, edge_dist_map_t, vertex_dist_map_t, heap_t> dijks_alg_t;
 
 
-// Test cases
-
 struct dijks_action
 {
 	enum type
@@ -254,6 +252,69 @@ struct dijkstra_recorder
 
 };
 
+// Test cases
+
+struct bford_visitor
+{
+	array_map<vertex_t, vertex_t> preds;
+
+	bford_visitor(gint n)
+	: preds(n, make_gvertex(gint(0)))
+	{
+	}
+
+	void update(const vertex_t& u, const vertex_t& v, const dist_t& d)
+	{
+		preds[v] = u;
+	}
+};
+
+
+TEST( GraphShortestPaths, BellmanFord )
+{
+	const gint n = 5;
+	const gint m = 10;
+	const dist_t maxlen = 10000;
+
+	const gint vpair_ints[m * 2] = {
+			1, 2,
+			1, 3,
+			2, 3,
+			3, 2,
+			2, 4,
+			3, 5,
+			4, 5,
+			5, 4,
+			3, 4,
+			5, 1
+	};
+
+	graph_t g(n, m, true, (const vpair_t*)(vpair_ints));
+
+	dist_t edge_dists[m] = {10, 5, 2, 3, 1, 2, 4, 6, 9, 7};
+	edge_dist_map_t edge_dist_map(edge_dists, m);
+
+	vertex_dist_map_t spathlens(n, -1);
+	vertex_t sv = make_gvertex(1);
+
+	bford_visitor vis(n);
+
+	bool ret = bellman_ford_shortest_paths(g, edge_dist_map, spathlens, maxlen, vis, sv);
+
+	ASSERT_TRUE(ret);
+
+	ASSERT_EQ(0, spathlens[make_gvertex(1)]);
+	ASSERT_EQ(8, spathlens[make_gvertex(2)]);
+	ASSERT_EQ(5, spathlens[make_gvertex(3)]);
+	ASSERT_EQ(9, spathlens[make_gvertex(4)]);
+	ASSERT_EQ(7, spathlens[make_gvertex(5)]);
+
+	ASSERT_EQ(0, vis.preds[make_gvertex(1)].id);
+	ASSERT_EQ(3, vis.preds[make_gvertex(2)].id);
+	ASSERT_EQ(1, vis.preds[make_gvertex(3)].id);
+	ASSERT_EQ(2, vis.preds[make_gvertex(4)].id);
+	ASSERT_EQ(3, vis.preds[make_gvertex(5)].id);
+}
 
 
 TEST( GraphShortestPaths, DijkstraDirected )

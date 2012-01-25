@@ -23,7 +23,126 @@ namespace bcs
 {
 	/***********************************************************
 	 *
+	 *   Bellman-Ford Shortest Path Algorithm
+	 *
+	 *
+	 *   Agent concept
+	 *   --------------
+	 *
+	 *   agent.update(u, v, len);
+	 *  	invoked when the bound on the shortest-path-len of
+	 *      v is reduced to len via u.
+	 *
+	 ***********************************************************/
+
+	namespace _detail
+	{
+		template<class Derived, typename TDist, class EdgeDistMap, class PathLenMap, class Agent>
+		bool bellman_ford_shortest_paths_impl(const IGraphIncidenceList<Derived>& graph,
+				const EdgeDistMap& edge_dists, PathLenMap& spath_lens, index_t nsources, Agent& agent)
+		{
+			typedef typename gview_traits<Derived>::index_type index_type;
+			typedef typename gview_traits<Derived>::vertex_type vertex_type;
+			typedef typename gview_traits<Derived>::edge_type edge_type;
+			typedef typename gview_traits<Derived>::edge_iterator edge_iter;
+
+			index_type max_iters = graph.nvertices() - (index_type)nsources;
+
+			edge_iter ebegin = graph.edges_begin();
+			edge_iter eend = graph.edges_end();
+
+			bool changed = true;
+
+			for(index_type i = 1; changed ;++i)
+			{
+				changed = false;
+				for (edge_iter p = ebegin; p != eend; ++p)
+				{
+					const edge_type& e = *p;
+					vertex_type u = graph.source(e);
+					vertex_type v = graph.target(e);
+
+					TDist alt_len = spath_lens[u] + edge_dists[e];
+					if (spath_lens[v] > alt_len)
+					{
+						spath_lens[v] = alt_len;
+						changed = true;
+
+						agent.update(u, v, alt_len);
+					}
+				}
+
+				if (changed && i > max_iters) return false;
+			}
+
+			return true; // no negative-cycle
+		}
+	}
+
+
+	template<class Derived, typename TDist, class EdgeDistMap, class PathLenMap, class Agent>
+	inline bool bellman_ford_shortest_paths(const IGraphIncidenceList<Derived>& graph,
+			const EdgeDistMap& edge_dists, PathLenMap& spath_lens, const TDist& defaultlen,
+			Agent& agent, const typename gview_traits<Derived>::vertex_type& source)
+	{
+		typedef typename gview_traits<Derived>::vertex_iterator vertex_iter;
+
+		vertex_iter vend = graph.vertices_end();
+		for (vertex_iter it = graph.vertices_begin(); it != vend; ++it)
+		{
+			spath_lens[*it] = defaultlen;
+		}
+		spath_lens[source] = 0;
+
+		return _detail::bellman_ford_shortest_paths_impl<Derived,TDist,EdgeDistMap,PathLenMap,Agent>(
+				graph, edge_dists, spath_lens, 1, agent);
+	}
+
+
+	/***********************************************************
+	 *
 	 *   Dijkstra Shortest Path Algorithm
+	 *
+	 *
+	 *   Agent concept
+	 *   -------------
+	 *
+	 *   agent.source(u);
+	 *       invoked when u is added as source, which has not
+	 *       been processed though.
+	 *
+	 *       returns whether to continue
+	 *
+	 *   agent.enroll(u, len);
+	 *       invoked when u's shortest path length has been
+	 *       determined, and its neighbors is to be examined.
+	 *
+	 *       returns whether to continue
+	 *
+	 *   agent.examine_edge(u, v, e);
+	 *       invoked when the edge e that connects between u
+	 *       and v is seen.
+	 *
+	 *       returns whether the edge e is viable
+	 *
+	 *   agent.discover(u, v, e, len);
+	 *       invoked when a new vertex is first attained (via
+	 *       e = (u, v)), whose initial path length is len.
+	 *
+	 *       returns whether to continue
+	 *
+	 *   agent.relax(u, v, e, len);
+	 *       invoked when a shorter path from source(s) to
+	 *       v is found (with new length len), via e = (u, v).
+	 *
+	 *       returns whether to continue
+	 *
+	 *   agent.finish(u, len);
+	 *       invoked when all neighbors of u have been examined.
+	 *       Here, len is the shortest path length from sources
+	 *       to u.
+	 *
+	 *       returns whether to continue.
 	 *
 	 ***********************************************************/
 
