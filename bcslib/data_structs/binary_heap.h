@@ -17,7 +17,6 @@
 #include <vector>
 #include <functional>
 
-
 namespace bcs
 {
 
