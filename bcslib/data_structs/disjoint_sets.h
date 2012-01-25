@@ -44,7 +44,7 @@ namespace bcs
 			{
 				m_nodes.push_back(node(i));
 			}
-			m_nclasses = n;
+			m_ncomps = n;
 		}
 
 		size_type size() const
@@ -52,9 +52,9 @@ namespace bcs
 			return m_nodes.size();
 		}
 
-		size_type nclasses() const
+		size_type ncomponents() const
 		{
-			return m_nclasses;
+			return m_ncomps;
 		}
 
 		bool is_root(const size_type& x) const
@@ -70,6 +70,11 @@ namespace bcs
 		size_type rank(const size_type& x) const
 		{
 			return m_nodes[x].rank;
+		}
+
+		bool in_same_component(const size_type& x, const size_type& y)
+		{
+			return find_root(x) == find_root(y);
 		}
 
 	public:
@@ -141,7 +146,7 @@ namespace bcs
 			node& nx = m_nodes[rx];
 			node& ny = m_nodes[ry];
 
-			-- m_nclasses;
+			-- m_ncomps;
 
 			if (nx.rank > ny.rank)
 			{
@@ -160,7 +165,7 @@ namespace bcs
 
 	private:
 		std::vector<node> m_nodes;
-		size_type m_nclasses;
+		size_type m_ncomps;
 
 	}; // end class disjoint_set_forest
 

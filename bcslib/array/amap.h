@@ -214,8 +214,7 @@ namespace bcs
 		{
 		}
 
-		template<typename InputIterator>
-		array_map(index_t n, InputIterator src)
+		array_map(index_t n, const value_type* src)
 		: m_arr(n)
 		{
 			for (index_t i = 0; i < n; ++i)
