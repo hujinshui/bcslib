@@ -323,7 +323,7 @@ namespace bcs
 			return m_btree.empty();
 		}
 
-		size_type top_key() const
+		key_type top_key() const
 		{
 			return m_btree.root_value();
 		}
@@ -338,7 +338,7 @@ namespace bcs
 			return m_compare(x, y);
 		}
 
-		bool in_heap(size_type key) const
+		bool in_heap(const key_type& key) const
 		{
 			return m_node_map[key].non_nil();
 		}
@@ -369,7 +369,7 @@ namespace bcs
 			}
 		}
 
-		void insert(size_type key) // pre-condition: !in_heap(idx)
+		void insert(const key_type& key) // pre-condition: !in_heap(idx)
 		{
 			// push to the last node of the tree
 			m_btree.push(key);
@@ -397,7 +397,7 @@ namespace bcs
 				if (n > 1)
 				{
 					// put back to root
-					size_type i = m_btree.root_value() = m_btree.back_value();
+					key_type i = m_btree.root_value() = m_btree.back_value();
 					m_node_map[i] = m_btree.root();
 
 					// pop the back
@@ -415,12 +415,12 @@ namespace bcs
 			}
 		}
 
-		void update_up(size_type key) // pre-condition: in_heap(key)
+		void update_up(const key_type& key) // pre-condition: in_heap(key)
 		{
 			bubble_up(m_node_map[key], m_value_map[key]);
 		}
 
-		void update_down(size_type key) // pre-condition: in_heap(key)
+		void update_down(const key_type& key) // pre-condition: in_heap(key)
 		{
 			bubble_down(m_node_map[key], m_value_map[key]);
 		}
@@ -434,9 +434,9 @@ namespace bcs
 			return m_value_map[m_btree(u)];
 		}
 
-		node_type node(size_type idx) const
+		node_type node(const key_type& key) const
 		{
-			return m_node_map[idx];
+			return m_node_map[key];
 		}
 
 		const tree_type& tree() const
@@ -523,8 +523,8 @@ namespace bcs
 
 		node_type swap(node_type u, node_type v)
 		{
-			size_type ui = m_btree(u);
-			size_type vi = m_btree(v);
+			key_type ui = m_btree(u);
+			key_type vi = m_btree(v);
 
 			m_node_map[ui] = v;
 			m_node_map[vi] = u;

@@ -39,6 +39,11 @@ namespace bcs
 		typedef aview1d<value_type> view_type;
 
 	public:
+		caview_map(const value_type *data, index_t n)
+		: m_view(data, n)
+		{
+		}
+
 		caview_map(cview_type& view)
 		: m_view(view)
 		{
@@ -107,6 +112,11 @@ namespace bcs
 		typedef aview1d<value_type> view_type;
 
 	public:
+		aview_map(value_type *data, index_t n)
+		: m_view(data, n)
+		{
+		}
+
 		aview_map(view_type& view)
 		: m_view(view)
 		{
