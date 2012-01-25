@@ -23,20 +23,46 @@
 namespace bcs
 {
 
-	/********************************************
+	/***********************************************************
+	 *
+	 *   The Concept of Agent
+	 *   ----------------------------------
+	 *
+	 *   Let a be an instance of an agent model
+	 *
+	 *	 a.source(v);
+	 *	     invoked when a source vertex is to be added to
+	 *	     the queue
+	 *
+	 *	     no return
+	 *
+	 *	 a.examine(u, v, v_status);
+	 *	     invoked when an edge is examined.
+	 *
+	 *	     the agent should return whether the edge (u, v)
+	 *	     is viable
+	 *
+	 *   a.discover(u, v);
+	 *       invoked when a new vertex v is attained from u, which
+	 *       is to be added to the queue
+	 *
+	 *       the agent should return whether to continue
+	 *
+	 *   a.finish(v);
+	 *   	 invoked when all neighbors of v have been added
+	 *   	 to the queue, and v is removed from the queue
+	 *
+	 *   	 the agent should return whether to continue
+	 *
+	 ***********************************************************/
+
+
+
+	/***********************************************************
 	 *
 	 *   Breadth-First Traversal
 	 *
-	 *
-	 *   Visitor concept
-	 *   ---------------
-	 *
-	 *	 vis.seed(v);
-	 *	 vis.examine(u, v, v_status);
-	 *   vis.discover(u, v);
-	 *   vis.finish(v);
-	 *
-	 ********************************************/
+	 ***********************************************************/
 
 	enum gvisit_status
 	{
@@ -46,16 +72,17 @@ namespace bcs
 	};
 
 
-	template<class Derived>
+	template<class Derived, class Queue>
 	class breadth_first_traverser
 	{
 	public:
+		typedef Queue queue_type;
 		typedef typename gview_traits<Derived>::vertex_type vertex_type;
 		typedef typename gview_traits<Derived>::neighbor_iterator neighbor_iterator;
 
 	public:
-		breadth_first_traverser(const IGraphAdjacencyList<Derived>& g)
-		: m_graph(g), m_status(g.nvertices(), GVISIT_NONE)
+		breadth_first_traverser(const IGraphAdjacencyList<Derived>& g, Queue& queue)
+		: m_graph(g), m_status(g.nvertices(), GVISIT_NONE), m_queue(queue)
 		{
 		}
 
@@ -64,91 +91,88 @@ namespace bcs
 			return m_status[v];
 		}
 
-		bool is_ended() const
+		template<class Agent>
+		void add_source(const vertex_type& u, Agent& agent)
 		{
-			return m_queue.empty();
-		}
-
-		template<class Visitor>
-		void add_seed(const vertex_type& v, Visitor& visitor)
-		{
-			if (status(v) < GVISIT_DISCOVERED)
+			if (status(u) < GVISIT_DISCOVERED)
 			{
-				visitor.seed(v);
-				m_status[v] = GVISIT_DISCOVERED;
-				add_neighbors(v, visitor);
+				agent.source(u);
+				m_status[u] = GVISIT_DISCOVERED;
+				m_queue.push(u);
 			}
 		}
 
 
-		template<class Visitor>
-		void next(Visitor& visitor)
+		template<class Agent>
+		void run(Agent& agent)
 		{
-			vertex_type v = m_queue.front();
-			m_queue.pop();
+			bool stopped = false;
 
-			add_neighbors(v, visitor);
-		}
-
-	private:
-		template<class Visitor>
-		void add_neighbors(const vertex_type& v, Visitor& visitor)
-		{
-			neighbor_iterator nb_begin = m_graph.out_neighbors_begin(v);
-			neighbor_iterator nb_end = m_graph.out_neighbors_end(v);
-
-			for (neighbor_iterator it = nb_begin; it != nb_end; ++it)
+			while (!m_queue.empty())
 			{
-				vertex_type u = *it;
+				vertex_type u = m_queue.front();
 
-				gvisit_status ustat = status(u);
-				visitor.examine(v, u, ustat);
+				neighbor_iterator it = m_graph.out_neighbors_begin(u);
+				neighbor_iterator nb_end = m_graph.out_neighbors_end(u);
 
-				if (status(u) < GVISIT_DISCOVERED)
+				for (; it != nb_end; ++it)
 				{
-					m_status[u] = GVISIT_DISCOVERED;
-					visitor.discover(v, u);
-					m_queue.push(u);
+					vertex_type v = *it;
+					gvisit_status vstat = status(v);
+
+					if (agent.examine(u, v, vstat) && vstat < GVISIT_DISCOVERED)
+					{
+						m_status[v] = GVISIT_DISCOVERED;
+						m_queue.push(v);
+
+						if (!agent.discover(u, v))
+						{
+							stopped = true;
+							break;
+						}
+					}
+				}
+
+				if (stopped) break;
+
+				if (it == nb_end)
+				{
+					m_queue.pop();
+					m_status[u] = GVISIT_FINISHED;
+					if (!agent.finish(u)) break;
 				}
 			}
-
-			m_status[v] = GVISIT_FINISHED;
-			visitor.finish(v);
 		}
 
 	private:
 		const IGraphAdjacencyList<Derived>& m_graph;
 		array_map<vertex_type, gvisit_status> m_status;
-		std::queue<vertex_type> m_queue;
+		queue_type& m_queue;
 	};
 
 
-	template<class Derived, class Visitor>
-	inline void breadth_first_traverse(const IGraphAdjacencyList<Derived>& g, Visitor& visitor,
-			const typename gview_traits<Derived>::vertex_type& seed)
+	template<class Derived, class Agent>
+	inline void breadth_first_traverse(const IGraphAdjacencyList<Derived>& g, Agent& agent,
+			const typename gview_traits<Derived>::vertex_type& source)
 	{
-		breadth_first_traverser<Derived> T(g);
+		typedef typename gview_traits<Derived>::vertex_type vertex_type;
+		std::queue<vertex_type> Q;
+		breadth_first_traverser<Derived, std::queue<vertex_type> > T(g, Q);
 
-		T.add_seed(seed, visitor);
-
-		while (!T.is_ended())
-		{
-			T.next(visitor);
-		}
+		T.add_source(source, agent);
+		T.run(agent);
 	}
 
-	template<class Derived, class Visitor, typename InputIter>
-	inline void breadth_first_traverse(const IGraphAdjacencyList<Derived>& g, Visitor& visitor,
+	template<class Derived, class Agent, typename InputIter>
+	inline void breadth_first_traverse(const IGraphAdjacencyList<Derived>& g, Agent& agent,
 			InputIter first, InputIter last)
 	{
-		breadth_first_traverser<Derived> T(g);
+		typedef typename gview_traits<Derived>::vertex_type vertex_type;
+		std::queue<vertex_type> Q;
+		breadth_first_traverser<Derived, std::queue<vertex_type> > T(g, Q);
 
-		for (; first != last; ++first) T.add_seed(*first, visitor);
-
-		while (!T.is_ended())
-		{
-			T.next(visitor);
-		}
+		for (; first != last; ++first) T.add_source(*first, agent);
+		T.run(agent);
 	}
 
 
@@ -156,15 +180,6 @@ namespace bcs
 	/********************************************
 	 *
 	 *   Depth-First Traversal
-	 *
-	 *
-	 *   Visitor concept
-	 *   ---------------
-	 *
-	 *   vis.seed(v);
-	 *   vis.examine(u, v, v_status);
-	 *   vis.discover(u, v);
-	 *   vis.finish(v);
 	 *
 	 ********************************************/
 
@@ -194,61 +209,51 @@ namespace bcs
 			return m_status[v];
 		}
 
-		bool is_ended() const
+		template<class Agent>
+		void add_source(const vertex_type& u, Agent& agent)
 		{
-			return m_stack.empty();
-		}
-
-		template<class Visitor>
-		void add_seed(const vertex_type& v, Visitor& visitor)
-		{
-			if (status(v) < GVISIT_DISCOVERED)
+			if (status(u) < GVISIT_DISCOVERED)
 			{
-				visitor.seed(v);
-				add_discovered(v, visitor);
+				agent.source(u);
+				add_discovered(u);
 			}
 		}
 
-		template<class Visitor>
-		void next(Visitor& visitor)
+
+		template<class Agent>
+		void run(Agent& agent)
 		{
-			entry& e = m_stack.top();
-
-			if (e.nb_current != e.nb_end)
+			while (!m_stack.empty())
 			{
-				vertex_type v = *e.nb_current;
+				entry& e = m_stack.top();
 
-				gvisit_status vstatus = status(v);
-				visitor.examine(e.v, v, vstatus);
-
-				bool pushed = false;
-
-				if (vstatus < GVISIT_DISCOVERED)
+				if (e.nb_current != e.nb_end)
 				{
-					visitor.discover(e.v, v);
-					pushed = add_discovered(v, visitor);
+					vertex_type v = *e.nb_current;
+					++e.nb_current;
+					gvisit_status vstatus = status(v);
+
+					if (agent.examine(e.v, v, vstatus) && vstatus < GVISIT_DISCOVERED)
+					{
+						add_discovered(v);
+						if (!agent.discover(e.v, v))
+							break;
+					}
 				}
-
-				if (!pushed) ++e.nb_current;
-			}
-			else
-			{
-				m_status[e.v] = GVISIT_FINISHED;
-				visitor.finish(e.v);
-				m_stack.pop();
-
-				if (!m_stack.empty())
+				else
 				{
-					++ m_stack.top().nb_current;
+					vertex_type v = e.v;
+					m_stack.pop();
+
+					if (!agent.finish(v)) break;
 				}
 			}
-
 		}
+
 
 	private:
 
-		template<class Visitor>
-		bool add_discovered(const vertex_type &v, Visitor& visitor)
+		void add_discovered(const vertex_type &v)
 		{
 			m_status[v] = GVISIT_DISCOVERED;
 
@@ -257,18 +262,9 @@ namespace bcs
 			e.nb_current = m_graph.out_neighbors_begin(v);
 			e.nb_end = m_graph.out_neighbors_end(v);
 
-			if (e.nb_current != e.nb_end)
-			{
-				m_stack.push(e);
-				return true;
-			}
-			else
-			{
-				m_status[v] = GVISIT_FINISHED;
-				visitor.finish(v);
-				return false;
-			}
+			m_stack.push(e);
 		}
+
 
 	private:
 		const IGraphAdjacencyList<Derived>& m_graph;
@@ -277,34 +273,26 @@ namespace bcs
 	};
 
 
-	template<class Derived, class Visitor>
-	inline void depth_first_traverse(const IGraphAdjacencyList<Derived>& g, Visitor& visitor,
+	template<class Derived, class Agent>
+	inline void depth_first_traverse(const IGraphAdjacencyList<Derived>& g, Agent& agent,
 			const typename gview_traits<Derived>::vertex_type& seed)
 	{
 		depth_first_traverser<Derived> T(g);
 
-		T.add_seed(seed, visitor);
-
-		while (!T.is_ended())
-		{
-			T.next(visitor);
-		}
+		T.add_source(seed, agent);
+		T.run(agent);
 	}
 
-	template<class Derived, class Visitor, typename InputIter>
-	inline void depth_first_traverse(const IGraphAdjacencyList<Derived>& g, Visitor& visitor,
+	template<class Derived, class Agent, typename InputIter>
+	inline void depth_first_traverse(const IGraphAdjacencyList<Derived>& g, Agent& agent,
 			InputIter first, InputIter last)
 	{
 		depth_first_traverser<Derived> T(g);
 
 		for (; first != last; ++first)
 		{
-			T.add_seed(*first, visitor);
-
-			while (!T.is_ended())
-			{
-				T.next(visitor);
-			}
+			T.add_source(*first, agent);
+			T.run(agent);
 		}
 	}
 

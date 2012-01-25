@@ -23,14 +23,14 @@ typedef gvertex<gint> vertex_t;
 typedef gvertex_pair<gint> vpair_t;
 typedef ginclist<gint> graph_t;
 
-template class bcs::breadth_first_traverser<graph_t>;
+template class bcs::breadth_first_traverser<graph_t, std::queue<vertex_t> >;
 template class bcs::depth_first_traverser<graph_t>;
 
 struct gtr_action
 {
 	enum type
 	{
-		GTR_SEED,
+		GTR_SOURCE,
 		GTR_EXAMINE,
 		GTR_DISCOVER,
 		GTR_FINISH
@@ -44,8 +44,8 @@ struct gtr_action
 	{
 		switch (ty)
 		{
-		case GTR_SEED:
-			std::printf("seed(%d)", v.id);
+		case GTR_SOURCE:
+			std::printf("source(%d)", v.id);
 			break;
 		case GTR_EXAMINE:
 			std::printf("examine(%d, %d)", u.id, v.id);
@@ -69,18 +69,18 @@ struct gtr_action
 		return !(operator == (a));
 	}
 
-	static gtr_action seed(vertex_t v_)
+	static gtr_action source(vertex_t v_)
 	{
 		gtr_action a;
-		a.ty = GTR_SEED;
+		a.ty = GTR_SOURCE;
 		a.u = make_gvertex(gint(-1));
 		a.v = v_;
 		return a;
 	}
 
-	static gtr_action seed(gint vi)
+	static gtr_action source(gint vi)
 	{
-		return seed(make_gvertex(vi));
+		return source(make_gvertex(vi));
 	}
 
 	static gtr_action examine(vertex_t u_, vertex_t v_)
@@ -131,24 +131,27 @@ struct gtr_recording_visitor
 {
 	std::vector<gtr_action> records;
 
-	void seed(vertex_t v)
+	void source(vertex_t v)
 	{
-		records.push_back(gtr_action::seed(v));
+		records.push_back(gtr_action::source(v));
 	}
 
-	void examine(vertex_t u, vertex_t v, gvisit_status s)
+	bool examine(vertex_t u, vertex_t v, gvisit_status s)
 	{
 		records.push_back(gtr_action::examine(u, v));
+		return true;
 	}
 
-	void discover(vertex_t u, vertex_t v)
+	bool discover(vertex_t u, vertex_t v)
 	{
 		records.push_back(gtr_action::discover(u, v));
+		return true;
 	}
 
-	void finish(vertex_t v)
+	bool finish(vertex_t v)
 	{
 		records.push_back(gtr_action::finish(v));
+		return true;
 	}
 
 	bool verify_with(const gtr_action *expected, size_t n) const
@@ -203,7 +206,7 @@ TEST( GraphTraversal, BFS )
 	ASSERT_EQ(g.nedges(), m);
 
 	static gtr_action expected_actions[] = {
-			gtr_action::seed(1),
+			gtr_action::source(1),
 			gtr_action::examine(1, 2),
 			gtr_action::discover(1, 2),
 			gtr_action::examine(1, 3),
@@ -261,7 +264,7 @@ TEST( GraphTraversal, DFS )
 	ASSERT_EQ(g.nedges(), m);
 
 	static gtr_action expected_actions[] = {
-			gtr_action::seed(1),
+			gtr_action::source(1),
 			gtr_action::examine(1, 2),
 			gtr_action::discover(1, 2),
 			gtr_action::examine(2, 4),
