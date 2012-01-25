@@ -46,17 +46,17 @@ namespace bcs
 	 * h.compare(x, y);
 	 *     tests whether x is "more towards the top" as opposed to y.
 	 *
+	 * h.reserve(n);
+	 *     prepare for enough room to store n keys
+	 *
+	 * h.add_key(key);
+	 * 	   add a key (without inserting it to the heap) as a preparation for make_heap
+	 *
 	 * h.make_heap();
-	 *     makes heap upon all elements in the associated container
+	 *     make heap by organizing the added elements
 	 *
-	 * h.make_heap(n);
-	 *     makes heap up to the n-th element
-	 *
-	 * h.make_heap(first, last);
-	 *     makes heap upon selected elements whose indices are given via iterators
-	 *
-	 * h.top_index();
-	 *     returns the index of the top element
+	 * h.top_key();
+	 *     returns the key of the top element
 	 *
 	 * h.top_value();
 	 *     returns the value of the top element
@@ -65,23 +65,58 @@ namespace bcs
 	 *     removes the top element from the heap and adjusts the heap
 	 *     to maintain heap properties
 	 *
-	 * h.in_heap(idx);
-	 *     tests whether the element with index idx is in the heap
+	 * h.in_heap(key);
+	 *     tests whether the element with the specified key is in the heap
 	 *
-	 * h.insert(idx);
-	 *     inserts the element with index idx to the heap
+	 * h.insert(key);
+	 *     inserts the element with the specified key to the heap
 	 *     pre-condition: not in_heap(idx)
 	 *
-	 * h.update_up(idx);
-	 * h.update_down(idx);
+	 * h.update_up(key);
+	 * h.update_down(key);
 	 *
 	 *     notifies the heap to adjust its structure in response to an
-	 *     update to the idx-th element.
+	 *     update to the element with the specified key
 	 *
 	 *     use update_up if the change is towards the top
 	 *     use update_down if the change is against the top
 	 *
 	 */
+
+	struct cbtree_node
+	{
+		size_t id;
+
+		cbtree_node() : id(0) { }
+
+		cbtree_node(size_t id_) : id(id_) { }
+
+		size_t index() const
+		{
+			return id - 1;
+		}
+
+		bool is_nil() const
+		{
+			return id == 0;
+		}
+
+		bool non_nil() const
+		{
+			return id > 0;
+		}
+
+		bool operator == (const cbtree_node& rhs) const
+		{
+			return id == rhs.id;
+		}
+
+		bool operator != (const cbtree_node& rhs) const
+		{
+			return id != rhs.id;
+		}
+	};
+
 
 
 	/**
@@ -102,39 +137,7 @@ namespace bcs
 		typedef typename container_type::iterator iterator;
 		typedef typename container_type::const_iterator const_iterator;
 
-		struct handle
-		{
-			size_type id;
-
-			handle() : id(0) { }
-
-			handle(size_type id_) : id(id_) { }
-
-			size_type index() const
-			{
-				return id - 1;
-			}
-
-			bool is_nil() const
-			{
-				return id == 0;
-			}
-
-			bool non_nil() const
-			{
-				return id > 0;
-			}
-
-			bool operator == (const handle& rhs) const
-			{
-				return id == rhs.id;
-			}
-
-			bool operator != (const handle& rhs) const
-			{
-				return id != rhs.id;
-			}
-		};
+		typedef cbtree_node handle;
 
 	public:
 		size_type size() const
@@ -279,35 +282,33 @@ namespace bcs
 
 
 
-	template<typename T,
-		class Container=std::vector<T>,
-		class Compare=std::less<T> >
+	template<typename TKey, typename TValue,
+		class ValueMap, class NodeMap, class Compare=std::less<TValue> >
 	class binary_heap
 	{
 	public:
-		typedef Container container_type;
+		typedef TKey key_type;
+		typedef TValue value_type;
+
+		typedef ValueMap value_map_type;
+		typedef NodeMap node_map_type;
 		typedef Compare compare_type;
 
-		typedef T value_type;
 		typedef size_t size_type;
 		typedef ptrdiff_t difference_type;
-		typedef typename container_type::reference reference;
-		typedef typename container_type::const_reference const_reference;
-		typedef typename container_type::pointer pointer;
-		typedef typename container_type::const_pointer const_pointer;
-		typedef typename container_type::iterator iterator;
-		typedef typename container_type::const_iterator const_iterator;
-		typedef typename container_type::allocator_type allocator_type;
+		typedef typename value_map_type::reference reference;
+		typedef typename value_map_type::const_reference const_reference;
 
-		typedef consecutive_binary_tree<size_type> tree_type;
-		typedef tree_type::handle node_type;
-		typedef std::vector<node_type> node_map_type;
+		typedef consecutive_binary_tree<key_type> tree_type;
+		typedef typename tree_type::handle node_type;
 
 	public:
-		binary_heap(const container_type& elements, const compare_type& compare = compare_type())
-		: m_elements(elements), m_compare(compare)
+		binary_heap(const value_map_type& value_map,
+				node_map_type& node_map,
+				const compare_type& compare = compare_type())
+		: m_value_map(value_map), m_node_map(node_map), m_compare(compare)
 		{
-			init_node_map();
+			// note: the caller should initialize the node_map before it is used in the heap
 		}
 
 	public:
@@ -323,72 +324,65 @@ namespace bcs
 			return m_btree.empty();
 		}
 
-		size_type top_index() const
+		size_type top_key() const
 		{
 			return m_btree.root_value();
 		}
 
 		const_reference top_value() const
 		{
-			return m_elements[top_index()];
+			return m_value_map[top_key()];
 		}
 
-		bool compare(const T& x, const T& y) const
+		bool compare(const value_type& x, const value_type& y) const
 		{
 			return m_compare(x, y);
 		}
 
-		bool in_heap(size_type idx) const
+		bool in_heap(size_type key) const
 		{
-			return m_node_map[idx].non_nil();
+			return m_node_map[key].non_nil();
 		}
 
 	public:
 		// concept-required interfaces (for manipulation)
 
+		void reserve(size_type n)
+		{
+			m_btree.reserve(n);
+		}
+
+		void add_key(const key_type& key)
+		{
+			m_btree.push(key);
+			m_node_map[key] = m_btree.back();
+		}
+
 		void make_heap()
 		{
-			make_heap(m_elements.size());
-		}
-
-		void make_heap(size_type n)
-		{
-			for (size_type i = 0; i < n; ++i)
+			if (m_btree.size() > 1)
 			{
-				m_btree.push(i);
-				m_node_map[i] = m_btree.back();
+				size_type last_nonleaf_id = m_btree.last_parent().id;
+				for (size_type id = last_nonleaf_id; id > 0; --id)
+				{
+					bubble_down(id, get_by_node(id));
+				}
 			}
-
-			do_make_heap();
 		}
 
-		template<typename InputIterator>
-		void make_heap(InputIterator first, InputIterator last)
-		{
-			for (; first != last; ++first)
-			{
-				size_type i = (size_type)(*first);
-
-				m_btree.push(i);
-				m_node_map[i] = m_btree.back();
-			}
-
-			do_make_heap();
-		}
-
-		void insert(size_type idx) // pre-condition: !in_heap(idx)
+		void insert(size_type key) // pre-condition: !in_heap(idx)
 		{
 			// push to the last node of the tree
-			m_btree.push(idx);
+			m_btree.push(key);
 
 			// attach to node-map
 			node_type last_node = m_btree.back();
-			m_node_map[idx] = last_node;
+			m_node_map[key] = last_node;
 
 			// adjust position
 			if (m_btree.size() > 1)
 			{
-				bubble_up(last_node, m_elements[idx]);
+				bubble_up(last_node, m_value_map[key]);
 			}
 		}
 
@@ -411,7 +405,7 @@ namespace bcs
 					m_btree.pop();
 
 					// adjust position
-					bubble_down(m_btree.root(), m_elements[i]);
+					bubble_down(m_btree.root(), m_value_map[i]);
 				}
 				else
 				{
@@ -422,14 +416,14 @@ namespace bcs
 			}
 		}
 
-		void update_up(size_type idx) // pre-condition: in_heap(idx)
+		void update_up(size_type key) // pre-condition: in_heap(key)
 		{
-			bubble_up(m_node_map[idx], m_elements[idx]);
+			bubble_up(m_node_map[key], m_value_map[key]);
 		}
 
-		void update_down(size_type idx) // pre-condition: in_heap(idx)
+		void update_down(size_type key) // pre-condition: in_heap(key)
 		{
-			bubble_down(m_node_map[idx], m_elements[idx]);
+			bubble_down(m_node_map[key], m_value_map[key]);
 		}
 
 	public:
@@ -438,7 +432,7 @@ namespace bcs
 
 		const_reference get_by_node(node_type u) const
 		{
-			return m_elements[m_btree(u)];
+			return m_value_map[m_btree(u)];
 		}
 
 		node_type node(size_type idx) const
@@ -456,35 +450,13 @@ namespace bcs
 			return m_node_map;
 		}
 
-		const container_type& elements() const
+		const value_map_type& value_map() const
 		{
-			return m_elements;
+			return m_value_map;
 		}
 
 
 	private:
-		void init_node_map()
-		{
-			size_type n = m_elements.size();
-			m_node_map.reserve(n);
-			for (size_type i = 0; i < n; ++i)
-			{
-				m_node_map.push_back(node_type());
-			}
-		}
-
-
-		void do_make_heap()
-		{
-			if (m_btree.size() > 1)
-			{
-				size_type last_nonleaf_id = m_btree.last_parent().id;
-				for (size_type id = last_nonleaf_id; id > 0; --id)
-				{
-					bubble_down(id, get_by_node(id));
-				}
-			}
-		}
 
 		void bubble_up(node_type u, const value_type& e)
 		{
@@ -565,33 +537,48 @@ namespace bcs
 		}
 
 	private:
-		const container_type& m_elements;
+		const value_map_type& m_value_map;
+		node_map_type& m_node_map;
 		tree_type m_btree;
-		node_map_type m_node_map;
-
 		Compare m_compare;
 
 	}; // end class binary_heap
 
 
-	template<typename T, class Container, class Compare>
-	void update_element(Container& container, bcs::binary_heap<T, Container, Compare>& heap,
-			const typename Container::size_type& idx, const T& v)
+	template<typename TIntKey, typename TValue, class ValueMap, class NodeMap, class Compare>
+	void make_heap_with_int_keys(bcs::binary_heap<TIntKey, TValue, ValueMap, NodeMap, Compare>& heap,
+			const TIntKey& first, const TIntKey& last)
 	{
-		T v0 = container[idx];
-		container[idx] = v;
+		size_t n = size_t(last - first);
+		heap.reserve(n);
 
-		if (heap.compare(v, v0))
+		for (TIntKey key = first; key < last; ++key)
 		{
-			heap.update_up(idx);
+			heap.add_key(key);
+		}
+		heap.make_heap();
+	}
+
+
+	template<typename TKey, typename TValue, class ValueMap, class NodeMap, class Compare>
+	void update_element(ValueMap& value_map,
+			bcs::binary_heap<TKey, TValue, ValueMap, NodeMap, Compare>& heap,
+			const TKey& key, const TValue& value)
+	{
+		TValue v0 = value_map[key];
+		value_map[key] = value;
+
+		if (heap.compare(value, v0))
+		{
+			heap.update_up(key);
 		}
 		else
 		{
-			heap.update_down(idx);
+			heap.update_down(key);
 		}
 	}
 
 
 }
 
-#endif /* STATIC_BINARY_TREE_H_ */
+#endif /* BINARY_TREE_H_ */
