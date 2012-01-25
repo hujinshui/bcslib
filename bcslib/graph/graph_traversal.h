@@ -103,52 +103,57 @@ namespace bcs
 		}
 
 
-		template<class Agent>
-		void run(Agent& agent)
-		{
-			bool stopped = false;
-
-			while (!m_queue.empty())
-			{
-				vertex_type u = m_queue.front();
-
-				neighbor_iterator it = m_graph.out_neighbors_begin(u);
-				neighbor_iterator nb_end = m_graph.out_neighbors_end(u);
-
-				for (; it != nb_end; ++it)
-				{
-					vertex_type v = *it;
-					gvisit_status vstat = status(v);
-
-					if (agent.examine(u, v, vstat) && vstat < GVISIT_DISCOVERED)
-					{
-						m_status[v] = GVISIT_DISCOVERED;
-						m_queue.push(v);
-
-						if (!agent.discover(u, v))
-						{
-							stopped = true;
-							break;
-						}
-					}
-				}
-
-				if (stopped) break;
-
-				if (it == nb_end)
-				{
-					m_queue.pop();
-					m_status[u] = GVISIT_FINISHED;
-					if (!agent.finish(u)) break;
-				}
-			}
-		}
+		template<class Agent> void run(Agent& agent);
 
 	private:
 		const IGraphAdjacencyList<Derived>& m_graph;
 		array_map<vertex_type, gvisit_status> m_status;
 		queue_type& m_queue;
 	};
+
+
+	template<class Derived, class Queue>
+	template<class Agent>
+	void breadth_first_traverser<Derived, Queue>::run(Agent& agent)
+	{
+		bool stopped = false;
+
+		while (!m_queue.empty())
+		{
+			vertex_type u = m_queue.front();
+
+			neighbor_iterator it = m_graph.out_neighbors_begin(u);
+			neighbor_iterator nb_end = m_graph.out_neighbors_end(u);
+
+			for (; it != nb_end; ++it)
+			{
+				vertex_type v = *it;
+				gvisit_status vstat = status(v);
+
+				if (agent.examine(u, v, vstat) && vstat < GVISIT_DISCOVERED)
+				{
+					m_status[v] = GVISIT_DISCOVERED;
+					m_queue.push(v);
+
+					if (!agent.discover(u, v))
+					{
+						stopped = true;
+						break;
+					}
+				}
+			}
+
+			if (stopped) break;
+
+			if (it == nb_end)
+			{
+				m_queue.pop();
+				m_status[u] = GVISIT_FINISHED;
+				if (!agent.finish(u)) break;
+			}
+		}
+	}
+
 
 
 	template<class Derived, class Agent>
@@ -220,36 +225,7 @@ namespace bcs
 		}
 
 
-		template<class Agent>
-		void run(Agent& agent)
-		{
-			while (!m_stack.empty())
-			{
-				entry& e = m_stack.top();
-
-				if (e.nb_current != e.nb_end)
-				{
-					vertex_type v = *e.nb_current;
-					++e.nb_current;
-					gvisit_status vstatus = status(v);
-
-					if (agent.examine(e.v, v, vstatus) && vstatus < GVISIT_DISCOVERED)
-					{
-						add_discovered(v);
-						if (!agent.discover(e.v, v))
-							break;
-					}
-				}
-				else
-				{
-					vertex_type v = e.v;
-					m_stack.pop();
-
-					if (!agent.finish(v)) break;
-				}
-			}
-		}
-
+		template<class Agent> void run(Agent& agent);
 
 	private:
 
@@ -271,6 +247,38 @@ namespace bcs
 		array_map<vertex_type, gvisit_status> m_status;
 		std::stack<entry> m_stack;
 	};
+
+
+	template<class Derived>
+	template<class Agent>
+	void depth_first_traverser<Derived>::run(Agent& agent)
+	{
+		while (!m_stack.empty())
+		{
+			entry& e = m_stack.top();
+
+			if (e.nb_current != e.nb_end)
+			{
+				vertex_type v = *e.nb_current;
+				++e.nb_current;
+				gvisit_status vstatus = status(v);
+
+				if (agent.examine(e.v, v, vstatus) && vstatus < GVISIT_DISCOVERED)
+				{
+					add_discovered(v);
+					if (!agent.discover(e.v, v))
+						break;
+				}
+			}
+			else
+			{
+				vertex_type v = e.v;
+				m_stack.pop();
+
+				if (!agent.finish(v)) break;
+			}
+		}
+	}
 
 
 	template<class Derived, class Agent>
