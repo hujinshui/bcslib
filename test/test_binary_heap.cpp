@@ -85,7 +85,7 @@ int verify_heap_basics(heap_t& heap)
 	size_t c = 0;
 	for (size_t i = 0; i < ne; ++i)
 	{
-		typename tree_t::handle v = node_map[i];
+		cbtree_node v = node_map[i];
 		if (v.non_nil())
 		{
 			if (!heap.in_heap(i)) return 3;
