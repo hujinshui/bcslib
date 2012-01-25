@@ -256,7 +256,7 @@ struct dijkstra_recorder
 
 
 
-TEST( GraphShortestPaths, DijkstraCLRS )
+TEST( GraphShortestPaths, DijkstraDirected )
 {
 	const gint n = 5;
 	const gint m = 10;
@@ -324,7 +324,110 @@ TEST( GraphShortestPaths, DijkstraCLRS )
 	// recorder.print_actions();
 
 	ASSERT_TRUE( recorder.verify_actions(expected_actions, nexpected) );
+
+	ASSERT_EQ(0, spathlens[make_gvertex(1)]);
+	ASSERT_EQ(8, spathlens[make_gvertex(2)]);
+	ASSERT_EQ(5, spathlens[make_gvertex(3)]);
+	ASSERT_EQ(9, spathlens[make_gvertex(4)]);
+	ASSERT_EQ(7, spathlens[make_gvertex(5)]);
 }
+
+
+TEST( GraphShortestPaths, DijkstraUndirected )
+{
+	const gint n = 6;
+	const gint m = 9;
+	const dist_t maxlen = 10000;
+
+	const gint vpair_ints[m * 2] = {
+			1, 2,
+			1, 3,
+			1, 6,
+			2, 3,
+			2, 4,
+			3, 4,
+			3, 6,
+			4, 5,
+			5, 6
+	};
+
+	graph_t g(n, m, false, (const vpair_t*)(vpair_ints));
+
+	dist_t edge_dists[m * 2] = {
+			7, 9, 14, 10, 15, 11, 2, 6, 1,
+			7, 9, 14, 10, 15, 11, 2, 6, 1
+	};
+
+	edge_dist_map_t edge_dist_map(edge_dists, m * 2);
+
+	vertex_dist_map_t spathlens(n, -1);
+	dijkstra_recorder recorder;
+	vertex_t sv = make_gvertex(1);
+
+	static const dijks_action expected_actions[] = {
+			dijks_action::source(1),
+			dijks_action::examine(1, 2),
+			dijks_action::discover(1, 2, 7),
+			dijks_action::examine(1, 3),
+			dijks_action::discover(1, 3, 9),
+			dijks_action::examine(1, 6),
+			dijks_action::discover(1, 6, 14),
+			dijks_action::finish(1, 0),
+
+			dijks_action::enroll(2, 7),
+			dijks_action::examine(2, 3),
+			dijks_action::examine(2, 4),
+			dijks_action::discover(2, 4, 22),
+			dijks_action::examine(2, 1),
+			dijks_action::finish(2, 7),
+
+			dijks_action::enroll(3, 9),
+			dijks_action::examine(3, 4),
+			dijks_action::relax(3, 4, 20),
+			dijks_action::examine(3, 6),
+			dijks_action::relax(3, 6, 11),
+			dijks_action::examine(3, 1),
+			dijks_action::examine(3, 2),
+			dijks_action::finish(3, 9),
+
+			dijks_action::enroll(6, 11),
+			dijks_action::examine(6, 1),
+			dijks_action::examine(6, 3),
+			dijks_action::examine(6, 5),
+			dijks_action::discover(6, 5, 12),
+			dijks_action::finish(6, 11),
+
+			dijks_action::enroll(5, 12),
+			dijks_action::examine(5, 6),
+			dijks_action::examine(5, 4),
+			dijks_action::relax(5, 4, 18),
+			dijks_action::finish(5, 12),
+
+			dijks_action::enroll(4, 18),
+			dijks_action::examine(4, 5),
+			dijks_action::examine(4, 2),
+			dijks_action::examine(4, 3),
+			dijks_action::finish(4, 18)
+	};
+
+	size_t nexpected = sizeof(expected_actions) / sizeof(dijks_action);
+
+	dijkstra_shortest_paths(g, edge_dist_map, spathlens, maxlen, recorder, sv);
+	// recorder.print_actions();
+
+	ASSERT_TRUE( recorder.verify_actions(expected_actions, nexpected) );
+
+	ASSERT_EQ(0, spathlens[make_gvertex(1)]);
+	ASSERT_EQ(7, spathlens[make_gvertex(2)]);
+	ASSERT_EQ(9, spathlens[make_gvertex(3)]);
+	ASSERT_EQ(18, spathlens[make_gvertex(4)]);
+	ASSERT_EQ(12, spathlens[make_gvertex(5)]);
+	ASSERT_EQ(11, spathlens[make_gvertex(6)]);
+}
+
+
+
+
 
 
 
