@@ -14,9 +14,10 @@
 #ifndef BCSLIB_GRAPH_SHORTEST_PATHS_H_
 #define BCSLIB_GRAPH_SHORTEST_PATHS_H_
 
-#include <bcslib/graph/gview_base.h>
-#include <bcslib/graph/graph_traversal.h>
+#include <bcslib/graph/graph_algbase.h>
+#include <bcslib/array/amap.h>
 #include <bcslib/data_structs/binary_heap.h>
+#include <queue>
 #include <vector>
 
 namespace bcs
@@ -297,16 +298,14 @@ namespace bcs
 						m_shortest_path_lens[v] = current_pl;
 						m_heap.insert(v);
 
-						if (!agent.discover(u, v, e, current_pl))
-							return false;
+						if (!agent.discover(u, v, e, current_pl)) return false;
 					}
 					else if (current_pl < m_shortest_path_lens[v])
 					{
 						m_shortest_path_lens[v] = current_pl;
 						m_heap.update_up(v);
 
-						if (!agent.relax(u, v, e, current_pl))
-							return false;
+						if (!agent.relax(u, v, e, current_pl)) return false;
 					}
 				}
 			}
