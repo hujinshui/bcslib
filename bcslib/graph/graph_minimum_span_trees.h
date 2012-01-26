@@ -13,8 +13,8 @@
 #ifndef BCSLIB_GRAPH_MINIMUM_SPAN_TREES_H_
 #define BCSLIB_GRAPH_MINIMUM_SPAN_TREES_H_
 
-#include <bcslib/graph/gview_base.h>
-#include <bcslib/graph/graph_traversal.h>
+#include <bcslib/graph/graph_algbase.h>
+#include <bcslib/array/amap.h>
 #include <bcslib/data_structs/disjoint_sets.h>
 #include <bcslib/data_structs/binary_heap.h>
 #include <vector>
@@ -132,12 +132,10 @@ namespace bcs
 
 				if (dsets.join(ui, vi))
 				{
-					if (!agent.add_edge(u, v, e))
-						break;
+					if (!agent.add_edge(u, v, e)) break;
 				}
 
-				if (dsets.ncomponents() == 1)
-					break;
+				if (dsets.ncomponents() == 1) break;
 			}
 		}
 

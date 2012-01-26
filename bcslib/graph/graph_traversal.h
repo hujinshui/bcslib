@@ -13,7 +13,7 @@
 #ifndef GRAPH_TRAVERSAL_H_
 #define GRAPH_TRAVERSAL_H_
 
-#include <bcslib/graph/gview_base.h>
+#include <bcslib/graph/graph_algbase.h>
 #include <bcslib/array/amap.h>
 #include <vector>
 #include <stack>
@@ -64,13 +64,6 @@ namespace bcs
 	 *
 	 ***********************************************************/
 
-	enum gvisit_status
-	{
-		GVISIT_NONE = 0,
-		GVISIT_DISCOVERED = 1,
-		GVISIT_FINISHED = 2
-	};
-
 
 	template<class Derived, class Queue>
 	class breadth_first_traverser
@@ -116,8 +109,6 @@ namespace bcs
 	template<class Agent>
 	void breadth_first_traverser<Derived, Queue>::run(Agent& agent)
 	{
-		bool stopped = false;
-
 		while (!m_queue.empty())
 		{
 			vertex_type u = m_queue.front();
@@ -135,22 +126,13 @@ namespace bcs
 					m_status[v] = GVISIT_DISCOVERED;
 					m_queue.push(v);
 
-					if (!agent.discover(u, v))
-					{
-						stopped = true;
-						break;
-					}
+					if (!agent.discover(u, v)) return;
 				}
 			}
 
-			if (stopped) break;
-
-			if (it == nb_end)
-			{
-				m_queue.pop();
-				m_status[u] = GVISIT_FINISHED;
-				if (!agent.finish(u)) break;
-			}
+			m_queue.pop();
+			m_status[u] = GVISIT_FINISHED;
+			if (!agent.finish(u)) return;
 		}
 	}
 
@@ -266,8 +248,7 @@ namespace bcs
 				if (agent.examine(e.v, v, vstatus) && vstatus < GVISIT_DISCOVERED)
 				{
 					add_discovered(v);
-					if (!agent.discover(e.v, v))
-						break;
+					if (!agent.discover(e.v, v)) return;
 				}
 			}
 			else
@@ -275,7 +256,7 @@ namespace bcs
 				vertex_type v = e.v;
 				m_stack.pop();
 
-				if (!agent.finish(v)) break;
+				if (!agent.finish(v)) return;
 			}
 		}
 	}
