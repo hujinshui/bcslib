@@ -463,12 +463,14 @@ TEST( GraphTraversal, ConnectedComponents )
 
 	cc_action expected[] = {
 			cc_action::newc(),
+			cc_action::addv(1),
 			cc_action::addv(2),
 			cc_action::addv(3),
 			cc_action::addv(4),
 			cc_action::endc(),
 
 			cc_action::newc(),
+			cc_action::addv(5),
 			cc_action::addv(7),
 			cc_action::addv(6),
 			cc_action::endc()
