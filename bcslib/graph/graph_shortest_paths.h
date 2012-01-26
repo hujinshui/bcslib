@@ -112,8 +112,6 @@ namespace bcs
 	 *       invoked when u is added as source, which has not
 	 *       been processed though.
 	 *
-	 *       returns whether to continue
-	 *
 	 *   agent.enroll(u, len);
 	 *       invoked when u's shortest path length has been
 	 *       determined, and its neighbors is to be examined.
@@ -156,6 +154,20 @@ namespace bcs
 		typedef array_map<key_type, cbtree_node> node_map_type;
 
 		typedef binary_heap<key_type, value_type, value_map_type, node_map_type> type;
+	};
+
+	template<class Derived, typename TDist>
+	struct trivial_dijkstra_agent
+	{
+		typedef typename gview_traits<Derived>::vertex_type vertex_type;
+		typedef typename gview_traits<Derived>::edge_type edge_type;
+
+		void source(const vertex_type& ) { }
+		bool enroll(const vertex_type&, const TDist& ) { return true; }
+		bool examine_edge(const vertex_type&, const vertex_type&, const edge_type& ) { return true; }
+		bool discover(const vertex_type&, const vertex_type&, const edge_type&, const TDist& ) { return true; }
+		bool relax(const vertex_type&, const vertex_type&, const edge_type&, const TDist& ) { return true; }
+		bool finish(const vertex_type&, const TDist& ) { return true; }
 	};
 
 
@@ -346,6 +358,7 @@ namespace bcs
 		}
 		T.run(agent);
 	}
+
 
 }
 
