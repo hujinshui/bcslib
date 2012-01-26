@@ -365,6 +365,11 @@ namespace bcs
 		{
 		}
 
+		void source(const vertex_type& u)
+		{
+			cc_agent.add_vertex(u);
+		}
+
 		bool discover(const vertex_type& u, const vertex_type& v)
 		{
 			cc_agent.add_vertex(v);
