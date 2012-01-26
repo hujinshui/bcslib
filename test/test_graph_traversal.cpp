@@ -299,8 +299,184 @@ TEST( GraphTraversal, DFS )
 }
 
 
+TEST( GraphTraversal, Reachability )
+{
+	const gint n = 7;
+	const gint m = 8;
+
+	static gint edge_ends[m * 2] = {
+			1, 2,
+			2, 4,
+			1, 3,
+			3, 4,
+			4, 5,
+			5, 7,
+			3, 6,
+			6, 4,
+	};
+
+	graph_t g(n, m, true, (const vpair_t*)edge_ends);
+	ASSERT_EQ(n, g.nvertices());
+	ASSERT_EQ(m, g.nedges());
+
+	EXPECT_EQ(6, count_reachable_vertices(g, make_gvertex(1)));
+	EXPECT_EQ(3, count_reachable_vertices(g, make_gvertex(2)));
+	EXPECT_EQ(4, count_reachable_vertices(g, make_gvertex(3)));
+	EXPECT_EQ(2, count_reachable_vertices(g, make_gvertex(4)));
+	EXPECT_EQ(1, count_reachable_vertices(g, make_gvertex(5)));
+	EXPECT_EQ(3, count_reachable_vertices(g, make_gvertex(6)));
+	EXPECT_EQ(0, count_reachable_vertices(g, make_gvertex(7)));
+}
 
 
+struct cc_action
+{
+	enum type
+	{
+		CCA_NEW,
+		CCA_ADD,
+		CCA_END
+	};
+
+	type ty;
+	vertex_t v;
+
+	bool equal(const cc_action& r) const
+	{
+		return ty == r.ty && v == r.v;
+	}
+
+	void print() const
+	{
+		switch (ty)
+		{
+		case CCA_NEW:
+			std::printf("new");
+			break;
+		case CCA_ADD:
+			std::printf("add %d", v.id);
+			break;
+		case CCA_END:
+			std::printf("end");
+			break;
+		}
+	}
+
+	static cc_action newc()
+	{
+		cc_action a;
+		a.ty = CCA_NEW;
+		a.v.id = -1;
+		return a;
+	}
+
+	static cc_action addv(const vertex_t& v)
+	{
+		cc_action a;
+		a.ty = CCA_ADD;
+		a.v = v;
+		return a;
+	}
+
+	static cc_action addv(gint id)
+	{
+		cc_action a;
+		a.ty = CCA_ADD;
+		a.v.id = id;
+		return a;
+	}
+
+	static cc_action endc()
+	{
+		cc_action a;
+		a.ty = CCA_END;
+		a.v.id = -1;
+		return a;
+	}
+};
+
+
+struct cc_recorder
+{
+	void new_component()
+	{
+		m_actions.push_back(cc_action::newc());
+	}
+
+	void end_component()
+	{
+		m_actions.push_back(cc_action::endc());
+	}
+
+	void add_vertex(const vertex_t& v)
+	{
+		m_actions.push_back(cc_action::addv(v));
+	}
+
+	std::vector<cc_action> m_actions;
+
+	void print_actions() const
+	{
+		size_t n = m_actions.size();
+		for (size_t i = 0; i < n; ++i)
+		{
+			m_actions[i].print();
+			printf("\n");
+		}
+	}
+
+	bool verify(const cc_action* expected, size_t n0)
+	{
+		if (m_actions.size() != n0) return false;
+		for (size_t i = 0; i < n0; ++i)
+		{
+			if (!m_actions[i].equal(expected[i])) return false;
+		}
+		return true;
+	}
+};
+
+
+TEST( GraphTraversal, ConnectedComponents )
+{
+	const gint n = 7;
+	const gint m = 7;
+
+	static gint edge_ends[m * 2] = {
+			1, 2,
+			2, 4,
+			1, 3,
+			3, 4,
+			7, 6,
+			6, 5,
+			5, 7
+	};
+
+	graph_t g(n, m, false, (const vpair_t*)edge_ends);
+	ASSERT_EQ(n, g.nvertices());
+	ASSERT_EQ(m, g.nedges());
+
+	cc_recorder recorder;
+	size_t ncc = find_connected_components(g, recorder);
+
+	ASSERT_EQ(2, ncc);
+
+	cc_action expected[] = {
+			cc_action::newc(),
+			cc_action::addv(2),
+			cc_action::addv(3),
+			cc_action::addv(4),
+			cc_action::endc(),
+
+			cc_action::newc(),
+			cc_action::addv(7),
+			cc_action::addv(6),
+			cc_action::endc()
+	};
+	size_t nexpected = sizeof(expected) / sizeof(cc_action);
+
+	ASSERT_TRUE( recorder.verify(expected, nexpected) );
+}
 
 
 
