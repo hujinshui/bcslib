@@ -38,7 +38,9 @@ namespace bcs
 	, public IContinuousAView2D<array2d<T, TOrd, Alloc>, T, TOrd>
 	{
 	public:
-		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert( is_layout_order<TOrd>::value, "TOrd must be a layout order type." );
+#endif
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 

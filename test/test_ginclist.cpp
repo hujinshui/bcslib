@@ -19,29 +19,39 @@ typedef int32_t gint;
 template class bcs::ginclist_view<gint>;
 template class bcs::ginclist<gint>;
 
-BCS_STATIC_ASSERT( (is_base_of<
+#ifdef BCS_USE_STATIC_ASSERT
+
+static_assert( (is_base_of<
 		bcs::IGraphEdgeList<bcs::ginclist_view<gint> >,
-		bcs::ginclist_view<gint> >::value) );
+		bcs::ginclist_view<gint> >::value),
+		"ginclist_view base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IGraphAdjacencyList<bcs::ginclist_view<gint> >,
-		bcs::ginclist_view<gint> >::value) );
+		bcs::ginclist_view<gint> >::value),
+		"ginclist_view base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IGraphIncidenceList<bcs::ginclist_view<gint> >,
-		bcs::ginclist_view<gint> >::value) );
+		bcs::ginclist_view<gint> >::value),
+		"ginclist_view base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IGraphEdgeList<bcs::ginclist<gint> >,
-		bcs::ginclist<gint> >::value) );
+		bcs::ginclist<gint> >::value),
+		"ginclist base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IGraphAdjacencyList<bcs::ginclist<gint> >,
-		bcs::ginclist<gint> >::value) );
+		bcs::ginclist<gint> >::value),
+		"ginclist base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IGraphIncidenceList<bcs::ginclist<gint> >,
-		bcs::ginclist<gint> >::value) );
+		bcs::ginclist<gint> >::value),
+		"ginclist base-class assertion failure");
+
+#endif
 
 
 // typedefs

@@ -33,7 +33,9 @@ namespace bcs
 	class caview1d_ex : public IConstRegularAView1D<caview1d_ex<T, TIndexer>, T>
 	{
 	public:
-		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert( is_indexer<TIndexer>::value, "TIndexer must be an indexer type." );
+#endif
 
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
 		typedef TIndexer indexer_type;
@@ -100,7 +102,9 @@ namespace bcs
 	class aview1d_ex : public caview1d_ex<T, TIndexer>, public IRegularAView1D<aview1d_ex<T, TIndexer>, T>
 	{
 	public:
-		BCS_STATIC_ASSERT_V( is_indexer<TIndexer> );
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert( is_indexer<TIndexer>::value, "TIndexer must be an indexer type." );
+#endif
 
 		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
 

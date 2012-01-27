@@ -14,6 +14,7 @@
 #define BCSLIB_BLOCK_H_
 
 #include <bcslib/base/basic_mem.h>
+#include <bcslib/base/smart_ptr.h>
 
 namespace bcs
 {

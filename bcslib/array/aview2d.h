@@ -81,9 +81,11 @@ namespace bcs
 	: public IConstRegularAView2D<caview2d_ex<T, TOrd, TIndexer0, TIndexer1>, T, TOrd>
 	{
 	public:
-		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
-		BCS_STATIC_ASSERT_V( is_indexer<TIndexer0> );
-		BCS_STATIC_ASSERT_V( is_indexer<TIndexer1> );
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert( is_layout_order<TOrd>::value, "TOrd must be a layout order type." );
+		static_assert( is_indexer<TIndexer0>::value, "TIndexer0 must be an indexer type." );
+		static_assert( is_indexer<TIndexer1>::value, "TIndexer1 must be an indexer type." );
+#endif
 
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
@@ -193,9 +195,11 @@ namespace bcs
 	, public IRegularAView2D<aview2d_ex<T, TOrd, TIndexer0, TIndexer1>, T, TOrd>
 	{
 	public:
-		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
-		BCS_STATIC_ASSERT_V( is_indexer<TIndexer0> );
-		BCS_STATIC_ASSERT_V( is_indexer<TIndexer1> );
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert( is_layout_order<TOrd>::value, "TOrd must be a layout order type." );
+		static_assert( is_indexer<TIndexer0>::value, "TIndexer0 must be an indexer type." );
+		static_assert( is_indexer<TIndexer1>::value, "TIndexer1 must be an indexer type." );
+#endif
 
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 
@@ -296,7 +300,9 @@ namespace bcs
 	class caview2d_block : public IConstBlockAView2D<caview2d_block<T, TOrd>, T, TOrd>
 	{
 	public:
-		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert( is_layout_order<TOrd>::value, "TOrd must be a layout order type." );
+#endif
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 
@@ -434,7 +440,9 @@ namespace bcs
 	, public IBlockAView2D<aview2d_block<T, TOrd>, T, TOrd>
 	{
 	public:
-		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert( is_layout_order<TOrd>::value, "TOrd must be a layout order type." );
+#endif
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 
@@ -613,7 +621,9 @@ namespace bcs
 	: public IConstContinuousAView2D<caview2d<T, TOrd>, T, TOrd>
 	{
 	public:
-		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert( is_layout_order<TOrd>::value, "TOrd must be a layout order type." );
+#endif
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 
@@ -763,7 +773,9 @@ namespace bcs
 	, public IContinuousAView2D<aview2d<T, TOrd>, T, TOrd>
 	{
 	public:
-		BCS_STATIC_ASSERT_V( is_layout_order<TOrd> );
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert( is_layout_order<TOrd>::value, "TOrd must be a layout order type." );
+#endif
 		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
 		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
 

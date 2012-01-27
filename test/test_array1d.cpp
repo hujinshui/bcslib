@@ -47,89 +47,110 @@ template class bcs::array_map<SimpleKey, double>;
 
 // caview1d_ex
 
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IConstAView1DBase<bcs::caview1d_ex<double, id_ind>, double>,
-		bcs::caview1d_ex<double, id_ind> >::value) );
+#ifdef BCS_USE_STATIC_ASSERT
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
+		bcs::IConstAView1DBase<bcs::caview1d_ex<double, id_ind>, double>,
+		bcs::caview1d_ex<double, id_ind> >::value),
+		"caview1d_ex base-class assertion failure" );
+
+static_assert( (is_base_of<
 		bcs::IConstRegularAView1D<bcs::caview1d_ex<double, id_ind>, double>,
-		bcs::caview1d_ex<double, id_ind> >::value) );
+		bcs::caview1d_ex<double, id_ind> >::value),
+		"caview1d_ex base-class assertion failure" );
 
 
 // aview1d_ex
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::caview1d_ex<double, id_ind>,
-		bcs::aview1d_ex<double, id_ind> >::value) );
+		bcs::aview1d_ex<double, id_ind> >::value),
+		"aview1d_ex base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IAView1DBase<bcs::aview1d_ex<double, id_ind>, double>,
-		bcs::aview1d_ex<double, id_ind> >::value) );
+		bcs::aview1d_ex<double, id_ind> >::value),
+		"aview1d_ex base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IRegularAView1D<bcs::aview1d_ex<double, id_ind>, double>,
-		bcs::aview1d_ex<double, id_ind> >::value) );
+		bcs::aview1d_ex<double, id_ind> >::value),
+		"aview1d_ex base-class assertion failure" );
 
 // caview1d
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstAView1DBase<bcs::caview1d<double>, double>,
-		bcs::caview1d<double> >::value) );
+		bcs::caview1d<double> >::value),
+		"caview1d base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstRegularAView1D<bcs::caview1d<double>, double>,
-		bcs::caview1d<double> >::value) );
+		bcs::caview1d<double> >::value),
+		"caview1d base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstContinuousAView1D<bcs::caview1d<double>, double>,
-		bcs::caview1d<double> >::value) );
+		bcs::caview1d<double> >::value),
+		"cview1d base-class assertion failure" );
 
 
 // aview1d
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::caview1d<double>,
-		bcs::aview1d<double> >::value) );
+		bcs::aview1d<double> >::value),
+		"aview1d base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IAView1DBase<bcs::aview1d<double>, double>,
-		bcs::aview1d<double> >::value) );
+		bcs::aview1d<double> >::value),
+		"aview1d base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IRegularAView1D<bcs::aview1d<double>, double>,
-		bcs::aview1d<double> >::value) );
+		bcs::aview1d<double> >::value),
+		"aview1d base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IContinuousAView1D<bcs::aview1d<double>, double>,
-		bcs::aview1d<double> >::value) );
+		bcs::aview1d<double> >::value),
+		"aview1d base-class assertion failure" );
 
 
 // array1d
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstAView1DBase<bcs::array1d<double>, double>,
-		bcs::array1d<double> >::value) );
+		bcs::array1d<double> >::value),
+		"array1d base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstRegularAView1D<bcs::array1d<double>, double>,
-		bcs::array1d<double> >::value) );
+		bcs::array1d<double> >::value),
+		"array1d base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstContinuousAView1D<bcs::array1d<double>, double>,
-		bcs::array1d<double> >::value) );
+		bcs::array1d<double> >::value),
+		"array1d base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IAView1DBase<bcs::array1d<double>, double>,
-		bcs::array1d<double> >::value) );
+		bcs::array1d<double> >::value),
+		"array1d base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IRegularAView1D<bcs::array1d<double>, double>,
-		bcs::array1d<double> >::value) );
+		bcs::array1d<double> >::value),
+		"array1d base-class assertion failure" );
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IContinuousAView1D<bcs::array1d<double>, double>,
-		bcs::array1d<double> >::value) );
+		bcs::array1d<double> >::value),
+		"array1d base-class assertion failure");
 
+#endif
 
 
 /************************************************
