@@ -13,7 +13,7 @@
 #ifndef GRAPH_TRAVERSAL_H_
 #define GRAPH_TRAVERSAL_H_
 
-#include <bcslib/graph/gview_base.h>
+#include <bcslib/graph/graph_algbase.h>
 #include <bcslib/array/amap.h>
 #include <vector>
 #include <stack>
@@ -57,19 +57,24 @@ namespace bcs
 	 ***********************************************************/
 
 
+	template<class Derived>
+	class trivial_traversal_agent
+	{
+	public:
+		typedef typename gview_traits<Derived>::vertex_type vertex_type;
+
+		void source(const vertex_type& ) { }
+		bool examine(const vertex_type&, const vertex_type&, gvisit_status) { return true; }
+		bool discover(const vertex_type&, const vertex_type& ) { return true; }
+		bool finish(const vertex_type& ) { return true; }
+	};
+
 
 	/***********************************************************
 	 *
 	 *   Breadth-First Traversal
 	 *
 	 ***********************************************************/
-
-	enum gvisit_status
-	{
-		GVISIT_NONE = 0,
-		GVISIT_DISCOVERED = 1,
-		GVISIT_FINISHED = 2
-	};
 
 
 	template<class Derived, class Queue>
@@ -116,8 +121,6 @@ namespace bcs
 	template<class Agent>
 	void breadth_first_traverser<Derived, Queue>::run(Agent& agent)
 	{
-		bool stopped = false;
-
 		while (!m_queue.empty())
 		{
 			vertex_type u = m_queue.front();
@@ -135,22 +138,13 @@ namespace bcs
 					m_status[v] = GVISIT_DISCOVERED;
 					m_queue.push(v);
 
-					if (!agent.discover(u, v))
-					{
-						stopped = true;
-						break;
-					}
+					if (!agent.discover(u, v)) return;
 				}
 			}
 
-			if (stopped) break;
-
-			if (it == nb_end)
-			{
-				m_queue.pop();
-				m_status[u] = GVISIT_FINISHED;
-				if (!agent.finish(u)) break;
-			}
+			m_queue.pop();
+			m_status[u] = GVISIT_FINISHED;
+			if (!agent.finish(u)) return;
 		}
 	}
 
@@ -266,8 +260,7 @@ namespace bcs
 				if (agent.examine(e.v, v, vstatus) && vstatus < GVISIT_DISCOVERED)
 				{
 					add_discovered(v);
-					if (!agent.discover(e.v, v))
-						break;
+					if (!agent.discover(e.v, v)) return;
 				}
 			}
 			else
@@ -275,7 +268,7 @@ namespace bcs
 				vertex_type v = e.v;
 				m_stack.pop();
 
-				if (!agent.finish(v)) break;
+				if (!agent.finish(v)) return;
 			}
 		}
 	}
@@ -302,6 +295,120 @@ namespace bcs
 			T.add_source(*first, agent);
 			T.run(agent);
 		}
+	}
+
+
+
+	/********************************************
+	 *
+	 *   Connected Components
+	 *
+	 *   Agent concept
+	 *   -------------
+	 *
+	 *   a.new_component();
+	 *   	invoked when a new component is
+	 *   	detected and set to be the current
+	 *   	component
+	 *
+	 *   a.add_vertex();
+	 *   	invoked when a new vertex is found
+	 *   	to be in the current component
+	 *
+	 *   a.end_component();
+	 *   	invoked when the current component
+	 *   	is completed
+	 *
+	 ********************************************/
+
+	template<class Derived>
+	class traversal_counter : public trivial_traversal_agent<Derived>
+	{
+	public:
+		typedef typename gview_traits<Derived>::vertex_type vertex_type;
+
+		traversal_counter() : m_count(0) { }
+
+		size_t count() const
+		{
+			return m_count;
+		}
+
+		bool discover(const vertex_type&, const vertex_type& )
+		{
+			++m_count;
+			return true;
+		}
+
+	private:
+		size_t m_count;
+	};
+
+
+	template<class Derived>
+	inline size_t count_reachable_vertices(const IGraphAdjacencyList<Derived>& g,
+			const typename gview_traits<Derived>::vertex_type& s)
+	{
+		traversal_counter<Derived> counter;
+		breadth_first_traverse(g, counter, s);
+		return counter.count();
+	}
+
+
+	template<class Derived, class CCAgent>
+	class connected_components_agent : public trivial_traversal_agent<Derived>
+	{
+	public:
+		typedef typename gview_traits<Derived>::vertex_type vertex_type;
+
+		connected_components_agent(CCAgent& cca) : cc_agent(cca)
+		{
+		}
+
+		void source(const vertex_type& u)
+		{
+			cc_agent.add_vertex(u);
+		}
+
+		bool discover(const vertex_type& u, const vertex_type& v)
+		{
+			cc_agent.add_vertex(v);
+			return true;
+		}
+
+	private:
+		CCAgent& cc_agent;
+	};
+
+
+	// return the number of components found
+	template<class Derived, class CCAgent>
+	inline size_t find_connected_components(const IGraphAdjacencyList<Derived>& g, CCAgent& cc_agent)
+	{
+		connected_components_agent<Derived, CCAgent> agent(cc_agent);
+
+		typedef typename gview_traits<Derived>::vertex_type vertex_type;
+		typedef typename gview_traits<Derived>::vertex_iterator viter;
+		std::queue<vertex_type> Q;
+		breadth_first_traverser<Derived, std::queue<vertex_type> > T(g, Q);
+
+		size_t ncc = 0;
+
+		viter pend = g.vertices_end();
+		for (viter p = g.vertices_begin(); p != pend; ++p)
+		{
+			const vertex_type& s = *p;
+			if (T.status(s) == GVISIT_NONE)
+			{
+				++ncc;
+				cc_agent.new_component();
+				T.add_source(s, agent);
+				T.run(agent);
+				cc_agent.end_component();
+			}
+		}
+
+		return ncc;
 	}
 
 }
