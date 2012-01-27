@@ -12,9 +12,6 @@ CPPFLAGS = @cppflags@
 CXXFLAGS = $(CPPFLAGS) @cxxflags@
 OFLAGS = @oflags@ 
 
-CUDA_CC=nvcc
-CUDA_FLAGS = --compiler-options @cuda_cxxflags@ @cudaflags@
-
 USE_INTEL = "yes"
 
 ifndef GTEST_HOME
@@ -150,15 +147,6 @@ test_data_structs: \
 	$(TEST_BIN_DIR)/test_data_struct_basics	
 	
 	
-#------ CUDA tests (declaration) -----------
-
-.PHONY: test_cuda
-
-test_cuda: \
-	$(TEST_BIN_DIR)/test_cuda_basics \
-	$(TEST_BIN_DIR)/stest_cuda_elemacc
-
-
 #------ Graph tests (declaration) -----------
 
 .PHONY: test_graph
@@ -236,25 +224,6 @@ TEST_DATASTRUCT_BASICS_SOURCES = \
 $(TEST_BIN_DIR)/test_data_struct_basics: $(DATASTRUCT_BASIC_HEADERS) $(TEST_DATASTRUCT_BASICS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_DATASTRUCT_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
 
-
-#----------------------------------------------------------
-#
-#   CUDA test & bench
-#
-#----------------------------------------------------------
-
-# CUDA tests
-
-TEST_CUDA_BASICS_SOURCES = \
-	test/test_cuda_base.cpp \
-	test/test_cuda_vec.cpp \
-	test/test_cuda_mat.cpp
-	
-$(TEST_BIN_DIR)/test_cuda_basics: $(CUDA_BASIC_HEADERS) $(TEST_CUDA_BASICS_SOURCES) 
-	$(CUDA_CC) $(CUDA_FLAGS) $(CUDA_TEST_PRE) $(TEST_CUDA_BASICS_SOURCES) $(CUDA_TEST_POST) -o $@
-
-$(TEST_BIN_DIR)/stest_cuda_elemacc: $(CUDA_BASIC_HEADERS) test/stest_cuda_elemacc.cu
-	$(CUDA_CC) $(CUDA_FLAGS) test/stest_cuda_elemacc.cu -o $@
 
 
 #----------------------------------------------------------
