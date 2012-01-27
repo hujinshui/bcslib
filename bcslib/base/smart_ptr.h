@@ -1,7 +1,8 @@
 /*
  * @file smart_ptr.h
  *
- * Useful smart pointers from TR1/C++0x and a scoped_ptr class
+ * Useful smart pointers from TR1/C++0x and
+ * a scoped_ptr class and an alt_var class
  *
  * @author Dahua Lin
  */
@@ -10,8 +11,8 @@
 #pragma once
 #endif
 
-#ifndef SMART_PTR_H_
-#define SMART_PTR_H_
+#ifndef BCSLIB_SMART_PTR_H_
+#define BCSLIB_SMART_PTR_H_
 
 #include <bcslib/base/basic_defs.h>
 
@@ -82,6 +83,70 @@ namespace bcs
 	{
 		a.swap(b);
 	}
+
+
+	template<class T>
+	class alt_cvar
+	{
+	public:
+		typedef T element_type;
+
+	public:
+		explicit alt_cvar() : _ptr(0)
+		{
+		}
+
+		alt_cvar(const T *p, bool takeover)
+		: _ptr(p), _sp(takeover ? const_cast<T*>(p) : (T*)(0))
+		{
+		}
+
+		const T& value() const
+		{
+			return *_ptr;
+		}
+
+		operator bool() const
+		{
+			return bool(_ptr);
+		}
+
+	private:
+		T *_ptr;
+		std::shared_ptr<T> _sp;
+	};
+
+
+	template<class T>
+	class alt_var
+	{
+	public:
+		typedef T element_type;
+
+	public:
+		explicit alt_var() : _ptr(0)
+		{
+		}
+
+		alt_var(T *p, bool takeover)
+		: _ptr(p), _sp(takeover ? p : (T*)(0))
+		{
+		}
+
+		const T& value() const
+		{
+			return *_ptr;
+		}
+
+		operator bool() const
+		{
+			return bool(_ptr);
+		}
+
+	private:
+		T *_ptr;
+		std::shared_ptr<T> _sp;
+	};
 
 }
 

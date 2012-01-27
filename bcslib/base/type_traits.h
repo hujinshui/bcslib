@@ -43,6 +43,9 @@ namespace bcs
 	using BCS_TR1::is_compound;
 	using BCS_TR1::is_member_pointer;
 
+	using BCS_TR1::is_signed;
+	using BCS_TR1::is_unsigned;
+
 	using BCS_TR1::is_const;
 	using BCS_TR1::is_volatile;
 	using BCS_TR1::is_pod;

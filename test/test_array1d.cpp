@@ -34,6 +34,15 @@ struct SimpleKey
 	index_t index() const { return i; }
 };
 
+namespace bcs
+{
+	template<>
+	struct index_convertible<SimpleKey>
+	{
+		static const bool value = true;
+	};
+}
+
 template class bcs::caview_map<SimpleKey, double>;
 template class bcs::aview_map<SimpleKey, double>;
 template class bcs::array_map<SimpleKey, double>;
