@@ -11,6 +11,7 @@
 #endif
 
 #include <bcslib/array/array1d.h>
+#include <bcslib/base/key_map.h>
 
 #ifndef BCSLIB_AMAP_H_
 #define BCSLIB_AMAP_H_
@@ -18,20 +19,14 @@
 namespace bcs
 {
 
-	template<typename TKey>
-	struct key_to_index
-	{
-		static index_t to_index(const TKey& key)
-		{
-			return key.index();
-		}
-	};
-
-
 	template<typename TKey, typename TValue>
 	class caview_map
 	{
 	public:
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(index_convertible<TKey>::value, "TKey must be index-convertible.");
+#endif
+
 		typedef TKey key_type;
 		typedef TValue value_type;
 
@@ -105,6 +100,10 @@ namespace bcs
 	class aview_map
 	{
 	public:
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(index_convertible<TKey>::value, "TKey must be index-convertible.");
+#endif
+
 		typedef TKey key_type;
 		typedef TValue value_type;
 
@@ -197,6 +196,10 @@ namespace bcs
 	class array_map
 	{
 	public:
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(index_convertible<TKey>::value, "TKey must be index-convertible.");
+#endif
+
 		typedef TKey key_type;
 		typedef TValue value_type;
 
@@ -294,6 +297,9 @@ namespace bcs
 	}; // end class array_map
 
 
+	BCS_SETUP_KEYMAP_CLASS2(caview_map, key_type, value_type)
+	BCS_SETUP_KEYMAP_CLASS2(aview_map, key_type, value_type)
+	BCS_SETUP_KEYMAP_CLASS2(array_map, key_type, value_type)
 }
 
 #endif /* GRAPH_MAP_H_ */

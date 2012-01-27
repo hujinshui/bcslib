@@ -10,6 +10,7 @@
 #define BCSLIB_GVIEW_BASE_H_
 
 #include <bcslib/base/basic_defs.h>
+#include <bcslib/base/key_map.h>
 #include <bcslib/base/iterator_wrappers.h>
 
 #ifndef BCS_GRAPH_ENTITY_IDBASE
@@ -79,6 +80,12 @@ namespace bcs
 	};
 
 	template<typename TInt>
+	struct index_convertible<gvertex<TInt> >
+	{
+		static const bool value = true;
+	};
+
+	template<typename TInt>
 	inline BCS_ENSURE_INLINE gvertex<TInt> make_gvertex(TInt id)
 	{
 		gvertex<TInt> v;
@@ -114,6 +121,12 @@ namespace bcs
 		{
 			return id != r.id;
 		}
+	};
+
+	template<typename TInt>
+	struct index_convertible<gedge<TInt> >
+	{
+		static const bool value = true;
 	};
 
 	template<typename TInt>
