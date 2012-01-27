@@ -50,132 +50,164 @@ template class bcs::array2d<double, column_major_t>;
 // caview2d_ex
 
 
-BCS_STATIC_ASSERT( (is_base_of<
-		bcs::IConstAView2DBase<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind>, double, row_major_t>,
-		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
+#ifdef BCS_USE_STATIC_ASSERT
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
+		bcs::IConstAView2DBase<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind>, double, row_major_t>,
+		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value),
+		"caview2d_ex base-class assertion failure" );
+
+static_assert( (is_base_of<
 		bcs::IConstRegularAView2D<bcs::caview2d_ex<double, row_major_t, id_ind, step_ind>, double, row_major_t>,
-		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
+		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind> >::value),
+		"caview2d_ex base-class assertion failure" );
 
 // aview2d_ex
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::caview2d_ex<double, row_major_t, id_ind, step_ind>,
-		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
+		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value),
+		"aview2d_ex base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IAView2DBase<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind>, double, row_major_t>,
-		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
+		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value),
+		"aview2d_ex base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IRegularAView2D<bcs::aview2d_ex<double, row_major_t, id_ind, step_ind>, double, row_major_t>,
-		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value) );
+		bcs::aview2d_ex<double, row_major_t, id_ind, step_ind> >::value),
+		"aview2d_ex base-class assertion failure" );
 
 
 // caview2d_block
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstAView2DBase<bcs::caview2d_block<double, row_major_t>, double, row_major_t>,
-		bcs::caview2d_block<double, row_major_t> >::value) );
+		bcs::caview2d_block<double, row_major_t> >::value),
+		"cview2d_block base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstRegularAView2D<bcs::caview2d_block<double, row_major_t>, double, row_major_t>,
-		bcs::caview2d_block<double, row_major_t> >::value) );
+		bcs::caview2d_block<double, row_major_t> >::value),
+		"cview2d_block base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstBlockAView2D<bcs::caview2d_block<double, row_major_t>, double, row_major_t>,
-		bcs::caview2d_block<double, row_major_t> >::value) );
+		bcs::caview2d_block<double, row_major_t> >::value),
+		"cview2d_block base-class assertion failure");
 
 
 // aview2d_block
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::caview2d_block<double, row_major_t>,
-		bcs::aview2d_block<double, row_major_t> >::value) );
+		bcs::aview2d_block<double, row_major_t> >::value),
+		"aview2d_block base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IAView2DBase<bcs::aview2d_block<double, row_major_t>, double, row_major_t>,
-		bcs::aview2d_block<double, row_major_t> >::value) );
+		bcs::aview2d_block<double, row_major_t> >::value),
+		"aview2d_block base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IRegularAView2D<bcs::aview2d_block<double, row_major_t>, double, row_major_t>,
-		bcs::aview2d_block<double, row_major_t> >::value) );
+		bcs::aview2d_block<double, row_major_t> >::value),
+		"aview2d_block base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IBlockAView2D<bcs::aview2d_block<double, row_major_t>, double, row_major_t>,
-		bcs::aview2d_block<double, row_major_t> >::value) );
+		bcs::aview2d_block<double, row_major_t> >::value),
+		"aview2d_block base-class assertion failure");
 
 
 // caview2d
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstAView2DBase<bcs::caview2d<double, row_major_t>, double, row_major_t>,
-		bcs::caview2d<double, row_major_t> >::value) );
+		bcs::caview2d<double, row_major_t> >::value),
+		"caview2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstRegularAView2D<bcs::caview2d<double, row_major_t>, double, row_major_t>,
-		bcs::caview2d<double, row_major_t> >::value) );
+		bcs::caview2d<double, row_major_t> >::value),
+		"caview2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstBlockAView2D<bcs::caview2d<double, row_major_t>, double, row_major_t>,
-		bcs::caview2d<double, row_major_t> >::value) );
+		bcs::caview2d<double, row_major_t> >::value),
+		"caview2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstContinuousAView2D<bcs::caview2d<double, row_major_t>, double, row_major_t>,
-		bcs::caview2d<double, row_major_t> >::value) );
+		bcs::caview2d<double, row_major_t> >::value),
+		"caview2d base-class assertion failure");
 
 // aview2d
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IAView2DBase<bcs::aview2d<double, row_major_t>, double, row_major_t>,
-		bcs::aview2d<double, row_major_t> >::value) );
+		bcs::aview2d<double, row_major_t> >::value),
+		"aview2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IRegularAView2D<bcs::aview2d<double, row_major_t>, double, row_major_t>,
-		bcs::aview2d<double, row_major_t> >::value) );
+		bcs::aview2d<double, row_major_t> >::value),
+		"aview2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IBlockAView2D<bcs::aview2d<double, row_major_t>, double, row_major_t>,
-		bcs::aview2d<double, row_major_t> >::value) );
+		bcs::aview2d<double, row_major_t> >::value),
+		"aview2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IContinuousAView2D<bcs::aview2d<double, row_major_t>, double, row_major_t>,
-		bcs::aview2d<double, row_major_t> >::value) );
+		bcs::aview2d<double, row_major_t> >::value),
+		"aview2d base-class assertion failure");
 
 // array2d
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstAView2DBase<bcs::array2d<double, row_major_t>, double, row_major_t>,
-		bcs::array2d<double, row_major_t> >::value) );
+		bcs::array2d<double, row_major_t> >::value),
+		"array2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstRegularAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
-		bcs::array2d<double, row_major_t> >::value) );
+		bcs::array2d<double, row_major_t> >::value),
+		"array2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstBlockAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
-		bcs::array2d<double, row_major_t> >::value) );
+		bcs::array2d<double, row_major_t> >::value),
+		"array2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IConstContinuousAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
-		bcs::array2d<double, row_major_t> >::value) );
+		bcs::array2d<double, row_major_t> >::value),
+		"array2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IAView2DBase<bcs::array2d<double, row_major_t>, double, row_major_t>,
-		bcs::array2d<double, row_major_t> >::value) );
+		bcs::array2d<double, row_major_t> >::value),
+		"array2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IRegularAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
-		bcs::array2d<double, row_major_t> >::value) );
+		bcs::array2d<double, row_major_t> >::value),
+		"array2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IBlockAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
-		bcs::array2d<double, row_major_t> >::value) );
+		bcs::array2d<double, row_major_t> >::value),
+		"array2d base-class assertion failure");
 
-BCS_STATIC_ASSERT( (is_base_of<
+static_assert( (is_base_of<
 		bcs::IContinuousAView2D<bcs::array2d<double, row_major_t>, double, row_major_t>,
-		bcs::array2d<double, row_major_t> >::value) );
+		bcs::array2d<double, row_major_t> >::value),
+		"array2d base-class assertion failure");
+
+#endif
 
 
 

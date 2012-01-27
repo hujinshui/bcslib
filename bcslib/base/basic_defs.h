@@ -72,33 +72,6 @@ namespace bcs
 		noncopyable& operator= (const noncopyable& );
 	};
 
-
-	/**
-	 * type selection
-	 */
-	template<bool B, typename T1, typename T2> struct tyselect;
-
-	template<typename T1, typename T2>
-	struct tyselect<true, T1, T2>
-	{
-		typedef T1 type;
-	};
-
-	template<typename T1, typename T2>
-	struct tyselect<false, T1, T2>
-	{
-		typedef T2 type;
-	};
-
-
-	/**
-	 *  Auxiliary class for static assertion
-	 */
-
-	template<bool x> struct BCSLIB_STATIC_ASSERT_FAILURE;
-	template<> struct BCSLIB_STATIC_ASSERT_FAILURE<true> { enum { value = 1 }; };
-	template<int x> struct static_assert_test { };
-
 }
 
 
@@ -116,23 +89,6 @@ namespace bcs
 #define BCS_ENSURE_INLINE __attribute__((always_inline))
 #endif
 
-// static assertion
-
-#define BCS_CONCAT_STR(a, b) BCS_DO_CONCAT_STR(a, b)
-#define BCS_DO_CONCAT_STR(a, b) BCS_DO_CONCAT_STR2(a, b)
-#define BCS_DO_CONCAT_STR2(a, b) a##b
-
-#if BCSLIB_COMPILER == BCSLIB_GCC && __GNUC_MINOR__ < 4
-#define BCS_STATIC_ASSERT( cond ) \
-   typedef ::bcs::static_assert_test< sizeof(::bcs::BCSLIB_STATIC_ASSERT_FAILURE< cond >) > \
-         BCS_CONCAT_STR(bcslib_static_assert_typedef_, __LINE__)
-#else
-#define BCS_STATIC_ASSERT( cond ) \
-   typedef ::bcs::static_assert_test< sizeof(::bcs::BCSLIB_STATIC_ASSERT_FAILURE< cond >) > \
-         BCS_CONCAT_STR(bcslib_static_assert_typedef_, __COUNTER__)
-#endif
-
-#define BCS_STATIC_ASSERT_V(cond) BCS_STATIC_ASSERT(cond::value)
 
 #endif
 

@@ -10,8 +10,8 @@
 #define BCS_GRAPH_TEST_BASICS_H_
 
 #include "bcs_test_basics.h"
-#include <bcslib/base/tr1_imports.h>
 #include <bcslib/graph/gview_base.h>
+#include <bcslib/base/type_traits.h>
 
 namespace bcs { namespace test {
 

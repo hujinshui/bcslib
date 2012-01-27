@@ -19,9 +19,14 @@ typedef int32_t gint;
 
 template class bcs::gedgelist_view<gint>;
 
-BCS_STATIC_ASSERT( (is_base_of<
+#ifdef BCS_USE_STATIC_ASSERT
+
+static_assert( (is_base_of<
 		bcs::IGraphEdgeList<bcs::gedgelist_view<gint> >,
-		bcs::gedgelist_view<gint> >::value) );
+		bcs::gedgelist_view<gint> >::value),
+		"gedgelist_view base-class assertion failure");
+
+#endif
 
 // typedefs
 

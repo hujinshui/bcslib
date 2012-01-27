@@ -10,7 +10,7 @@
 #define BCSLIB_HASH_ACCUMULATOR_H
 
 #include <bcslib/base/basic_defs.h>
-#include <bcslib/base/tr1_imports.h>
+#include <bcslib/base/tr1_containers.h>
 #include <functional>
 
 namespace bcs

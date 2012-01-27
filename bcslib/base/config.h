@@ -29,12 +29,14 @@
 	#define BCSLIB_COMPILER BCSLIB_MSVC
 
 	#define BCS_PLATFORM_INTERFACE BCS_WINDOWS_INTERFACE
-	#define USE_C1X_STDLIB
+
+	#define BCS_USE_C11_STDLIB
+	#define BCS_USE_STATIC_ASSERT
 
 #elif (defined(__GNUC__))
 	#if (defined(__clang__))
-		#if ((__clang_major__ < 2) || (__clang_major__ == 2 && __clang_minor__ < 1))
-			#error CLANG of version lower than 2.1.0 is not supported
+		#if ((__clang_major__ < 2) || (__clang_major__ == 2 && __clang_minor__ < 8))
+			#error CLANG of version lower than 2.8.0 is not supported
 		#endif
 		#define BCSLIB_COMPILER BCSLIB_CLANG
 	#else
@@ -42,12 +44,24 @@
 			#error GCC of version lower than 4.2.0 is not supported
 		#endif
 		#define BCSLIB_COMPILER BCSLIB_GCC
+
+		#if (defined(__GXX_EXPERIMENTAL_CXX0X__))
+			#define BCS_USE_C11_STDLIB
+			#define BCS_USE_STATIC_ASSERT
+		#endif
 	#endif
 
 	#define BCS_PLATFORM_INTERFACE BCS_POSIX_INTERFACE
 
 #else
 	#error BCSLib can only be used with Microsoft Visual C++, GCC (G++), or clang (clang++).
+#endif
+
+
+#ifdef BCS_USE_C11_STDLIB
+	#define BCS_TR1 std
+#else
+	#define BCS_TR1 std::tr1
 #endif
 
 

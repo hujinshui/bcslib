@@ -15,7 +15,7 @@
 #define BCSLIB_BASIC_MEM_H
 
 #include <bcslib/base/basic_mem_alloc.h>
-#include <bcslib/base/tr1_imports.h>  // for type_traits
+#include <bcslib/base/type_traits.h>
 
 #include <cstring>  	// for low-level memory manipulation functions
 #include <new>   		// for std::bad_alloc
@@ -143,26 +143,26 @@ namespace bcs
 	template<typename T>
 	inline void default_construct_elements(T *a, size_t n)
 	{
-		_detail::_element_construct_helper<T, has_trivial_constructor<T>::value>::default_construct(a, n);
+		_detail::_element_construct_helper<T, has_trivial_default_constructor<T>::value>::default_construct(a, n);
 	}
 
 
     template<typename T>
     inline void copy_construct_elements(const T& v, T *dst, size_t n)
     {
-    	_detail::_element_copy_helper<T, has_trivial_copy<T>::value>::copy_construct(v, dst, n);
+    	_detail::_element_copy_helper<T, is_pod<T>::value>::copy_construct(v, dst, n);
     }
 
     template<typename T>
     inline void copy_construct_elements(const T *src, T *dst, size_t n)
     {
-    	_detail::_element_copy_helper<T, has_trivial_copy<T>::value>::copy_construct(src, dst, n);
+    	_detail::_element_copy_helper<T, is_pod<T>::value>::copy_construct(src, dst, n);
     }
 
     template<typename T>
     inline void copy_elements(const T *src, T *dst, size_t n)
     {
-    	_detail::_element_copy_helper<T, has_trivial_assign<T>::value>::copy(src, dst, n);
+    	_detail::_element_copy_helper<T, is_pod<T>::value>::copy(src, dst, n);
     }
 
     template<typename T>
@@ -184,7 +184,9 @@ namespace bcs
     template<typename T>
     inline void set_zeros_to_elements(T *dst, size_t n)
     {
-    	BCS_STATIC_ASSERT_V(is_scalar<T>);
+#ifdef BCS_USE_STATIC_ASSERT
+    	static_assert(is_scalar<T>::value, "T should be a scalar type.");
+#endif
     	if (n > 0) std::memset(dst, 0, sizeof(T) * n);
     }
 
