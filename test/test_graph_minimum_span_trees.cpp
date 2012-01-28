@@ -30,7 +30,7 @@ typedef caview_map<edge_t, dist_t> edge_dist_map_t;
 
 // explicit instantiation for syntax checking
 
-template class bcs::prim_traverser<graph_t, dist_t, edge_dist_map_t, prim_default_heap<graph_t, dist_t>::type>;
+template class bcs::prim_traverser<graph_t, edge_dist_map_t, prim_default_heap<graph_t, dist_t>::type>;
 
 
 bool verify_mst_edges(const std::vector<edge_t>& results, size_t ne, const gint *expects)

@@ -11,7 +11,8 @@
 #endif
 
 #include <bcslib/base/basic_defs.h>
-#include <vector>
+#include <bcslib/array/amap.h>
+
 
 #ifndef BCSLIB_DISJOINT_SETS_H_
 #define BCSLIB_DISJOINT_SETS_H_
@@ -19,30 +20,32 @@
 namespace bcs
 {
 
+	template<typename T>
 	class disjoint_set_forest
 	{
 	public:
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(index_convertible<T>::value, "T must be index-convertible.");
+#endif
+
 		typedef size_t size_type;
+		typedef T element_type;
 
 		struct node
 		{
-			size_type rank;
-			size_type parent;
-
-			node(size_type i)
-			{
-				rank = 0;
-				parent = i;
-			}
+			size_t rank;
+			index_t parent_idx;
 		};
 
 	public:
-		disjoint_set_forest(size_type n)
+		explicit disjoint_set_forest(index_t n)
+		: m_nodes(n)
 		{
-			m_nodes.reserve(n);
-			for (size_type i = 0; i < n; ++i)
+			for (index_t i = 0; i < n; ++i)
 			{
-				m_nodes.push_back(node(i));
+				node& nd = m_nodes[i];
+				nd.rank = 0;
+				nd.parent_idx = i;
 			}
 			m_ncomps = n;
 		}
@@ -57,22 +60,27 @@ namespace bcs
 			return m_ncomps;
 		}
 
-		bool is_root(const size_type& x) const
+		bool is_root(const element_type& x) const
 		{
-			return x == parent(x);
+			return index(x) == parent_index(x);
 		}
 
-		size_type parent(const size_type& x) const
+		index_t index(const element_type& x) const
 		{
-			return m_nodes[x].parent;
+			return key_to_index<element_type>::to_index(x);
 		}
 
-		size_type rank(const size_type& x) const
+		index_t parent_index(const element_type& x) const
 		{
-			return m_nodes[x].rank;
+			return m_nodes[index(x)].parent_idx;
 		}
 
-		bool in_same_component(const size_type& x, const size_type& y)
+		size_type rank(const element_type& x) const
+		{
+			return m_nodes[index(x)].rank;
+		}
+
+		bool in_same_component(const element_type& x, const element_type& y)
 		{
 			return find_root(x) == find_root(y);
 		}
@@ -83,17 +91,17 @@ namespace bcs
 		 * Returns true if x and y were not in the same set, and thus
 		 * the joining was actually performed
 		 */
-		bool join(const size_type& x, const size_type& y)
+		bool join(const element_type& x, const element_type& y)
 		{
-			size_type rx = find_root(x);
-			size_type ry = find_root(y);
+			index_t rx = find_root(x);
+			index_t ry = find_root(y);
 
 			if (rx != ry)
 			{
-				size_type r = link_root(rx, ry);
+				index_t r = link_root(rx, ry);
 
-				m_nodes[x].parent = r;
-				m_nodes[y].parent = r;
+				m_nodes[index(x)].parent_idx = r;
+				m_nodes[index(y)].parent_idx = r;
 
 				return true;
 			}
@@ -103,45 +111,50 @@ namespace bcs
 			}
 		}
 
-		size_type find_root(const size_type& x)
+		index_t find_root(const element_type& x)
 		{
-			node& nx = m_nodes[x];
-			if (x != nx.parent)
-			{
-				return nx.parent = find_root(nx.parent);
-			}
-			else
-			{
-				return x;
-			}
+			return find_root_from_index(index(x));
 		}
 
 		void compress_all()
 		{
-			size_type n = size();
-			for (size_type i = 0; i < n; ++i)
+			index_t n = (index_t)size();
+			for (index_t i = 0; i < n; ++i)
 			{
-				size_type ri = find_root(i);
+				index_t ri = find_root_from_index(i);
 				m_nodes[i].rank = (ri == i ? 1 : 0);
 			}
 		}
 
-		size_type trace_root(const size_type& x) const
+		index_t trace_root(const element_type& x) const
 		{
-			size_type p = x;
-			size_type pp = parent(p);
+			index_t p = index(x);
+			index_t pp = m_nodes[p].parent_idx;
 
 			while (p != pp)
 			{
 				p = pp;
-				pp = parent(p);
+				pp = m_nodes[p].parent_idx;
 			}
 
 			return p;
 		}
 
 	private:
-		size_type link_root(const size_type& rx, const size_type & ry)
+		index_t find_root_from_index(const index_t& xi)
+		{
+			node& nx = m_nodes[xi];
+			if (xi != nx.parent_idx)
+			{
+				return nx.parent_idx = find_root_from_index(nx.parent_idx);
+			}
+			else
+			{
+				return xi;
+			}
+		}
+
+		index_t link_root(const index_t& rx, const index_t& ry)
 		{
 			node& nx = m_nodes[rx];
 			node& ny = m_nodes[ry];
@@ -150,13 +163,13 @@ namespace bcs
 
 			if (nx.rank > ny.rank)
 			{
-				ny.parent = rx;
+				ny.parent_idx = rx;
 
 				return rx;
 			}
 			else
 			{
-				nx.parent = ry;
+				nx.parent_idx = ry;
 				if (nx.rank == ny.rank) ++ ny.rank;
 
 				return ry;
@@ -164,7 +177,7 @@ namespace bcs
 		}
 
 	private:
-		std::vector<node> m_nodes;
+		array1d<node> m_nodes;
 		size_type m_ncomps;
 
 	}; // end class disjoint_set_forest

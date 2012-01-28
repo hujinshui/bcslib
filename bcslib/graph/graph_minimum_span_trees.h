@@ -95,7 +95,7 @@ namespace bcs
 		typedef typename gview_traits<Derived>::vertex_type vertex_type;
 		typedef typename gview_traits<Derived>::edge_type edge_type;
 		typedef typename gview_traits<Derived>::edge_iterator edge_iter;
-		typedef typename EdgeDistMap::value_type dist_type;
+		typedef typename key_map_traits<EdgeDistMap>::value_type dist_type;
 		typedef kruskal_entry<edge_type, dist_type> entry;
 
 		typedef typename DisjointSets::size_type dset_index_type;
@@ -127,10 +127,7 @@ namespace bcs
 
 			if (agent.examine_edge(u, v, e))
 			{
-				dset_index_type ui = (dset_index_type)u.index();
-				dset_index_type vi = (dset_index_type)v.index();
-
-				if (dsets.join(ui, vi))
+				if (dsets.join(u, v))
 				{
 					if (!agent.add_edge(u, v, e)) break;
 				}
@@ -147,7 +144,8 @@ namespace bcs
 	inline size_t kruskal_minimum_span_tree(const IGraphEdgeList<Derived>& graph,
 			const EdgeDistMap& edge_dists, OutputIterator output)
 	{
-		disjoint_set_forest dsets((size_t)graph.nvertices());
+		typedef typename gview_traits<Derived>::vertex_type vertex_type;
+		disjoint_set_forest<vertex_type> dsets(graph.nvertices());
 
 		kruskal_outputer<Derived, OutputIterator> agent(output);
 		return kruskal_minimum_span_tree_ex(graph, edge_dists, dsets, agent);
@@ -241,14 +239,14 @@ namespace bcs
 
 
 
-	template<class Derived, typename TDist, class EdgeDistMap, class Heap>
+	template<class Derived, class EdgeDistMap, class Heap>
 	class prim_traverser
 	{
 	public:
 		typedef typename gview_traits<Derived>::vertex_type vertex_type;
 		typedef typename gview_traits<Derived>::edge_type edge_type;
 
-		typedef TDist distance_type;
+		typedef typename key_map_traits<EdgeDistMap>::value_type distance_type;
 		typedef prim_entry<vertex_type, edge_type, distance_type> entry_type;
 		typedef EdgeDistMap edge_distance_map_type;
 		typedef Heap heap_type;
@@ -305,9 +303,9 @@ namespace bcs
 	}; // end class prim_traverser
 
 
-	template<class Derived, typename TDist, class EdgeDistMap, class Heap>
+	template<class Derived, class EdgeDistMap, class Heap>
 	template<class Agent>
-	void prim_traverser<Derived, TDist, EdgeDistMap, Heap>::run(Agent& agent)
+	void prim_traverser<Derived, EdgeDistMap, Heap>::run(Agent& agent)
 	{
 		if (m_root_open)
 		{
@@ -329,9 +327,9 @@ namespace bcs
 	}
 
 
-	template<class Derived, typename TDist, class EdgeDistMap, class Heap>
+	template<class Derived, class EdgeDistMap, class Heap>
 	template<class Agent>
-	void prim_traverser<Derived, TDist, EdgeDistMap, Heap>::process(
+	void prim_traverser<Derived, EdgeDistMap, Heap>::process(
 			const vertex_type& u, Agent& agent)
 	{
 		incident_edge_iterator it = m_graph.out_edges_begin(u);
@@ -374,10 +372,10 @@ namespace bcs
 	inline void prim_minimum_span_tree_ex(const IGraphIncidenceList<Derived>& graph, const EdgeDistMap& edge_dists,
 			const typename gview_traits<Derived>::vertex_type& root, Agent& agent)
 	{
-		typedef typename EdgeDistMap::value_type dist_type;
+		typedef typename key_map_traits<EdgeDistMap>::value_type dist_type;
 		typedef typename prim_default_heap<Derived, dist_type>::type heap_type;
 
-		prim_traverser<Derived, dist_type, EdgeDistMap, heap_type> T(graph, edge_dists, root);
+		prim_traverser<Derived, EdgeDistMap, heap_type> T(graph, edge_dists, root);
 		T.run(agent);
 	}
 
