@@ -14,6 +14,7 @@
 #define BINARY_HEAP_H_
 
 #include <bcslib/base/basic_defs.h>
+#include <bcslib/base/key_map.h>
 #include <vector>
 #include <functional>
 
@@ -32,10 +33,6 @@ namespace bcs
 	 *
 	 * H::container_type 		The type of the associated container
 	 *
-	 * H h(container);
-	 * h h(container, compare);
-	 *     constructs a heap upon a container (without making heap)
-	 *
 	 * h.size();
 	 *     returns the number of elements in the heap
 	 *
@@ -44,9 +41,6 @@ namespace bcs
 	 *
 	 * h.compare(x, y);
 	 *     tests whether x is "more towards the top" as opposed to y.
-	 *
-	 * h.reserve(n);
-	 *     prepare for enough room to store n keys
 	 *
 	 * h.add_key(key);
 	 * 	   add a key (without inserting it to the heap) as a preparation for make_heap
@@ -281,16 +275,19 @@ namespace bcs
 
 
 
-	template<typename TKey, typename TValue,
-		class ValueMap, class NodeMap, class Compare=std::less<TValue> >
+	template<class ValueMap, class Compare=std::less<typename key_map_traits<ValueMap>::value_type> >
 	class binary_heap
 	{
 	public:
-		typedef TKey key_type;
-		typedef TValue value_type;
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(is_key_map<ValueMap>::value, "ValueMap should be a key-map.");
+		static_assert(index_convertible<typename key_map_traits<ValueMap>::key_type>::value, "The key type must be index convertible.");
+#endif
+		typedef typename key_map_traits<ValueMap>::key_type key_type;
+		typedef typename key_map_traits<ValueMap>::value_type value_type;
 
 		typedef ValueMap value_map_type;
-		typedef NodeMap node_map_type;
+		typedef std::vector<cbtree_node> node_map_type;
 		typedef Compare compare_type;
 
 		typedef size_t size_type;
@@ -302,10 +299,9 @@ namespace bcs
 		typedef typename tree_type::node_type node_type;
 
 	public:
-		binary_heap(const value_map_type& value_map,
-				node_map_type& node_map,
+		binary_heap(const value_map_type& value_map, index_t max_index,
 				const compare_type& compare = compare_type())
-		: m_value_map(value_map), m_node_map(node_map), m_compare(compare)
+		: m_value_map(value_map), m_node_map((size_t)max_index), m_compare(compare)
 		{
 			// note: the caller should initialize the node_map before it is used in the heap
 		}
@@ -346,15 +342,10 @@ namespace bcs
 	public:
 		// concept-required interfaces (for manipulation)
 
-		void reserve(size_type n)
-		{
-			m_btree.reserve(n);
-		}
-
 		void add_key(const key_type& key)
 		{
 			m_btree.push(key);
-			m_node_map[key] = m_btree.back();
+			m_node_map[kidx(key)] = m_btree.back();
 		}
 
 		void make_heap()
@@ -376,7 +367,7 @@ namespace bcs
 
 			// attach to node-map
 			node_type last_node = m_btree.back();
-			m_node_map[key] = last_node;
+			m_node_map[kidx(key)] = last_node;
 
 			// adjust position
 			if (m_btree.size() > 1)
@@ -392,19 +383,19 @@ namespace bcs
 			if (n > 0)
 			{
 				// detach root-node from node-map
-				m_node_map[m_btree.root_value()] = node_type();
+				m_node_map[kidx(m_btree.root_value())] = node_type();
 
 				if (n > 1)
 				{
 					// put back to root
-					key_type i = m_btree.root_value() = m_btree.back_value();
-					m_node_map[i] = m_btree.root();
+					key_type key = m_btree.root_value() = m_btree.back_value();
+					m_node_map[kidx(key)] = m_btree.root();
 
 					// pop the back
 					m_btree.pop();
 
 					// adjust position
-					bubble_down(m_btree.root(), m_value_map[i]);
+					bubble_down(m_btree.root(), m_value_map[key]);
 				}
 				else
 				{
@@ -417,12 +408,12 @@ namespace bcs
 
 		void update_up(const key_type& key) // pre-condition: in_heap(key)
 		{
-			bubble_up(m_node_map[key], m_value_map[key]);
+			bubble_up(m_node_map[kidx(key)], m_value_map[key]);
 		}
 
 		void update_down(const key_type& key) // pre-condition: in_heap(key)
 		{
-			bubble_down(m_node_map[key], m_value_map[key]);
+			bubble_down(m_node_map[kidx(key)], m_value_map[key]);
 		}
 
 	public:
@@ -456,6 +447,11 @@ namespace bcs
 
 
 	private:
+
+		size_t kidx(const key_type& key) const
+		{
+			return (size_t)key_to_index<key_type>::to_index(key);
+		}
 
 		void bubble_up(node_type u, const value_type& e)
 		{
@@ -526,8 +522,8 @@ namespace bcs
 			key_type ui = m_btree(u);
 			key_type vi = m_btree(v);
 
-			m_node_map[ui] = v;
-			m_node_map[vi] = u;
+			m_node_map[kidx(ui)] = v;
+			m_node_map[kidx(vi)] = u;
 
 			m_btree(u) = vi;
 			m_btree(v) = ui;
@@ -537,21 +533,21 @@ namespace bcs
 
 	private:
 		const value_map_type& m_value_map;
-		node_map_type& m_node_map;
+		node_map_type m_node_map;
 		tree_type m_btree;
 		Compare m_compare;
 
 	}; // end class binary_heap
 
 
-	template<typename TIntKey, typename TValue, class ValueMap, class NodeMap, class Compare>
-	void make_heap_with_int_keys(bcs::binary_heap<TIntKey, TValue, ValueMap, NodeMap, Compare>& heap,
-			const TIntKey& first, const TIntKey& last)
+	template<class ValueMap, class Compare>
+	void make_heap_with_int_keys(bcs::binary_heap<ValueMap, Compare>& heap,
+			const typename key_map_traits<ValueMap>::key_type& first,
+			const typename key_map_traits<ValueMap>::key_type& last)
 	{
-		size_t n = size_t(last - first);
-		heap.reserve(n);
+		typedef typename key_map_traits<ValueMap>::key_type key_type;
 
-		for (TIntKey key = first; key < last; ++key)
+		for (key_type key = first; key < last; ++key)
 		{
 			heap.add_key(key);
 		}
@@ -559,12 +555,14 @@ namespace bcs
 	}
 
 
-	template<typename TKey, typename TValue, class ValueMap, class NodeMap, class Compare>
-	void update_element(ValueMap& value_map,
-			bcs::binary_heap<TKey, TValue, ValueMap, NodeMap, Compare>& heap,
-			const TKey& key, const TValue& value)
+	template<class ValueMap, class Compare>
+	void update_element(ValueMap& value_map, bcs::binary_heap<ValueMap, Compare>& heap,
+			const typename key_map_traits<ValueMap>::key_type& key,
+			const typename key_map_traits<ValueMap>::value_type& value)
 	{
-		TValue v0 = value_map[key];
+		typedef typename key_map_traits<ValueMap>::value_type vtype;
+
+		vtype v0 = value_map[key];
 		value_map[key] = value;
 
 		if (heap.compare(value, v0))
