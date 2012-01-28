@@ -47,7 +47,7 @@ namespace bcs
 				nd.rank = 0;
 				nd.parent_idx = i;
 			}
-			m_ncomps = n;
+			m_ncomps = (size_type)n;
 		}
 
 		size_type size() const

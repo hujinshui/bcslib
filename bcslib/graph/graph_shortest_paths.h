@@ -159,7 +159,7 @@ namespace bcs
 		typedef PathLenMap value_map_type;
 		typedef array_map<key_type, cbtree_node> node_map_type;
 
-		typedef binary_heap<value_map_type> type;
+		typedef binary_heap<value_map_type, node_map_type> type;
 	};
 
 	template<class Derived, typename TDist>
@@ -196,7 +196,6 @@ namespace bcs
 
 		typedef typename gview_traits<Derived>::vertex_iterator vertex_iterator;
 		typedef typename gview_traits<Derived>::incident_edge_iterator incident_edge_iterator;
-		typedef typename heap_type::node_type heap_node_type;
 
 	public:
 		dijkstra_traverser(const IGraphIncidenceList<Derived>& g,
@@ -207,7 +206,8 @@ namespace bcs
 		, m_status(g.nvertices(), GVISIT_NONE)
 		, m_edge_dists(edge_dists)
 		, m_shortest_path_lens(shortest_path_lens)
-		, m_heap(m_shortest_path_lens, g.nvertices())
+		, m_node_map(g.nvertices())
+		, m_heap(m_shortest_path_lens, m_node_map)
 		{
 			vertex_iterator pv = g.vertices_begin();
 			vertex_iterator vend = g.vertices_end();
@@ -257,6 +257,7 @@ namespace bcs
 		const edge_distance_map_type& m_edge_dists;
 		path_length_map_type& m_shortest_path_lens;
 
+		array_map<vertex_type, typename heap_type::handle_type> m_node_map;
 		heap_type m_heap;
 
 		std::queue<vertex_type> m_sources;
@@ -358,6 +359,7 @@ namespace bcs
 			const typename key_map_traits<PathLenMap>::value_type& default_len,
 			Agent& agent, InputIterator src_first, InputIterator src_last)
 	{
+
 		typedef typename dijkstra_default_heap<Derived, PathLenMap>::type heap_type;
 
 		dijkstra_traverser<Derived, EdgeDistMap, PathLenMap, heap_type> T(

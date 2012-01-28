@@ -207,7 +207,7 @@ namespace bcs
 		typedef array_map<key_type, value_type> value_map_type;
 		typedef array_map<key_type, cbtree_node> node_map_type;
 
-		typedef binary_heap<value_map_type> type;
+		typedef binary_heap<value_map_type, node_map_type> type;
 	};
 
 	template<class Derived, class OutputIterator>
@@ -253,16 +253,17 @@ namespace bcs
 
 		typedef typename gview_traits<Derived>::vertex_iterator vertex_iterator;
 		typedef typename gview_traits<Derived>::incident_edge_iterator incident_edge_iterator;
-		typedef typename heap_type::node_type heap_node_type;
 
 	public:
 		prim_traverser(const IGraphIncidenceList<Derived>& g,
-				const edge_distance_map_type& edge_dists, const vertex_type& root)
+				const edge_distance_map_type& edge_dists,
+				const vertex_type& root)
 		: m_graph(g)
 		, m_status(g.nvertices(), GVISIT_NONE)
 		, m_edge_dists(edge_dists)
 		, m_entries(g.nvertices())
-		, m_heap(m_entries, g.nvertices())
+		, m_node_map(g.nvertices())
+		, m_heap(m_entries, m_node_map)
 		, m_root(root)
 		, m_root_open(true)
 		{
@@ -293,6 +294,7 @@ namespace bcs
 		const edge_distance_map_type& m_edge_dists;
 
 		array_map<vertex_type, entry_type> m_entries;
+		array_map<vertex_type, typename heap_type::handle_type> m_node_map;
 		heap_type m_heap;
 
 		vertex_type m_root;

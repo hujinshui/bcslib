@@ -53,10 +53,6 @@ namespace bcs
 	using BCS_TR1::is_polymorphic;
 	using BCS_TR1::is_abstract;
 
-	using BCS_TR1::is_pod;
-	using BCS_TR1::has_trivial_default_constructor;
-	using BCS_TR1::has_trivial_destructor;
-
 	using BCS_TR1::is_same;
 	using BCS_TR1::is_base_of;
 
