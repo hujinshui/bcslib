@@ -38,14 +38,19 @@ namespace bcs
 
 	namespace _detail
 	{
-		template<class Derived, typename TDist, class EdgeDistMap, class PathLenMap, class Agent>
+		template<class Derived, class EdgeDistMap, class PathLenMap, class Agent>
 		bool bellman_ford_shortest_paths_impl(const IGraphIncidenceList<Derived>& graph,
 				const EdgeDistMap& edge_dists, PathLenMap& spath_lens, index_t nsources, Agent& agent)
 		{
+#ifdef BCS_USE_STATIC_ASSERT
+			static_assert(is_key_map<EdgeDistMap>::value, "EdgeDistMap must be a key-map.");
+			static_assert(is_key_map<PathLenMap>::value, "PathLenMap must be a key-map.");
+#endif
 			typedef typename gview_traits<Derived>::index_type index_type;
 			typedef typename gview_traits<Derived>::vertex_type vertex_type;
 			typedef typename gview_traits<Derived>::edge_type edge_type;
 			typedef typename gview_traits<Derived>::edge_iterator edge_iter;
+			typedef typename key_map_traits<EdgeDistMap>::value_type dist_type;
 
 			index_type max_iters = graph.nvertices() - (index_type)nsources;
 
@@ -63,7 +68,7 @@ namespace bcs
 					vertex_type u = graph.source(e);
 					vertex_type v = graph.target(e);
 
-					TDist alt_len = spath_lens[u] + edge_dists[e];
+					dist_type alt_len = spath_lens[u] + edge_dists[e];
 					if (spath_lens[v] > alt_len)
 					{
 						spath_lens[v] = alt_len;
@@ -81,9 +86,10 @@ namespace bcs
 	}
 
 
-	template<class Derived, typename TDist, class EdgeDistMap, class PathLenMap, class Agent>
+	template<class Derived, class EdgeDistMap, class PathLenMap, class Agent>
 	inline bool bellman_ford_shortest_paths(const IGraphIncidenceList<Derived>& graph,
-			const EdgeDistMap& edge_dists, PathLenMap& spath_lens, const TDist& defaultlen,
+			const EdgeDistMap& edge_dists, PathLenMap& spath_lens,
+			const typename key_map_traits<PathLenMap>::value_type& defaultlen,
 			Agent& agent, const typename gview_traits<Derived>::vertex_type& source)
 	{
 		typedef typename gview_traits<Derived>::vertex_iterator vertex_iter;
@@ -95,7 +101,7 @@ namespace bcs
 		}
 		spath_lens[source] = 0;
 
-		return _detail::bellman_ford_shortest_paths_impl<Derived,TDist,EdgeDistMap,PathLenMap,Agent>(
+		return _detail::bellman_ford_shortest_paths_impl(
 				graph, edge_dists, spath_lens, 1, agent);
 	}
 
@@ -145,11 +151,11 @@ namespace bcs
 	 *
 	 ***********************************************************/
 
-	template<class Derived, typename TDist, class PathLenMap>
+	template<class Derived, class PathLenMap>
 	struct dijkstra_default_heap
 	{
 		typedef typename gview_traits<Derived>::vertex_type key_type;
-		typedef TDist value_type;
+		typedef typename key_map_traits<PathLenMap>::value_type value_type;
 		typedef PathLenMap value_map_type;
 		typedef array_map<key_type, cbtree_node> node_map_type;
 
@@ -171,14 +177,19 @@ namespace bcs
 	};
 
 
-	template<class Derived, typename TDist, class EdgeDistMap, class PathLenMap, class Heap>
+	template<class Derived, class EdgeDistMap, class PathLenMap, class Heap>
 	class dijkstra_traverser
 	{
 	public:
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(is_key_map<EdgeDistMap>::value, "EdgeDistMap must be a key-map.");
+		static_assert(is_key_map<PathLenMap>::value, "PathLenMap must be a key-map.");
+#endif
+
 		typedef typename gview_traits<Derived>::vertex_type vertex_type;
 		typedef typename gview_traits<Derived>::edge_type edge_type;
 
-		typedef TDist distance_type;
+		typedef typename key_map_traits<EdgeDistMap>::value_type distance_type;
 		typedef EdgeDistMap edge_distance_map_type;
 		typedef PathLenMap path_length_map_type;
 		typedef Heap heap_type;
@@ -191,7 +202,7 @@ namespace bcs
 		dijkstra_traverser(const IGraphIncidenceList<Derived>& g,
 				const edge_distance_map_type& edge_dists,
 				path_length_map_type& shortest_path_lens,
-				const TDist& defaultlen)
+				const typename key_map_traits<PathLenMap>::value_type& defaultlen)
 		: m_graph(g)
 		, m_status(g.nvertices(), GVISIT_NONE)
 		, m_edge_dists(edge_dists)
@@ -255,9 +266,9 @@ namespace bcs
 	}; // end class dijkstra_traverser
 
 
-	template<class Derived, typename TDist, class EdgeDistMap, class PathLenMap, class Heap>
+	template<class Derived, class EdgeDistMap, class PathLenMap, class Heap>
 	template<class Agent>
-	void dijkstra_traverser<Derived, TDist, EdgeDistMap, PathLenMap, Heap>::run(Agent& agent)
+	void dijkstra_traverser<Derived, EdgeDistMap, PathLenMap, Heap>::run(Agent& agent)
 	{
 		while (!m_sources.empty())
 		{
@@ -283,9 +294,9 @@ namespace bcs
 		}
 	}
 
-	template<class Derived, typename TDist, class EdgeDistMap, class PathLenMap, class Heap>
+	template<class Derived, class EdgeDistMap, class PathLenMap, class Heap>
 	template<class Agent>
-	bool dijkstra_traverser<Derived, TDist, EdgeDistMap, PathLenMap, Heap>::process(
+	bool dijkstra_traverser<Derived, EdgeDistMap, PathLenMap, Heap>::process(
 			const vertex_type& u, const distance_type& spl_u, Agent& agent)
 	{
 		incident_edge_iterator it = m_graph.out_edges_begin(u);
@@ -328,28 +339,30 @@ namespace bcs
 	}
 
 
-	template<class Derived, typename TDist, class EdgeDistMap, class PathLenMap, class Agent>
+	template<class Derived, class EdgeDistMap, class PathLenMap, class Agent>
 	inline void dijkstra_shortest_paths(const IGraphIncidenceList<Derived>& graph,
-			const EdgeDistMap& edge_dists, PathLenMap& shortest_path_lens, const TDist& default_len,
+			const EdgeDistMap& edge_dists, PathLenMap& shortest_path_lens,
+			const typename key_map_traits<PathLenMap>::value_type& default_len,
 			Agent& agent, typename gview_traits<Derived>::vertex_type& source)
 	{
-		typedef typename dijkstra_default_heap<Derived, TDist, PathLenMap>::type heap_type;
+		typedef typename dijkstra_default_heap<Derived, PathLenMap>::type heap_type;
 
-		dijkstra_traverser<Derived, TDist, EdgeDistMap, PathLenMap, heap_type> T(
+		dijkstra_traverser<Derived, EdgeDistMap, PathLenMap, heap_type> T(
 				graph, edge_dists, shortest_path_lens, default_len);
 
 		T.add_source(source, agent);
 		T.run(agent);
 	}
 
-	template<class Derived, typename TDist, class EdgeDistMap, class PathLenMap, class Agent, typename InputIterator>
+	template<class Derived, class EdgeDistMap, class PathLenMap, class Agent, typename InputIterator>
 	inline void dijkstra_shortest_paths(const IGraphIncidenceList<Derived>& graph,
-			const EdgeDistMap& edge_dists, PathLenMap& shortest_path_lens, const TDist& default_len,
+			const EdgeDistMap& edge_dists, PathLenMap& shortest_path_lens,
+			const typename key_map_traits<PathLenMap>::value_type& default_len,
 			Agent& agent, InputIterator src_first, InputIterator src_last)
 	{
-		typedef typename dijkstra_default_heap<Derived, TDist, PathLenMap>::type heap_type;
+		typedef typename dijkstra_default_heap<Derived, PathLenMap>::type heap_type;
 
-		dijkstra_traverser<Derived, TDist, EdgeDistMap, PathLenMap, heap_type> T(
+		dijkstra_traverser<Derived, EdgeDistMap, PathLenMap, heap_type> T(
 				graph, edge_dists, shortest_path_lens, default_len);
 
 		for(; src_first != src_last; ++src_first)

@@ -27,13 +27,13 @@ typedef ginclist<gint> graph_t;
 typedef int dist_t;
 typedef aview_map<edge_t, dist_t> edge_dist_map_t;
 typedef array_map<vertex_t, dist_t> vertex_dist_map_t;
-typedef dijkstra_default_heap<graph_t, dist_t, vertex_dist_map_t>::type heap_t;
+typedef dijkstra_default_heap<graph_t, vertex_dist_map_t>::type heap_t;
 
 // explicit instantiation for syntax checking
 
-template class dijkstra_traverser<graph_t, dist_t, edge_dist_map_t, vertex_dist_map_t, heap_t>;
+template class dijkstra_traverser<graph_t, edge_dist_map_t, vertex_dist_map_t, heap_t>;
 
-typedef dijkstra_traverser<graph_t, dist_t, edge_dist_map_t, vertex_dist_map_t, heap_t> dijks_alg_t;
+typedef dijkstra_traverser<graph_t, edge_dist_map_t, vertex_dist_map_t, heap_t> dijks_alg_t;
 
 
 struct dijks_action
