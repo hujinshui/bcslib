@@ -143,7 +143,7 @@ namespace bcs
 	template<typename T>
 	inline void default_construct_elements(T *a, size_t n)
 	{
-		_detail::_element_construct_helper<T, has_trivial_default_constructor<T>::value>::default_construct(a, n);
+		_detail::_element_construct_helper<T, is_pod<T>::value>::default_construct(a, n);
 	}
 
 
@@ -200,7 +200,7 @@ namespace bcs
     template<typename T>
     inline void destruct_elements(T *dst, size_t n)
     {
-    	_detail::_element_destruct_helper<T, has_trivial_destructor<T>::value>::destruct(dst, n);
+    	_detail::_element_destruct_helper<T, is_pod<T>::value>::destruct(dst, n);
     }
 
 }

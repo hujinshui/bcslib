@@ -39,7 +39,7 @@ namespace bcs
 	};
 }
 
-template class disjoint_set_forest<dse>;
+template class bcs::disjoint_set_forest<dse>;
 
 
 TEST( DisjointSetForest, Init )

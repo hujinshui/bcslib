@@ -100,8 +100,6 @@ namespace bcs
 		using ::round;
 		using ::trunc;
 
-		using ::sincos;
-
 		using ::asinh;
 		using ::acosh;
 		using ::atanh;

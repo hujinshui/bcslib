@@ -39,6 +39,10 @@
 			#error CLANG of version lower than 2.8.0 is not supported
 		#endif
 		#define BCSLIB_COMPILER BCSLIB_CLANG
+
+		#define BCS_USE_C11_STDLIB
+		#define BCS_USE_STATIC_ASSERT
+
 	#else
 		#if ((__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 2))
 			#error GCC of version lower than 4.2.0 is not supported

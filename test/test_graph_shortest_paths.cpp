@@ -31,7 +31,7 @@ typedef dijkstra_default_heap<graph_t, vertex_dist_map_t>::type heap_t;
 
 // explicit instantiation for syntax checking
 
-template class dijkstra_traverser<graph_t, edge_dist_map_t, vertex_dist_map_t, heap_t>;
+template class bcs::dijkstra_traverser<graph_t, edge_dist_map_t, vertex_dist_map_t, heap_t>;
 
 typedef dijkstra_traverser<graph_t, edge_dist_map_t, vertex_dist_map_t, heap_t> dijks_alg_t;
 

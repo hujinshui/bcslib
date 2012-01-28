@@ -31,7 +31,10 @@ namespace bcs
 	 *
 	 * In addition to other standard container typedefs, it also defines
 	 *
-	 * H::container_type 		The type of the associated container
+	 * H::value_map_type 		The type of the associated value-map
+	 * H::handle_type 			The handle to nodes
+	 *
+	 * H h(value_map, node_map)
 	 *
 	 * h.size();
 	 *     returns the number of elements in the heap
@@ -275,19 +278,19 @@ namespace bcs
 
 
 
-	template<class ValueMap, class Compare=std::less<typename key_map_traits<ValueMap>::value_type> >
+	template<class ValueMap, class NodeMap, class Compare=std::less<typename key_map_traits<ValueMap>::value_type> >
 	class binary_heap
 	{
 	public:
 #ifdef BCS_USE_STATIC_ASSERT
 		static_assert(is_key_map<ValueMap>::value, "ValueMap should be a key-map.");
-		static_assert(index_convertible<typename key_map_traits<ValueMap>::key_type>::value, "The key type must be index convertible.");
+		static_assert(is_key_map<NodeMap>::value, "NodeMap should be a key-map.");
 #endif
 		typedef typename key_map_traits<ValueMap>::key_type key_type;
 		typedef typename key_map_traits<ValueMap>::value_type value_type;
 
 		typedef ValueMap value_map_type;
-		typedef std::vector<cbtree_node> node_map_type;
+		typedef NodeMap node_map_type;
 		typedef Compare compare_type;
 
 		typedef size_t size_type;
@@ -296,12 +299,12 @@ namespace bcs
 		typedef typename value_map_type::const_reference const_reference;
 
 		typedef consecutive_binary_tree<key_type> tree_type;
-		typedef typename tree_type::node_type node_type;
+		typedef typename tree_type::node_type handle_type;
 
 	public:
-		binary_heap(const value_map_type& value_map, index_t max_index,
+		binary_heap(const value_map_type& value_map, node_map_type& node_map,
 				const compare_type& compare = compare_type())
-		: m_value_map(value_map), m_node_map((size_t)max_index), m_compare(compare)
+		: m_value_map(value_map), m_node_map(node_map), m_compare(compare)
 		{
 			// note: the caller should initialize the node_map before it is used in the heap
 		}
@@ -345,7 +348,7 @@ namespace bcs
 		void add_key(const key_type& key)
 		{
 			m_btree.push(key);
-			m_node_map[kidx(key)] = m_btree.back();
+			m_node_map[key] = m_btree.back();
 		}
 
 		void make_heap()
@@ -366,8 +369,8 @@ namespace bcs
 			m_btree.push(key);
 
 			// attach to node-map
-			node_type last_node = m_btree.back();
-			m_node_map[kidx(key)] = last_node;
+			handle_type last_node = m_btree.back();
+			m_node_map[key] = last_node;
 
 			// adjust position
 			if (m_btree.size() > 1)
@@ -383,13 +386,13 @@ namespace bcs
 			if (n > 0)
 			{
 				// detach root-node from node-map
-				m_node_map[kidx(m_btree.root_value())] = node_type();
+				m_node_map[m_btree.root_value()] = handle_type();
 
 				if (n > 1)
 				{
 					// put back to root
 					key_type key = m_btree.root_value() = m_btree.back_value();
-					m_node_map[kidx(key)] = m_btree.root();
+					m_node_map[key] = m_btree.root();
 
 					// pop the back
 					m_btree.pop();
@@ -408,24 +411,24 @@ namespace bcs
 
 		void update_up(const key_type& key) // pre-condition: in_heap(key)
 		{
-			bubble_up(m_node_map[kidx(key)], m_value_map[key]);
+			bubble_up(m_node_map[key], m_value_map[key]);
 		}
 
 		void update_down(const key_type& key) // pre-condition: in_heap(key)
 		{
-			bubble_down(m_node_map[kidx(key)], m_value_map[key]);
+			bubble_down(m_node_map[key], m_value_map[key]);
 		}
 
 	public:
 
 		// binary-tree specific interfaces
 
-		const_reference get_by_node(node_type u) const
+		const_reference get_by_node(handle_type u) const
 		{
 			return m_value_map[m_btree(u)];
 		}
 
-		node_type node(const key_type& key) const
+		handle_type node(const key_type& key) const
 		{
 			return m_node_map[key];
 		}
@@ -448,18 +451,13 @@ namespace bcs
 
 	private:
 
-		size_t kidx(const key_type& key) const
-		{
-			return (size_t)key_to_index<key_type>::to_index(key);
-		}
-
-		void bubble_up(node_type u, const value_type& e)
+		void bubble_up(handle_type u, const value_type& e)
 		{
 			bool cont = true;
 
 			while (cont && m_btree.is_non_root(u))
 			{
-				node_type p = m_btree.parent(u);
+				handle_type p = m_btree.parent(u);
 				if (compare(e, get_by_node(p)))
 				{
 					u = swap(u, p);
@@ -471,16 +469,16 @@ namespace bcs
 			}
 		}
 
-		void bubble_down(node_type u, const value_type& e)
+		void bubble_down(handle_type u, const value_type& e)
 		{
 			bool cont = true;
 
-			node_type last_nl = m_btree.last_parent();
+			handle_type last_nl = m_btree.last_parent();
 			while (cont && u.id <= last_nl.id)
 			{
 				cont = false;
 
-				node_type lc, rc;
+				handle_type lc, rc;
 				m_btree.get_children(u, lc, rc);
 
 				if (rc.non_nil())
@@ -517,13 +515,13 @@ namespace bcs
 			}
 		}
 
-		node_type swap(node_type u, node_type v)
+		handle_type swap(handle_type u, handle_type v)
 		{
 			key_type ui = m_btree(u);
 			key_type vi = m_btree(v);
 
-			m_node_map[kidx(ui)] = v;
-			m_node_map[kidx(vi)] = u;
+			m_node_map[ui] = v;
+			m_node_map[vi] = u;
 
 			m_btree(u) = vi;
 			m_btree(v) = ui;
@@ -533,7 +531,7 @@ namespace bcs
 
 	private:
 		const value_map_type& m_value_map;
-		node_map_type m_node_map;
+		node_map_type& m_node_map;
 		tree_type m_btree;
 		Compare m_compare;
 

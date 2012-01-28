@@ -20,12 +20,12 @@ using namespace bcs::test;
 template class bcs::consecutive_binary_tree<int>;
 
 typedef std::vector<int> value_map_t;
-// typedef std::vector<cbtree_node> node_map_t;
+typedef std::vector<cbtree_node> node_map_t;
 
-template class bcs::binary_heap<value_map_t>;
+template class bcs::binary_heap<value_map_t, node_map_t>;
 
 typedef std::vector<int> vec_t;
-typedef bcs::binary_heap<value_map_t> heap_t;
+typedef bcs::binary_heap<value_map_t, node_map_t> heap_t;
 
 // Tests
 
@@ -145,7 +145,8 @@ TEST( BinaryHeap, MakeHeap )
 
 	vec_t V0;
 
-	heap_t H0(V0, 0);
+	node_map_t M0(0);
+	heap_t H0(V0, M0);
 	make_heap_with_int_keys(H0, (size_t)0, (size_t)0);
 
 	ASSERT_EQ( 0, H0.size() );
@@ -157,7 +158,8 @@ TEST( BinaryHeap, MakeHeap )
 	vec_t V1;
 	V1.push_back(101);
 
-	heap_t H1(V1, 1);
+	node_map_t M1(1);
+	heap_t H1(V1, M1);
 	make_heap_with_int_keys(H1, (size_t)0, (size_t)1);
 
 	ASSERT_EQ( 1, H1.size() );
@@ -175,7 +177,8 @@ TEST( BinaryHeap, MakeHeap )
 			V5.push_back(std::rand() % 100);
 		}
 
-		heap_t H5(V5, 5);
+		node_map_t M5(5);
+		heap_t H5(V5, M5);
 		make_heap_with_int_keys(H5, (size_t)0, (size_t)5);
 
 		ASSERT_EQ( 5, H5.size() );
@@ -194,7 +197,8 @@ TEST( BinaryHeap, MakeHeap )
 			V6.push_back(std::rand() % 100);
 		}
 
-		heap_t H6(V6, 6);
+		node_map_t M6(6);
+		heap_t H6(V6, M6);
 		make_heap_with_int_keys(H6, (size_t)0, (size_t)6);
 
 		ASSERT_EQ( 6, H6.size());
@@ -212,7 +216,8 @@ TEST( BinaryHeap, MakeHeap )
 			V7.push_back(std::rand() % 100);
 		}
 
-		heap_t H7(V7, 7);
+		node_map_t M7(7);
+		heap_t H7(V7, M7);
 		make_heap_with_int_keys(H7, (size_t)0, (size_t)7);
 
 		ASSERT_EQ( 7, H7.size());
@@ -232,7 +237,8 @@ TEST( BinaryHeap, MakeHeap )
 			V9.push_back(std::rand() % 100);
 		}
 
-		heap_t H9(V9, 9);
+		node_map_t M9(9);
+		heap_t H9(V9, M9);
 		make_heap_with_int_keys(H9, (size_t)0, (size_t)9);
 
 		ASSERT_EQ( 9, H9.size());
@@ -251,7 +257,8 @@ TEST( BinaryHeap, MakeHeap )
 			V9.push_back(std::rand() % 100);
 		}
 
-		heap_t H9(V9, 9);
+		node_map_t M9(9);
+		heap_t H9(V9, M9);
 		ASSERT_EQ( 0, H9.size());
 		ASSERT_EQ( 0, verify_heap_basics(H9) );
 		ASSERT_TRUE( verify_binary_min_heap(H9) );
@@ -295,7 +302,8 @@ TEST( BinaryHeap, InsertAndDelete )
 
 		// gradual enroll
 
-		heap_t H(V, (index_t)V.size());
+		node_map_t M(V.size());
+		heap_t H(V, M);
 		for (size_t j = 0; j < N; ++j)
 		{
 			H.insert(j);
@@ -341,7 +349,8 @@ TEST( BinaryHeap, Update )
 			V.push_back(std::rand() % 100);
 		}
 
-		heap_t H(V, (index_t)V.size());
+		node_map_t M(V.size());
+		heap_t H(V, M);
 		make_heap_with_int_keys(H, (size_t)0, V.size());
 
 		ASSERT_EQ( N, H.size() );

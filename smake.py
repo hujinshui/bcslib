@@ -297,10 +297,10 @@ if __name__ == '__main__':
 	
 	cxx = os.getenv('CXX')
 	if cxx == None:
-		if found_sys_command('g++'):
-			cxx = 'g++'
-		elif found_sys_command('clang++'):
+		if found_sys_command('clang++'):
 			cxx = 'clang++'
+		elif found_sys_command('g++'):
+			cxx = 'g++'
 		else:
 			report_err('Unable to detect a supported compiler')
 			

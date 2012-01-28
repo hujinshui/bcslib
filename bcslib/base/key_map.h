@@ -16,6 +16,8 @@
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/type_traits.h>
 
+#include <vector>
+#include <map>
 
 // macro
 
@@ -67,13 +69,6 @@
 
 
 // forward declaration of some STL containers
-
-namespace std
-{
-	template<class T, class Allocator> class vector;
-	template<class Key, class T, class Compare, class Allocator> class map;
-}
-
 
 namespace bcs
 {

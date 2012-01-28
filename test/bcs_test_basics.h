@@ -12,7 +12,7 @@
 #include <gtest/gtest.h>
 
 #include <bcslib/base/basic_defs.h>
-#include <cmath>
+#include <bcslib/base/basic_math.h>
 #include <cstdio>
 
 namespace bcs { namespace test {
@@ -100,7 +100,7 @@ namespace bcs { namespace test {
 	{
 		for (index_t i = 0; i < n; ++i)
 		{
-			double d = std::abs((double)(a[i] - b[i]));
+			double d = abs((double)(a[i] - b[i]));
 			if (d > eps) return false;
 		}
 		return true;

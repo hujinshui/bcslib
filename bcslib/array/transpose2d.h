@@ -138,7 +138,7 @@ namespace bcs
 
 		// deal with block at bottom-right [rm x rn]
 
-		size_t rbu = std::max(rm, rn);
+		size_t rbu = rm > rn ? rm : rn;
 		if (rbu > 0)
 		{
 			_detail::_tr_process_block(src, dst, cache, m, n, bdim, n_br, n_bc, rm, rn, rbu);
