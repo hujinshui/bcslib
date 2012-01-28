@@ -207,7 +207,7 @@ namespace bcs
 		typedef array_map<key_type, value_type> value_map_type;
 		typedef array_map<key_type, cbtree_node> node_map_type;
 
-		typedef binary_heap<key_type, value_type, value_map_type, node_map_type> type;
+		typedef binary_heap<value_map_type> type;
 	};
 
 	template<class Derived, class OutputIterator>
@@ -262,8 +262,7 @@ namespace bcs
 		, m_status(g.nvertices(), GVISIT_NONE)
 		, m_edge_dists(edge_dists)
 		, m_entries(g.nvertices())
-		, m_heap_node_map(g.nvertices(), heap_node_type())
-		, m_heap(m_entries, m_heap_node_map)
+		, m_heap(m_entries, g.nvertices())
 		, m_root(root)
 		, m_root_open(true)
 		{
@@ -294,7 +293,6 @@ namespace bcs
 		const edge_distance_map_type& m_edge_dists;
 
 		array_map<vertex_type, entry_type> m_entries;
-		array_map<vertex_type, heap_node_type> m_heap_node_map;
 		heap_type m_heap;
 
 		vertex_type m_root;

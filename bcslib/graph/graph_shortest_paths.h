@@ -159,7 +159,7 @@ namespace bcs
 		typedef PathLenMap value_map_type;
 		typedef array_map<key_type, cbtree_node> node_map_type;
 
-		typedef binary_heap<key_type, value_type, value_map_type, node_map_type> type;
+		typedef binary_heap<value_map_type> type;
 	};
 
 	template<class Derived, typename TDist>
@@ -207,8 +207,7 @@ namespace bcs
 		, m_status(g.nvertices(), GVISIT_NONE)
 		, m_edge_dists(edge_dists)
 		, m_shortest_path_lens(shortest_path_lens)
-		, m_heap_node_map(g.nvertices(), heap_node_type())
-		, m_heap(m_shortest_path_lens, m_heap_node_map)
+		, m_heap(m_shortest_path_lens, g.nvertices())
 		{
 			vertex_iterator pv = g.vertices_begin();
 			vertex_iterator vend = g.vertices_end();
@@ -258,7 +257,6 @@ namespace bcs
 		const edge_distance_map_type& m_edge_dists;
 		path_length_map_type& m_shortest_path_lens;
 
-		array_map<vertex_type, heap_node_type> m_heap_node_map;
 		heap_type m_heap;
 
 		std::queue<vertex_type> m_sources;
