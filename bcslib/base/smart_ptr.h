@@ -113,7 +113,7 @@ namespace bcs
 
 	private:
 		T *_ptr;
-		std::shared_ptr<T> _sp;
+		shared_ptr<T> _sp;
 	};
 
 
@@ -145,7 +145,7 @@ namespace bcs
 
 	private:
 		T *_ptr;
-		std::shared_ptr<T> _sp;
+		shared_ptr<T> _sp;
 	};
 
 }
