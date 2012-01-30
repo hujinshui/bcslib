@@ -30,8 +30,8 @@ namespace bcs
 	 * typedef of pointer;
 	 *
 	 * - void move_next();
-	 * - T* ptr() const;
-	 * - T& ref() const;
+	 * - pointer ptr() const;
+	 * - reference ref() const;
 	 * - operator ==
 	 *
 	 * The Concept of bidirectional_iterator_implementer
