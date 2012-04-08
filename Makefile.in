@@ -49,7 +49,6 @@ BASE_HEADERS = \
 	bcslib/base/smart_ptr.h \
 	bcslib/base/tr1_containers.h \
 	bcslib/base/type_traits.h \
-	bcslib/base/alt_structure.h \
 	bcslib/base/basic_algorithms.h \
 	bcslib/base/iterator_wrappers.h \
 	bcslib/base/block.h \
