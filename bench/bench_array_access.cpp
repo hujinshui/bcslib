@@ -22,12 +22,12 @@ using namespace bcs;
 
 double time_copy_memory(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
-	copy_elements(src, buf, (size_t)nelems);
+	mem<double>::copy(src, buf, (size_t)nelems);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)
 	{
-		bcs::copy_elements(src, buf, (size_t)nelems);
+		mem<double>::copy(src, buf, (size_t)nelems);
 	}
 
 	return tm.elapsed( SECONDS );
@@ -36,7 +36,7 @@ double time_copy_memory(int nrepeats, const index_t nelems, const double *src, d
 
 double time_raw_for_loop(int nrepeats, const index_t nelems, const double *src, double *buf)
 {
-	copy_elements(src, buf, (size_t)nelems);
+	mem<double>::copy(src, buf, (size_t)nelems);
 
 	timer tm(true);
 	for (int i = 0; i < nrepeats; ++i)

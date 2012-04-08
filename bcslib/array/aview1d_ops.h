@@ -14,7 +14,7 @@
 #define BCSLIB_AVIEW1D_OPS_H_
 
 #include <bcslib/array/aview1d_base.h>
-#include <bcslib/base/basic_mem.h>
+#include <bcslib/base/mem_op.h>
 
 namespace bcs
 {
@@ -25,7 +25,7 @@ namespace bcs
 			const IConstContinuousAView1D<LDerived, T>& a,
 			const IConstContinuousAView1D<RDerived, T>& b)
 	{
-		return is_same_shape(a, b) && elements_equal(a.pbase(), b.pbase(), a.size());
+		return is_same_shape(a, b) && mem<T>::equal(a.pbase(), b.pbase(), a.size());
 	}
 
 	// import, export, fill
@@ -42,7 +42,7 @@ namespace bcs
 	template<class Derived, typename T>
 	inline void import_from(IContinuousAView1D<Derived, T>& a, const T *src)
 	{
-		copy_elements(src, a.pbase(), a.size());
+		mem<T>::copy(src, a.pbase(), a.size());
 	}
 
 	template<class Derived, typename T>
@@ -57,7 +57,7 @@ namespace bcs
 	template<class Derived, typename T>
 	inline void export_to(const IConstContinuousAView1D<Derived, T>& a, T *dst)
 	{
-		copy_elements(a.pbase(), dst, a.size());
+		mem<T>::copy(a.pbase(), dst, a.size());
 	}
 
 
@@ -80,7 +80,7 @@ namespace bcs
 		RDerived& rd = dst.derived();
 
 		check_arg(is_same_shape(sd, rd), "aview1d copy: the shapes of src and dst are inconsistent.");
-		copy_elements(src.pbase(), dst.pbase(), src.size());
+		mem<T>::copy(src.pbase(), dst.pbase(), src.size());
 	}
 
 	template<class LDerived, class RDerived, typename T>

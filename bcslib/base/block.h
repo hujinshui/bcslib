@@ -13,7 +13,7 @@
 #ifndef BCSLIB_BLOCK_H_
 #define BCSLIB_BLOCK_H_
 
-#include <bcslib/base/basic_mem.h>
+#include <bcslib/base/mem_op.h>
 #include <bcslib/base/smart_ptr.h>
 
 namespace bcs
@@ -54,54 +54,33 @@ namespace bcs
     		{
     		}
 
-    		explicit block_impl(size_type n)
-    		: m_allocator()
-    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
-    		{
-    			default_construct_elements(m_base, n);
-    		}
-
-    		block_impl(size_type n, const allocator_type& allocator)
+    		explicit block_impl(size_type n, const allocator_type& allocator = allocator_type())
     		: m_allocator(allocator)
-    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
+    		, m_base(safe_alloc(n)), m_n(n), m_own(true)
     		{
-    			default_construct_elements(m_base, n);
     		}
 
-    		block_impl(size_type n, const_reference v)
-    		: m_allocator()
-    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
-    		{
-    			if (n > 0) copy_construct_elements(v, m_base, n);
-    		}
-
-    		block_impl(size_type n, const_reference v, const allocator_type& allocator)
+    		block_impl(size_type n, const_reference v, const allocator_type& allocator = allocator_type())
     		: m_allocator(allocator)
-    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
+    		, m_base(safe_alloc(n)), m_n(n), m_own(true)
     		{
-    			if (n > 0) copy_construct_elements(v, m_base, n);
+    			if (n > 0) mem<value_type>::fill(m_base, n, v);
     		}
 
-    		block_impl(size_type n, const_pointer src)
-    		: m_allocator()
-    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
-    		{
-    			if (n > 0) copy_construct_elements(src, m_base, n);
-    		}
 
-    		block_impl(size_type n, const_pointer src, const allocator_type& allocator)
+    		block_impl(size_type n, const_pointer src, const allocator_type& allocator = allocator_type())
     		: m_allocator(allocator)
-    		, m_base(safe_allocate(m_allocator, n)), m_n(n), m_own(true)
+    		, m_base(safe_alloc(n)), m_n(n), m_own(true)
     		{
-    			if (n > 0) copy_construct_elements(src, m_base, n);
+    			if (n > 0) mem<value_type>::copy(src, m_base, n);
     		}
+
 
     		~block_impl()
     		{
     			if (m_own)
     			{
-    				destruct_elements(m_base, m_n);
-    				safe_deallocate(m_allocator, m_base, m_n);
+    				safe_dealloc(m_base, m_n);
     			}
     		}
 
@@ -109,7 +88,7 @@ namespace bcs
     		{
     			if (m_own)
     			{
-    				safe_deallocate(m_allocator, m_base, m_n);
+    				safe_dealloc(m_base, m_n);
     			}
 
     			m_base = BCS_NULL;
@@ -119,11 +98,11 @@ namespace bcs
 
     		block_impl(const block_impl& r)
     		: m_allocator(r.m_allocator)
-    		, m_base(r.m_own ? safe_allocate(m_allocator, r.m_n) : r.m_base)
+    		, m_base(r.m_own ? safe_alloc(r.m_n) : r.m_base)
     		, m_n(r.m_n)
     		, m_own(r.m_own)
     		{
-    			if (m_own && r.m_n > 0) copy_construct_elements(r.m_base, m_base, r.m_n);
+    			if (m_own && r.m_n > 0) mem<value_type>::copy(r.m_base, m_base, r.m_n);
     		}
 
     		void swap(block_impl& r)
@@ -179,6 +158,17 @@ namespace bcs
     		bool own_memory() const
     		{
     			return m_own;
+    		}
+
+    	private:
+    		pointer safe_alloc(size_type n)
+    		{
+    			return n > 0 ? m_allocator.allocate(n) : BCS_NULL;
+    		}
+
+    		void safe_dealloc(pointer p, size_t n)
+    		{
+    			m_allocator.deallocate(p, n);
     		}
 
     	private:

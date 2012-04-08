@@ -13,11 +13,14 @@
 #ifndef BCSLIB_ARRAY2D_H
 #define BCSLIB_ARRAY2D_H
 
+
 #include <bcslib/array/aview2d.h>
 #include <bcslib/array/aview2d_ops.h>
 #include <bcslib/array/array1d.h>
 
 #include <bcslib/array/transpose2d.h>
+#include <bcslib/base/type_traits.h>
+
 #include <cmath>
 
 namespace bcs
@@ -465,7 +468,7 @@ namespace bcs
 	{
 		const size_t block_size = BCS_TRANSPOSITION_BLOCK_BYTES / sizeof(T);
 
-		aligned_array<T, block_size> cache;
+		T cache[block_size];
 
 		if (block_size < 4)
 		{
@@ -474,7 +477,7 @@ namespace bcs
 		else
 		{
 			size_t bdim = (size_t)std::sqrt((double)block_size);
-			blockwise_transpose_matrix(src, dst, (size_t)m, (size_t)n, bdim, cache.data);
+			blockwise_transpose_matrix(src, dst, (size_t)m, (size_t)n, bdim, cache);
 		}
 	}
 

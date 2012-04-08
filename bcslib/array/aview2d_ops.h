@@ -14,7 +14,7 @@
 #define BCSLIB_AVIEW2D_OPS_H_
 
 #include <bcslib/array/aview2d_base.h>
-#include <bcslib/base/basic_mem.h>
+#include <bcslib/base/mem_op.h>
 
 namespace bcs
 {
@@ -25,7 +25,7 @@ namespace bcs
 			const IConstContinuousAView2D<LDerived, T, TOrd>& lhs,
 			const IConstContinuousAView2D<RDerived, T, TOrd>& rhs)
 	{
-		return is_same_shape(lhs, rhs) && elements_equal(lhs.pbase(), rhs.pbase(), lhs.size());
+		return is_same_shape(lhs, rhs) && mem<T>::equal(lhs.pbase(), rhs.pbase(), lhs.size());
 	}
 
 
@@ -66,7 +66,7 @@ namespace bcs
 	template<class Derived, typename T, typename TOrd>
 	inline void import_from(IContinuousAView2D<Derived, T, TOrd>& a, const T *src)
 	{
-		copy_elements(src, a.pbase(), a.size());
+		mem<T>::copy(src, a.pbase(), a.size());
 	}
 
 
@@ -107,7 +107,7 @@ namespace bcs
 	template<class Derived, typename T, typename TOrd>
 	inline void export_to(const IConstContinuousAView2D<Derived, T, TOrd>& a, T *dst)
 	{
-		copy_elements(a.pbase(), dst, a.size());
+		mem<T>::copy(a.pbase(), dst, a.size());
 	}
 
 
@@ -208,7 +208,7 @@ namespace bcs
 		RDerived& dstd = dst.derived();
 
 		check_arg(is_same_shape(srcd, dstd), "aview2d copy: the shapes of src and dst are inconsistent.");
-		copy_elements(srcd.pbase(), dstd.pbase(), srcd.size());
+		mem<T>::copy(srcd.pbase(), dstd.pbase(), srcd.size());
 	}
 
 	template<class LDerived, class RDerived, typename T, typename TOrd>

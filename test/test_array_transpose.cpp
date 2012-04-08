@@ -26,7 +26,7 @@ bool verify_blkwise_transpose(const T *src, T *dst, T *r, size_t bdim, size_t m,
 	// do block-wise transposition
 	blockwise_transpose_matrix(src, dst, m, n, bdim, cache);
 
-	return elements_equal(dst, r, m * n);
+	return mem<T>::equal(dst, r, m * n);
 }
 
 
@@ -66,7 +66,7 @@ TEST( ArrayTranspose, DirectTranspose )
 	double r0[m0 * n0] = {1, 2};
 
 	direct_transpose_matrix(src, t0, m0, n0);
-	EXPECT_TRUE( elements_equal(t0, r0, m0 * n0) );
+	EXPECT_TRUE( mem<double>::equal(t0, r0, m0 * n0) );
 
 	// 2 x 2
 
@@ -75,7 +75,7 @@ TEST( ArrayTranspose, DirectTranspose )
 	double r1[m1 * n1] = {1, 3, 2, 4};
 
 	direct_transpose_matrix(src, t1, m1, n1);
-	EXPECT_TRUE( elements_equal(t1, r1, m1 * n1) );
+	EXPECT_TRUE( mem<double>::equal(t1, r1, m1 * n1) );
 
 	// 2 x 3
 
@@ -84,7 +84,7 @@ TEST( ArrayTranspose, DirectTranspose )
 	double r2[m2 * n2] = {1, 4, 2, 5, 3, 6};
 
 	direct_transpose_matrix(src, t2, m2, n2);
-	EXPECT_TRUE( elements_equal(t2, r2, m2 * n2) );
+	EXPECT_TRUE( mem<double>::equal(t2, r2, m2 * n2) );
 
 	// 3 x 2
 
@@ -93,7 +93,7 @@ TEST( ArrayTranspose, DirectTranspose )
 	double r3[m3 * n3] = {1, 3, 5, 2, 4, 6};
 
 	direct_transpose_matrix(src, t3, m3, n3);
-	EXPECT_TRUE( elements_equal(t3, r3, m3 * n3) );
+	EXPECT_TRUE( mem<double>::equal(t3, r3, m3 * n3) );
 
 	// 3 x 3
 
@@ -102,7 +102,7 @@ TEST( ArrayTranspose, DirectTranspose )
 	double r4[m4 * n4] = {1, 4, 7, 2, 5, 8, 3, 6, 9};
 
 	direct_transpose_matrix(src, t4, m4, n4);
-	EXPECT_TRUE( elements_equal(t4, r4, m4 * n4) );
+	EXPECT_TRUE( mem<double>::equal(t4, r4, m4 * n4) );
 }
 
 
@@ -114,7 +114,7 @@ TEST( ArrayTranspose, DirectTransposeSquare )
 	double r1[1] = {1};
 
 	direct_transpose_sqmatrix_inplace(t1, 1);
-	EXPECT_TRUE( elements_equal(t1, r1, 1) );
+	EXPECT_TRUE( mem<double>::equal(t1, r1, 1) );
 
 	// 2 x 2
 
@@ -122,7 +122,7 @@ TEST( ArrayTranspose, DirectTransposeSquare )
 	double r2[4] = {1, 3, 2, 4};
 
 	direct_transpose_sqmatrix_inplace(t2, 2);
-	EXPECT_TRUE( elements_equal(t2, r2, 4) );
+	EXPECT_TRUE( mem<double>::equal(t2, r2, 4) );
 
 	// 3 x 3
 
@@ -130,7 +130,7 @@ TEST( ArrayTranspose, DirectTransposeSquare )
 	double r3[9] = {1, 4, 7, 2, 5, 8, 3, 6, 9};
 
 	direct_transpose_sqmatrix_inplace(t3, 3);
-	EXPECT_TRUE( elements_equal(t3, r3, 9) );
+	EXPECT_TRUE( mem<double>::equal(t3, r3, 9) );
 
 	// 4 x 4
 
@@ -138,7 +138,7 @@ TEST( ArrayTranspose, DirectTransposeSquare )
 	double r4[16] = {1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16};
 
 	direct_transpose_sqmatrix_inplace(t4, 4);
-	EXPECT_TRUE( elements_equal(t4, r4, 16) );
+	EXPECT_TRUE( mem<double>::equal(t4, r4, 16) );
 }
 
 
@@ -199,7 +199,7 @@ TEST( ArrayTranspose, Array2DTransposeRowMajor )
 {
 	const size_t Nmax = 40000;
 
-	scoped_buffer<double> buf(Nmax);
+	block<double> buf(Nmax);
 	for (size_t i = 0; i < Nmax; ++i) buf[i] = (double)(i + 1);
 	const double *src = buf.pbase();
 
@@ -256,7 +256,7 @@ TEST( ArrayTranspose, Array2DTransposeColumnMajor )
 {
 	const size_t Nmax = 40000;
 
-	scoped_buffer<double> buf(Nmax);
+	block<double> buf(Nmax);
 	for (size_t i = 0; i < Nmax; ++i) buf[i] = (double)(i + 1);
 	const double *src = buf.pbase();
 

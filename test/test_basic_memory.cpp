@@ -8,7 +8,7 @@
 
 #include "bcs_test_basics.h"
 
-#include <bcslib/base/basic_mem.h>
+#include <bcslib/base/mem_op.h>
 #include <bcslib/base/block.h>
 #include <bcslib/base/monitored_allocator.h>
 #include <vector>
@@ -19,7 +19,6 @@ using namespace bcs::test;
 // explicit template instantiation for syntax check
 
 template class bcs::monitored_allocator<int>;
-template class bcs::aligned_allocator<int>;
 template class bcs::cref_blk_t<int>;
 template class bcs::ref_blk_t<int>;
 template class bcs::copy_blk_t<int>;
@@ -105,9 +104,6 @@ TEST( BasicMem, ElemWiseOperations )
 {
 	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 
-	{
-	// POD
-
 	const size_t N = 5;
 
 	int src0[N] = {1, 3, 4, 5, 2};
@@ -118,69 +114,18 @@ TEST( BasicMem, ElemWiseOperations )
 	int *p = alloc.allocate(N, BCS_NULL);
 	for (size_t i = 0; i < N; ++i) p[i] = 0;
 
-	copy_construct_elements(src, p, N);
-	EXPECT_TRUE( collection_equal(p, p+N, src, N) );
-	EXPECT_TRUE( elements_equal(src, p, N) );
+	mem<int>::fill(p, N, 7);
+	EXPECT_TRUE( mem<int>::equal(p, 7, N) );
 	p[2] = 0;
-	EXPECT_FALSE( elements_equal(src, p, N) );
+	EXPECT_FALSE( mem<int>::equal(p, 7, N) );
 
-	fill_elements(p, N, 7);
-	EXPECT_TRUE( elements_equal(7, p, N) );
-	p[2] = 0;
-	EXPECT_FALSE( elements_equal(7, p, N) );
+	mem<int>::copy(src, p, N);
+	EXPECT_TRUE( mem<int>::equal(p, src, N) );
 
-	copy_elements(src, p, N);
-	EXPECT_TRUE( elements_equal(p, src, N) );
-
-	set_zeros_to_elements(p, N);
-	EXPECT_TRUE( elements_equal(0, p, N) );
+	mem<int>::zero(p, N);
+	EXPECT_TRUE( mem<int>::equal(p, int(0), N) );
 
 	alloc.deallocate(p, N);
-
-	// non-POD
-
-	EXPECT_EQ( MyInt::num_objects(), 0 );
-
-	std::vector<MyInt> objvec;
-	objvec.push_back( MyInt(1) );
-	objvec.push_back( MyInt(3) );
-	objvec.push_back( MyInt(4) );
-	objvec.push_back( MyInt(5) );
-	objvec.push_back( MyInt(2) );
-
-	EXPECT_EQ( MyInt::num_objects(), N );
-	const MyInt *obj_src = objvec.data();
-
-	aligned_allocator<MyInt> obj_alloc;
-
-	MyInt *q = obj_alloc.allocate(N, BCS_NULL);
-	ASSERT_EQ( MyInt::num_objects(), N );
-
-	copy_construct_elements(obj_src, q, N);
-	ASSERT_EQ( MyInt::num_objects(), 2 * N );
-	EXPECT_TRUE( elements_equal(q, obj_src, N) );
-	q[2] = MyInt(0);
-	EXPECT_FALSE( elements_equal(q, obj_src, N) );
-
-	fill_elements(q, N, MyInt(1));
-	ASSERT_EQ( MyInt::num_objects(), 2 * N );
-	EXPECT_TRUE( elements_equal(MyInt(1), q, N) );
-	q[2] = MyInt(0);
-	EXPECT_FALSE( elements_equal(MyInt(1), q, N) );
-
-	copy_elements(obj_src, q, N);
-	ASSERT_EQ( MyInt::num_objects(), 2 * N );
-	EXPECT_TRUE( elements_equal(q, obj_src, N) );
-
-	destruct_elements(q, N);
-	ASSERT_EQ( MyInt::num_objects(), N );
-
-	obj_alloc.deallocate(q, N);
-
-	objvec.clear();
-	ASSERT_EQ( MyInt::num_objects(), 0 );
-
-	}
 
 	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 }
@@ -205,14 +150,14 @@ TEST( BasicMem, ConstBlocks )
 
 	cblk_t B1(N, int(2));
 	EXPECT_TRUE( test_block(B1, true, N) );
-	EXPECT_TRUE( elements_equal(int(2), B1.pbase(), N) );
+	EXPECT_TRUE( mem<int>::equal(B1.pbase(), int(2), N) );
 
 	CHECK_MEM_PENDING( 1 );
 
 	cblk_t B2(copy_blk(src, N));
 	EXPECT_TRUE( test_block(B2, true, N) );
 	EXPECT_TRUE( B2.pbase() != src );
-	EXPECT_TRUE( elements_equal(B2.pbase(), src, N) );
+	EXPECT_TRUE( mem<int>::equal(B2.pbase(), src, N) );
 
 	CHECK_MEM_PENDING( 2 );
 
@@ -227,7 +172,7 @@ TEST( BasicMem, ConstBlocks )
 	EXPECT_TRUE( test_block(B2, true, N, p2) );
 	EXPECT_TRUE( test_block(B2c, true, N) );
 	EXPECT_TRUE( B2c.pbase() != p2 );
-	EXPECT_TRUE( elements_equal(B2.pbase(), B2c.pbase(), N) );
+	EXPECT_TRUE( mem<int>::equal(B2.pbase(), B2c.pbase(), N) );
 
 	CHECK_MEM_PENDING( 3 );
 
@@ -275,14 +220,14 @@ TEST( BasicMem, Blocks )
 
 	blk_t B1(N, int(2));
 	EXPECT_TRUE( test_block(B1, true, N) );
-	EXPECT_TRUE( elements_equal(int(2), B1.pbase(), N) );
+	EXPECT_TRUE( mem<int>::equal(B1.pbase(), int(2), N) );
 
 	CHECK_MEM_PENDING( 1 );
 
 	blk_t B2(copy_blk(src, N));
 	EXPECT_TRUE( test_block(B2, true, N) );
 	EXPECT_TRUE( B2.pbase() != src );
-	EXPECT_TRUE( elements_equal(B2.pbase(), src, N) );
+	EXPECT_TRUE( mem<int>::equal(B2.pbase(), src, N) );
 
 	CHECK_MEM_PENDING( 2 );
 
@@ -297,7 +242,7 @@ TEST( BasicMem, Blocks )
 	EXPECT_TRUE( test_block(B2, true, N, p2) );
 	EXPECT_TRUE( test_block(B2c, true, N) );
 	EXPECT_TRUE( B2c.pbase() != p2 );
-	EXPECT_TRUE( elements_equal(B2.pbase(), B2c.pbase(), N) );
+	EXPECT_TRUE( mem<int>::equal(B2.pbase(), B2c.pbase(), N) );
 
 	CHECK_MEM_PENDING( 3 );
 

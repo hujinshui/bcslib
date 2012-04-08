@@ -1207,10 +1207,10 @@ TEST( Array2D, ViewCopy )
 	double e3_buf[4 * N];
 	double a4_buf[N];
 
-	set_zeros_to_elements(a1_buf, N);
-	set_zeros_to_elements(e2_buf, 4 * N);
-	set_zeros_to_elements(e3_buf, 4 * N);
-	set_zeros_to_elements(a4_buf, N);
+	mem<double>::zero(a1_buf, N);
+	mem<double>::zero(e2_buf, 4 * N);
+	mem<double>::zero(e3_buf, 4 * N);
+	mem<double>::zero(a4_buf, N);
 
 	// row major
 
@@ -1232,10 +1232,10 @@ TEST( Array2D, ViewCopy )
 	copy(e3_rm, a4_rm);
 	ASSERT_TRUE( array2d_equal(a4_rm, make_caview2d_rm(a0_buf, m, n) ));
 
-	set_zeros_to_elements(a1_buf, N);
-	set_zeros_to_elements(e2_buf, 4 * N);
-	set_zeros_to_elements(e3_buf, 4 * N);
-	set_zeros_to_elements(a4_buf, N);
+	mem<double>::zero(a1_buf, N);
+	mem<double>::zero(e2_buf, 4 * N);
+	mem<double>::zero(e3_buf, 4 * N);
+	mem<double>::zero(a4_buf, N);
 
 	// column_major
 
