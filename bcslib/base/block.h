@@ -18,367 +18,16 @@
 
 namespace bcs
 {
-	// forward declarations
-
-    template<typename T, class Allocator> class const_block;
-    template<typename T, class Allocator> class block;
-
 
     /********************************************
      *
-     *   block implementation details
+     *   block
      *
      ********************************************/
 
-	namespace _detail
-	{
-    	template<typename T, typename Allocator>
-    	class block_impl
-    	{
-    	public:
-    		typedef T value_type;
-    		typedef Allocator allocator_type;
-
-    		typedef typename allocator_type::size_type size_type;
-    		typedef typename allocator_type::difference_type difference_type;
-
-    		typedef typename allocator_type::pointer pointer;
-    		typedef typename allocator_type::reference reference;
-    		typedef typename allocator_type::const_pointer const_pointer;
-    		typedef typename allocator_type::const_reference const_reference;
-
-    	public:
-    		block_impl(pointer p, size_type n)
-    		: m_allocator()
-    		, m_base(p), m_n(n), m_own(false)
-    		{
-    		}
-
-    		explicit block_impl(size_type n, const allocator_type& allocator = allocator_type())
-    		: m_allocator(allocator)
-    		, m_base(safe_alloc(n)), m_n(n), m_own(true)
-    		{
-    		}
-
-    		block_impl(size_type n, const_reference v, const allocator_type& allocator = allocator_type())
-    		: m_allocator(allocator)
-    		, m_base(safe_alloc(n)), m_n(n), m_own(true)
-    		{
-    			if (n > 0) mem<value_type>::fill(m_base, n, v);
-    		}
-
-
-    		block_impl(size_type n, const_pointer src, const allocator_type& allocator = allocator_type())
-    		: m_allocator(allocator)
-    		, m_base(safe_alloc(n)), m_n(n), m_own(true)
-    		{
-    			if (n > 0) mem<value_type>::copy(src, m_base, n);
-    		}
-
-
-    		~block_impl()
-    		{
-    			if (m_own)
-    			{
-    				safe_dealloc(m_base, m_n);
-    			}
-    		}
-
-    		void release()
-    		{
-    			if (m_own)
-    			{
-    				safe_dealloc(m_base, m_n);
-    			}
-
-    			m_base = BCS_NULL;
-    			m_n = 0;
-    			m_own = false;
-    		}
-
-    		block_impl(const block_impl& r)
-    		: m_allocator(r.m_allocator)
-    		, m_base(r.m_own ? safe_alloc(r.m_n) : r.m_base)
-    		, m_n(r.m_n)
-    		, m_own(r.m_own)
-    		{
-    			if (m_own && r.m_n > 0) mem<value_type>::copy(r.m_base, m_base, r.m_n);
-    		}
-
-    		void swap(block_impl& r)
-    		{
-    			using std::swap;
-
-    			swap(m_allocator, r.m_allocator);
-    			swap(m_base, r.m_base);
-    			swap(m_n, r.m_n);
-    			swap(m_own, r.m_own);
-    		}
-
-    		void operator = (const block_impl& r)
-    		{
-    			if (this !=  &r)
-    			{
-    				block_impl tmp(r);
-    				swap(tmp);
-    			}
-    		}
-
-    	public:
-    		size_type nelems() const
-    		{
-    			return m_n;
-    		}
-
-    		const_pointer pbase() const
-    		{
-    			return m_base;
-    		}
-
-    		pointer pbase()
-    		{
-    			return m_base;
-    		}
-
-    		const_reference get(size_type i) const
-    		{
-    			return m_base[i];
-    		}
-
-    		reference get(size_type i)
-    		{
-    			return m_base[i];
-    		}
-
-    		const allocator_type& get_allocator() const
-    		{
-    			return m_allocator;
-    		}
-
-    		bool own_memory() const
-    		{
-    			return m_own;
-    		}
-
-    	private:
-    		pointer safe_alloc(size_type n)
-    		{
-    			return n > 0 ? m_allocator.allocate(n) : BCS_NULL;
-    		}
-
-    		void safe_dealloc(pointer p, size_t n)
-    		{
-    			m_allocator.deallocate(p, n);
-    		}
-
-    	private:
-    		allocator_type m_allocator;
-    		pointer m_base;
-    		size_type m_n;
-    		bool m_own;
-
-    	}; // end class block_impl
-	}
-
-
-	/********************************************
-	 *
-	 *	const_block and block
-	 *
-	 ********************************************/
-
-    // different ways of input memory
-
-    template<typename T>
-    class cref_blk_t
-    {
-    public:
-    	cref_blk_t(const T* base, size_t n)
-    	: m_base(base), m_n(n)
-    	{
-    	}
-
-		size_t nelems() const
-		{
-			return m_n;
-		}
-
-		const T* pbase() const
-		{
-			return m_base;
-		}
-
-		const T* pend() const
-		{
-			return m_base + m_n;
-		}
-
-    private:
-    	const T *m_base;
-    	size_t m_n;
-    };
-
-
-    template<typename T>
-    class ref_blk_t
-    {
-    public:
-    	ref_blk_t(T* base, size_t n)
-    	: m_base(base), m_n(n)
-    	{
-    	}
-
-		size_t nelems() const
-		{
-			return m_n;
-		}
-
-		T* pbase() const
-		{
-			return m_base;
-		}
-
-		T* pend() const
-		{
-			return m_base + m_n;
-		}
-
-    private:
-    	T *m_base;
-    	size_t m_n;
-    };
-
-
-    template<typename T>
-    class copy_blk_t
-    {
-    public:
-    	copy_blk_t(const T* base, size_t n)
-    	: m_base(base), m_n(n)
-    	{
-    	}
-
-		size_t nelems() const
-		{
-			return m_n;
-		}
-
-		const T* pbase() const
-		{
-			return m_base;
-		}
-
-		const T* pend() const
-		{
-			return m_base + m_n;
-		}
-
-    private:
-    	const T *m_base;
-    	size_t m_n;
-    };
-
-
-    template<typename T, typename Allocator=aligned_allocator<T> >
-	class const_block
-	{
-	public:
-		typedef T value_type;
-		typedef Allocator allocator_type;
-
-		typedef typename allocator_type::size_type size_type;
-		typedef typename allocator_type::difference_type difference_type;
-
-		typedef typename allocator_type::pointer pointer;
-		typedef typename allocator_type::reference reference;
-		typedef typename allocator_type::const_pointer const_pointer;
-		typedef typename allocator_type::const_reference const_reference;
-
-	public:
-		explicit const_block(const cref_blk_t<value_type>& src)
-		: m_impl(const_cast<pointer>(src.pbase()), src.nelems())
-		{
-		}
-
-		const_block(const size_type& n, const_reference v)
-		: m_impl(n, v)
-		{
-		}
-
-		const_block(const size_type& n, const_reference v, const allocator_type& allocator)
-		: m_impl(n, v, allocator)
-		{
-		}
-
-		explicit const_block(const copy_blk_t<value_type>& src)
-		: m_impl(src.nelems(), src.pbase())
-		{
-		}
-
-		const_block(const copy_blk_t<value_type>& src, const allocator_type& allocator)
-		: m_impl(src.nelems(), src.pbase(), allocator)
-		{
-		}
-
-
-		const_block(const const_block& r)
-		: m_impl(r.m_impl)
-		{
-		}
-
-		const_block& operator = (const const_block& r)
-		{
-			m_impl = r.m_impl;
-			return *this;
-		}
-
-		void swap(const_block& r)
-		{
-			m_impl.swap(r.m_impl);
-		}
-
-	public:
-		size_type nelems() const
-		{
-			return m_impl.nelems();
-		}
-
-		bool own_memory() const
-		{
-			return m_impl.own_memory();
-		}
-
-		const allocator_type& get_allocator() const
-		{
-			return m_impl.get_allocator();
-		}
-
-		const_pointer pbase() const
-		{
-			return m_impl.pbase();
-		}
-
-		const_pointer pend() const
-		{
-			return m_impl.pbase() + m_impl.nelems();
-		}
-
-		const_reference operator[](size_type i) const
-		{
-			return m_impl.get(i);
-		}
-
-	private:
-		_detail::block_impl<T, Allocator> m_impl;
-
-	}; // end class const_block
-
-
-    template<typename T, typename Allocator=aligned_allocator<T> >
+	template<typename T, typename Allocator>
 	class block
 	{
-    	friend class const_block<T, Allocator>;
-
 	public:
 		typedef T value_type;
 		typedef Allocator allocator_type;
@@ -391,267 +40,393 @@ namespace bcs
 		typedef typename allocator_type::const_pointer const_pointer;
 		typedef typename allocator_type::const_reference const_reference;
 
+		typedef index_t index_type;
+
 	public:
-		explicit block(const ref_blk_t<value_type>& src)
-		: m_impl(src.pbase(), src.nelems())
+		explicit block(index_type len, const allocator_type& allocator = allocator_type())
+		: m_allocator(allocator)
+		, m_len(len)
+		, m_data(safe_alloc(len))
 		{
 		}
 
-		explicit block(const size_type& n)
-		: m_impl(n)
+		block(index_type len, const value_type& v, const allocator_type& allocator = allocator_type())
+		: m_allocator(allocator)
+		, m_len(len)
+		, m_data(safe_alloc(len))
 		{
+			if (len > 0) mem<T>::fill(m_data, v);
 		}
 
-		block(const size_type& n, const allocator_type& allocator)
-		: m_impl(n, allocator)
+		block(index_type len, const_pointer src, const allocator_type& allocator = allocator_type())
+		: m_allocator(allocator)
+		, m_len(len)
+		, m_data(safe_alloc(len))
 		{
+			if (len > 0) mem<T>::copy(src, m_data, len);
 		}
 
-		block(const size_type& n, const_reference v)
-		: m_impl(n, v)
+		block(const block& s, const allocator_type& allocator = allocator_type())
+		: m_allocator(allocator)
+		, m_len(s.m_len)
+		, m_data(safe_alloc(m_len))
 		{
+			if (m_len > 0) mem<T>::copy(s.pbase(), m_data, m_len);
 		}
 
-		block(const size_type& n, const_reference v, const allocator_type& allocator)
-		: m_impl(n, v, allocator)
+		~block()
 		{
-		}
-
-		explicit block(const copy_blk_t<value_type>& src)
-		: m_impl(src.nelems(), src.pbase())
-		{
-		}
-
-		block(const copy_blk_t<value_type>& src, const allocator_type& allocator)
-		: m_impl(src.nelems(), src.pbase(), allocator)
-		{
-		}
-
-		block(const block& r)
-		: m_impl(r.m_impl)
-		{
-		}
-
-		block& operator = (const block& r)
-		{
-			m_impl = r.m_impl;
-			return *this;
+			safe_dealloc(m_data, m_len);
 		}
 
 		void swap(block& r)
 		{
-			m_impl.swap(r.m_impl);
+			using std::swap;
+
+			swap(m_allocator, r.m_allocator);
+			swap(m_len, r.m_len);
+			swap(m_data, r.m_data);
+		}
+
+		block& operator = (const block& r)
+		{
+			if (this != &r)
+			{
+				swap(block(r));
+			}
+			return *this;
 		}
 
 	public:
-		size_type nelems() const
+		size_type size() const
 		{
-			return m_impl.nelems();
+			return (size_type)m_len;
 		}
 
-		bool own_memory() const
+		index_type nelems() const
 		{
-			return m_impl.own_memory();
-		}
-
-		const allocator_type& get_allocator() const
-		{
-			return m_impl.get_allocator();
+			return m_len;
 		}
 
 		const_pointer pbase() const
 		{
-			return m_impl.pbase();
+			return m_data;
 		}
 
 		pointer pbase()
 		{
-			return m_impl.pbase();
+			return m_data;
 		}
 
 		const_pointer pend() const
 		{
-			return m_impl.pbase() + m_impl.nelems();
+			return m_data + m_len;
 		}
 
 		pointer pend()
 		{
-			return m_impl.pbase() + m_impl.nelems();
+			return m_data + m_len;
 		}
 
-		const_reference operator[](size_type i) const
+		const allocator_type& get_allocator() const
 		{
-			return m_impl.get(i);
+			return m_allocator;
 		}
 
-		reference operator[](size_type i)
+		const_reference operator[] (index_type i) const
 		{
-			return m_impl.get(i);
+			return m_data[i];
+		}
+
+		reference operator[] (index_type i)
+		{
+			return m_data[i];
 		}
 
 	private:
-		_detail::block_impl<T, Allocator> m_impl;
+		pointer safe_alloc(index_type n)
+		{
+			return n > 0 ? m_allocator.allocate((size_type)n) : BCS_NULL;
+		}
+
+		void safe_dealloc(pointer p, index_type n)
+		{
+			m_allocator.deallocate(p, (size_type)n);
+		}
+
+	private:
+		allocator_type m_allocator;
+		index_type m_len;
+		pointer m_data;
 
 	}; // end class block
 
-	// specialize swap for const_block and block
 
-	template<typename T, class Allocator>
-	inline void swap(bcs::const_block<T, Allocator>& lhs, bcs::const_block<T, Allocator>& rhs)
-	{
-		lhs.swap(rhs);
-	}
-
-	template<typename T, class Allocator>
-	inline void swap(bcs::block<T, Allocator>& lhs, bcs::block<T, Allocator>& rhs)
-	{
-		lhs.swap(rhs);
-	}
-
-
-	// convenient routines
-
-    template<typename T>
-    inline cref_blk_t<T> cref_blk(const T *p, size_t n)
-    {
-    	return cref_blk_t<T>(p, n);
-    }
-
-    template<typename T, class Allocator>
-    inline cref_blk_t<T> cref_blk(const const_block<T, Allocator>& blk)
-    {
-    	return cref_blk_t<T>(blk.pbase(), blk.nelems());
-    }
-
-    template<typename T, class Allocator>
-    inline cref_blk_t<T> cref_blk(const block<T, Allocator>& blk)
-    {
-    	return cref_blk_t<T>(blk.pbase(), blk.nelems());
-    }
-
-    template<typename T>
-    inline ref_blk_t<T> ref_blk(T *p, size_t n)
-    {
-    	return ref_blk_t<T>(p, n);
-    }
-
-    template<typename T, class Allocator>
-    inline ref_blk_t<T> ref_blk(block<T, Allocator>& blk)
-    {
-    	return ref_blk_t<T>(blk.pbase(), blk.nelems());
-    }
-
-
-    template<typename T>
-    inline copy_blk_t<T> copy_blk(const T *p, size_t n)
-    {
-    	return copy_blk_t<T>(p, n);
-    }
-
-    template<typename T, class Allocator>
-    inline copy_blk_t<T> copy_blk(const const_block<T, Allocator>& blk)
-    {
-    	return copy_blk_t<T>(blk.pbase(), blk.nelems());
-    }
-
-    template<typename T, class Allocator>
-    inline copy_blk_t<T> copy_blk(const block<T, Allocator>& blk)
-    {
-    	return copy_blk_t<T>(blk.pbase(), blk.nelems());
-    }
-
-
-    /**********************************************
+    /********************************************
      *
-     *  shared block
+     *   scoped_block
      *
-     **********************************************/
+     ********************************************/
 
-    template<typename T, class Allocator=aligned_allocator<T> >
-    class shared_block
-    {
-    public:
-    	typedef block<T, Allocator> block_type;
+	template<typename T, typename Allocator>
+	class scoped_block : private noncopyable
+	{
+	public:
+		typedef T value_type;
+		typedef Allocator allocator_type;
 
-    	explicit shared_block(size_t n)
-    	: m_sp_block(new block_type(n))
-    	{
-    	}
+		typedef typename allocator_type::size_type size_type;
+		typedef typename allocator_type::difference_type difference_type;
 
-    	shared_block(size_t n, const T& v)
-    	: m_sp_block(new block_type(n, v))
-    	{
-    	}
+		typedef typename allocator_type::pointer pointer;
+		typedef typename allocator_type::reference reference;
+		typedef typename allocator_type::const_pointer const_pointer;
+		typedef typename allocator_type::const_reference const_reference;
 
-    	shared_block(size_t n, const T *src)
-    	: m_sp_block(new block_type(copy_blk(src, n)))
-    	{
-    	}
+		typedef index_t index_type;
 
-    public:
-    	size_t nelems() const
-    	{
-    		return m_sp_block->nelems();
-    	}
+	public:
+		explicit scoped_block(index_type len, const allocator_type& allocator = allocator_type())
+		: m_allocator(allocator)
+		, m_len(len)
+		, m_data(safe_alloc(len))
+		{
+		}
 
-    	T* pbase()
-    	{
-    		return m_sp_block->pbase();
-    	}
+		scoped_block(index_type len, const value_type& v, const allocator_type& allocator = allocator_type())
+		: m_allocator(allocator)
+		, m_len(len)
+		, m_data(safe_alloc(len))
+		{
+			if (len > 0) mem<T>::fill(m_data, v);
+		}
 
-    	const T* pbase() const
-    	{
-    		return m_sp_block->pbase();
-    	}
+		scoped_block(index_type len, const_pointer src, const allocator_type& allocator = allocator_type())
+		: m_allocator(allocator)
+		, m_len(len)
+		, m_data(safe_alloc(len))
+		{
+			if (len > 0) mem<T>::copy(src, m_data, len);
+		}
 
-    	T* pend()
-    	{
-    		return pbase() + nelems();
-    	}
+		~scoped_block()
+		{
+			safe_dealloc(m_data, m_len);
+		}
 
-    	const T* pend() const
-    	{
-    		return pbase() + nelems();
-    	}
+	public:
+		size_type size() const
+		{
+			return (size_type)m_len;
+		}
 
-    	const T& operator[] (size_t i) const
-    	{
-    		return pbase()[i];
-    	}
+		index_type nelems() const
+		{
+			return m_len;
+		}
 
-    	T& operator[] (size_t i)
-    	{
-    		return pbase()[i];
-    	}
+		const_pointer pbase() const
+		{
+			return m_data;
+		}
 
-    public:
-    	void swap(shared_block& r)
-    	{
-    		m_sp_block.swap(r.m_sp_block);
-    	}
+		pointer pbase()
+		{
+			return m_data;
+		}
 
-    	bool is_unique() const
-    	{
-    		return m_sp_block.unique();
-    	}
+		const_pointer pend() const
+		{
+			return m_data + m_len;
+		}
 
-    	void make_unique()
-    	{
-    		if (!is_unique())
-    		{
-    			m_sp_block.reset(new block_type(*m_sp_block));
-    		}
-    	}
+		pointer pend()
+		{
+			return m_data + m_len;
+		}
 
-    	shared_block deep_copy() const
-    	{
-    		return shared_block(nelems(), pbase());
-    	}
+		const allocator_type& get_allocator() const
+		{
+			return m_allocator;
+		}
 
-    private:
-    	shared_ptr<block_type> m_sp_block;
+		const_reference operator[] (index_type i) const
+		{
+			return m_data[i];
+		}
 
-    }; // end class sharable_storage_base
+		reference operator[] (index_type i)
+		{
+			return m_data[i];
+		}
+
+	private:
+		pointer safe_alloc(index_type n)
+		{
+			return n > 0 ? m_allocator.allocate((size_type)n) : BCS_NULL;
+		}
+
+		void safe_dealloc(pointer p, index_type n)
+		{
+			m_allocator.deallocate(p, (size_type)n);
+		}
+
+	private:
+		allocator_type m_allocator;
+		index_type m_len;
+		pointer m_data;
+
+	}; // end class scoped_block
+
+
+    /********************************************
+     *
+     *   shared_block
+     *
+     ********************************************/
+
+	template<typename T, typename Allocator>
+	class shared_block
+	{
+	public:
+		typedef T value_type;
+		typedef Allocator allocator_type;
+
+		typedef typename allocator_type::size_type size_type;
+		typedef typename allocator_type::difference_type difference_type;
+
+		typedef typename allocator_type::pointer pointer;
+		typedef typename allocator_type::reference reference;
+		typedef typename allocator_type::const_pointer const_pointer;
+		typedef typename allocator_type::const_reference const_reference;
+
+		typedef index_t index_type;
+		typedef block<T, Allocator> block_type;
+
+	public:
+		explicit shared_block(index_type len, const allocator_type& allocator = allocator_type())
+		: m_ptr(new block_type(len, allocator))
+		, m_len(len)
+		, m_data(m_ptr->pbase())
+		{
+		}
+
+		shared_block(index_type len, const value_type& v, const allocator_type& allocator = allocator_type())
+		: m_ptr(new block_type(len, v, allocator))
+		, m_len(len)
+		, m_data(m_ptr->pbase())
+		{
+		}
+
+		shared_block(index_type len, const_pointer src, const allocator_type& allocator = allocator_type())
+		: m_ptr(new block_type(len, src, allocator))
+		, m_len(len)
+		, m_data(m_ptr->pbase())
+		{
+		}
+
+		shared_block(const block_type& s, const allocator_type& allocator = allocator_type())
+		: m_ptr(new block_type(s, allocator))
+		, m_len(s.nelems())
+		, m_data(m_ptr->pbase())
+		{
+		}
+
+		shared_block(shared_block& s)
+		: m_ptr(s.m_ptr)
+		, m_len(s.nelems())
+		, m_data(s.pbase())
+		{
+		}
+
+		void swap(shared_block& r)
+		{
+			using std::swap;
+			swap(m_ptr, r.m_ptr);
+			swap(m_len, r.m_len);
+			swap(m_data, r.m_data);
+		}
+
+		shared_block& operator = (shared_block& r)
+		{
+			if (m_ptr != r.m_ptr)
+			{
+				swap(shared_block(r));
+			}
+			return *this;
+		}
+
+		shared_block clone() const
+		{
+			return shared_block(*m_ptr);
+		}
+
+		void make_unique()
+		{
+			if (!m_ptr.unique())
+			{
+				swap(shared_block(*m_ptr));
+			}
+		}
+
+	public:
+		bool unique() const
+		{
+			return m_ptr.unique();
+		}
+
+		size_type size() const
+		{
+			return (size_type)m_len;
+		}
+
+		index_type nelems() const
+		{
+			return m_len;
+		}
+
+		const_pointer pbase() const
+		{
+			return m_data;
+		}
+
+		pointer pbase()
+		{
+			return m_data;
+		}
+
+		const_pointer pend() const
+		{
+			return m_data + m_len;
+		}
+
+		pointer pend()
+		{
+			return m_data + m_len;
+		}
+
+		const allocator_type& get_allocator() const
+		{
+			return m_ptr->get_allocator();
+		}
+
+		const_reference operator[] (index_type i) const
+		{
+			return m_data[i];
+		}
+
+		reference operator[] (index_type i)
+		{
+			return m_data[i];
+		}
+
+	private:
+		shared_ptr<block_type> m_ptr;
+		index_type m_len;
+		pointer m_data;
+
+	}; // end class shared_block
+
 
 }
 

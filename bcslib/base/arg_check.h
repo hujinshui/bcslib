@@ -37,6 +37,24 @@ namespace bcs
 	};
 
 
+	class out_of_range : public std::exception
+	{
+	public:
+		out_of_range(const char *msg)
+		: m_msg(msg)
+		{
+		}
+
+		virtual const char* what() const throw()
+		{
+			return m_msg;
+		}
+
+	private:
+		const char *m_msg;
+	};
+
+
 	// generic argument checking
 
 	inline void check_arg(bool cond)
@@ -52,6 +70,22 @@ namespace bcs
 		if (!cond)
 		{
 			throw invalid_argument(message);
+		}
+	}
+
+	inline void check_range(bool cond)
+	{
+		if (!cond)
+		{
+			throw out_of_range("Out of range");
+		}
+	}
+
+	inline void check_range(bool cond, const char *message)
+	{
+		if (!cond)
+		{
+			throw out_of_range(message);
 		}
 	}
 
