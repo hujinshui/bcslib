@@ -13,24 +13,30 @@
 
 #include <bcslib/base/basic_defs.h>
 #include <string>
+#include <exception>
 
 namespace bcs { namespace matlab {
 
 	// exception class
 
-	class mexception
+	class mexception : public std::exception
 	{
 	public:
 		mexception(const char *id, const char *msg) : m_identifier(id), m_message(msg)
 		{
 		}
 
-		const char *identifier() const
+		const char *identifier() const throw()
 		{
 			return m_identifier.c_str();
 		}
 
-		const char *message() const
+		const char *message() const throw()
+		{
+			return m_message.c_str();
+		}
+
+		const char *what() const throw ()
 		{
 			return m_message.c_str();
 		}

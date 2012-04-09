@@ -232,7 +232,7 @@ namespace bcs { namespace matlab {
 			return (index_t)mxGetNumberOfFields(m_pa);
 		}
 
-		const char* field_name(int fieldnum) const
+		const char* field_name(index_t fieldnum) const
 		{
 			return mxGetFieldNameByNumber(m_pa, fieldnum);
 		}
@@ -242,12 +242,12 @@ namespace bcs { namespace matlab {
 			return mxGetFieldNumber(m_pa, fieldname);
 		}
 
-		const_marray get_field(int i, const char *fieldname) const
+		const_marray get_field(index_t i, const char *fieldname) const
 		{
 			return mxGetField(m_pa, i, fieldname);
 		}
 
-		const_marray get_field(int i, int fieldnum) const
+		const_marray get_field(index_t i, int fieldnum) const
 		{
 			return mxGetFieldByNumber(m_pa, i, fieldnum);
 		}
@@ -260,14 +260,14 @@ namespace bcs { namespace matlab {
 			return nelems();
 		}
 
-		const_marray get_cell(int i) const
+		const_marray get_cell(index_t i) const
 		{
 			return mxGetCell(m_pa, i);
 		}
 
 		// object related
 
-		const_marray get_property(int i, const char *propertyname) const
+		const_marray get_property(index_t i, const char *propertyname) const
 		{
 			return mxGetProperty(m_pa, i, propertyname);
 		}

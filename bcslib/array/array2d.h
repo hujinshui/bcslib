@@ -374,6 +374,25 @@ namespace bcs
 
 	/******************************************************
 	 *
+	 *  Typedefs
+	 *
+	 ******************************************************/
+
+	typedef array2d<double>   mat_f64;
+	typedef array2d<float>    mat_f32;
+	typedef array2d<int64_t>  mat_i64;
+	typedef array2d<uint64_t> mat_u64;
+	typedef array2d<int32_t>  mat_i32;
+	typedef array2d<uint32_t> mat_u32;
+	typedef array2d<int16_t>  mat_i16;
+	typedef array2d<uint16_t> mat_u16;
+	typedef array2d<int8_t>   mat_i8;
+	typedef array2d<uint8_t>  mat_u8;
+
+
+
+	/******************************************************
+	 *
 	 *  Transposition
 	 *
 	 ******************************************************/

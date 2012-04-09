@@ -432,6 +432,35 @@ namespace bcs
 
 	/************************************
 	 *
+	 *  Typedefs
+	 *
+	 ************************************/
+
+	typedef caview1d<double>   cvec_f64_view;
+	typedef caview1d<float>    cvec_f32_view;
+	typedef caview1d<int64_t>  cvec_i64_view;
+	typedef caview1d<uint64_t> cvec_u64_view;
+	typedef caview1d<int32_t>  cvec_i32_view;
+	typedef caview1d<uint32_t> cvec_u32_view;
+	typedef caview1d<int16_t>  cvec_i16_view;
+	typedef caview1d<uint16_t> cvec_u16_view;
+	typedef caview1d<int8_t>   cvec_i8_view;
+	typedef caview1d<uint8_t>  cvec_u8_view;
+
+	typedef aview1d<double>   vec_f64_view;
+	typedef aview1d<float>    vec_f32_view;
+	typedef aview1d<int64_t>  vec_i64_view;
+	typedef aview1d<uint64_t> vec_u64_view;
+	typedef aview1d<int32_t>  vec_i32_view;
+	typedef aview1d<uint32_t> vec_u32_view;
+	typedef aview1d<int16_t>  vec_i16_view;
+	typedef aview1d<uint16_t> vec_u16_view;
+	typedef aview1d<int8_t>   vec_i8_view;
+	typedef aview1d<uint8_t>  vec_u8_view;
+
+
+	/************************************
+	 *
 	 *  Convenient functions
 	 *
 	 ************************************/
