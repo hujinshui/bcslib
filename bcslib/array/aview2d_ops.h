@@ -20,35 +20,19 @@ namespace bcs
 {
 	// Comparison
 
-	template<class LDerived, class RDerived, typename T, typename TOrd>
+	template<class LDerived, class RDerived, typename T>
 	inline bool is_equal(
-			const IConstContinuousAView2D<LDerived, T, TOrd>& lhs,
-			const IConstContinuousAView2D<RDerived, T, TOrd>& rhs)
+			const IConstContinuousAView2D<LDerived, T>& lhs,
+			const IConstContinuousAView2D<RDerived, T>& rhs)
 	{
-		return is_same_shape(lhs, rhs) && mem<T>::equal(lhs.pbase(), rhs.pbase(), lhs.size());
+		return is_same_shape(lhs, rhs) && mem<T>::equal(lhs.size(), lhs.pbase(), rhs.pbase());
 	}
 
 
 	// Import
 
 	template<class Derived, typename T>
-	inline void import_from(IRegularAView2D<Derived, T, row_major_t>& a, const T *src)
-	{
-		Derived& ad = a.derived();
-		index_t m = a.nrows();
-		index_t n = a.ncolumns();
-
-		for (index_t i = 0; i < m; ++i)
-		{
-			for (index_t j = 0; j < n; ++j)
-			{
-				ad(i, j) = *(src++);
-			}
-		}
-	}
-
-	template<class Derived, typename T>
-	inline void import_from(IRegularAView2D<Derived, T, column_major_t>& a, const T *src)
+	inline void import_from(IRegularAView2D<Derived, T>& a, const T *src)
 	{
 		Derived& ad = a.derived();
 		index_t m = a.nrows();
@@ -63,33 +47,17 @@ namespace bcs
 		}
 	}
 
-	template<class Derived, typename T, typename TOrd>
-	inline void import_from(IContinuousAView2D<Derived, T, TOrd>& a, const T *src)
+	template<class Derived, typename T>
+	inline void import_from(IContinuousAView2D<Derived, T>& a, const T *src)
 	{
-		mem<T>::copy(src, a.pbase(), a.size());
+		mem<T>::copy(a.size(), src, a.pbase());
 	}
 
 
 	// Export
 
 	template<class Derived, typename T>
-	inline void export_to(const IConstRegularAView2D<Derived, T, row_major_t>& a, T *dst)
-	{
-		const Derived& ad = a.derived();
-		index_t m = a.nrows();
-		index_t n = a.ncolumns();
-
-		for (index_t i = 0; i < m; ++i)
-		{
-			for (index_t j = 0; j < n; ++j)
-			{
-				*(dst++) = ad(i, j);
-			}
-		}
-	}
-
-	template<class Derived, typename T>
-	inline void export_to(const IConstRegularAView2D<Derived, T, column_major_t>& a, T *dst)
+	inline void export_to(const IConstRegularAView2D<Derived, T>& a, T *dst)
 	{
 		const Derived& ad = a.derived();
 		index_t m = a.nrows();
@@ -104,33 +72,17 @@ namespace bcs
 		}
 	}
 
-	template<class Derived, typename T, typename TOrd>
-	inline void export_to(const IConstContinuousAView2D<Derived, T, TOrd>& a, T *dst)
+	template<class Derived, typename T>
+	inline void export_to(const IConstContinuousAView2D<Derived, T>& a, T *dst)
 	{
-		mem<T>::copy(a.pbase(), dst, a.size());
+		mem<T>::copy(a.size(), a.pbase(), dst);
 	}
 
 
 	// Fill
 
 	template<class Derived, typename T>
-	inline void fill(IRegularAView2D<Derived, T, row_major_t>& a, const typename Derived::value_type& v)
-	{
-		Derived& ad = a.derived();
-		index_t m = a.nrows();
-		index_t n = a.ncolumns();
-
-		for (index_t i = 0; i < m; ++i)
-		{
-			for (index_t j = 0; j < n; ++j)
-			{
-				ad(i, j) = v;
-			}
-		}
-	}
-
-	template<class Derived, typename T>
-	inline void fill(IRegularAView2D<Derived, T, column_major_t>& a, const typename Derived::value_type& v)
+	inline void fill(IRegularAView2D<Derived, T>& a, const T& v)
 	{
 		Derived& ad = a.derived();
 		index_t m = a.nrows();
@@ -145,8 +97,8 @@ namespace bcs
 		}
 	}
 
-	template<class Derived, typename T, typename TOrd>
-	inline void fill(IContinuousAView2D<Derived, T, TOrd>& a, const typename Derived::value_type& v)
+	template<class Derived, typename T>
+	inline void fill(IContinuousAView2D<Derived, T>& a, const T& v)
 	{
 		index_t N = a.nelems();
 		T *p = a.pbase();
@@ -160,36 +112,17 @@ namespace bcs
 
 	// copy
 
+
 	template<class LDerived, class RDerived, typename T>
-	inline void copy(const IConstRegularAView2D<LDerived, T, row_major_t>& src, IRegularAView2D<RDerived, T, row_major_t>& dst)
+	inline void copy(const IConstRegularAView2D<LDerived, T>& src, IRegularAView2D<RDerived, T>& dst)
 	{
 		const LDerived& srcd = src.derived();
 		RDerived& dstd = dst.derived();
 
 		check_arg(is_same_shape(srcd, dstd), "aview2d copy: the shapes of src and dst are inconsistent.");
 
-		index_t d0 = src.dim0();
-		index_t d1 = src.dim1();
-
-		for (index_t i = 0; i < d0; ++i)
-		{
-			for (index_t j = 0; j < d1; ++j)
-			{
-				dstd(i, j) = srcd(i, j);
-			}
-		}
-	}
-
-	template<class LDerived, class RDerived, typename T>
-	inline void copy(const IConstRegularAView2D<LDerived, T, column_major_t>& src, IRegularAView2D<RDerived, T, column_major_t>& dst)
-	{
-		const LDerived& srcd = src.derived();
-		RDerived& dstd = dst.derived();
-
-		check_arg(is_same_shape(srcd, dstd), "aview2d copy: the shapes of src and dst are inconsistent.");
-
-		index_t d0 = src.dim0();
-		index_t d1 = src.dim1();
+		index_t d0 = src.nrows();
+		index_t d1 = src.ncolumns();
 
 		for (index_t j = 0; j < d1; ++j)
 		{
@@ -201,18 +134,18 @@ namespace bcs
 	}
 
 
-	template<class LDerived, class RDerived, typename T, typename TOrd>
-	inline void copy(const IConstContinuousAView2D<LDerived, T, TOrd>& src, IContinuousAView2D<RDerived, T, TOrd>& dst)
+	template<class LDerived, class RDerived, typename T>
+	inline void copy(const IConstContinuousAView2D<LDerived, T>& src, IContinuousAView2D<RDerived, T>& dst)
 	{
 		const LDerived& srcd = src.derived();
 		RDerived& dstd = dst.derived();
 
 		check_arg(is_same_shape(srcd, dstd), "aview2d copy: the shapes of src and dst are inconsistent.");
-		mem<T>::copy(srcd.pbase(), dstd.pbase(), srcd.size());
+		mem<T>::copy(srcd.size(), srcd.pbase(), dstd.pbase());
 	}
 
-	template<class LDerived, class RDerived, typename T, typename TOrd>
-	inline void copy(const IConstContinuousAView2D<LDerived, T, TOrd>& src, IRegularAView2D<RDerived, T, TOrd>& dst)
+	template<class LDerived, class RDerived, typename T>
+	inline void copy(const IConstContinuousAView2D<LDerived, T>& src, IRegularAView2D<RDerived, T>& dst)
 	{
 		const LDerived& srcd = src.derived();
 		RDerived& dstd = dst.derived();
@@ -221,8 +154,8 @@ namespace bcs
 		import_from(dstd, src.pbase());
 	}
 
-	template<class LDerived, class RDerived, typename T, typename TOrd>
-	inline void copy(const IConstRegularAView2D<LDerived, T, TOrd>& src, IContinuousAView2D<RDerived, T, TOrd>& dst)
+	template<class LDerived, class RDerived, typename T>
+	inline void copy(const IConstRegularAView2D<LDerived, T>& src, IContinuousAView2D<RDerived, T>& dst)
 	{
 		const LDerived& srcd = src.derived();
 		RDerived& dstd = dst.derived();

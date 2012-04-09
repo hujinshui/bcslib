@@ -18,74 +18,17 @@ namespace bcs
 	template<typename T> class caview1d;
 	template<typename T> class aview1d;
 
-	// extents and index calculation
+	// index calculation
 
-	class row_extent
+	BCS_ENSURE_INLINE
+	inline index_t sub2ind(index_t m, index_t n, index_t i, index_t j)
 	{
-	public:
-		explicit row_extent(index_t d) : m_dim(d) { }
-
-		BCS_ENSURE_INLINE index_t dim() const
-		{
-			return m_dim;
-		}
-
-		BCS_ENSURE_INLINE index_t sub2ind(index_t i, index_t j) const
-		{
-			return i * m_dim + j;
-		}
-
-		BCS_ENSURE_INLINE static row_extent from_base_dims(index_t m, index_t n)
-		{
-			return row_extent(n);
-		}
-
-	private:
-		index_t m_dim;
-	};
-
-
-	class column_extent
-	{
-	public:
-		explicit column_extent(index_t d) : m_dim(d) { }
-
-		BCS_ENSURE_INLINE index_t dim() const
-		{
-			return m_dim;
-		}
-
-		BCS_ENSURE_INLINE index_t sub2ind(index_t i, index_t j) const
-		{
-			return i + j * m_dim;
-		}
-
-		BCS_ENSURE_INLINE static column_extent from_base_dims(index_t m, index_t n)
-		{
-			return column_extent(m);
-		}
-
-	private:
-		index_t m_dim;
-	};
-
-
-	template<typename TOrd> struct aview2d_slice_extent;
-
-	template<> struct aview2d_slice_extent<row_major_t>
-	{
-		typedef row_extent type;
-	};
-
-	template<> struct aview2d_slice_extent<column_major_t>
-	{
-		typedef column_extent type;
-	};
-
+		return i + j * n;
+	}
 
 	// concept interfaces
 
-	template<class Derived, typename T, typename TOrd>
+	template<class Derived, typename T>
 	class IConstAView2DBase
 	{
 	public:
@@ -116,16 +59,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE index_type dim1() const
-		{
-			return derived().dim1();
-		}
-
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
 			return derived().nrows();
@@ -139,7 +72,7 @@ namespace bcs
 	}; // end class caview2d_base
 
 
-	template<class Derived, typename T, typename TOrd>
+	template<class Derived, typename T>
 	class IAView2DBase
 	{
 	public:
@@ -172,16 +105,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE index_type dim1() const
-		{
-			return derived().dim1();
-		}
-
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
 			return derived().nrows();
@@ -195,8 +118,8 @@ namespace bcs
 	}; // end class aview2d_base
 
 
-	template<class Derived, typename T, typename TOrd>
-	class IConstRegularAView2D : public IConstAView2DBase<Derived, T, TOrd>
+	template<class Derived, typename T>
+	class IConstRegularAView2D : public IConstAView2DBase<Derived, T>
 	{
 	public:
 		BCS_AVIEW_INTERFACE_DEFS(Derived)
@@ -226,16 +149,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE index_type dim1() const
-		{
-			return derived().dim1();
-		}
-
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
 			return derived().nrows();
@@ -244,12 +157,6 @@ namespace bcs
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
 			return derived().ncolumns();
-		}
-
-
-		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
-		{
-			return derived().slice_extent();
 		}
 
 		BCS_ENSURE_INLINE index_type lead_dim() const
@@ -265,8 +172,8 @@ namespace bcs
 	}; // end class dense_caview2d_base
 
 
-	template<class Derived, typename T, typename TOrd>
-	class IRegularAView2D : public IAView2DBase<Derived, T, TOrd>
+	template<class Derived, typename T>
+	class IRegularAView2D : public IAView2DBase<Derived, T>
 	{
 	public:
 		BCS_AVIEW_INTERFACE_DEFS(Derived)
@@ -296,16 +203,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE index_type dim1() const
-		{
-			return derived().dim1();
-		}
-
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
 			return derived().nrows();
@@ -314,12 +211,6 @@ namespace bcs
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
 			return derived().ncolumns();
-		}
-
-
-		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
-		{
-			return derived().slice_extent();
 		}
 
 		BCS_ENSURE_INLINE index_type lead_dim() const
@@ -340,8 +231,8 @@ namespace bcs
 	}; // end class dense_aview2d_base
 
 
-	template<class Derived, typename T, typename TOrd>
-	class IConstBlockAView2D : public IConstRegularAView2D<Derived, T, TOrd>
+	template<class Derived, typename T>
+	class IConstBlockAView2D : public IConstRegularAView2D<Derived, T>
 	{
 	public:
 		BCS_AVIEW_INTERFACE_DEFS(Derived)
@@ -371,27 +262,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-
-		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
-		{
-			return derived().slice_extent();
-		}
-
-		BCS_ENSURE_INLINE index_type lead_dim() const
-		{
-			return derived().lead_dim();
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE index_type dim1() const
-		{
-			return derived().dim1();
-		}
-
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
 			return derived().nrows();
@@ -400,6 +270,11 @@ namespace bcs
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
 			return derived().ncolumns();
+		}
+
+		BCS_ENSURE_INLINE index_type lead_dim() const
+		{
+			return derived().lead_dim();
 		}
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
@@ -427,8 +302,8 @@ namespace bcs
 	}; // end class block_caview2d_base
 
 
-	template<class Derived, typename T, typename TOrd>
-	class IBlockAView2D : public IRegularAView2D<Derived, T, TOrd>
+	template<class Derived, typename T>
+	class IBlockAView2D : public IRegularAView2D<Derived, T>
 	{
 	public:
 		BCS_AVIEW_INTERFACE_DEFS(Derived)
@@ -458,27 +333,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-
-		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
-		{
-			return derived().slice_extent();
-		}
-
-		BCS_ENSURE_INLINE index_type lead_dim() const
-		{
-			return derived().lead_dim();
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE index_type dim1() const
-		{
-			return derived().dim1();
-		}
-
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
 			return derived().nrows();
@@ -487,6 +341,11 @@ namespace bcs
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
 			return derived().ncolumns();
+		}
+
+		BCS_ENSURE_INLINE index_type lead_dim() const
+		{
+			return derived().lead_dim();
 		}
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
@@ -536,8 +395,8 @@ namespace bcs
 	}; // end class block_aview2d_base
 
 
-	template<class Derived, typename T, typename TOrd>
-	class IConstContinuousAView2D : public IConstBlockAView2D<Derived, T, TOrd>
+	template<class Derived, typename T>
+	class IConstContinuousAView2D : public IConstBlockAView2D<Derived, T>
 	{
 	public:
 		BCS_AVIEW_INTERFACE_DEFS(Derived)
@@ -567,26 +426,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
-		{
-			return derived().slice_extent();
-		}
-
-		BCS_ENSURE_INLINE index_type lead_dim() const
-		{
-			return derived().lead_dim();
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE index_type dim1() const
-		{
-			return derived().dim1();
-		}
-
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
 			return derived().nrows();
@@ -595,6 +434,11 @@ namespace bcs
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
 			return derived().ncolumns();
+		}
+
+		BCS_ENSURE_INLINE index_type lead_dim() const
+		{
+			return derived().lead_dim();
 		}
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
@@ -632,8 +476,8 @@ namespace bcs
 	};
 
 
-	template<class Derived, typename T, typename TOrd>
-	class IContinuousAView2D : public IBlockAView2D<Derived, T, TOrd>
+	template<class Derived, typename T>
+	class IContinuousAView2D : public IBlockAView2D<Derived, T>
 	{
 	public:
 		BCS_AVIEW_INTERFACE_DEFS(Derived)
@@ -663,26 +507,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE typename aview2d_slice_extent<layout_order>::type slice_extent() const
-		{
-			return derived().slice_extent();
-		}
-
-		BCS_ENSURE_INLINE index_type lead_dim() const
-		{
-			return derived().lead_dim();
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
-		BCS_ENSURE_INLINE index_type dim1() const
-		{
-			return derived().dim1();
-		}
-
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
 			return derived().nrows();
@@ -691,6 +515,11 @@ namespace bcs
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
 			return derived().ncolumns();
+		}
+
+		BCS_ENSURE_INLINE index_type lead_dim() const
+		{
+			return derived().lead_dim();
 		}
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
@@ -762,12 +591,12 @@ namespace bcs
 
 	// convenient generic functions
 
-	template<class LDerived, typename LT, class RDerived, typename RT, typename TOrd>
+	template<class LDerived, typename LT, class RDerived, typename RT>
 	inline bool is_same_shape(
-			const IConstAView2DBase<LDerived, LT, TOrd>& lhs,
-			const IConstAView2DBase<RDerived, RT, TOrd>& rhs)
+			const IConstAView2DBase<LDerived, LT>& lhs,
+			const IConstAView2DBase<RDerived, RT>& rhs)
 	{
-		return lhs.dim0() == rhs.dim0() && lhs.dim1() == rhs.dim1();
+		return lhs.nrows() == rhs.nrows() && lhs.ncolumns() == rhs.ncolumns();
 	}
 
 }

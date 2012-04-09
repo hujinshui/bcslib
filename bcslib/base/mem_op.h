@@ -44,22 +44,22 @@ namespace bcs
 	class mem
 	{
 	public:
-		static void copy(const T *src, T *dst, size_t n)
+		static void copy(size_t n, const T *src, T *dst)
 		{
 			std::memcpy(dst, src, n * sizeof(T));
 		}
 
-		static void zero(T *dst, size_t n)
+		static void zero(size_t n, T *dst)
 		{
 			std::memset(dst, 0, n * sizeof(T));
 		}
 
-		static void fill(T *dst, size_t n, const T& v)
+		static void fill(size_t n, T *dst, const T& v)
 		{
 			while(n--) *(dst++) = v;
 		}
 
-		static bool equal(const T *s1, const T *s2, size_t n)
+		static bool equal(size_t n, const T *s1, const T *s2)
 		{
 			while(n--)
 			{
@@ -68,7 +68,7 @@ namespace bcs
 			return true;
 		}
 
-		static bool equal(const T *s, const T& v, size_t n)
+		static bool equal(size_t n, const T *s, const T& v)
 		{
 			while (n--)
 			{

@@ -26,7 +26,7 @@ namespace bcs
 	template<typename T, class TIndexer>
 	struct aview_traits<caview1d_ex<T, TIndexer> >
 	{
-		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+		BCS_AVIEW_TRAITS_DEFS(1u, T)
 	};
 
 	template<typename T, class TIndexer>
@@ -37,12 +37,12 @@ namespace bcs
 		static_assert( is_indexer<TIndexer>::value, "TIndexer must be an indexer type." );
 #endif
 
-		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+		BCS_AVIEW_TRAITS_DEFS(1u, T)
 		typedef TIndexer indexer_type;
 
 	public:
 		caview1d_ex(const_pointer pbase, const indexer_type& indexer)
-		: m_pbase(const_cast<pointer>(pbase)), m_d0(indexer.dim()), m_indexer(indexer)
+		: m_pbase(const_cast<pointer>(pbase)), m_len(indexer.dim()), m_indexer(indexer)
 		{
 		}
 
@@ -60,22 +60,17 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return m_d0;
+			return m_len;
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return m_d0 == 0;
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return m_d0;
+			return m_len == 0;
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return arr_shape(m_d0);
+			return arr_shape(m_len);
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i) const
@@ -85,7 +80,7 @@ namespace bcs
 
 	protected:
 		pointer m_pbase;
-		index_type m_d0;
+		index_type m_len;
 		indexer_type m_indexer;
 
 	}; // end class caview1d_ex
@@ -94,7 +89,7 @@ namespace bcs
 	template<typename T, class TIndexer>
 	struct aview_traits<aview1d_ex<T, TIndexer> >
 	{
-		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+		BCS_AVIEW_TRAITS_DEFS(1u, T)
 	};
 
 
@@ -106,7 +101,7 @@ namespace bcs
 		static_assert( is_indexer<TIndexer>::value, "TIndexer must be an indexer type." );
 #endif
 
-		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+		BCS_AVIEW_TRAITS_DEFS(1u, T)
 
 		typedef TIndexer indexer_type;
 
@@ -130,22 +125,17 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return this->m_d0;
+			return this->m_len;
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return this->m_d0 == 0;
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return this->m_d0;
+			return this->m_len == 0;
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return arr_shape(this->m_d0);
+			return arr_shape(this->m_len);
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_t i) const
@@ -179,7 +169,7 @@ namespace bcs
 	csubview(const IConstContinuousAView1D<Derived, T>& a, const IndexSelector& I)
 	{
 		return _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::cview(
-				a.pbase(), a.dim0(), I);
+				a.pbase(), a.nelems(), I);
 	}
 
 	template<class Derived, typename T, class IndexSelector>
@@ -187,7 +177,7 @@ namespace bcs
 	subview(IContinuousAView1D<Derived, T>& a, const IndexSelector& I)
 	{
 		return _detail::subview_helper1d<typename Derived::value_type, IndexSelector>::view(
-				a.pbase(), a.dim0(), I);
+				a.pbase(), a.nelems(), I);
 	}
 
 
@@ -196,24 +186,24 @@ namespace bcs
 	template<typename T>
 	struct aview_traits<caview1d<T> >
 	{
-		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+		BCS_AVIEW_TRAITS_DEFS(1u, T)
 	};
 
 	template<typename T>
 	class caview1d : public IConstContinuousAView1D<caview1d<T>, T>
 	{
 	public:
-		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+		BCS_AVIEW_TRAITS_DEFS(1u, T)
 
 	public:
 		caview1d(const_pointer pbase, index_type n)
 		: m_pbase(const_cast<pointer>(pbase))
-		, m_d0(n)
+		, m_len(n)
 		{
 		}
 
 		caview1d(const_pointer pbase, const shape_type& shape)
-		: m_pbase(const_cast<pointer>(pbase)), m_d0(shape[0])
+		: m_pbase(const_cast<pointer>(pbase)), m_len(shape[0])
 		{
 		}
 
@@ -231,22 +221,17 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return m_d0;
+			return m_len;
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return m_d0 == 0;
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return m_d0;
+			return m_len == 0;
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return arr_shape(m_d0);
+			return arr_shape(m_len);
 		}
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
@@ -273,7 +258,7 @@ namespace bcs
 
 	protected:
 		pointer m_pbase;
-		index_type m_d0;
+		index_type m_len;
 
 	}; // end class caview1d
 
@@ -281,14 +266,14 @@ namespace bcs
 	template<typename T>
 	struct aview_traits<aview1d<T> >
 	{
-		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+		BCS_AVIEW_TRAITS_DEFS(1u, T)
 	};
 
 	template<typename T>
 	class aview1d : public caview1d<T>, public IContinuousAView1D<aview1d<T>, T>
 	{
 	public:
-		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+		BCS_AVIEW_TRAITS_DEFS(1u, T)
 
 	public:
 		aview1d(pointer pbase, index_type n)
@@ -315,22 +300,17 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return this->m_d0;
+			return this->m_len;
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return this->m_d0 == 0;
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return this->m_d0;
+			return this->m_len == 0;
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return arr_shape(this->m_d0);
+			return arr_shape(this->m_len);
 		}
 
 		BCS_ENSURE_INLINE const_pointer pbase() const

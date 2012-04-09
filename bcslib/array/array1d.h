@@ -25,7 +25,7 @@ namespace bcs
 	template<typename T, class Alloc>
 	struct aview_traits<array1d<T, Alloc> >
 	{
-		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+		BCS_AVIEW_TRAITS_DEFS(1u, T)
 	};
 
 	template<typename T, class Alloc>
@@ -34,40 +34,39 @@ namespace bcs
 	, public IContinuousAView1D<array1d<T, Alloc>, T>
 	{
 	public:
-		BCS_AVIEW_TRAITS_DEFS(1u, T, layout_1d_t)
+		BCS_AVIEW_TRAITS_DEFS(1u, T)
 
-		typedef shared_block<T, Alloc> storage_type;
-		typedef aview1d<T> view_type;
+		typedef block<T, Alloc> block_type;
 
 	public:
 		explicit array1d(index_type n)
-		: m_storage((size_t)n), m_view(m_storage.pbase(), n)
+		: m_block(n)
 		{
 		}
 
 		explicit array1d(const shape_type& shape)
-		: m_storage((size_t)(shape[0])), m_view(m_storage.pbase(), shape[0])
+		: m_block(shape[0])
 		{
 		}
 
-		array1d(index_type n, const value_type& x)
-		: m_storage((size_t)n, x), m_view(m_storage.pbase(), n)
+		array1d(index_type n, const value_type& v)
+		: m_block(n, v)
 		{
 		}
 
 		array1d(index_type n, const_pointer src)
-		: m_storage((size_t)n, src), m_view(m_storage.pbase(), n)
+		: m_block(n, src)
 		{
 		}
 
 		array1d(const array1d& r)
-		: m_storage(r.m_storage), m_view(r.m_view)
+		: m_block(r.m_block)
 		{
 		}
 
 		template<class Derived>
 		explicit array1d(const IConstRegularAView1D<Derived, T>& r)
-		: m_storage(r.size()), m_view(m_storage.pbase(), r.nelems())
+		: m_block(r.nelems())
 		{
 			copy(r.derived(), *this);
 		}
@@ -76,56 +75,24 @@ namespace bcs
 		{
 			if (this != &r)
 			{
-				m_storage = r.m_storage;
-				m_view = r.m_view;
+				m_block = r.m_block;
 			}
 			return *this;
 		}
 
 		void swap(array1d& r)
 		{
-			using std::swap;
-
-			m_storage.swap(r.m_storage);
-			swap(m_view, r.m_view);
-		}
-
-		bool is_unique() const
-		{
-			return m_storage.is_unique();
-		}
-
-		void make_unique()
-		{
-			m_storage.make_unique();
-
-			index_t n = dim0();
-			m_view = view_type(m_storage.pbase(), n);
-		}
-
-		array1d deep_copy()
-		{
-			return array1d(dim0(), pbase());
-		}
-
-		operator caview1d<T>() const
-		{
-			return cview();
-		}
-
-		operator aview1d<T>()
-		{
-			return view();
+			m_block.swap(r.m_block);
 		}
 
 		caview1d<T> cview() const
 		{
-			return caview1d<T>(pbase(), dim0());
+			return caview1d<T>(pbase(), nelems());
 		}
 
 		aview1d<T> view()
 		{
-			return aview1d<T>(pbase(), dim0());
+			return aview1d<T>(pbase(), nelems());
 		}
 
 	public:
@@ -136,57 +103,52 @@ namespace bcs
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
-			return m_view.size();
+			return m_block.size();
 		}
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return m_view.nelems();
+			return m_block.nelems();
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return m_view.is_empty();
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return m_view.dim0();
+			return nelems() == 0;
 		}
 
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
-			return m_view.shape();
+			return arr_shape(nelems());
 		}
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
-			return m_view.pbase();
+			return m_block.pbase();
 		}
 
 		BCS_ENSURE_INLINE pointer pbase()
 		{
-			return m_view.pbase();
+			return m_block.pbase();
 		}
 
 		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
 		{
-			return m_view[i];
+			return m_block[i];
 		}
 
 		BCS_ENSURE_INLINE reference operator[](index_type i)
 		{
-			return m_view[i];
+			return m_block[i];
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i) const
 		{
-			return m_view[i];
+			return m_block[i];
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i)
 		{
-			return m_view[i];
+			return m_block[i];
 		}
 
 		template<class IndexSelector>
@@ -204,8 +166,7 @@ namespace bcs
 		}
 
 	private:
-		storage_type m_storage;
-		view_type m_view;
+		block_type m_block;
 
 	}; // end class array1d
 
@@ -214,13 +175,6 @@ namespace bcs
 	inline void swap(array1d<T, Alloc>& lhs, array1d<T, Alloc>& rhs)
 	{
 		lhs.swap(rhs);
-	}
-
-
-	template<class Derived, typename T>
-	inline array1d<T> clone_array(const IConstRegularAView1D<Derived, T>& a)
-	{
-		return array1d<typename Derived::value_type>(a);
 	}
 
 
@@ -233,7 +187,7 @@ namespace bcs
 	template<class Derived, typename T>
 	inline array1d<index_t> find(const IConstRegularAView1D<Derived, T>& B)
 	{
-		index_t n = B.dim0();
+		index_t n = B.nelems();
 
 		const Derived& Bd = B.derived();
 

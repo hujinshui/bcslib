@@ -21,9 +21,6 @@ endif
 MAIN_TEST_PRE=-isystem $(GTEST_HOME)/include test/bcs_test_main.cpp
 MAIN_TEST_POST=$(GTEST_HOME)/lib/@gtestlib_main@ -lpthread
 
-CUDA_TEST_PRE=-isystem $(GTEST_HOME)/include test/bcs_test_main.cpp
-CUDA_TEST_POST=$(GTEST_HOME)/lib/@gtestlib_cuda@ -lpthread
-
 
 ifeq ($(USE_INTEL), "yes")
     INTEL_PATHS = @intel_paths@
@@ -94,10 +91,12 @@ GRAPH_ALGORITHM_HEADERS = $(GRAPH_BASIC_HEADERS) \
 #---------- Target groups -------------------
 
 .PHONY: all
-all: test bench
+all: test
+# all: test bench
 
 .PHONY: test
-test: test_basics test_array test_data_structs test_graph
+test: test_basics test_array
+# test: test_basics test_array test_data_structs test_graph
 
 .PHONY: bench
 bench: bench_array
