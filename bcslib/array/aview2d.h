@@ -1028,6 +1028,36 @@ namespace bcs
 
 	/************************************
 	 *
+	 *  Typedefs
+	 *
+	 ************************************/
+
+	typedef caview2d<double>   cmat_f64_view;
+	typedef caview2d<float>    cmat_f32_view;
+	typedef caview2d<int64_t>  cmat_i64_view;
+	typedef caview2d<uint64_t> cmat_u64_view;
+	typedef caview2d<int32_t>  cmat_i32_view;
+	typedef caview2d<uint32_t> cmat_u32_view;
+	typedef caview2d<int16_t>  cmat_i16_view;
+	typedef caview2d<uint16_t> cmat_u16_view;
+	typedef caview2d<int8_t>   cmat_i8_view;
+	typedef caview2d<uint8_t>  cmat_u8_view;
+
+	typedef aview2d<double>   mat_f64_view;
+	typedef aview2d<float>    mat_f32_view;
+	typedef aview2d<int64_t>  mat_i64_view;
+	typedef aview2d<uint64_t> mat_u64_view;
+	typedef aview2d<int32_t>  mat_i32_view;
+	typedef aview2d<uint32_t> mat_u32_view;
+	typedef aview2d<int16_t>  mat_i16_view;
+	typedef aview2d<uint16_t> mat_u16_view;
+	typedef aview2d<int8_t>   mat_i8_view;
+	typedef aview2d<uint8_t>  mat_u8_view;
+
+
+
+	/************************************
+	 *
 	 *  Convenient functions
 	 *
 	 ************************************/

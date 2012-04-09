@@ -178,6 +178,24 @@ namespace bcs
 	}
 
 
+	/********************************************
+	 *
+	 *  Typedefs
+	 *
+	 ********************************************/
+
+	typedef array1d<double>   vec_f64;
+	typedef array1d<float>    vec_f32;
+	typedef array1d<int64_t>  vec_i64;
+	typedef array1d<uint64_t> vec_u64;
+	typedef array1d<int32_t>  vec_i32;
+	typedef array1d<uint32_t> vec_u32;
+	typedef array1d<int16_t>  vec_i16;
+	typedef array1d<uint16_t> vec_u16;
+	typedef array1d<int8_t>   vec_i8;
+	typedef array1d<uint8_t>  vec_u8;
+
+
 	/******************************************************
 	 *
 	 *  Element selection
