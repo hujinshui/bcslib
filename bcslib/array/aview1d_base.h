@@ -46,10 +46,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
 	};
 
 
@@ -84,10 +80,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
 	};
 
 
@@ -123,11 +115,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
 		}
 
 		// new interfaces
@@ -170,11 +157,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
 		}
 
 		// new interfaces
@@ -220,11 +202,6 @@ namespace bcs
 		BCS_ENSURE_INLINE shape_type shape() const
 		{
 			return derived().shape();
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
 		}
 
 		// new interfaces
@@ -278,11 +255,6 @@ namespace bcs
 			return derived().shape();
 		}
 
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return derived().dim0();
-		}
-
 		// new interfaces
 
 		BCS_ENSURE_INLINE const_pointer pbase() const
@@ -323,7 +295,7 @@ namespace bcs
 	template<class LDerived, typename LT, class RDerived, typename RT>
 	inline bool is_same_shape(const IConstAView1DBase<LDerived, LT>& lhs, const IConstAView1DBase<RDerived, RT>& rhs)
 	{
-		return lhs.dim0() == rhs.dim0();
+		return lhs.nelems() == rhs.nelems();
 	}
 
 

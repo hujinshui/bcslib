@@ -26,65 +26,61 @@
 namespace bcs
 {
 
-	template<typename T, typename TOrd, class Alloc=aligned_allocator<T> > class array2d;
+	template<typename T, class Alloc=aligned_allocator<T> > class array2d;
 
-	template<typename T, typename TOrd, class Alloc>
-	struct aview_traits<array2d<T, TOrd, Alloc> >
+	template<typename T, class Alloc>
+	struct aview_traits<array2d<T, Alloc> >
 	{
-		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
-		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
+		BCS_AVIEW_TRAITS_DEFS(2u, T)
+		BCS_AVIEW2D_SLICE_TYPEDEFS(T)
 	};
 
-	template<typename T, typename TOrd, class Alloc>
+	template<typename T, class Alloc>
 	class array2d
-	: public IConstContinuousAView2D<array2d<T, TOrd, Alloc>, T, TOrd>
-	, public IContinuousAView2D<array2d<T, TOrd, Alloc>, T, TOrd>
+	: public IConstContinuousAView2D<array2d<T, Alloc>, T>
+	, public IContinuousAView2D<array2d<T, Alloc>, T>
 	{
 	public:
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert( is_layout_order<TOrd>::value, "TOrd must be a layout order type." );
-#endif
-		BCS_AVIEW_TRAITS_DEFS(2u, T, TOrd)
-		BCS_AVIEW2D_SLICE_TYPEDEFS(T, TOrd)
+		BCS_AVIEW_TRAITS_DEFS(2u, T)
+		BCS_AVIEW2D_SLICE_TYPEDEFS(T)
 
-		typedef typename aview2d_slice_extent<TOrd>::type slice_extent_type;
-		typedef shared_block<T, Alloc> storage_type;
-		typedef aview2d<T, TOrd> view_type;
+		typedef block<T, Alloc> block_type;
 
 	public:
 		explicit array2d(index_type m, index_type n)
-		: m_storage((size_t)(m * n))
-		, m_view(m_storage.pbase(), m, n)
+		: m_block(m * n)
+		, m_nrows(m), m_ncols(n)
 		{
 		}
 
 		explicit array2d(const shape_type& shape)
-		: m_storage((size_t)(shape[0] * shape[1]))
-		, m_view(m_storage.pbase(), shape[0], shape[1])
+		: m_block(shape[0] * shape[1])
+		, m_nrows(shape[0]), m_ncols(shape[1])
 		{
 		}
 
 		array2d(index_type m, index_type n, const T& x)
-		: m_storage((size_t)(m * n), x)
-		, m_view(m_storage.pbase(), m, n)
+		: m_block(m * n, x)
+		, m_nrows(m), m_ncols(n)
 		{
 		}
 
 		array2d(index_type m, index_type n, const_pointer src)
-		: m_storage((size_t)(m * n), src)
-		, m_view(m_storage.pbase(), m, n)
+		: m_block(m * n, src)
+		, m_nrows(m), m_ncols(n)
 		{
 		}
 
 		array2d(const array2d& r)
-		: m_storage(r.m_storage), m_view(r.m_view)
+		: m_block(r.m_block)
+		, m_nrows(r.nrows()), m_ncols(r.ncolumns())
 		{
 		}
 
 		template<class Derived>
-		explicit array2d(const IConstRegularAView2D<Derived, T, TOrd>& r)
-		: m_storage(r.size())
-		, m_view(m_storage.pbase(), r.nrows(), r.ncolumns())
+		explicit array2d(const IConstRegularAView2D<Derived, T>& r)
+		: m_block(r.nelems())
+		, m_nrows(r.nrows()), m_ncols(r.ncolumns())
 		{
 			copy(r.derived(), *this);
 		}
@@ -93,8 +89,9 @@ namespace bcs
 		{
 			if (this != &r)
 			{
-				m_storage = r.m_storage;
-				m_view = r.m_view;
+				m_block = r.m_block;
+				m_nrows = r.m_nrows;
+				m_ncols = r.m_ncols;
 			}
 			return *this;
 		}
@@ -103,47 +100,19 @@ namespace bcs
 		{
 			using std::swap;
 
-			m_storage.swap(r.m_storage);
-			swap(m_view, r.m_view);
+			m_block.swap(r.m_block);
+			swap(m_nrows, r.m_nrows);
+			swap(m_ncols, r.m_ncols);
 		}
 
-		bool is_unique() const
+		caview2d<T> cview() const
 		{
-			return m_storage.is_unique();
+			return caview2d<T>(pbase(), nrows(), ncolumns());
 		}
 
-		void make_unique()
+		aview2d<T> view()
 		{
-			m_storage.make_unique();
-
-			index_t m = dim0();
-			index_t n = dim1();
-			m_view = view_type(m_storage.pbase(), m, n);
-		}
-
-		array2d deep_copy()
-		{
-			return array2d(dim0(), dim1(), pbase());
-		}
-
-		operator caview2d<T, TOrd>() const
-		{
-			return cview();
-		}
-
-		operator aview2d<T, TOrd>()
-		{
-			return view();
-		}
-
-		caview2d<T, TOrd> cview() const
-		{
-			return caview2d<T, TOrd>(pbase(), dim0(), dim1());
-		}
-
-		aview2d<T, TOrd> view()
-		{
-			return aview2d<T, TOrd>(pbase(), dim0(), dim1());
+			return aview2d<T>(pbase(), nrows(), ncolumns());
 		}
 
 	public:
@@ -154,175 +123,161 @@ namespace bcs
 
 		BCS_ENSURE_INLINE size_type size() const
 		{
-			return m_view.size();
+			return (size_type)m_block.nelems();
 		}
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return m_view.nelems();
+			return m_block.nelems();
 		}
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return m_view.is_empty();
-		}
-
-		BCS_ENSURE_INLINE index_type dim0() const
-		{
-			return m_view.dim0();
-		}
-
-		BCS_ENSURE_INLINE index_type dim1() const
-		{
-			return m_view.dim1();
+			return nelems() == 0;
 		}
 
 		BCS_ENSURE_INLINE index_type nrows() const
 		{
-			return m_view.nrows();
+			return m_nrows;
 		}
 
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
-			return m_view.ncolumns();
-		}
-
-		BCS_ENSURE_INLINE shape_type shape() const
-		{
-			return m_view.shape();
-		}
-
-		BCS_ENSURE_INLINE slice_extent_type slice_extent() const
-		{
-			return m_view.slice_extent();
+			return m_ncols;
 		}
 
 		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
-			return m_view.lead_dim();
+			return m_nrows;
 		}
+
+		BCS_ENSURE_INLINE shape_type shape() const
+		{
+			return arr_shape(m_nrows, m_ncols);
+		}
+
 
 	public:
 		BCS_ENSURE_INLINE const_pointer pbase() const
 		{
-			return m_view.pbase();
+			return m_block.pbase();
 		}
 
 		BCS_ENSURE_INLINE pointer pbase()
 		{
-			return m_view.pbase();
+			return m_block.pbase();
 		}
 
 		BCS_ENSURE_INLINE const_reference operator[](index_type i) const
 		{
-			return m_view[i];
+			return m_block[i];
 		}
 
 		BCS_ENSURE_INLINE reference operator[](index_type i)
 		{
-			return m_view[i];
+			return m_block[i];
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
-			return m_view(i, j);
+			return m_block[offset(i, j)];
 		}
 
 		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
 		{
-			return m_view(i, j);
+			return m_block[offset(i, j)];
+		}
+
+		BCS_ENSURE_INLINE index_type offset(index_type i, index_type j) const
+		{
+			return i + m_nrows * j;
 		}
 
 	public:
 		row_cview_type row(index_t i) const
 		{
-			return m_view.row(i);
+			return row_cview(*this, i);
 		}
 
 		row_view_type row(index_t i)
 		{
-			return m_view.row(i);
+			return row_view(*this, i);
 		}
 
 		column_cview_type column(index_t i) const
 		{
-			return m_view.column(i);
+			return column_cview(*this, i);
 		}
 
 		column_view_type column(index_t i)
 		{
-			return m_view.column(i);
+			return column_view(*this, i);
 		}
 
 		template<class TRange>
-		typename _detail::slice_row_range_helper2d<value_type, layout_order, TRange>::cview_type
+		typename _detail::slice_row_range_helper2d<value_type, TRange>::cview_type
 		row(index_t i, const TRange& rgn) const
 		{
-			return row_view(*this, i, rgn);
+			return row_cview(*this, i, rgn);
 		}
 
 		template<class TRange>
-		typename _detail::slice_row_range_helper2d<value_type, layout_order, TRange>::view_type
+		typename _detail::slice_row_range_helper2d<value_type, TRange>::view_type
 		row(index_t i, const TRange& rgn)
 		{
 			return row_view(*this, i, rgn);
 		}
 
 		template<class TRange>
-		typename _detail::slice_col_range_helper2d<value_type, layout_order, TRange>::cview_type
+		typename _detail::slice_col_range_helper2d<value_type, TRange>::cview_type
 		column(index_t i, const TRange& rgn) const
 		{
-			return column_view(*this, i, rgn);
+			return column_cview(*this, i, rgn);
 		}
 
 		template<class TRange>
-		typename _detail::slice_col_range_helper2d<value_type, layout_order, TRange>::view_type
+		typename _detail::slice_col_range_helper2d<value_type, TRange>::view_type
 		column(index_t i, const TRange& rgn)
 		{
 			return column_view(*this, i, rgn);
 		}
 
 		template<class TRange0, class TRange1>
-		typename _detail::subview_helper2d<T, TOrd, true, TRange0, TRange1>::cview_type
+		typename _detail::subview_helper2d<T, true, TRange0, TRange1>::cview_type
 		V(const TRange0& I, const TRange1& J) const
 		{
-			return m_view.V(I, J);
+			return csubview(*this, I, J);
 		}
 
 		template<class TRange0, class TRange1>
-		typename _detail::subview_helper2d<T, TOrd, true, TRange0, TRange1>::view_type
+		typename _detail::subview_helper2d<T, true, TRange0, TRange1>::view_type
 		V(const TRange0& I, const TRange1& J)
 		{
-			return m_view.V(I, J);
+			return subview(*this, I, J);
 		}
 
 		caview1d<T> flatten() const
 		{
-			return m_view.flatten();
+			return caview1d<T>(pbase(), nelems());
 		}
 
-		caview1d<T> flatten()
+		aview1d<T> flatten()
 		{
-			return m_view.flatten();
+			return aview1d<T>(pbase(), nelems());
 		}
 
 	private:
-		storage_type m_storage;
-		view_type m_view;
+		block_type m_block;
+		index_type m_nrows;
+		index_type m_ncols;
 
 	}; // end class array2d
 
 
-	template<typename T, typename TOrd, class Alloc>
-	inline void swap(array2d<T, TOrd, Alloc>& lhs, array2d<T, TOrd, Alloc>& rhs)
+	template<typename T, class Alloc>
+	inline void swap(array2d<T, Alloc>& lhs, array2d<T, Alloc>& rhs)
 	{
 		lhs.swap(rhs);
-	}
-
-	template<class Derived, typename T, typename TOrd>
-	inline array2d<T, TOrd> clone_array(const IConstRegularAView2D<Derived, T, TOrd>& a)
-	{
-		return array2d<typename Derived::value_type, typename Derived::layout_order>(a);
 	}
 
 
@@ -332,8 +287,8 @@ namespace bcs
 	 *
 	 ******************************************************/
 
-	template<class Derived, typename T, typename TOrd, class IndexSelector>
-	array1d<T> select_elems(const IConstRegularAView2D<Derived, T, TOrd>& a, const IndexSelector& I, const IndexSelector& J)
+	template<class Derived, typename T, class IndexSelector>
+	array1d<T> select_elems(const IConstRegularAView2D<Derived, T>& a, const IndexSelector& I, const IndexSelector& J)
 	{
 		index_t n = (index_t)I.size();
 		check_arg(n == (index_t)J.size(), "Inconsistent selector sizes.");
@@ -350,35 +305,21 @@ namespace bcs
 	}
 
 
-	template<class Derived, typename T, typename TOrd, class IndexSelector>
-	array2d<T, TOrd> select_rows(const IConstRegularAView2D<Derived, T, TOrd>& a, const IndexSelector& I)
+	template<class Derived, typename T, class IndexSelector>
+	array2d<T> select_rows(const IConstRegularAView2D<Derived, T>& a, const IndexSelector& I)
 	{
 		index_t m = (index_t)I.size();
 		index_t n = a.ncolumns();
-		array2d<T, TOrd> r(m, n);
+		array2d<T> r(m, n);
 
 		const Derived& ad = a.derived();
 		T* rp = r.pbase();
 
-		if (is_same<TOrd, row_major_t>::value)
+		for (index_t j = 0; j < n; ++j)
 		{
 			for (index_t i = 0; i < m; ++i)
 			{
-				index_t si = I[i];
-				for (index_t j = 0; j < n; ++j)
-				{
-					*(rp++) = ad(si, j);
-				}
-			}
-		}
-		else
-		{
-			for (index_t j = 0; j < n; ++j)
-			{
-				for (index_t i = 0; i < m; ++i)
-				{
-					*(rp++) = ad(I[i], j);
-				}
+				*(rp++) = ad(I[i], j);
 			}
 		}
 
@@ -386,35 +327,22 @@ namespace bcs
 	}
 
 
-	template<class Derived, typename T, typename TOrd, class IndexSelector>
-	array2d<T, TOrd> select_columns(const IConstRegularAView2D<Derived, T, TOrd>& a, const IndexSelector& J)
+	template<class Derived, typename T, class IndexSelector>
+	array2d<T> select_columns(const IConstRegularAView2D<Derived, T>& a, const IndexSelector& J)
 	{
 		index_t m = a.nrows();
 		index_t n = (index_t)J.size();
-		array2d<T, TOrd> r(m, n);
+		array2d<T> r(m, n);
 
 		const Derived& ad = a.derived();
 		T* rp = r.pbase();
 
-		if (is_same<TOrd, row_major_t>::value)
+		for (index_t j = 0; j < n; ++j)
 		{
+			index_t sj = J[j];
 			for (index_t i = 0; i < m; ++i)
 			{
-				for (index_t j = 0; j < n; ++j)
-				{
-					*(rp++) = ad(i, J[j]);
-				}
-			}
-		}
-		else
-		{
-			for (index_t j = 0; j < n; ++j)
-			{
-				index_t sj = J[j];
-				for (index_t i = 0; i < m; ++i)
-				{
-					*(rp++) = ad(i, sj);
-				}
+				*(rp++) = ad(i, sj);
 			}
 		}
 
@@ -422,34 +350,21 @@ namespace bcs
 	}
 
 
-	template<class Derived, typename T, typename TOrd, class IndexSelectorI, class IndexSelectorJ>
-	array2d<T, TOrd> select_rows_cols(const IConstRegularAView2D<Derived, T, TOrd>& a, const IndexSelectorI& I, const IndexSelectorJ& J)
+	template<class Derived, typename T, class IndexSelectorI, class IndexSelectorJ>
+	array2d<T> select_rows_cols(const IConstRegularAView2D<Derived, T>& a, const IndexSelectorI& I, const IndexSelectorJ& J)
 	{
 		index_t m = (index_t)I.size();
 		index_t n = (index_t)J.size();
-		array2d<T, TOrd> r(m, n);
+		array2d<T> r(m, n);
 
 		const Derived& ad = a.derived();
 		T* rp = r.pbase();
 
-		if (is_same<TOrd, row_major_t>::value)
+		for (index_t j = 0; j < n; ++j)
 		{
 			for (index_t i = 0; i < m; ++i)
 			{
-				for (index_t j = 0; j < n; ++j)
-				{
-					*(rp++) = ad(I[i], J[j]);
-				}
-			}
-		}
-		else
-		{
-			for (index_t j = 0; j < n; ++j)
-			{
-				for (index_t i = 0; i < m; ++i)
-				{
-					*(rp++) = ad(I[i], J[j]);
-				}
+				*(rp++) = ad(I[i], J[j]);
 			}
 		}
 
@@ -481,19 +396,12 @@ namespace bcs
 		}
 	}
 
-	template<class Derived, typename T, typename TOrd>
-	inline array2d<T, TOrd> transpose(const IConstContinuousAView2D<Derived, T, TOrd>& a)
+	template<class Derived, typename T>
+	inline array2d<T> transpose(const IConstContinuousAView2D<Derived, T>& a)
 	{
-		array2d<T, TOrd> r(a.ncolumns(), a.nrows());
+		array2d<T> r(a.ncolumns(), a.nrows());
 
-		if (is_same<typename Derived::layout_order, row_major_t>::value)
-		{
-			transpose_matrix(a.pbase(), r.pbase(), a.nrows(), a.ncolumns());
-		}
-		else
-		{
-			transpose_matrix(a.pbase(), r.pbase(), a.ncolumns(), a.nrows());
-		}
+		transpose_matrix(a.pbase(), r.pbase(), a.ncolumns(), a.nrows());
 
 		return r;
 	}

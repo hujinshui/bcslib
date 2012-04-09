@@ -171,10 +171,9 @@ static_assert( (is_base_of<
 template<class Derived, typename T>
 bool array_integrity_test(const bcs::IConstRegularAView1D<Derived, T>& a)
 {
-	index_t n = a.dim0();
+	index_t n = a.nelems();
 
 	if (a.ndims() != 1) return false;
-	if (a.nelems() != n) return false;
 	if (a.size() != (size_t)n) return false;
 	if (a.shape() != arr_shape(n)) return false;
 	if (a.is_empty() != (a.nelems() == 0)) return false;
@@ -187,7 +186,7 @@ bool cont_array_integrity_test(const bcs::IConstContinuousAView1D<Derived, T>& a
 {
 	if (!array_integrity_test(a)) return false;
 
-	index_t n = a.dim0();
+	index_t n = a.nelems();
 	if (!a.is_empty())
 	{
 		if (a.pbase() != &(a[0])) return false;
@@ -206,7 +205,7 @@ template<class Derived, typename T>
 bool elemwise_operation_test(bcs::IRegularAView1D<Derived, T>& a)
 {
 	index_t n = a.nelems();
-	block<T> blk(a.size());
+	block<T> blk(n);
 	const T *b = blk.pbase();
 
 	Derived& ad = a.derived();
@@ -253,14 +252,14 @@ TEST( Array1D, Aview1D )
 
 	aview1d<double> a1(src1, n1);
 
-	ASSERT_EQ(a1.dim0(), n1);
+	ASSERT_EQ(a1.nelems(), n1);
 	ASSERT_TRUE( cont_array_integrity_test(a1) );
 	ASSERT_TRUE( array_equal(a1, src1, n1) );
 	ASSERT_TRUE( elemwise_operation_test(a1) );
 
 	aview1d<double> a2(a1);
 
-	ASSERT_EQ(a2.dim0(), n1);
+	ASSERT_EQ(a2.nelems(), n1);
 	ASSERT_TRUE( cont_array_integrity_test(a2) );
 	ASSERT_TRUE( array_equal(a2, src1, n1) );
 
@@ -281,41 +280,35 @@ TEST( Array1D, Array1D )
 
 	array1d<double> a0(0);
 
-	ASSERT_EQ(a0.dim0(), 0);
-	ASSERT_TRUE( a0.is_unique() );
+	ASSERT_EQ(a0.nelems(), 0);
 	ASSERT_TRUE( cont_array_integrity_test(a0) );
 
 	array1d<double> a1(n1);
 
 	for (int i = 0; i < n1; ++i) a1(i) = src1[i];
 
-	ASSERT_EQ(a1.dim0(), n1);
-	ASSERT_TRUE( a1.is_unique() );
+	ASSERT_EQ(a1.nelems(), n1);
 	ASSERT_TRUE( cont_array_integrity_test(a1) );
 	ASSERT_TRUE( array_equal(a1, src1, n1) );
 
 	array1d<double> a2(n2, v2);
 
-	ASSERT_EQ(a2.dim0(), n2);
-	ASSERT_TRUE( a2.is_unique() );
+	ASSERT_EQ(a2.nelems(), n2);
 	ASSERT_TRUE( cont_array_integrity_test(a2) );
 	ASSERT_TRUE( array_equal(a2, src2, n2) );
 	ASSERT_TRUE( elemwise_operation_test(a2) );
 
 	array1d<double> a3(n1, src1);
 
-	ASSERT_EQ(a3.dim0(), n1);
-	ASSERT_TRUE( a3.is_unique() );
+	ASSERT_EQ(a3.nelems(), n1);
 	ASSERT_TRUE( cont_array_integrity_test(a3) );
 	ASSERT_TRUE( array_equal(a3, src1, n1) );
 	ASSERT_TRUE( elemwise_operation_test(a3) );
 
 	array1d<double> a4(a3);
 
-	ASSERT_EQ(a4.dim0(), n1);
-	ASSERT_FALSE( a3.is_unique() );
-	ASSERT_FALSE( a4.is_unique() );
-	ASSERT_EQ( a4.pbase(), a3.pbase() );
+	ASSERT_EQ(a4.nelems(), n1);
+	ASSERT_TRUE( a4.pbase() != a3.pbase() );
 
 	ASSERT_TRUE( cont_array_integrity_test(a3) );
 	ASSERT_TRUE( array_equal(a3, src1, n1) );
@@ -323,61 +316,7 @@ TEST( Array1D, Array1D )
 	ASSERT_TRUE( cont_array_integrity_test(a4) );
 	ASSERT_TRUE( array_equal(a4, src1, n1) );
 	ASSERT_TRUE( elemwise_operation_test(a4) );
-
-	a4.make_unique();
-
-	ASSERT_NE( a4.pbase(), a3.pbase() );
-	ASSERT_TRUE( a3.is_unique() );
-	ASSERT_TRUE( a4.is_unique() );
-
-	ASSERT_EQ(a3.dim0(), n1);
-	ASSERT_EQ(a4.dim0(), n1);
-
-	ASSERT_TRUE( cont_array_integrity_test(a3) );
-	ASSERT_TRUE( array_equal(a3, src1, n1) );
-
-	ASSERT_TRUE( cont_array_integrity_test(a4) );
-	ASSERT_TRUE( array_equal(a4, src1, n1) );
-
-	array1d<double> a5 = a1.deep_copy();
-
-	ASSERT_NE( a1.pbase(), a5.pbase() );
-	ASSERT_TRUE( a1.is_unique() );
-	ASSERT_TRUE( a5.is_unique() );
-
-	ASSERT_EQ(a1.dim0(), n1);
-	ASSERT_EQ(a5.dim0(), n1);
-
-	ASSERT_TRUE( cont_array_integrity_test(a1) );
-	ASSERT_TRUE( array_equal(a1, src1, n1) );
-
-	ASSERT_TRUE( cont_array_integrity_test(a5) );
-	ASSERT_TRUE( array_equal(a5, src1, n1) );
-	ASSERT_TRUE( elemwise_operation_test(a5) );
 }
-
-
-TEST( Array1D, Array1DClone )
-{
-	double src[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
-	aview1d<double> view1(src, 5);
-	array1d<double> a1 = clone_array(view1);
-
-	ASSERT_TRUE( array_integrity_test(a1) );
-	ASSERT_NE( a1.pbase(), view1.pbase() );
-	ASSERT_TRUE( array_equal(a1, src, 5) );
-	ASSERT_TRUE( elemwise_operation_test(a1) );
-
-	aview1d_ex<double, step_ind> view2(src, step_ind(3, 2));
-	array1d<double> a2 = clone_array(view2);
-
-	ASSERT_TRUE( array_integrity_test(a2) );
-	double r2[3] = {1, 3, 5};
-	ASSERT_TRUE( array_equal(a2, r2, 3) );
-	ASSERT_TRUE( elemwise_operation_test(a2) );
-}
-
 
 
 TEST( Array1D, Aview1DEx_IdInd )
@@ -393,7 +332,7 @@ TEST( Array1D, Aview1DEx_IdInd )
 	double r1[] = {1, 2, 3};
 	index_t n1 = 3;
 
-	ASSERT_EQ( a1.dim0(), n1 );
+	ASSERT_EQ( a1.nelems(), n1 );
 	ASSERT_TRUE( array_integrity_test(a1) );
 	ASSERT_TRUE( array1d_equal(a1, make_caview1d(r1, n1)) );
 	ASSERT_TRUE( elemwise_operation_test(a1) );
@@ -414,7 +353,7 @@ TEST( Array1D, Aview1DEx_StepInd )
 	double r1[] = {1, 2, 3};
 	index_t n1 = 3;
 
-	ASSERT_EQ( a1.dim0(), n1 );
+	ASSERT_EQ( a1.nelems(), n1 );
 	ASSERT_TRUE( array_integrity_test(a1) );
 	ASSERT_TRUE( array1d_equal(a1, make_caview1d(r1, n1)) );
 	ASSERT_TRUE( elemwise_operation_test(a1) );
@@ -423,7 +362,7 @@ TEST( Array1D, Aview1DEx_StepInd )
 	double r2[] = {1, 3, 5, 7};
 	index_t n2 = 4;
 
-	ASSERT_EQ( a2.dim0(), n2 );
+	ASSERT_EQ( a2.nelems(), n2 );
 	ASSERT_TRUE( array_integrity_test(a2) );
 	ASSERT_TRUE( array1d_equal(a2, make_caview1d(r2, n2)) );
 	ASSERT_TRUE( elemwise_operation_test(a2) );
@@ -432,7 +371,7 @@ TEST( Array1D, Aview1DEx_StepInd )
 	double r3[] = {8, 6, 4};
 	index_t n3 = 3;
 
-	ASSERT_EQ( a3.dim0(), n3 );
+	ASSERT_EQ( a3.nelems(), n3 );
 	ASSERT_TRUE( array_integrity_test(a3) );
 	ASSERT_TRUE( array1d_equal(a3, make_caview1d(r3, n3)) );
 	ASSERT_TRUE( elemwise_operation_test(a3) );
@@ -476,10 +415,10 @@ TEST( Array1D, SubView )
 	EXPECT_TRUE( array1d_equal(a1.V(rgn(1, 7, 2)), make_aview1d(r1c, 3)) );
 
 	double r1d[] = {2, 3, 4, 5, 6};
-	EXPECT_TRUE( array1d_equal(a1.V(rgn(2, a1.dim0() - 1)), make_aview1d(r1d, 5)) );
+	EXPECT_TRUE( array1d_equal(a1.V(rgn(2, a1.nelems() - 1)), make_aview1d(r1d, 5)) );
 
 	double r1e[] = {1, 3, 5, 7};
-	EXPECT_TRUE( array1d_equal(a1.V(rgn(1, a1.dim0(), 2)), make_aview1d(r1e, 4)) );
+	EXPECT_TRUE( array1d_equal(a1.V(rgn(1, a1.nelems(), 2)), make_aview1d(r1e, 4)) );
 
 	double r1f[] = {7, 6, 5, 4, 3, 2, 1, 0};
 	EXPECT_TRUE( array1d_equal(a1.V(rev_whole()),  make_aview1d(r1f, 8)) );
@@ -533,16 +472,16 @@ TEST( Array1D, SubArraySelection )
 	index_t I0r[n] = {2, 4, 7, 9};
 	array1d<index_t> I0 = find(b0);
 
-	ASSERT_EQ( I0.dim0(), n );
+	ASSERT_EQ( I0.nelems(), n );
 	ASSERT_TRUE( array_equal(I0, I0r, n) );
 
 	double sr[n] = {30, 50, 80, 100};
 	array1d<double> s = select_elems(a0, I0);
-	ASSERT_EQ( s.dim0(), n );
+	ASSERT_EQ( s.nelems(), n );
 	ASSERT_TRUE( array_equal(s, sr, n) );
 
 	array1d<double> sf = select_elems(a0, find(b0));
-	ASSERT_EQ( sf.dim0(), n );
+	ASSERT_EQ( sf.nelems(), n );
 	ASSERT_TRUE( array_equal(sf, sr, n));
 
 	bool msk1[] = {false, false, false, false, false, false, false, false, false, false};

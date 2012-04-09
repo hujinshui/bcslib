@@ -18,7 +18,7 @@
 
 
 
-#define BCS_AVIEW_TRAITS_DEFS(nd, T, lorder) \
+#define BCS_AVIEW_TRAITS_DEFS(nd, T) \
 	static const dim_num_t num_dimensions = nd; \
 	typedef array_shape_t<nd> shape_type; \
 	typedef T value_type; \
@@ -28,13 +28,11 @@
 	typedef const T& const_reference; \
 	typedef size_t size_type; \
 	typedef index_t difference_type; \
-	typedef index_t index_type; \
-	typedef lorder layout_order;
+	typedef index_t index_type;
 
 #define BCS_AVIEW_INTERFACE_DEFS(Derived) \
 	static const dim_num_t num_dimensions = aview_traits<Derived>::num_dimensions; \
 	typedef typename aview_traits<Derived>::value_type value_type; \
-	typedef typename aview_traits<Derived>::layout_order layout_order; \
 	typedef typename aview_traits<Derived>::pointer pointer; \
 	typedef typename aview_traits<Derived>::const_pointer const_pointer; \
 	typedef typename aview_traits<Derived>::reference reference; \
@@ -126,7 +124,7 @@ namespace bcs
 	 *   Array form, access, and layout
 	 *
 	 ********************************************/
-
+/*
 	struct layout_1d_t { };
 	struct row_major_t { };
 	struct column_major_t { };
@@ -135,6 +133,7 @@ namespace bcs
 	template<> struct is_layout_order<layout_1d_t> { static const bool value = true; };
 	template<> struct is_layout_order<row_major_t> { static const bool value = true; };
 	template<> struct is_layout_order<column_major_t> { static const bool value = true; };
+*/
 
 
 	/********************************************
@@ -164,23 +163,23 @@ namespace bcs
 
 	// 2D
 
-	template<class Derived, typename T, typename TOrd> class IConstAView2DBase;
-	template<class Derived, typename T, typename TOrd> class IAView2DBase;
-	template<class Derived, typename T, typename TOrd> class IConstRegularAView2D;
-	template<class Derived, typename T, typename TOrd> class IRegularAView2D;
-	template<class Derived, typename T, typename TOrd> class IConstBlockAView2D;
-	template<class Derived, typename T, typename TOrd> class IBlockAView2D;
-	template<class Derived, typename T, typename TOrd> class IConstContinuousAView2D;
-	template<class Derived, typename T, typename TOrd> class IContinuousAView2D;
+	template<class Derived, typename T> class IConstAView2DBase;
+	template<class Derived, typename T> class IAView2DBase;
+	template<class Derived, typename T> class IConstRegularAView2D;
+	template<class Derived, typename T> class IRegularAView2D;
+	template<class Derived, typename T> class IConstBlockAView2D;
+	template<class Derived, typename T> class IBlockAView2D;
+	template<class Derived, typename T> class IConstContinuousAView2D;
+	template<class Derived, typename T> class IContinuousAView2D;
 
-	template<typename T, typename TOrd> class caview2d;
-	template<typename T, typename TOrd> class aview2d;
+	template<typename T> class caview2d;
+	template<typename T> class aview2d;
 
-	template<typename T, typename TOrd> class caview2d_block;
-	template<typename T, typename TOrd> class aview2d_block;
+	template<typename T> class caview2d_block;
+	template<typename T> class aview2d_block;
 
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1> class caview2d_ex;
-	template<typename T, typename TOrd, class TIndexer0, class TIndexer1> class aview2d_ex;
+	template<typename T, class TIndexer0, class TIndexer1> class caview2d_ex;
+	template<typename T, class TIndexer0, class TIndexer1> class aview2d_ex;
 
 }
 

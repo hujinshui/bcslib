@@ -42,7 +42,7 @@ namespace bcs
 	template<class Derived, typename T>
 	inline void import_from(IContinuousAView1D<Derived, T>& a, const T *src)
 	{
-		mem<T>::copy(src, a.pbase(), a.size());
+		mem<T>::copy(a.size(), src, a.pbase());
 	}
 
 	template<class Derived, typename T>
@@ -57,7 +57,7 @@ namespace bcs
 	template<class Derived, typename T>
 	inline void export_to(const IConstContinuousAView1D<Derived, T>& a, T *dst)
 	{
-		mem<T>::copy(a.pbase(), dst, a.size());
+		mem<T>::copy(a.size(), a.pbase(), dst);
 	}
 
 
@@ -80,7 +80,7 @@ namespace bcs
 		RDerived& rd = dst.derived();
 
 		check_arg(is_same_shape(sd, rd), "aview1d copy: the shapes of src and dst are inconsistent.");
-		mem<T>::copy(src.pbase(), dst.pbase(), src.size());
+		mem<T>::copy(src.size(), src.pbase(), dst.pbase());
 	}
 
 	template<class LDerived, class RDerived, typename T>
@@ -114,8 +114,8 @@ namespace bcs
 		const LDerived& srcd = src.derived();
 		RDerived& dstd = dst.derived();
 
-		index_t d0 = src.dim0();
-		for (index_t i = 0; i < d0; ++i)
+		index_t n = src.nelems();
+		for (index_t i = 0; i < n; ++i)
 		{
 			dstd(i) = srcd(i);
 		}

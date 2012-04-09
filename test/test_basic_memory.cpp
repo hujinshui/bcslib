@@ -19,85 +19,18 @@ using namespace bcs::test;
 // explicit template instantiation for syntax check
 
 template class bcs::monitored_allocator<int>;
-template class bcs::cref_blk_t<int>;
-template class bcs::ref_blk_t<int>;
-template class bcs::copy_blk_t<int>;
-template class bcs::const_block<int, aligned_allocator<int> >;
 template class bcs::block<int, aligned_allocator<int> >;
-template class bcs::const_block<int, monitored_allocator<int> >;
 template class bcs::block<int, monitored_allocator<int> >;
 
-typedef class bcs::const_block<int, monitored_allocator<int> > cblk_t;
+template class bcs::scoped_block<int, aligned_allocator<int> >;
+template class bcs::scoped_block<int, monitored_allocator<int> >;
+
 typedef class bcs::block<int, monitored_allocator<int> > blk_t;
+typedef class bcs::scoped_block<int, monitored_allocator<int> > scblk_t;
 
 
 bcs::memory_allocation_monitor bcs::global_memory_allocation_monitor;
 
-class MyInt
-{
-public:
-	explicit MyInt(int v) : p_v(new int(v)) { ++ s_nobjs; }
-
-	~MyInt() { delete p_v; -- s_nobjs; }
-
-	MyInt(const MyInt& r) : p_v(new int(r.value())) { ++ s_nobjs; }
-
-	MyInt& operator = (const MyInt& r)
-	{
-		if (this != &r)
-		{
-			int *tmp = new int(r.value());
-			delete p_v;
-			p_v = tmp;
-		}
-		return *this;
-	}
-
-	int value() const
-	{
-		return *p_v;
-	}
-
-	bool operator == (const MyInt& r) const
-	{
-		return value() == r.value();
-	}
-
-	bool operator != (const MyInt& r) const
-	{
-		return value() != r.value();
-	}
-
-private:
-	int *p_v;
-
-public:
-	static size_t num_objects()
-	{
-		return s_nobjs;
-	}
-
-private:
-	static size_t s_nobjs;
-
-};
-
-size_t MyInt::s_nobjs = 0;
-
-
-template<typename T, class Allocator>
-inline static bool test_block(const const_block<T, Allocator>& blk, bool own, size_t n, const T *pbase = BCS_NULL)
-{
-	return blk.own_memory() == own && blk.nelems() == n && (blk.pend() == blk.pbase() + n) &&
-			(pbase == BCS_NULL || blk.pbase() == pbase);
-}
-
-template<typename T, class Allocator>
-inline static bool test_block(const block<T, Allocator>& blk, bool own, size_t n, const T *pbase = BCS_NULL)
-{
-	return blk.own_memory() == own && blk.nelems() == n && (blk.pend() == blk.pbase() + n) &&
-			(pbase == BCS_NULL || blk.pbase() == pbase);
-}
 
 
 TEST( BasicMem, ElemWiseOperations )
@@ -114,16 +47,16 @@ TEST( BasicMem, ElemWiseOperations )
 	int *p = alloc.allocate(N, BCS_NULL);
 	for (size_t i = 0; i < N; ++i) p[i] = 0;
 
-	mem<int>::fill(p, N, 7);
-	EXPECT_TRUE( mem<int>::equal(p, 7, N) );
+	mem<int>::fill(N, p, 7);
+	EXPECT_TRUE( mem<int>::equal(N, p, 7) );
 	p[2] = 0;
-	EXPECT_FALSE( mem<int>::equal(p, 7, N) );
+	EXPECT_FALSE( mem<int>::equal(N, p, 7) );
 
-	mem<int>::copy(src, p, N);
-	EXPECT_TRUE( mem<int>::equal(p, src, N) );
+	mem<int>::copy(N, src, p);
+	EXPECT_TRUE( mem<int>::equal(N, p, src) );
 
-	mem<int>::zero(p, N);
-	EXPECT_TRUE( mem<int>::equal(p, int(0), N) );
+	mem<int>::zero(N, p);
+	EXPECT_TRUE( mem<int>::equal(N, p, int(0)) );
 
 	alloc.deallocate(p, N);
 
@@ -131,146 +64,153 @@ TEST( BasicMem, ElemWiseOperations )
 }
 
 
-#define CHECK_MEM_PENDING(k) ASSERT_EQ( global_memory_allocation_monitor.num_pending_sections(), k )
+#define CHECK_MEM_PENDING(k) ASSERT_EQ(k, global_memory_allocation_monitor.num_pending_sections() )
 
-TEST( BasicMem, ConstBlocks )
+TEST( BasicMem, BlockBase )
+{
+	const size_t N = 5;
+
+	const int src[N] = {1, 3, 4, 5, 2};
+	int dst[N] = {-1, -1, -1, -1, -1};
+	int tmp[N] = {-1, -1, -1, -1, -1};
+
+	typedef block_base<int> bbt;
+
+	bbt B0(0, BCS_NULL);
+	ASSERT_EQ(0, B0.size());
+	ASSERT_EQ(0, B0.nelems());
+	ASSERT_EQ(BCS_NULL, B0.pbase());
+	ASSERT_EQ(BCS_NULL, B0.pend());
+
+	bbt B1(index_t(N), dst);
+	ASSERT_EQ(N, B1.size());
+	ASSERT_EQ(index_t(N), B1.nelems());
+	ASSERT_EQ(dst, B1.pbase());
+	ASSERT_EQ(dst+N, B1.pend());
+
+	B1.set_zeros();
+	EXPECT_TRUE( mem<int>::equal(N, B1.pbase(), 0) );
+
+	B1.fill(7);
+	EXPECT_TRUE( mem<int>::equal(N, B1.pbase(), 7) );
+
+	B1.copy_from(src);
+	EXPECT_TRUE( mem<int>::equal(N, B1.pbase(), src) );
+
+	B1.copy_to(tmp);
+	EXPECT_TRUE( mem<int>::equal(N, B1.pbase(), src) );
+	EXPECT_TRUE( mem<int>::equal(N, tmp, src) );
+
+	B0.swap(B1);
+	ASSERT_EQ(dst, B0.pbase());
+	ASSERT_EQ(index_t(N), B0.nelems());
+	ASSERT_EQ(BCS_NULL, B1.pbase());
+	ASSERT_EQ(0, B1.nelems());
+}
+
+
+TEST( BasicMem, Block )
 {
 	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
+
+	const index_t N1 = 3;
+	const index_t N2 = 5;
+	const int src[N2] = {1, 3, 4, 5, 2};
+
 	{
+		blk_t B0(0);
+		ASSERT_EQ(0, B0.nelems());
+		ASSERT_EQ(BCS_NULL, B0.pbase());
 
-	using std::swap;
+		CHECK_MEM_PENDING(0);
 
-	const size_t N = 5;
-	int src[N] = {4, 3, 1, 2, 5};
+		blk_t B1(N1);
+		ASSERT_EQ(N1, B1.nelems());
+		ASSERT_TRUE(B1.pbase() != BCS_NULL);
 
-	CHECK_MEM_PENDING( 0 );
+		CHECK_MEM_PENDING(1);
 
-	cblk_t B0(cref_blk(src, N));
-	EXPECT_TRUE( test_block(B0, false, N, src) );
+		blk_t B2(N1, 7);
+		ASSERT_EQ(N1, B2.nelems());
+		ASSERT_TRUE(B2.pbase() != BCS_NULL);
+		EXPECT_TRUE( mem<int>::equal(size_t(N1), B2.pbase(), 7) );
 
-	cblk_t B1(N, int(2));
-	EXPECT_TRUE( test_block(B1, true, N) );
-	EXPECT_TRUE( mem<int>::equal(B1.pbase(), int(2), N) );
+		CHECK_MEM_PENDING(2);
 
-	CHECK_MEM_PENDING( 1 );
+		blk_t B3(N2, src);
+		ASSERT_EQ(N2, B3.nelems());
+		ASSERT_TRUE(B3.pbase() != BCS_NULL);
+		ASSERT_TRUE(B3.pbase() != src);
+		EXPECT_TRUE( mem<int>::equal(size_t(N2), B3.pbase(), src) );
 
-	cblk_t B2(copy_blk(src, N));
-	EXPECT_TRUE( test_block(B2, true, N) );
-	EXPECT_TRUE( B2.pbase() != src );
-	EXPECT_TRUE( mem<int>::equal(B2.pbase(), src, N) );
+		CHECK_MEM_PENDING(3);
 
-	CHECK_MEM_PENDING( 2 );
+		blk_t B4(B3);
+		ASSERT_EQ(N2, B4.nelems());
+		ASSERT_TRUE(B4.pbase() != BCS_NULL);
+		ASSERT_TRUE(B4.pbase() != B3.pbase());
+		EXPECT_TRUE( mem<int>::equal(size_t(N2), B4.pbase(), src) );
 
-	cblk_t B0c(B0);
-	EXPECT_TRUE( test_block(B0, false, N, src) );
-	EXPECT_TRUE( test_block(B0c, false, N, src) );
+		CHECK_MEM_PENDING(4);
 
-	CHECK_MEM_PENDING( 2 );
+		B4 = B2;
 
-	const int *p2 = B2.pbase();
-	cblk_t B2c(B2);
-	EXPECT_TRUE( test_block(B2, true, N, p2) );
-	EXPECT_TRUE( test_block(B2c, true, N) );
-	EXPECT_TRUE( B2c.pbase() != p2 );
-	EXPECT_TRUE( mem<int>::equal(B2.pbase(), B2c.pbase(), N) );
+		ASSERT_EQ(N1, B4.nelems());
+		ASSERT_TRUE(B4.pbase() != BCS_NULL);
+		ASSERT_TRUE(B4.pbase() != B2.pbase());
+		EXPECT_TRUE( mem<int>::equal(size_t(N1), B4.pbase(), B2.pbase()) );
 
-	CHECK_MEM_PENDING( 3 );
+		CHECK_MEM_PENDING(4);
 
-	const int *p1 = B1.pbase();
-	// const int *p2 = B2.pbase();
+		B4 = B0;
 
-	swap(B1, B2);
-	swap(p1, p2);
-	EXPECT_TRUE( test_block(B1, true, N, p1) );
-	EXPECT_TRUE( test_block(B2, true, N, p2) );
+		ASSERT_EQ(0, B4.nelems());
+		ASSERT_EQ(BCS_NULL, B4.pbase());
 
-	CHECK_MEM_PENDING( 3 );
-
-	swap(B0, B1);
-
-	EXPECT_TRUE( test_block(B0, true, N, p1) );
-	EXPECT_TRUE( test_block(B1, false, N, src) );
-
-	CHECK_MEM_PENDING( 3 );
-
-	swap(B0, B1);
-
-	EXPECT_TRUE( test_block(B1, true, N, p1) );
-	EXPECT_TRUE( test_block(B0, false, N, src) );
-
-	CHECK_MEM_PENDING( 3 );
+		CHECK_MEM_PENDING(3);
 	}
+
 	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 }
 
-TEST( BasicMem, Blocks )
+
+TEST( BasicMem, ScopedBlock )
 {
 	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
+
+	const index_t N1 = 3;
+	const index_t N2 = 5;
+	const int src[N2] = {1, 3, 4, 5, 2};
+
 	{
+		scblk_t B0(0);
+		ASSERT_EQ(0, B0.nelems());
+		ASSERT_EQ(BCS_NULL, B0.pbase());
 
-	using std::swap;
+		CHECK_MEM_PENDING(0);
 
-	const size_t N = 5;
-	int src[N] = {4, 3, 1, 2, 5};
+		scblk_t B1(N1);
+		ASSERT_EQ(N1, B1.nelems());
+		ASSERT_TRUE(B1.pbase() != BCS_NULL);
 
-	CHECK_MEM_PENDING( 0 );
+		CHECK_MEM_PENDING(1);
 
-	blk_t B0( ref_blk(src, N));
-	EXPECT_TRUE( test_block(B0, false, N, src) );
+		scblk_t B2(N1, 7);
+		ASSERT_EQ(N1, B2.nelems());
+		ASSERT_TRUE(B2.pbase() != BCS_NULL);
+		EXPECT_TRUE( mem<int>::equal(size_t(N1), B2.pbase(), 7) );
 
-	blk_t B1(N, int(2));
-	EXPECT_TRUE( test_block(B1, true, N) );
-	EXPECT_TRUE( mem<int>::equal(B1.pbase(), int(2), N) );
+		CHECK_MEM_PENDING(2);
 
-	CHECK_MEM_PENDING( 1 );
+		scblk_t B3(N2, src);
+		ASSERT_EQ(N2, B3.nelems());
+		ASSERT_TRUE(B3.pbase() != BCS_NULL);
+		ASSERT_TRUE(B3.pbase() != src);
+		EXPECT_TRUE( mem<int>::equal(size_t(N2), B3.pbase(), src) );
 
-	blk_t B2(copy_blk(src, N));
-	EXPECT_TRUE( test_block(B2, true, N) );
-	EXPECT_TRUE( B2.pbase() != src );
-	EXPECT_TRUE( mem<int>::equal(B2.pbase(), src, N) );
-
-	CHECK_MEM_PENDING( 2 );
-
-	blk_t B0c(B0);
-	EXPECT_TRUE( test_block(B0, false, N, src) );
-	EXPECT_TRUE( test_block(B0c, false, N, src) );
-
-	CHECK_MEM_PENDING( 2 );
-
-	const int *p2 = B2.pbase();
-	blk_t B2c(B2);
-	EXPECT_TRUE( test_block(B2, true, N, p2) );
-	EXPECT_TRUE( test_block(B2c, true, N) );
-	EXPECT_TRUE( B2c.pbase() != p2 );
-	EXPECT_TRUE( mem<int>::equal(B2.pbase(), B2c.pbase(), N) );
-
-	CHECK_MEM_PENDING( 3 );
-
-	const int *p1 = B1.pbase();
-	// const int *p2 = B2.pbase();
-
-	swap(B1, B2);
-	swap(p1, p2);
-	EXPECT_TRUE( test_block(B1, true, N, p1) );
-	EXPECT_TRUE( test_block(B2, true, N, p2) );
-
-	CHECK_MEM_PENDING( 3 );
-
-	swap(B0, B1);
-
-	EXPECT_TRUE( test_block(B0, true, N, p1) );
-	EXPECT_TRUE( test_block(B1, false, N, src) );
-
-	CHECK_MEM_PENDING( 3 );
-
-	swap(B0, B1);
-
-	EXPECT_TRUE( test_block(B1, true, N, p1) );
-	EXPECT_TRUE( test_block(B0, false, N, src) );
-
-	CHECK_MEM_PENDING( 3 );
-
+		CHECK_MEM_PENDING(3);
 	}
+
 	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 }
 
