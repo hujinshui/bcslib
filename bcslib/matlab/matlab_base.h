@@ -26,6 +26,10 @@ namespace bcs { namespace matlab {
 		{
 		}
 
+		virtual ~mexception() throw()
+		{
+		}
+
 		const char *identifier() const throw()
 		{
 			return m_identifier.c_str();
