@@ -121,23 +121,6 @@ namespace bcs
 
 	/********************************************
 	 *
-	 *   Array form, access, and layout
-	 *
-	 ********************************************/
-/*
-	struct layout_1d_t { };
-	struct row_major_t { };
-	struct column_major_t { };
-
-	template<class T> struct is_layout_order { static const bool value = false; };
-	template<> struct is_layout_order<layout_1d_t> { static const bool value = true; };
-	template<> struct is_layout_order<row_major_t> { static const bool value = true; };
-	template<> struct is_layout_order<column_major_t> { static const bool value = true; };
-*/
-
-
-	/********************************************
-	 *
 	 *   Forward declarations of specific
 	 *
 	 *   array classes
