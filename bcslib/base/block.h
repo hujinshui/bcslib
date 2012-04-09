@@ -190,7 +190,7 @@ namespace bcs
 		}
 
 		block(const block& s, const allocator_type& allocator = allocator_type())
-		: m_allocator(allocator)
+		: base_type(), m_allocator(allocator)
 		{
 			init(s.nelems());
 			this->copy_from(s.pbase());
