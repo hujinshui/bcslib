@@ -33,7 +33,7 @@ bcs::memory_allocation_monitor bcs::global_memory_allocation_monitor;
 
 
 
-TEST( BasicMem, ElemWiseOperations )
+TEST( BasicMem, ElemWise )
 {
 	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 
@@ -47,21 +47,67 @@ TEST( BasicMem, ElemWiseOperations )
 	int *p = alloc.allocate(N, BCS_NULL);
 	for (size_t i = 0; i < N; ++i) p[i] = 0;
 
-	mem<int>::fill(N, p, 7);
-	EXPECT_TRUE( mem<int>::equal(N, p, 7) );
+	fill_elems(N, p, 7);
+	ASSERT_TRUE( elems_equal(N, p, 7) );
 	p[2] = 0;
-	EXPECT_FALSE( mem<int>::equal(N, p, 7) );
+	ASSERT_FALSE( elems_equal(N, p, 7) );
 
-	mem<int>::copy(N, src, p);
-	EXPECT_TRUE( mem<int>::equal(N, p, src) );
+	copy_elems(N, src, p);
+	ASSERT_TRUE( elems_equal(N, p, src) );
 
-	mem<int>::zero(N, p);
-	EXPECT_TRUE( mem<int>::equal(N, p, int(0)) );
+	zero_elems(N, p);
+	ASSERT_TRUE( elems_equal(N, p, int(0)) );
 
 	alloc.deallocate(p, N);
 
 	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
 }
+
+TEST( BasicMem, ElemWise2D )
+{
+	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
+
+	const size_t m0 = 3;
+	const size_t n0 = 5;
+
+	const size_t m = 3;
+	const size_t n = 4;
+
+	const size_t in_dim = 3;
+	const size_t out_dim = 2;
+
+	int src0[m0 * n0] = {1, 2, 3, 4, 5,   6, 7, 8, 9, 10,   11, 12, 13, 14, 15};
+	const int *src = src0;
+
+	aligned_allocator<int> alloc;
+
+	int *p = alloc.allocate(m * n, BCS_NULL);
+	for (size_t i = 0; i < m * n; ++i) p[i] = -1;
+
+	zero_elems_2d(in_dim, out_dim, p, n);
+	int r0[m * n] = {0, 0, 0, -1,   0, 0, 0, -1,  -1, -1, -1, -1};
+	ASSERT_TRUE( elems_equal(m * n, p, r0) );
+
+	fill_elems_2d(in_dim, out_dim, p, n, 7);
+	int r1[m * n] = {7, 7, 7, -1,   7, 7, 7, -1,  -1, -1, -1, -1};
+	ASSERT_TRUE( elems_equal(m * n, p, r1) );
+	ASSERT_TRUE( elems_equal_2d(in_dim, out_dim, p, n, 7) );
+	p[6] = 100;
+	ASSERT_FALSE( elems_equal_2d(in_dim, out_dim, p, n, 7) );
+
+	copy_elems_2d(in_dim, out_dim, src, n0, p, n);
+	int r2[m * n] = {1, 2, 3, -1,   6, 7, 8, -1,  -1, -1, -1, -1};
+	ASSERT_TRUE( elems_equal(m * n, p, r2) );
+	ASSERT_TRUE( elems_equal_2d(in_dim, out_dim, p, n, src, n0) );
+	p[6] = 100;
+	ASSERT_FALSE( elems_equal_2d(in_dim, out_dim, p, n, src, n0) );
+
+	alloc.deallocate(p, m0 * n0);
+
+	ASSERT_FALSE( global_memory_allocation_monitor.has_pending() );
+}
+
+
 
 
 #define CHECK_MEM_PENDING(k) ASSERT_EQ(k, global_memory_allocation_monitor.num_pending_sections() )
@@ -89,17 +135,17 @@ TEST( BasicMem, BlockBase )
 	ASSERT_EQ(dst+N, B1.pend());
 
 	B1.set_zeros();
-	EXPECT_TRUE( mem<int>::equal(N, B1.pbase(), 0) );
+	EXPECT_TRUE( elems_equal(N, B1.pbase(), 0) );
 
 	B1.fill(7);
-	EXPECT_TRUE( mem<int>::equal(N, B1.pbase(), 7) );
+	EXPECT_TRUE( elems_equal(N, B1.pbase(), 7) );
 
 	B1.copy_from(src);
-	EXPECT_TRUE( mem<int>::equal(N, B1.pbase(), src) );
+	EXPECT_TRUE( elems_equal(N, B1.pbase(), src) );
 
 	B1.copy_to(tmp);
-	EXPECT_TRUE( mem<int>::equal(N, B1.pbase(), src) );
-	EXPECT_TRUE( mem<int>::equal(N, tmp, src) );
+	EXPECT_TRUE( elems_equal(N, B1.pbase(), src) );
+	EXPECT_TRUE( elems_equal(N, tmp, src) );
 
 	B0.swap(B1);
 	ASSERT_EQ(dst, B0.pbase());
@@ -133,7 +179,7 @@ TEST( BasicMem, Block )
 		blk_t B2(N1, 7);
 		ASSERT_EQ(N1, B2.nelems());
 		ASSERT_TRUE(B2.pbase() != BCS_NULL);
-		EXPECT_TRUE( mem<int>::equal(size_t(N1), B2.pbase(), 7) );
+		EXPECT_TRUE( elems_equal(size_t(N1), B2.pbase(), 7) );
 
 		CHECK_MEM_PENDING(2);
 
@@ -141,7 +187,7 @@ TEST( BasicMem, Block )
 		ASSERT_EQ(N2, B3.nelems());
 		ASSERT_TRUE(B3.pbase() != BCS_NULL);
 		ASSERT_TRUE(B3.pbase() != src);
-		EXPECT_TRUE( mem<int>::equal(size_t(N2), B3.pbase(), src) );
+		EXPECT_TRUE( elems_equal(size_t(N2), B3.pbase(), src) );
 
 		CHECK_MEM_PENDING(3);
 
@@ -149,7 +195,7 @@ TEST( BasicMem, Block )
 		ASSERT_EQ(N2, B4.nelems());
 		ASSERT_TRUE(B4.pbase() != BCS_NULL);
 		ASSERT_TRUE(B4.pbase() != B3.pbase());
-		EXPECT_TRUE( mem<int>::equal(size_t(N2), B4.pbase(), src) );
+		EXPECT_TRUE( elems_equal(size_t(N2), B4.pbase(), src) );
 
 		CHECK_MEM_PENDING(4);
 
@@ -158,7 +204,7 @@ TEST( BasicMem, Block )
 		ASSERT_EQ(N1, B4.nelems());
 		ASSERT_TRUE(B4.pbase() != BCS_NULL);
 		ASSERT_TRUE(B4.pbase() != B2.pbase());
-		EXPECT_TRUE( mem<int>::equal(size_t(N1), B4.pbase(), B2.pbase()) );
+		EXPECT_TRUE( elems_equal(size_t(N1), B4.pbase(), B2.pbase()) );
 
 		CHECK_MEM_PENDING(4);
 
@@ -198,7 +244,7 @@ TEST( BasicMem, ScopedBlock )
 		scblk_t B2(N1, 7);
 		ASSERT_EQ(N1, B2.nelems());
 		ASSERT_TRUE(B2.pbase() != BCS_NULL);
-		EXPECT_TRUE( mem<int>::equal(size_t(N1), B2.pbase(), 7) );
+		EXPECT_TRUE( elems_equal(size_t(N1), B2.pbase(), 7) );
 
 		CHECK_MEM_PENDING(2);
 
@@ -206,7 +252,7 @@ TEST( BasicMem, ScopedBlock )
 		ASSERT_EQ(N2, B3.nelems());
 		ASSERT_TRUE(B3.pbase() != BCS_NULL);
 		ASSERT_TRUE(B3.pbase() != src);
-		EXPECT_TRUE( mem<int>::equal(size_t(N2), B3.pbase(), src) );
+		EXPECT_TRUE( elems_equal(size_t(N2), B3.pbase(), src) );
 
 		CHECK_MEM_PENDING(3);
 	}

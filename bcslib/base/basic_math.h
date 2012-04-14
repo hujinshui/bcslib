@@ -86,7 +86,7 @@ namespace bcs
 
 		// Part of the new stuff in C++0x (Unfortunately, many are not available for MSVC yet)
 
-#if BCS_PLATFORM_INTERFACE==BCS_POSIX_INTERFACE
+#ifdef BCS_HAS_C99_MATH
 
 		using ::cbrt;
 		using ::copysign;
@@ -112,7 +112,7 @@ namespace bcs
 		using ::isinf;
 		using ::isnan;
 
-		// TODO: implement C99 math for MSVC
+		// TODO: alternative implementation of C99 math
 #endif
 
 

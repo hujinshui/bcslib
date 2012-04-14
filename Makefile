@@ -123,10 +123,12 @@ GRAPH_ALGORITHM_HEADERS = $(GRAPH_BASIC_HEADERS) \
 #---------- Target groups -------------------
 
 .PHONY: all
-all: test bench
+all: test
+# all: test bench
 
 .PHONY: test
-test: test_basics test_array test_data_structs test_graph
+test: test_basics
+# test: test_basics test_array test_data_structs test_graph
 
 .PHONY: benchnelems, 
 bench: bench_array
