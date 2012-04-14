@@ -99,25 +99,25 @@ namespace bcs
 		void copy_from(const value_type* src)
 		{
 			if (m_len > 0)
-				mem<T>::copy((size_type)m_len, src, m_data);
+				copy_elems((size_type)m_len, src, m_data);
 		}
 
 		void fill(const value_type& v)
 		{
 			if (m_len > 0)
-				mem<T>::fill((size_type)m_len, m_data, v);
+				fill_elems((size_type)m_len, m_data, v);
 		}
 
 		void set_zeros()
 		{
 			if (m_len > 0)
-				mem<T>::zero((size_type)m_len, m_data);
+				zero_elems((size_type)m_len, m_data);
 		}
 
 		void copy_to(value_type* dst) const
 		{
 			if (m_len > 0)
-				mem<T>::copy((size_type)m_len, m_data, dst);
+				copy_elems((size_type)m_len, m_data, dst);
 		}
 
 		void swap(block_base& r)
@@ -137,7 +137,7 @@ namespace bcs
 	template<typename T>
 	inline bool is_equal(const block_base<T>& B1, const block_base<T>& B2)
 	{
-		return B1.nelems() == B2.nelems() && mem<T>::equal(B1.nelems(), B1.pbase(), B2.pbase());
+		return B1.nelems() == B2.nelems() && elems_equal(B1.nelems(), B1.pbase(), B2.pbase());
 	}
 
 

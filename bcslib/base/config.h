@@ -13,7 +13,48 @@
 #ifndef BCSLIB_CONFIG_H
 #define BCSLIB_CONFIG_H
 
-// Platform-specific stuff
+/************************************************
+ *
+ *  User controls
+ *
+ ************************************************/
+
+/**
+ * Whether to use SSE2:
+ *
+ * Note: SSE2 contains a large set of useful vectorized
+ * computation instructions
+ */
+#define BCSLIB_USE_SSE2
+
+/**
+ * Whether to use SSE3:
+ *
+ * Note: SSE3 contains HADDPS and HADDPD (useful to speed up sum)
+ */
+#define BCSLIB_USE_SSE3
+
+
+/**
+ * Whether to use SSE4.1:
+ *
+ * Note: SSE4.1 contains DPPS and DPPD (useful to speed up dot product)
+ */
+#define BCSLIB_USE_SSE41
+
+
+/**
+ * Whether to turn off extensive checks (e.g. array bound)
+ */
+// #define BCSLIB_NO_DEBUG
+
+
+
+/************************************************
+ *
+ *  Compiler detection
+ *
+ ************************************************/
 
 #define BCSLIB_MSVC 0x01
 #define BCSLIB_GCC 0x02
@@ -34,6 +75,9 @@
 	#define BCS_USE_STATIC_ASSERT
 
 #elif (defined(__GNUC__))
+
+	#define BCS_HAS_C99_MATH
+
 	#if (defined(__clang__))
 		#if ((__clang_major__ < 2) || (__clang_major__ == 2 && __clang_minor__ < 8))
 			#error CLANG of version lower than 2.8.0 is not supported

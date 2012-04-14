@@ -36,48 +36,102 @@ namespace bcs
 	 *
 	 ********************************************/
 
-
-	/**
-	 * A static class for memory operations
-	 */
 	template<typename T>
-	class mem
+	inline void copy_elems(const size_t n, const T *src, T *dst)
 	{
-	public:
-		static void copy(size_t n, const T *src, T *dst)
-		{
-			std::memcpy(dst, src, n * sizeof(T));
-		}
+		std::memcpy(dst, src, n * sizeof(T));
+	}
 
-		static void zero(size_t n, T *dst)
-		{
-			std::memset(dst, 0, n * sizeof(T));
-		}
+	template<typename T>
+	inline void zero_elems(const size_t n, T *dst)
+	{
+		std::memset(dst, 0, n * sizeof(T));
+	}
 
-		static void fill(size_t n, T *dst, const T& v)
-		{
-			while(n--) *(dst++) = v;
-		}
+	template<typename T>
+	static void fill_elems(const size_t n, T *dst, const T& v)
+	{
+		for (size_t i = 0; i < n; ++i) dst[i] = v;
+	}
 
-		static bool equal(size_t n, const T *s1, const T *s2)
+	template<typename T>
+	static bool elems_equal(const size_t n, const T *s1, const T *s2)
+	{
+		for (size_t i = 0; i < n; ++i)
 		{
-			while(n--)
+			if (s1[i] != s2[i]) return false;
+		}
+		return true;
+	}
+
+	template<typename T>
+	static bool elems_equal(const size_t n, const T *s, const T& v)
+	{
+		for (size_t i = 0; i < n; ++i)
+		{
+			if (s[i] != v) return false;
+		}
+		return true;
+	}
+
+
+	template<typename T>
+	inline void copy_elems_2d(const size_t inner_dim, const size_t outer_dim,
+			const T *src, size_t src_ext, T *dst, size_t dst_ext)
+	{
+		for (size_t j = 0; j < outer_dim; ++j, src += src_ext, dst += dst_ext)
+		{
+			std::memcpy(dst, src, inner_dim * sizeof(T));
+		}
+	}
+
+	template<typename T>
+	inline void zero_elems_2d(const size_t inner_dim, const size_t outer_dim,
+			T *dst, const size_t dst_ext)
+	{
+		for (size_t j = 0; j < outer_dim; ++j, dst += dst_ext)
+		{
+			std::memset(dst, 0, inner_dim * sizeof(T));
+		}
+	}
+
+	template<typename T>
+	inline void fill_elems_2d(const size_t inner_dim, const size_t outer_dim,
+			T *dst, const size_t dst_ext, const T& v)
+	{
+		for (size_t j = 0; j < outer_dim; ++j, dst += dst_ext)
+		{
+			for (size_t i = 0; i < inner_dim; ++i) dst[i] = v;
+		}
+	}
+
+	template<typename T>
+	inline bool elems_equal_2d(const size_t inner_dim, const size_t outer_dim,
+			const T *s1, size_t s1_ext, const T *s2, size_t s2_ext)
+	{
+		for (size_t i = 0; i < outer_dim; ++i, s1 += s1_ext, s2 += s2_ext)
+		{
+			for (size_t i = 0; i < inner_dim; ++i)
 			{
-				if (*(s1++) != *(s2++)) return false;
+				if (s1[i] != s2[i]) return false;
 			}
-			return true;
 		}
+		return true;
+	}
 
-		static bool equal(size_t n, const T *s, const T& v)
+	template<typename T>
+	inline bool elems_equal_2d(const size_t inner_dim, const size_t outer_dim,
+			const T *s1, size_t s1_ext, const T& v)
+	{
+		for (size_t i = 0; i < outer_dim; ++i, s1 += s1_ext)
 		{
-			while (n--)
+			for (size_t i = 0; i < inner_dim; ++i)
 			{
-				if (*(s++) != v) return false;
+				if (s1[i] != v) return false;
 			}
-			return true;
 		}
-
-	}; // end class mem
+		return true;
+	}
 
 
 	/********************************************

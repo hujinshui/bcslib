@@ -89,6 +89,11 @@ namespace bcs
 #define BCS_ENSURE_INLINE __attribute__((always_inline))
 #endif
 
+#define BCS_CRTP_REF \
+		BCS_ENSURE_INLINE const Derived& derived() const { return *(static_cast<const Derived*>(this)); } \
+		BCS_ENSURE_INLINE Derived& derived() { return *(static_cast<Derived*>(this)); }
+
+
 
 #endif
 
