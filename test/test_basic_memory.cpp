@@ -164,6 +164,8 @@ TEST( BasicMem, Block )
 	const int src[N2] = {1, 3, 4, 5, 2};
 
 	{
+		// construction
+
 		blk_t B0(0);
 		ASSERT_EQ(0, B0.nelems());
 		ASSERT_EQ(BCS_NULL, B0.pbase());
@@ -212,6 +214,37 @@ TEST( BasicMem, Block )
 
 		ASSERT_EQ(0, B4.nelems());
 		ASSERT_EQ(BCS_NULL, B4.pbase());
+
+		CHECK_MEM_PENDING(3);
+
+		// resize
+
+		B3.resize(N2);
+
+		int *pold = B3.pbase();
+		ASSERT_TRUE( B3.pbase() == pold );
+		ASSERT_EQ( N2, B3.nelems() );
+
+		CHECK_MEM_PENDING(3);
+
+		B3.resize(13);
+
+		ASSERT_EQ( 13, B3.nelems() );
+		ASSERT_TRUE( B3.pbase() != BCS_NULL );
+
+		CHECK_MEM_PENDING(3);
+
+		B3.resize(0);
+
+		ASSERT_EQ( 0, B3.nelems() );
+		ASSERT_TRUE( B3.pbase() == BCS_NULL );
+
+		CHECK_MEM_PENDING(2);
+
+		B3.resize(15);
+
+		ASSERT_EQ( 15, B3.nelems() );
+		ASSERT_TRUE( B3.pbase() != BCS_NULL );
 
 		CHECK_MEM_PENDING(3);
 	}

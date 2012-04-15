@@ -14,8 +14,6 @@ endif
 # Compiler configuration
 #-------------------------
 
-CXX=clang++
-
 WARNING_FLAGS = -Wall -Wextra -Wconversion -Wformat -Wno-unused-parameter
 CPPFLAGS = -I. -isystem $(ARMA_HOME)/include
 
@@ -83,6 +81,11 @@ BASE_HEADERS = \
 	$(INC)/base/block.h \
 	$(INC)/base/monitored_allocator.h \
 	$(INC)/base/timer.h
+	
+MATRIX_HEADERS = \
+	$(INC)/matrix/matrix_base.h \
+	$(INC)/matrix/dense_matrix.h	
+
 
 ARRAY_BASIC_HEADERS = $(BASE_HEADERS) \
 	$(INC)/array/aview_base.h \
@@ -127,7 +130,7 @@ all: test
 # all: test bench
 
 .PHONY: test
-test: test_basics
+test: test_basics test_matrix
 # test: test_basics test_array test_data_structs test_graph
 
 .PHONY: benchnelems, 
@@ -143,6 +146,11 @@ clean:
 
 .PHONY: test_basics
 test_basics: $(BIN)/test_basics
+
+#------ Matrix tests ----------
+
+.PHONY: test_matrix
+test_matrix: $(BIN)/test_matrix_basics
 
 
 #------ Array tests (declaration) -----------
@@ -199,6 +207,21 @@ TEST_BASICS_SOURCES = \
 	
 $(BIN)/test_basics: $(BASE_HEADERS) $(TEST_BASICS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
+
+
+#----------------------------------------------------------
+#
+#   Matrix (details)
+#
+#----------------------------------------------------------
+
+TEST_MATRIX_BASICS_SOURCES = \
+	test/test_dense_matrix.cpp
+
+
+$(BIN)/test_matrix_basics: $(MATRIX_HEADERS) $(TEST_MATRIX_BASICS_SOURCES)
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
+
 
 
 #----------------------------------------------------------

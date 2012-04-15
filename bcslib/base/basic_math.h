@@ -109,8 +109,9 @@ namespace bcs
 		using ::lgamma;
 		using ::tgamma;
 
-		using ::isinf;
-		using ::isnan;
+		// These two are not found by Mac's gcc 4.2
+		// using ::isinf;
+		// using ::isnan;
 
 		// TODO: alternative implementation of C99 math
 #endif

@@ -169,6 +169,12 @@ namespace bcs
 		typedef block_base<T> base_type;
 
 	public:
+		explicit block(const allocator_type& allocator = allocator_type())
+		: m_allocator(allocator)
+		{
+			init(0);
+		}
+
 		explicit block(index_type len, const allocator_type& allocator = allocator_type())
 		: m_allocator(allocator)
 		{
@@ -224,6 +230,15 @@ namespace bcs
 			return m_allocator;
 		}
 
+		void resize(index_type n)
+		{
+			if (n != this->nelems())
+			{
+				pointer p = n > 0 ? m_allocator.allocate(size_type(n)) : BCS_NULL;
+				release();
+				this->reset(n, p);
+			}
+		}
 
 	private:
 		void init(index_type n)
