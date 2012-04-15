@@ -19,9 +19,9 @@ namespace bcs
 {
 	namespace detail
 	{
-		template<class Mat>
+		template<class Derived, typename T>
 		BCS_ENSURE_INLINE
-		inline void check_matrix_indices(const Mat& mat, index_t i, index_t j)
+		inline void check_matrix_indices(const IMatrixBase<Derived, T>& mat, index_t i, index_t j)
 		{
 #ifndef BCSLIB_NO_DEBUG
 			check_arg(i >= 0 && i < mat.nrows() && j >= 0 && j < mat.ncolumns(),
@@ -29,30 +29,21 @@ namespace bcs
 #endif
 		}
 
-		template<class LMat, class RMat>
+		template<class LDerived, typename LT, class RDerived, typename RT>
 		BCS_ENSURE_INLINE
-		inline void check_rhs_view(const LMat& lhs, const RMat& rhs)
+		inline void check_rhs_view(
+				const IMatrixBase<LDerived, LT>& lhs,
+				const IMatrixBase<RDerived, RT>& rhs)
 		{
-			index_t lm = lhs.nrows();
-			index_t ln = lhs.ncolumns();
-
 			bool is_fit;
-
-			if (ln == 1)  // this is column
+			if (lhs.is_vector())
 			{
-				is_fit = ((rhs.nrows() == 1 && rhs.ncolumns() == lm) ||
-						  (rhs.nrows() == lm && rhs.ncolumns() == 1));
-			}
-			else if (lm == 1) // this is row
-			{
-				is_fit = ((rhs.nrows() == 1 && rhs.ncolumns() == ln) ||
-						  (rhs.nrows() == ln && rhs.ncolumns() == 1));
+				is_fit = rhs.is_vector() && lhs.nelems() == rhs.nelems();
 			}
 			else
 			{
-				is_fit = (lm == rhs.nrows() && ln == rhs.ncolumns());
+				is_fit = is_same_size(lhs, rhs);
 			}
-
 			check_arg(is_fit, "The right hand side assignment does not fit the view");
 		}
 
