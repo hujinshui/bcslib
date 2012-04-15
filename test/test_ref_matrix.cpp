@@ -89,6 +89,21 @@ TEST( RefClasses, RefMatrix)
 
 	ASSERT_TRUE( verify_dense_matrix(S2, m, n) );
 	ASSERT_TRUE( S2.ptr_base() == D.ptr_base() );
+
+	double tar[m * n] = {10, 20, 30, 40, 50, 60};
+	RefMatrix<double> S3(tar, m, n);
+
+	ASSERT_TRUE( verify_dense_matrix(S3, m, n) );
+	ASSERT_TRUE( S3.ptr_base() == tar );
+
+	S3 = S2;
+
+	ASSERT_TRUE( S3.ptr_base() == tar );
+	ASSERT_TRUE( S2.ptr_base() == D.ptr_base() );
+	ASSERT_FALSE( S3.ptr_base() == S2.ptr_base() );
+
+	ASSERT_TRUE( is_equal(S2, S3) );
+	ASSERT_TRUE( elems_equal(6, dst, tar) );
 }
 
 
