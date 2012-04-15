@@ -26,7 +26,7 @@
 #include <malloc.h>
 #endif
 
-#define BEAVER_DEFAULT_ALIGNMENT 16
+#define BCS_DEFAULT_ALIGNMENT 16
 
 namespace bcs
 {
@@ -174,7 +174,7 @@ namespace bcs
     class aligned_allocator
     {
     public:
-    	static const size_t default_memory_alignment = BEAVER_DEFAULT_ALIGNMENT;
+    	static const size_t default_memory_alignment = BCS_DEFAULT_ALIGNMENT;
 
     	typedef T value_type;
     	typedef T* pointer;

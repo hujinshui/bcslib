@@ -57,7 +57,7 @@ namespace bcs
 
 	// generic argument checking
 
-	inline void check_arg(bool cond)
+	BCS_ENSURE_INLINE inline void check_arg(bool cond)
 	{
 		if (!cond)
 		{
@@ -65,7 +65,7 @@ namespace bcs
 		}
 	}
 
-	inline void check_arg(bool cond, const char* message)
+	BCS_ENSURE_INLINE inline void check_arg(bool cond, const char* message)
 	{
 		if (!cond)
 		{
@@ -73,7 +73,7 @@ namespace bcs
 		}
 	}
 
-	inline void check_range(bool cond)
+	BCS_ENSURE_INLINE inline void check_range(bool cond)
 	{
 		if (!cond)
 		{
@@ -81,12 +81,19 @@ namespace bcs
 		}
 	}
 
-	inline void check_range(bool cond, const char *message)
+	BCS_ENSURE_INLINE inline void check_range(bool cond, const char *message)
 	{
 		if (!cond)
 		{
 			throw out_of_range(message);
 		}
+	}
+
+	template<typename T>
+	BCS_ENSURE_INLINE inline const T& check_forward(const T& val, const T& expect)
+	{
+		check_arg(val == expect);
+		return val;
 	}
 
 }

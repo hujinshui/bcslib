@@ -15,6 +15,7 @@
 
 using namespace bcs;
 
+#ifdef BCS_USE_STATIC_ASSERT
 static_assert(is_key_map<std::vector<double> >::value, "vector must be a key_map.");
 // static_assert(is_key_map<std::map<char, double> >::value, "vector must be a key_map.");
-
+#endif
