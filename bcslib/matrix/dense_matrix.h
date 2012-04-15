@@ -471,19 +471,6 @@ namespace bcs
 	 ********************************************/
 
 	template<typename T, int RowDim>
-	struct matrix_traits<DenseCol<T, RowDim> >
-	{
-		MAT_TRAITS_DEFS(T)
-
-		static const index_type RowDimension = RowDim;
-		static const index_type ColDimension = 1;
-		static const bool IsReadOnly = false;
-
-		typedef const DenseCol<T, RowDim>& eval_return_type;
-	};
-
-
-	template<typename T, int RowDim>
 	class DenseCol : public DenseMatrix<T, RowDim, 1>
 	{
 	private:
@@ -494,7 +481,6 @@ namespace bcs
 
 		static const index_t RowDimension = RowDim;
 		static const index_t ColDimension = 1;
-		typedef const DenseCol<T, RowDim>& eval_return_type;
 
 	public:
 
@@ -545,18 +531,6 @@ namespace bcs
 
 
 	template<typename T, int ColDim>
-	struct matrix_traits<DenseRow<T, ColDim> >
-	{
-		MAT_TRAITS_DEFS(T)
-
-		static const index_type RowDimension = 1;
-		static const index_type ColDimension = ColDim;
-		static const bool IsReadOnly = false;
-
-		typedef const DenseRow<T, ColDim>& eval_return_type;
-	};
-
-	template<typename T, int ColDim>
 	class DenseRow : public DenseMatrix<T, 1, ColDim>
 	{
 	private:
@@ -567,7 +541,6 @@ namespace bcs
 
 		static const index_t RowDimension = 1;
 		static const index_t ColDimension = ColDim;
-		typedef const DenseRow<T, ColDim>& eval_return_type;
 
 	public:
 

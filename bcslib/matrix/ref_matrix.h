@@ -259,7 +259,7 @@ namespace bcs
 		}
 
 		BCS_ENSURE_INLINE
-		CRefMatrix(CRefMatrix& other)
+		CRefMatrix(const CRefMatrix& other)
 		: m_base(other.m_base), m_nrows(other.m_nrows), m_ncols(other.m_ncols)
 		{
 		}
@@ -398,6 +398,106 @@ namespace bcs
 
 	}; // end class CRefMatrix
 
+
+	template<typename T, int RowDim>
+	class RefCol : public RefMatrix<T, RowDim, 1>
+	{
+		typedef RefMatrix<T, RowDim, 1> base_mat_t;
+
+	public:
+		MAT_TRAITS_DEFS(T)
+
+		static const index_t RowDimension = RowDim;
+		static const index_t ColDimension = 1;
+
+	public:
+
+		BCS_ENSURE_INLINE
+		explicit RefCol() : base_mat_t() { }
+
+		BCS_ENSURE_INLINE
+		RefCol(const base_mat_t& other) : base_mat_t(other) { }
+
+		BCS_ENSURE_INLINE
+		RefCol(T *data, index_t m) : base_mat_t(data, m, 1) { }
+
+	}; // end class RefCol
+
+
+	template<typename T, int RowDim>
+	class CRefCol : public CRefMatrix<T, RowDim, 1>
+	{
+		typedef CRefMatrix<T, RowDim, 1> base_mat_t;
+
+	public:
+		MAT_TRAITS_DEFS(T)
+
+		static const index_t RowDimension = RowDim;
+		static const index_t ColDimension = 1;
+
+	public:
+
+		BCS_ENSURE_INLINE
+		explicit CRefCol() : base_mat_t() { }
+
+		BCS_ENSURE_INLINE
+		CRefCol(const base_mat_t& other) : base_mat_t(other) { }
+
+		BCS_ENSURE_INLINE
+		CRefCol(const T *data, index_t m) : base_mat_t(data, m, 1) { }
+
+	}; // end class CRefCol
+
+
+
+	template<typename T, int ColDim>
+	class RefRow : public RefMatrix<T, 1, ColDim>
+	{
+		typedef RefMatrix<T, 1, ColDim> base_mat_t;
+
+	public:
+		MAT_TRAITS_DEFS(T)
+
+		static const index_t RowDimension = 1;
+		static const index_t ColDimension = ColDim;
+
+	public:
+
+		BCS_ENSURE_INLINE
+		explicit RefRow() : base_mat_t() { }
+
+		BCS_ENSURE_INLINE
+		RefRow(const base_mat_t& other) : base_mat_t(other) { }
+
+		BCS_ENSURE_INLINE
+		RefRow(T *data, index_t m) : base_mat_t(data, 1, m) { }
+
+	}; // end class RefRow
+
+
+	template<typename T, int ColDim>
+	class CRefRow : public CRefMatrix<T, 1, ColDim>
+	{
+		typedef CRefMatrix<T, 1, ColDim> base_mat_t;
+
+	public:
+		MAT_TRAITS_DEFS(T)
+
+		static const index_t RowDimension = 1;
+		static const index_t ColDimension = ColDim;
+
+	public:
+
+		BCS_ENSURE_INLINE
+		explicit CRefRow() : base_mat_t() { }
+
+		BCS_ENSURE_INLINE
+		CRefRow(const base_mat_t& other) : base_mat_t(other) { }
+
+		BCS_ENSURE_INLINE
+		CRefRow(T *data, index_t m) : base_mat_t(data, 1, m) { }
+
+	}; // end class CRefRow
 
 }
 
