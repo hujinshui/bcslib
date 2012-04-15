@@ -303,9 +303,8 @@ namespace bcs
 			other.eval_to(*this);
 		}
 
-		template<class OtherDerived>
 		BCS_ENSURE_INLINE
-		const DenseMatrix& operator = (const IMatrixBase<OtherDerived, T>& other)
+		const DenseMatrix& operator = (const DenseMatrix& other)
 		{
 			if (this != &other)
 			{
@@ -313,8 +312,20 @@ namespace bcs
 				{
 					this->resize(other.nrows(), other.ncolumns());
 				}
-				other.eval_to(*this);
+				copy_from(other.ptr_base());
 			}
+			return *this;
+		}
+
+		template<class OtherDerived>
+		BCS_ENSURE_INLINE
+		const DenseMatrix& operator = (const IMatrixBase<OtherDerived, T>& other)
+		{
+			if (!is_same_size(*this, other))
+			{
+				this->resize(other.nrows(), other.ncolumns());
+			}
+			other.eval_to(*this);
 			return *this;
 		}
 

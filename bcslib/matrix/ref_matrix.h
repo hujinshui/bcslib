@@ -71,16 +71,12 @@ namespace bcs
 		{
 		}
 
-
 		template<class OtherDerived>
 		BCS_ENSURE_INLINE
 		const RefMatrix& operator = (IMatrixBase<OtherDerived, T>& other)
 		{
-			if (this != &other)
-			{
-				check_arg( is_same_size(*this, other) );
-				other.eval_to(*this);
-			}
+			check_arg( is_same_size(*this, other) );
+			other.eval_to(*this);
 			return *this;
 		}
 
