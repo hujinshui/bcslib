@@ -45,6 +45,7 @@ static bool verify_dense_matrix(const IDenseMatrix<Derived, T>& A, index_t m, in
 	if (!(A.nelems() == m * n)) return false;
 	if (!(A.size() == size_t(m * n))) return false;
 	if (!(A.is_empty() == (m == 0 || n == 0))) return false;
+	if (!(A.is_vector() == (m == 1 || n == 1))) return false;
 	if (!(A.lead_dim() == m)) return false;
 
 	if (A.is_empty())
@@ -155,8 +156,6 @@ TEST( RefClasses, RefVector )
 
 	ASSERT_TRUE( elems_equal(len, dst, 2.0) );
 }
-
-
 
 
 

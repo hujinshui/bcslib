@@ -57,6 +57,12 @@ namespace bcs
 			index_t ncols() const { return ColDim; }
 
 			BCS_ENSURE_INLINE
+			bool is_empty() const { return false; }
+
+			BCS_ENSURE_INLINE
+			bool is_vector() const { return RowDim == 1 || ColDim == 1; }
+
+			BCS_ENSURE_INLINE
 			const T *ptr() const { return arr; }
 
 			BCS_ENSURE_INLINE
@@ -98,6 +104,12 @@ namespace bcs
 
 			BCS_ENSURE_INLINE
 			index_t ncols() const { return ColDim; }
+
+			BCS_ENSURE_INLINE
+			bool is_empty() const { return n_rows == 0; }
+
+			BCS_ENSURE_INLINE
+			bool is_vector() const { return ColDim == 1 || n_rows == 1; }
 
 			BCS_ENSURE_INLINE
 			const T *ptr() const { return blk.pbase(); }
@@ -150,6 +162,12 @@ namespace bcs
 			index_t ncols() const { return n_cols; }
 
 			BCS_ENSURE_INLINE
+			bool is_empty() const { return n_cols == 0; }
+
+			BCS_ENSURE_INLINE
+			bool is_vector() const { return RowDim == 1 || n_cols == 1; }
+
+			BCS_ENSURE_INLINE
 			const T *ptr() const { return blk.pbase(); }
 
 			BCS_ENSURE_INLINE
@@ -199,6 +217,12 @@ namespace bcs
 
 			BCS_ENSURE_INLINE
 			index_t ncols() const { return n_cols; }
+
+			BCS_ENSURE_INLINE
+			bool is_empty() const { return n_rows == 0 || n_cols == 0; }
+
+			BCS_ENSURE_INLINE
+			bool is_vector() const { return n_rows == 1 || n_rows == 1; }
 
 			BCS_ENSURE_INLINE
 			const T *ptr() const { return blk.pbase(); }
@@ -369,7 +393,12 @@ namespace bcs
 
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
-			return nrows() == 0 || ncolumns() == 0;
+			return m_internal.is_empty();
+		}
+
+		BCS_ENSURE_INLINE bool is_vector() const
+		{
+			return m_internal.is_vector();
 		}
 
 		BCS_ENSURE_INLINE const_pointer ptr_base() const

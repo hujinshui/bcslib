@@ -17,6 +17,7 @@
 
 namespace bcs
 {
+
 	// forward declaration of some important types
 
 	template<typename T, int RowDim=DynamicDim, int ColDim=DynamicDim> class RefMatrix;
@@ -28,8 +29,8 @@ namespace bcs
 	template<typename T, int ColDim=DynamicDim> class RefRow;
 	template<typename T, int ColDim=DynamicDim> class CRefRow;
 
-	template<typename T, int ColDim=DynamicDim> class RefStepRow;
-	template<typename T, int ColDim=DynamicDim> class CRefStepRow;
+	template<typename T, typename Dir=VertDir, int Dim=DynamicDim> class StepVector;
+	template<typename T, typename Dir=VertDir, int Dim=DynamicDim> class CStepVector;
 
 	template<typename T> class RefBlock;
 	template<typename T> class CRefBlock;
