@@ -19,6 +19,15 @@ namespace bcs
 {
 	namespace detail
 	{
+		template<class Mat>
+		BCS_ENSURE_INLINE
+		inline void check_matrix_indices(const Mat& mat, index_t i, index_t j)
+		{
+#ifndef BCSLIB_NO_DEBUG
+			check_arg(i >= 0 && i < mat.nrows() && j >= 0 && j < mat.ncolumns());
+#endif
+		}
+
 		template<bool SingleRow, bool SingleColumn> struct offset_helper;
 
 		template<> struct offset_helper<false, false>

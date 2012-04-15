@@ -7,8 +7,7 @@
  */
 
 #include "bcs_test_basics.h"
-
-#include <bcslib/matrix/ref_matrix.h>
+#include <bcslib/matrix/matrix.h>
 
 using namespace bcs;
 using namespace bcs::test;

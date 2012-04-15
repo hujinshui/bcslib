@@ -14,7 +14,7 @@
 #define BCSLIB_ARG_CHECK_H_
 
 #include <bcslib/base/basic_defs.h>
-#include <exception>
+#include <stdexcept>
 
 namespace bcs
 {
