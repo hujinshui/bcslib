@@ -14,13 +14,13 @@
 #define BCSLIB_DENSE_MATRIX_H_
 
 #include <bcslib/matrix/matrix_base.h>
+#include <bcslib/matrix/ref_matrix.h>
 #include <bcslib/base/block.h>
+
 
 namespace bcs
 {
 	// forward declaration
-
-	const int DynamicDim = 0;
 
 	template<typename T, int RowDim=DynamicDim, int ColDim=DynamicDim> class DenseMatrix;
 	template<typename T, int RowDim=DynamicDim> class DenseCol;
@@ -35,56 +35,6 @@ namespace bcs
 
 	namespace detail
 	{
-		// offset
-
-		template<bool SingleRow, bool SingleColumn> struct offset_helper;
-
-		template<> struct offset_helper<false, false>
-		{
-			BCS_ENSURE_INLINE
-			static inline index_t calc(index_t lead_dim, index_t i, index_t j)
-			{
-				return i + lead_dim * j;
-			}
-		};
-
-		template<> struct offset_helper<false, true>
-		{
-			BCS_ENSURE_INLINE
-			static inline index_t calc(index_t lead_dim, index_t i, index_t)
-			{
-				return i;
-			}
-		};
-
-		template<> struct offset_helper<true, false>
-		{
-			BCS_ENSURE_INLINE
-			static inline index_t calc(index_t lead_dim, index_t, index_t j)
-			{
-				return j;
-			}
-		};
-
-
-		template<> struct offset_helper<true, true>
-		{
-			BCS_ENSURE_INLINE
-			static inline index_t calc(index_t lead_dim, index_t, index_t)
-			{
-				return 0;
-			}
-		};
-
-
-		template<int RowDim, int ColDim>
-		BCS_ENSURE_INLINE
-		inline index_t calc_offset(index_t lead_dim, index_t i, index_t j)
-		{
-			return offset_helper<RowDim == 1, ColDim == 1>::calc(lead_dim, i, j);
-		}
-
-
 		// storage implementation
 
 		template<typename T, int RowDim, int ColDim> struct matrix_impl;
@@ -296,9 +246,6 @@ namespace bcs
 		static const int RowDimension = RowDim;
 		static const int ColDimension = ColDim;
 
-		static const bool RowDimensionIsFixed = (RowDim >= 1);
-		static const bool ColDimensionIsFixed = (ColDim >= 1);
-
 		typedef const DenseMatrix<T, RowDim, ColDim>& eval_return_type;
 	};
 
@@ -360,6 +307,35 @@ namespace bcs
 		: m_impl(other.nrows(), other.ncolumns())
 		{
 			other.eval_to(*this);
+		}
+
+		BCS_ENSURE_INLINE
+		const DenseMatrix& operator = (const DenseMatrix& other)
+		{
+			if (this != &other)
+			{
+				if (!is_same_size(*this, other))
+				{
+					this->resize(other.nrows(), other.ncolumns());
+				}
+				copy_from(other.ptr_base());
+			}
+			return *this;
+		}
+
+		template<class OtherDerived>
+		BCS_ENSURE_INLINE
+		const DenseMatrix& operator = (const IMatrixBase<OtherDerived, T>& other)
+		{
+			if (this != &other)
+			{
+				if (!is_same_size(*this, other))
+				{
+					this->resize(other.nrows(), other.ncolumns());
+				}
+				other.eval_to(*this);
+			}
+			return *this;
 		}
 
 		BCS_ENSURE_INLINE
@@ -497,7 +473,7 @@ namespace bcs
 		typedef detail::matrix_impl<T, RowDim, ColDim> impl_type;
 		impl_type m_impl;
 
-	}; // end class DenseMatrix<T, DynamicDim, DynamicDim>
+	}; // end class DenseMatrix
 
 
 
