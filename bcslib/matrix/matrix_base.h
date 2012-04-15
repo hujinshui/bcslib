@@ -243,6 +243,16 @@ namespace bcs
 			return derived().ptr_base();
 		}
 
+		BCS_ENSURE_INLINE const_pointer col_ptr(index_type j) const
+		{
+			return derived().col_ptr(j);
+		}
+
+		BCS_ENSURE_INLINE pointer col_ptr(index_type j)
+		{
+			return derived().col_ptr(j);
+		}
+
 		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
 			return derived().lead_dim();
@@ -354,6 +364,16 @@ namespace bcs
 			return derived().ptr_base();
 		}
 
+		BCS_ENSURE_INLINE const_pointer col_ptr(index_type j) const
+		{
+			return derived().col_ptr(j);
+		}
+
+		BCS_ENSURE_INLINE pointer col_ptr(index_type j)
+		{
+			return derived().col_ptr(j);
+		}
+
 		BCS_ENSURE_INLINE index_type lead_dim() const
 		{
 			return derived().lead_dim();
@@ -432,26 +452,71 @@ namespace bcs
 	 ********************************************/
 
 	template<class Derived1, typename T1, class Derived2, typename T2>
-	void is_same_size(const IMatrixBase<Derived1, T1>& A, const IMatrixBase<Derived2, T2>& B)
+	BCS_ENSURE_INLINE
+	inline bool is_same_size(const IMatrixBase<Derived1, T1>& A, const IMatrixBase<Derived2, T2>& B)
 	{
 		return A.nrows() == B.nrows() && A.ncolumns() == B.ncolumns();
 	}
 
+	template<typename T, class Derived1, class Derived2>
+	inline bool is_equal(const IDenseMatrixView<Derived1, T>& A, const IDenseMatrixView<Derived2, T>& B)
+	{
+		if (is_same_size(A, B))
+		{
+			index_t m = A.nrows();
+			index_t n = A.ncolumns();
+
+			for (index_t j = 0; j < n; ++j)
+			{
+				for (index_t i = 0; i < m; ++i)
+				{
+					if (A.elem(i, j) != B.elem(i, j)) return false;
+				}
+			}
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+
+	template<typename T, class Derived1, class Derived2>
+	inline bool is_equal(const IDenseMatrixBlock<Derived1, T>& A, const IDenseMatrixBlock<Derived2, T>& B)
+	{
+		if (is_same_size(A, B))
+		{
+			return elems_equal_2d((size_t)A.nrows(), (size_t)A.ncolumns(),
+					A.ptr_base(), (size_t)A.lead_dim(), B.ptr_base(), (size_t)B.lead_dim());
+		}
+		else return false;
+	}
+
+	template<typename T, class Derived1, class Derived2>
+	inline bool is_equal(const IDenseMatrix<Derived1, T>& A, const IDenseMatrix<Derived2, T>& B)
+	{
+		if (is_same_size(A, B))
+		{
+			return elems_equal(A.size(), A.ptr_base(), B.ptr_base());
+		}
+		else return false;
+	}
 
 	template<class Derived, typename T>
-	void fill(IDenseMatrixBlock<Derived, T>& X, const T& v)
+	inline void fill(IDenseMatrixBlock<Derived, T>& X, const T& v)
 	{
 		fill_elems_2d((size_t)X.nrows(), (size_t)X.ncolumns(), X.ptr_base(), (size_t)X.lead_dim(), v);
 	}
 
 	template<class Derived, typename T>
-	void zero(IDenseMatrixBlock<Derived, T>& X)
+	inline void zero(IDenseMatrixBlock<Derived, T>& X)
 	{
 		zero_elems_2d((size_t)X.nrows(), (size_t)X.ncolumns(), X.ptr_base(), (size_t)X.lead_dim());
 	}
 
 	template<class LDerived, class RDerived, typename T>
-	void copy(const IDenseMatrixBlock<LDerived, T>& src, IDenseMatrixBlock<RDerived, T>& dst)
+	inline void copy(const IDenseMatrixBlock<LDerived, T>& src, IDenseMatrixBlock<RDerived, T>& dst)
 	{
 		check_arg( is_same_size(src, dst) );
 		copy_elems_2d((size_t)src.nrows(), (size_t)src.ncolumns(),
@@ -460,7 +525,7 @@ namespace bcs
 	}
 
 	template<class LDerived, class RDerived, typename T>
-	void copy(const IDenseMatrix<LDerived, T>& src, IDenseMatrix<RDerived, T>& dst)
+	inline void copy(const IDenseMatrix<LDerived, T>& src, IDenseMatrix<RDerived, T>& dst)
 	{
 		check_arg( is_same_size(src, dst) );
 		copy_elems(src.size(), src.ptr_base(), dst.ptr_base());
