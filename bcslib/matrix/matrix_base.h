@@ -16,8 +16,7 @@
 #include <bcslib/base/basic_defs.h>
 #include <bcslib/base/basic_math.h>
 #include <bcslib/base/arg_check.h>
-#include <bcslib/base/mem_op.h>
-#include <cstdio>
+
 
 
 #define MAT_TRAITS_DEFS(T) \
@@ -29,7 +28,6 @@
 	typedef size_t size_type; \
 	typedef index_t difference_type; \
 	typedef index_t index_type;
-
 
 
 namespace bcs
@@ -124,19 +122,6 @@ namespace bcs
 
 	}; // end class IMatrixBase
 
-
-
-	namespace detail
-	{
-		template<class Mat>
-		BCS_ENSURE_INLINE
-		inline void check_matrix_indices(const Mat& mat, index_t i, index_t j)
-		{
-#ifndef BCSLIB_NO_DEBUG
-			check_arg(i >= 0 && i < mat.nrows() && j >= 0 && j < mat.ncolumns());
-#endif
-		}
-	}
 
 
 	/**
@@ -484,119 +469,6 @@ namespace bcs
 	{
 		return A.nrows() == B.nrows() && A.ncolumns() == B.ncolumns();
 	}
-
-	template<typename T, class Derived1, class Derived2>
-	inline bool is_equal(const IDenseMatrixView<Derived1, T>& A, const IDenseMatrixView<Derived2, T>& B)
-	{
-		if (is_same_size(A, B))
-		{
-			index_t m = A.nrows();
-			index_t n = A.ncolumns();
-
-			for (index_t j = 0; j < n; ++j)
-			{
-				for (index_t i = 0; i < m; ++i)
-				{
-					if (A.elem(i, j) != B.elem(i, j)) return false;
-				}
-			}
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-
-	template<typename T, class Derived1, class Derived2>
-	inline bool is_equal(const IDenseMatrixBlock<Derived1, T>& A, const IDenseMatrixBlock<Derived2, T>& B)
-	{
-		if (is_same_size(A, B))
-		{
-			return elems_equal_2d((size_t)A.nrows(), (size_t)A.ncolumns(),
-					A.ptr_base(), (size_t)A.lead_dim(), B.ptr_base(), (size_t)B.lead_dim());
-		}
-		else return false;
-	}
-
-	template<typename T, class Derived1, class Derived2>
-	inline bool is_equal(const IDenseMatrix<Derived1, T>& A, const IDenseMatrix<Derived2, T>& B)
-	{
-		if (is_same_size(A, B))
-		{
-			return elems_equal(A.size(), A.ptr_base(), B.ptr_base());
-		}
-		else return false;
-	}
-
-	template<class Derived, typename T>
-	inline void fill(IDenseMatrixBlock<Derived, T>& X, const T& v)
-	{
-		fill_elems_2d((size_t)X.nrows(), (size_t)X.ncolumns(), X.ptr_base(), (size_t)X.lead_dim(), v);
-	}
-
-	template<class Derived, typename T>
-	inline void zero(IDenseMatrixBlock<Derived, T>& X)
-	{
-		zero_elems_2d((size_t)X.nrows(), (size_t)X.ncolumns(), X.ptr_base(), (size_t)X.lead_dim());
-	}
-
-	template<class LDerived, class RDerived, typename T>
-	inline void copy(const IDenseMatrixBlock<LDerived, T>& src, IDenseMatrixBlock<RDerived, T>& dst)
-	{
-		check_arg( is_same_size(src, dst) );
-		copy_elems_2d((size_t)src.nrows(), (size_t)src.ncolumns(),
-				src.ptr_base(), (size_t)src.lead_dim(),
-				dst.ptr_base(), (size_t)dst.lead_dim());
-	}
-
-	template<class LDerived, class RDerived, typename T>
-	inline void copy(const IDenseMatrix<LDerived, T>& src, IDenseMatrix<RDerived, T>& dst)
-	{
-		check_arg( is_same_size(src, dst) );
-		copy_elems(src.size(), src.ptr_base(), dst.ptr_base());
-	}
-
-	template<class Derived, typename T>
-	void printf_mat(const char *fmt, const IDenseMatrixView<Derived, T>& X,
-			const char *pre_line = 0, const char *delim = "\n")
-	{
-		index_t m = X.nrows();
-		index_t n = X.ncolumns();
-
-		for (index_t i = 0; i < m; ++i)
-		{
-			if (pre_line) std::printf("%s", pre_line);
-			for (index_t j = 0; j < n; ++j)
-			{
-				std::printf(fmt, X.elem(i, j));
-			}
-			std::printf("%s", delim);
-		}
-	}
-
-
-	// forward declaration of some important types
-
-	template<typename T, int RowDim=DynamicDim, int ColDim=DynamicDim> class RefMatrix;
-	template<typename T, int RowDim=DynamicDim, int ColDim=DynamicDim> class CRefMatrix;
-
-	template<typename T, int RowDim=DynamicDim> class RefCol;
-	template<typename T, int RowDim=DynamicDim> class CRefCol;
-
-	template<typename T, int ColDim=DynamicDim> class RefRow;
-	template<typename T, int ColDim=DynamicDim> class CRefRow;
-
-	template<typename T, int ColDim=DynamicDim> class RefStepRow;
-	template<typename T, int ColDim=DynamicDim> class CRefStepRow;
-
-	template<typename T> class RefBlock;
-	template<typename T> class CRefBlock;
-
-	template<typename T, int RowDim=DynamicDim, int ColDim=DynamicDim> class DenseMatrix;
-	template<typename T, int RowDim=DynamicDim> class DenseCol;
-	template<typename T, int ColDim=DynamicDim> class DenseRow;
 
 }
 

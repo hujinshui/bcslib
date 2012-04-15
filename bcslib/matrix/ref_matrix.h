@@ -13,158 +13,11 @@
 #ifndef BCSLIB_REF_MATRIX_H_
 #define BCSLIB_REF_MATRIX_H_
 
-#include <bcslib/matrix/matrix_base.h>
-#include "bits/dense_matrix_facet.h"
+#include <bcslib/matrix/matrix_fwd.h>
+#include "bits/matrix_helpers.h"
 
 namespace bcs
 {
-
-
-	/********************************************
-	 *
-	 *  Internal implementation
-	 *
-	 ********************************************/
-
-	namespace detail
-	{
-
-		template<typename T, int RowDim, int ColDim>
-		struct RefMatrixInternal
-		{
-			T* data;
-			index_t n_rows;
-			index_t n_cols;
-
-			BCS_ENSURE_INLINE
-			RefMatrixInternal()
-			: data(BCS_NULL), n_rows(RowDim), n_cols(ColDim)
-			{
-			}
-
-			BCS_ENSURE_INLINE
-			RefMatrixInternal(T *refptr, index_t m, index_t n)
-			: data(refptr), n_rows(m), n_cols(n)
-			{
-				check_input_dims(m, n);
-			}
-
-			BCS_ENSURE_INLINE
-			void reset(T *refptr, index_t m, index_t n)
-			{
-				check_input_dims(m, n);
-
-				data = refptr;
-				n_rows = m;
-				n_cols = n;
-			}
-
-			BCS_ENSURE_INLINE
-			void move_forward(index_t step) { data += step; }
-
-			BCS_ENSURE_INLINE
-			void move_backward(index_t step) { data -= step; }
-
-			BCS_ENSURE_INLINE
-			index_t nelems() const { return n_rows * n_cols; }
-
-			BCS_ENSURE_INLINE
-			index_t nrows() const { return n_rows; }
-
-			BCS_ENSURE_INLINE
-			index_t ncols() const { return n_cols; }
-
-			BCS_ENSURE_INLINE
-			const T *ptr() const { return data; }
-
-			BCS_ENSURE_INLINE
-			T *ptr() { return data; }
-
-			BCS_ENSURE_INLINE
-			const T& at(index_t i) const { return data[i]; }
-
-			BCS_ENSURE_INLINE
-			T& at(index_t i) { return data[i]; }
-
-		private:
-			BCS_ENSURE_INLINE
-			void check_input_dims(index_t m, index_t n)
-			{
-				if (RowDim >= 1) check_arg( m == RowDim );
-				if (ColDim >= 1) check_arg( n == ColDim );
-			}
-		};
-
-
-		template<typename T, int RowDim, int ColDim>
-		struct CRefMatrixInternal
-		{
-			const T* data;
-			index_t n_rows;
-			index_t n_cols;
-
-			BCS_ENSURE_INLINE
-			CRefMatrixInternal()
-			: data(BCS_NULL), n_rows(RowDim), n_cols(ColDim)
-			{
-			}
-
-			BCS_ENSURE_INLINE
-			CRefMatrixInternal(const T *refptr, index_t m, index_t n)
-			: data(refptr), n_rows(m), n_cols(n)
-			{
-				check_input_dims(m, n);
-			}
-
-			BCS_ENSURE_INLINE
-			void reset(const T *refptr, index_t m, index_t n)
-			{
-				check_input_dims(m, n);
-
-				data = refptr;
-				n_rows = m;
-				n_cols = n;
-			}
-
-			BCS_ENSURE_INLINE
-			void move_forward(index_t step) { data += step; }
-
-			BCS_ENSURE_INLINE
-			void move_backward(index_t step) { data -= step; }
-
-			BCS_ENSURE_INLINE
-			index_t nelems() const { return n_rows * n_cols; }
-
-			BCS_ENSURE_INLINE
-			index_t nrows() const { return n_rows; }
-
-			BCS_ENSURE_INLINE
-			index_t ncols() const { return n_cols; }
-
-			BCS_ENSURE_INLINE
-			const T *ptr() const { return data; }
-
-			BCS_ENSURE_INLINE
-			const T *ptr() { return data; }
-
-			BCS_ENSURE_INLINE
-			const T& at(index_t i) const { return data[i]; }
-
-			BCS_ENSURE_INLINE
-			const T& at(index_t i) { return data[i]; }
-
-		private:
-			BCS_ENSURE_INLINE
-			void check_input_dims(index_t m, index_t n)
-			{
-				if (RowDim >= 1) check_arg( m == RowDim );
-				if (ColDim >= 1) check_arg( n == ColDim );
-			}
-		};
-
-	}
-
-
 
 
 
@@ -188,10 +41,7 @@ namespace bcs
 
 
 	template<typename T, int RowDim, int ColDim>
-	class RefMatrix
-	: public detail::DenseMatrixFacet<T,
-	  	  detail::RefMatrixInternal<T, RowDim, ColDim>,
-	  	  RefMatrix<T, RowDim, ColDim> >
+	class RefMatrix : public IDenseMatrix<RefMatrix<T, RowDim, ColDim>, T>
 	{
 
 #ifdef BCS_USE_STATIC_ASSERT
@@ -199,54 +49,170 @@ namespace bcs
 		static_assert(ColDim == DynamicDim || ColDim >= 1, "Invalid template argument ColDim");
 #endif
 
-		typedef detail::RefMatrixInternal<T, RowDim, ColDim> internal_type;
-		typedef detail::DenseMatrixFacet<T, internal_type, RefMatrix > facet_type;
-		BCS_DEFINE_MATRIX_FACET_INTERNAL
-
 	public:
 		MAT_TRAITS_DEFS(T)
 
 		typedef IDenseMatrix<RefMatrix<T, RowDim, ColDim>, T> base_type;
 		static const int RowDimension = RowDim;
 		static const int ColDimension = ColDim;
-		typedef const RefMatrix& eval_return_type;
+		typedef const RefMatrix<T, RowDim, ColDim>& eval_return_type;
 
 	public:
+
 		BCS_ENSURE_INLINE
-		RefMatrix()
-		: facet_type(internal_type())
+		explicit RefMatrix()
+		: m_base(BCS_NULL), m_nrows(RowDim), m_ncols(ColDim)
 		{
 		}
 
 		BCS_ENSURE_INLINE
-		RefMatrix(T *refptr, index_t m, index_t n)
-		: facet_type(internal_type(refptr, m, n))
+		RefMatrix(T *data, index_type m, index_type n)
+		: m_base(data), m_nrows(m), m_ncols(n)
 		{
 		}
 
 
+		template<class OtherDerived>
 		BCS_ENSURE_INLINE
-		void reset(T *refptr, index_t m, index_t n)
+		const RefMatrix& operator = (IMatrixBase<OtherDerived, T>& other)
 		{
-			internal().reset(refptr, m, n);
+			if (this != &other)
+			{
+				check_arg( is_same_size(*this, other) );
+				other.eval_to(*this);
+			}
+			return *this;
 		}
 
-		BCS_ENSURE_INLINE
-		void move_forward(index_t step)
+		template<class DstDerived>
+		BCS_ENSURE_INLINE void eval_to(IDenseMatrix<DstDerived, T>& dst) const
 		{
-			internal().move_forward(step);
+			if (dst.ptr_base() != this->ptr_base())
+			{
+				bcs::copy(*this, dst);
+			}
 		}
 
-		BCS_ENSURE_INLINE
-		void move_backward(index_t step)
+		template<class DstDerived>
+		BCS_ENSURE_INLINE void eval_to_block(IDenseMatrixBlock<DstDerived, T>& dst) const
 		{
-			internal().move_backward(step);
+			bcs::copy(*this, dst);
 		}
 
 		BCS_ENSURE_INLINE eval_return_type eval() const
 		{
 			return *this;
 		}
+
+	public:
+		BCS_ENSURE_INLINE index_type nelems() const
+		{
+			return m_nrows * m_ncols;
+		}
+
+		BCS_ENSURE_INLINE size_type size() const
+		{
+			return (size_type)nelems();
+		}
+
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return m_nrows;
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return m_ncols;
+		}
+
+		BCS_ENSURE_INLINE bool is_empty() const
+		{
+			return nrows() == 0 || ncolumns() == 0;
+		}
+
+		BCS_ENSURE_INLINE const_pointer ptr_base() const
+		{
+			return m_base;
+		}
+
+		BCS_ENSURE_INLINE pointer ptr_base()
+		{
+			return m_base;
+		}
+
+		BCS_ENSURE_INLINE const_pointer col_ptr(index_type j) const
+		{
+			return ptr_base() + j * lead_dim();
+		}
+
+		BCS_ENSURE_INLINE pointer col_ptr(index_type j)
+		{
+			return ptr_base() + j * lead_dim();
+		}
+
+		BCS_ENSURE_INLINE index_type lead_dim() const
+		{
+			return m_nrows;
+		}
+
+		BCS_ENSURE_INLINE index_type offset(index_type i, index_type j) const
+		{
+			return detail::calc_offset<RowDim, ColDim>(lead_dim(), i, j);
+		}
+
+		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j) const
+		{
+			return m_base[offset(i, j)];
+		}
+
+		BCS_ENSURE_INLINE reference elem(index_type i, index_type j)
+		{
+			return m_base[offset(i, j)];
+		}
+
+		BCS_ENSURE_INLINE const_reference operator[] (index_type idx) const
+		{
+			return m_base[idx];
+		}
+
+		BCS_ENSURE_INLINE reference operator[] (index_type idx)
+		{
+			return m_base[idx];
+		}
+
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
+		{
+			detail::check_matrix_indices(*this, i, j);
+			return elem(i, j);
+		}
+
+		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
+		{
+			detail::check_matrix_indices(*this, i, j);
+			return elem(i, j);
+		}
+
+	public:
+
+		BCS_ENSURE_INLINE void zero()
+		{
+			bcs::zero(*this);
+		}
+
+		BCS_ENSURE_INLINE void fill(const_reference v)
+		{
+			bcs::fill(*this, v);
+		}
+
+		BCS_ENSURE_INLINE void copy_from(const_pointer src)
+		{
+			bcs::copy_from_mem(*this, src);
+		}
+
+	private:
+		T *m_base;
+		index_t m_nrows;
+		index_t m_ncols;
 
 	}; // end class RefMatrix
 
@@ -266,10 +232,7 @@ namespace bcs
 
 
 	template<typename T, int RowDim, int ColDim>
-	class CRefMatrix
-	: public detail::DenseMatrixFacet<T,
-	  	  detail::CRefMatrixInternal<T, RowDim, ColDim>,
-	  	  CRefMatrix<T, RowDim, ColDim> >
+	class CRefMatrix : public IDenseMatrix<CRefMatrix<T, RowDim, ColDim>, T>
 	{
 
 #ifdef BCS_USE_STATIC_ASSERT
@@ -277,60 +240,165 @@ namespace bcs
 		static_assert(ColDim == DynamicDim || ColDim >= 1, "Invalid template argument ColDim");
 #endif
 
-		typedef detail::CRefMatrixInternal<T, RowDim, ColDim> internal_type;
-		typedef detail::DenseMatrixFacet<T, internal_type, CRefMatrix > facet_type;
-		BCS_DEFINE_MATRIX_FACET_INTERNAL
-
 	public:
 		MAT_TRAITS_DEFS(T)
 
-		typedef IDenseMatrix<RefMatrix<T, RowDim, ColDim>, T> base_type;
+		typedef IDenseMatrix<CRefMatrix<T, RowDim, ColDim>, T> base_type;
 		static const int RowDimension = RowDim;
 		static const int ColDimension = ColDim;
-		typedef const CRefMatrix& eval_return_type;
+		typedef const CRefMatrix<T, RowDim, ColDim>& eval_return_type;
 
 	public:
+
 		BCS_ENSURE_INLINE
-		CRefMatrix()
-		: facet_type(internal_type())
+		explicit CRefMatrix()
+		: m_base(BCS_NULL), m_nrows(RowDim), m_ncols(ColDim)
 		{
 		}
 
 		BCS_ENSURE_INLINE
-		CRefMatrix(const T *refptr, index_t m, index_t n)
-		: facet_type(internal_type(refptr, m, n))
+		CRefMatrix(const T *data, index_type m, index_type n)
+		: m_base(data), m_nrows(m), m_ncols(n)
+		{
+		}
+
+		BCS_ENSURE_INLINE
+		CRefMatrix(CRefMatrix& other)
+		: m_base(other.m_base), m_nrows(other.m_nrows), m_ncols(other.m_ncols)
 		{
 		}
 
 		BCS_ENSURE_INLINE
 		CRefMatrix(const RefMatrix<T, RowDim, ColDim>& other)
-		: facet_type(internal_type(other.ptr_base(), other.nrows(), other.ncolumns()))
+		: m_base(other.ptr_base()), m_nrows(other.nrows()), m_ncols(other.ncolumns())
 		{
-
 		}
 
-		BCS_ENSURE_INLINE
-		void reset(const T *refptr, index_t m, index_t n)
+		template<class DstDerived>
+		BCS_ENSURE_INLINE void eval_to(IDenseMatrix<DstDerived, T>& dst) const
 		{
-			internal().reset(refptr, m, n);
+			if (dst.ptr_base() != this->ptr_base())
+			{
+				bcs::copy(*this, dst);
+			}
 		}
 
-		BCS_ENSURE_INLINE
-		void move_forward(index_t step)
+		template<class DstDerived>
+		BCS_ENSURE_INLINE void eval_to_block(IDenseMatrixBlock<DstDerived, T>& dst) const
 		{
-			internal().move_forward(step);
-		}
-
-		BCS_ENSURE_INLINE
-		void move_backward(index_t step)
-		{
-			internal().move_backward(step);
+			bcs::copy(*this, dst);
 		}
 
 		BCS_ENSURE_INLINE eval_return_type eval() const
 		{
 			return *this;
 		}
+
+	private:
+		// no assignment
+		CRefMatrix& operator = (const CRefMatrix& );
+
+
+	public:
+		BCS_ENSURE_INLINE index_type nelems() const
+		{
+			return m_nrows * m_ncols;
+		}
+
+		BCS_ENSURE_INLINE size_type size() const
+		{
+			return (size_type)nelems();
+		}
+
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return m_nrows;
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return m_ncols;
+		}
+
+		BCS_ENSURE_INLINE bool is_empty() const
+		{
+			return nrows() == 0 || ncolumns() == 0;
+		}
+
+		BCS_ENSURE_INLINE const_pointer ptr_base() const
+		{
+			return m_base;
+		}
+
+		BCS_ENSURE_INLINE const_pointer ptr_base()
+		{
+			return m_base;
+		}
+
+		BCS_ENSURE_INLINE const_pointer col_ptr(index_type j) const
+		{
+			return ptr_base() + j * lead_dim();
+		}
+
+		BCS_ENSURE_INLINE const_pointer col_ptr(index_type j)
+		{
+			return ptr_base() + j * lead_dim();
+		}
+
+		BCS_ENSURE_INLINE index_type lead_dim() const
+		{
+			return m_nrows;
+		}
+
+		BCS_ENSURE_INLINE index_type offset(index_type i, index_type j) const
+		{
+			return detail::calc_offset<RowDim, ColDim>(lead_dim(), i, j);
+		}
+
+		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j) const
+		{
+			return m_base[offset(i, j)];
+		}
+
+		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j)
+		{
+			return m_base[offset(i, j)];
+		}
+
+		BCS_ENSURE_INLINE const_reference operator[] (index_type idx) const
+		{
+			return m_base[idx];
+		}
+
+		BCS_ENSURE_INLINE const_reference operator[] (index_type idx)
+		{
+			return m_base[idx];
+		}
+
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
+		{
+			detail::check_matrix_indices(*this, i, j);
+			return elem(i, j);
+		}
+
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j)
+		{
+			detail::check_matrix_indices(*this, i, j);
+			return elem(i, j);
+		}
+
+	public:
+
+		BCS_ENSURE_INLINE void zero() BCS_CREF_NOWRITE
+
+		BCS_ENSURE_INLINE void fill(const_reference v) BCS_CREF_NOWRITE
+
+		BCS_ENSURE_INLINE void copy_from(const_pointer src) BCS_CREF_NOWRITE
+
+	private:
+		const T *m_base;
+		index_t m_nrows;
+		index_t m_ncols;
 
 	}; // end class CRefMatrix
 
