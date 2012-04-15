@@ -45,6 +45,20 @@ namespace bcs
 
 	const int DynamicDim = 0;
 
+	namespace detail
+	{
+		template<typename T, bool IsConst> struct adapt_const;
+
+		template<typename T>
+		struct adapt_const<T, false> {  typedef T type; };
+
+		template<typename T>
+		struct adapt_const<T*, true> { typedef const T* type; };
+
+		template<typename T>
+		struct adapt_const<T&, true> { typedef const T& type; };
+	}
+
 
 	/********************************************
 	 *
@@ -210,6 +224,11 @@ namespace bcs
 		using base_type::ColDimension;
 		typedef typename base_type::eval_return_type eval_return_type;
 
+	private:
+		typedef typename detail::adapt_const<pointer, matrix_traits<Derived>::IsReadOnly>::type nc_pointer;
+		typedef typename detail::adapt_const<reference, matrix_traits<Derived>::IsReadOnly>::type nc_reference;
+
+	public:
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
 			return derived().nelems();
@@ -240,7 +259,7 @@ namespace bcs
 			return derived().ptr_base();
 		}
 
-		BCS_ENSURE_INLINE pointer ptr_base()
+		BCS_ENSURE_INLINE nc_pointer ptr_base()
 		{
 			return derived().ptr_base();
 		}
@@ -250,7 +269,7 @@ namespace bcs
 			return derived().col_ptr(j);
 		}
 
-		BCS_ENSURE_INLINE pointer col_ptr(index_type j)
+		BCS_ENSURE_INLINE nc_pointer col_ptr(index_type j)
 		{
 			return derived().col_ptr(j);
 		}
@@ -265,7 +284,7 @@ namespace bcs
 			return derived().elem(i, j);
 		}
 
-		BCS_ENSURE_INLINE reference elem(index_type i, index_type j)
+		BCS_ENSURE_INLINE nc_reference elem(index_type i, index_type j)
 		{
 			return derived().elem(i, j);
 		}
@@ -275,7 +294,7 @@ namespace bcs
 			return derived().operator()(i, j);
 		}
 
-		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
+		BCS_ENSURE_INLINE nc_reference operator() (index_type i, index_type j)
 		{
 			return derived().operator()(i, j);
 		}
@@ -331,6 +350,12 @@ namespace bcs
 		using base_type::ColDimension;
 		typedef typename base_type::eval_return_type eval_return_type;
 
+	private:
+		typedef typename detail::adapt_const<pointer, matrix_traits<Derived>::IsReadOnly>::type nc_pointer;
+		typedef typename detail::adapt_const<reference, matrix_traits<Derived>::IsReadOnly>::type nc_reference;
+
+	public:
+
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
 			return derived().nelems();
@@ -361,7 +386,7 @@ namespace bcs
 			return derived().ptr_base();
 		}
 
-		BCS_ENSURE_INLINE pointer ptr_base()
+		BCS_ENSURE_INLINE nc_pointer ptr_base()
 		{
 			return derived().ptr_base();
 		}
@@ -371,7 +396,7 @@ namespace bcs
 			return derived().col_ptr(j);
 		}
 
-		BCS_ENSURE_INLINE pointer col_ptr(index_type j)
+		BCS_ENSURE_INLINE nc_pointer col_ptr(index_type j)
 		{
 			return derived().col_ptr(j);
 		}
@@ -386,7 +411,7 @@ namespace bcs
 			return derived().elem(i, j);
 		}
 
-		BCS_ENSURE_INLINE reference elem(index_type i, index_type j)
+		BCS_ENSURE_INLINE nc_reference elem(index_type i, index_type j)
 		{
 			return derived().elem(i, j);
 		}
@@ -396,7 +421,7 @@ namespace bcs
 			return derived().operator[](idx);
 		}
 
-		BCS_ENSURE_INLINE reference operator[] (index_type idx)
+		BCS_ENSURE_INLINE nc_reference operator[] (index_type idx)
 		{
 			return derived().operator[](idx);
 		}
@@ -406,7 +431,7 @@ namespace bcs
 			return derived().operator()(i, j);
 		}
 
-		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
+		BCS_ENSURE_INLINE nc_reference operator() (index_type i, index_type j)
 		{
 			return derived().operator()(i, j);
 		}
@@ -552,10 +577,33 @@ namespace bcs
 	}
 
 
+	// forward declaration of some important types
+
+	template<typename T, int RowDim=DynamicDim, int ColDim=DynamicDim> class RefMatrix;
+	template<typename T, int RowDim=DynamicDim, int ColDim=DynamicDim> class CRefMatrix;
+
+	template<typename T, int RowDim=DynamicDim> class RefCol;
+	template<typename T, int RowDim=DynamicDim> class CRefCol;
+
+	template<typename T, int ColDim=DynamicDim> class RefRow;
+	template<typename T, int ColDim=DynamicDim> class CRefRow;
+
+	template<typename T, int ColDim=DynamicDim> class RefStepRow;
+	template<typename T, int ColDim=DynamicDim> class CRefStepRow;
+
+	template<typename T> class RefBlock;
+	template<typename T> class CRefBlock;
+
+	template<typename T, int RowDim=DynamicDim, int ColDim=DynamicDim> class DenseMatrix;
+	template<typename T, int RowDim=DynamicDim> class DenseCol;
+	template<typename T, int ColDim=DynamicDim> class DenseRow;
+
 }
 
 
 // some useful macros
+
+#define BCS_CREF_NOWRITE { throw std::logic_error("Writing to an CRef-kind object is not allowed"); }
 
 #define BCS_MATRIX_TYPEDEFS0(TName, prefix) \
 	typedef TName<double>   prefix##_f64; \

@@ -217,6 +217,7 @@ $(BIN)/test_basics: $(BASE_HEADERS) $(TEST_BASICS_SOURCES)
 #----------------------------------------------------------
 
 TEST_MATRIX_BASICS_SOURCES = \
+	test/test_ref_matrix.cpp \
 	test/test_dense_matrix.cpp
 
 

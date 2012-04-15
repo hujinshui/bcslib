@@ -14,41 +14,35 @@
 #define BCSLIB_DENSE_MATRIX_H_
 
 #include <bcslib/matrix/matrix_base.h>
-#include <bcslib/matrix/ref_matrix.h>
 #include <bcslib/base/block.h>
 
+#include "bits/dense_matrix_facet.h"
 
 namespace bcs
 {
-	// forward declaration
-
-	template<typename T, int RowDim=DynamicDim, int ColDim=DynamicDim> class DenseMatrix;
-	template<typename T, int RowDim=DynamicDim> class DenseCol;
-	template<typename T, int ColDim=DynamicDim> class DenseRow;
-
 
 	/********************************************
 	 *
-	 *  Helper
+	 *  Internal implementation
 	 *
 	 ********************************************/
 
 	namespace detail
 	{
 		// storage implementation
-
-		template<typename T, int RowDim, int ColDim> struct matrix_impl;
+		template<typename T, int RowDim, int ColDim> struct MatrixInternal;
 
 		template<typename T, int RowDim, int ColDim>
-		struct matrix_impl
+		struct MatrixInternal
 		{
+
 			T arr[RowDim * ColDim];
 
 			BCS_ENSURE_INLINE
-			matrix_impl() { }
+			MatrixInternal() { }
 
 			BCS_ENSURE_INLINE
-			matrix_impl(index_t m, index_t n)
+			MatrixInternal(index_t m, index_t n)
 			{
 				check_arg(m == RowDim && n == ColDim);
 			}
@@ -82,16 +76,16 @@ namespace bcs
 		};
 
 		template<typename T, int ColDim>
-		struct matrix_impl<T, DynamicDim, ColDim>
+		struct MatrixInternal<T, DynamicDim, ColDim>
 		{
 			index_t n_rows;
-			block<T> blk;
+			Block<T> blk;
 
 			BCS_ENSURE_INLINE
-			matrix_impl() : n_rows(0) { }
+			MatrixInternal() : n_rows(0) { }
 
 			BCS_ENSURE_INLINE
-			matrix_impl(index_t m, index_t n)
+			MatrixInternal(index_t m, index_t n)
 			: n_rows(m), blk(m * check_forward(n, (index_t)ColDim))
 			{
 			}
@@ -132,16 +126,16 @@ namespace bcs
 
 
 		template<typename T, int RowDim>
-		struct matrix_impl<T, RowDim, DynamicDim>
+		struct MatrixInternal<T, RowDim, DynamicDim>
 		{
 			index_t n_cols;
-			block<T> blk;
+			Block<T> blk;
 
 			BCS_ENSURE_INLINE
-			matrix_impl() : n_cols(0) { }
+			MatrixInternal() : n_cols(0) { }
 
 			BCS_ENSURE_INLINE
-			matrix_impl(index_t m, index_t n)
+			MatrixInternal(index_t m, index_t n)
 			: n_cols(n), blk(check_forward(m, (index_t)RowDim) * n)
 			{
 			}
@@ -182,17 +176,17 @@ namespace bcs
 
 
 		template<typename T>
-		struct matrix_impl<T, DynamicDim, DynamicDim>
+		struct MatrixInternal<T, DynamicDim, DynamicDim>
 		{
 			index_t n_rows;
 			index_t n_cols;
-			block<T> blk;
+			Block<T> blk;
 
 			BCS_ENSURE_INLINE
-			matrix_impl() : n_rows(0), n_cols(0) { }
+			MatrixInternal() : n_rows(0), n_cols(0) { }
 
 			BCS_ENSURE_INLINE
-			matrix_impl(index_t m, index_t n)
+			MatrixInternal(index_t m, index_t n)
 			: n_rows(m), n_cols(n), blk(m * n)
 			{
 			}
@@ -245,6 +239,7 @@ namespace bcs
 
 		static const int RowDimension = RowDim;
 		static const int ColDimension = ColDim;
+		static const bool IsReadOnly = false;
 
 		typedef const DenseMatrix<T, RowDim, ColDim>& eval_return_type;
 	};
@@ -252,12 +247,19 @@ namespace bcs
 
 	template<typename T, int RowDim, int ColDim>
 	class DenseMatrix
-	: public IDenseMatrix<DenseMatrix<T, RowDim, ColDim>, T>
+	: public detail::DenseMatrixFacet<T,
+	  	  detail::MatrixInternal<T, RowDim, ColDim>,
+	  	  DenseMatrix<T, RowDim, ColDim> >
 	{
+
 #ifdef BCS_USE_STATIC_ASSERT
 		static_assert(RowDim == DynamicDim || RowDim >= 1, "Invalid template argument RowDim");
 		static_assert(ColDim == DynamicDim || ColDim >= 1, "Invalid template argument ColDim");
 #endif
+
+		typedef detail::MatrixInternal<T, RowDim, ColDim> internal_type;
+		typedef detail::DenseMatrixFacet<T, internal_type, DenseMatrix> facet_type;
+		BCS_DEFINE_MATRIX_FACET_INTERNAL
 
 	public:
 		MAT_TRAITS_DEFS(T)
@@ -271,40 +273,40 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		explicit DenseMatrix()
-		: m_impl()
+		: facet_type(internal_type())
 		{
 		}
 
 		BCS_ENSURE_INLINE
 		DenseMatrix(index_type m, index_type n)
-		: m_impl(m, n)
+		: facet_type(internal_type(m, n))
 		{
 		}
 
 		BCS_ENSURE_INLINE
 		DenseMatrix(index_type m, index_type n, const T& v)
-		: m_impl(m, n)
+		: facet_type(internal_type(m, n))
 		{
-			fill(v);
+			this->fill(v);
 		}
 
 		BCS_ENSURE_INLINE
 		DenseMatrix(index_type m, index_type n, const T *src)
-		: m_impl(m, n)
+		: facet_type(internal_type(m, n))
 		{
-			copy_from(src);
+			this->copy_from(src);
 		}
 
 		BCS_ENSURE_INLINE
 		DenseMatrix(const DenseMatrix& other)
-		: m_impl(other.m_impl)
+		: facet_type(other)
 		{
 		}
 
 		template<class OtherDerived>
 		BCS_ENSURE_INLINE
 		DenseMatrix(const IMatrixBase<OtherDerived, T>& other)
-		: m_impl(other.nrows(), other.ncolumns())
+		: facet_type(internal_type(other.nrows(), other.ncolumns()))
 		{
 			other.eval_to(*this);
 		}
@@ -318,7 +320,7 @@ namespace bcs
 				{
 					this->resize(other.nrows(), other.ncolumns());
 				}
-				copy_from(other.ptr_base());
+				this->copy_from(other.ptr_base());
 			}
 			return *this;
 		}
@@ -341,137 +343,13 @@ namespace bcs
 		BCS_ENSURE_INLINE
 		void resize(index_type m, index_type n)
 		{
-			m_impl.resize(m, n);
-		}
-
-	public:
-		BCS_ENSURE_INLINE index_type nelems() const
-		{
-			return m_impl.nelems();
-		}
-
-		BCS_ENSURE_INLINE size_type size() const
-		{
-			return (size_type)nelems();
-		}
-
-		BCS_ENSURE_INLINE index_type nrows() const
-		{
-			return m_impl.nrows();
-		}
-
-		BCS_ENSURE_INLINE index_type ncolumns() const
-		{
-			return m_impl.ncols();
-		}
-
-		BCS_ENSURE_INLINE bool is_empty() const
-		{
-			return nrows() == 0 || ncolumns() == 0;
-		}
-
-		BCS_ENSURE_INLINE const_pointer ptr_base() const
-		{
-			return m_impl.ptr();
-		}
-
-		BCS_ENSURE_INLINE pointer ptr_base()
-		{
-			return m_impl.ptr();
-		}
-
-		BCS_ENSURE_INLINE const_pointer col_ptr(index_type j) const
-		{
-			return ptr_base() + j * lead_dim();
-		}
-
-		BCS_ENSURE_INLINE pointer col_ptr(index_type j)
-		{
-			return ptr_base() + j * lead_dim();
-		}
-
-		BCS_ENSURE_INLINE index_type lead_dim() const
-		{
-			return m_impl.nrows();
-		}
-
-		BCS_ENSURE_INLINE index_type offset(index_type i, index_type j) const
-		{
-			return detail::calc_offset<RowDim, ColDim>(lead_dim(), i, j);
-		}
-
-		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j) const
-		{
-			return m_impl.at(offset(i, j));
-		}
-
-		BCS_ENSURE_INLINE reference elem(index_type i, index_type j)
-		{
-			return m_impl.at(offset(i, j));
-		}
-
-		BCS_ENSURE_INLINE const_reference operator[] (index_type idx) const
-		{
-			return m_impl.at(idx);
-		}
-
-		BCS_ENSURE_INLINE reference operator[] (index_type idx)
-		{
-			return m_impl.at(idx);
-		}
-
-		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
-		{
-			detail::check_matrix_indices(*this, i, j);
-			return elem(i, j);
-		}
-
-		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
-		{
-			detail::check_matrix_indices(*this, i, j);
-			return elem(i, j);
-		}
-
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to(IDenseMatrix<DstDerived, T>& dst) const
-		{
-			if (dst.ptr_base() != this->ptr_base())
-			{
-				copy_elems(size(), this->ptr_base(), dst.ptr_base());
-			}
-		}
-
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to_block(IDenseMatrixBlock<DstDerived, T>& dst) const
-		{
-			copy_elems_2d(size_t(nrows()), size_t(ncolumns()),
-					this->ptr_base(), size_t(this->lead_dim()), dst.ptr_base(), size_t(dst.lead_dim()));
+			internal().resize(m, n);
 		}
 
 		BCS_ENSURE_INLINE eval_return_type eval() const
 		{
 			return *this;
 		}
-
-		BCS_ENSURE_INLINE void zero()
-		{
-			zero_elems(size(), ptr_base());
-		}
-
-		BCS_ENSURE_INLINE void fill(const_reference v)
-		{
-			fill_elems(size(), ptr_base(), v);
-		}
-
-		BCS_ENSURE_INLINE void copy_from(const_pointer src)
-		{
-			copy_elems(size(), src, ptr_base());
-		}
-
-
-	private:
-		typedef detail::matrix_impl<T, RowDim, ColDim> impl_type;
-		impl_type m_impl;
 
 	}; // end class DenseMatrix
 
@@ -490,6 +368,7 @@ namespace bcs
 
 		static const index_type RowDimension = RowDim;
 		static const index_type ColDimension = 1;
+		static const bool IsReadOnly = false;
 
 		typedef const DenseCol<T, RowDim>& eval_return_type;
 	};
@@ -563,6 +442,7 @@ namespace bcs
 
 		static const index_type RowDimension = 1;
 		static const index_type ColDimension = ColDim;
+		static const bool IsReadOnly = false;
 
 		typedef const DenseRow<T, ColDim>& eval_return_type;
 	};
@@ -638,16 +518,16 @@ namespace bcs
 	BCS_MATRIX_TYPEDEFS2(DenseMatrix, mat, DynamicDim, DynamicDim)
 	BCS_MATRIX_TYPEDEFS2(DenseMatrix, mat22, 2, 2)
 	BCS_MATRIX_TYPEDEFS2(DenseMatrix, mat23, 2, 3)
-	BCS_MATRIX_TYPEDEFS2(DenseMatrix, mat32, 2, 2)
+	BCS_MATRIX_TYPEDEFS2(DenseMatrix, mat32, 3, 2)
 	BCS_MATRIX_TYPEDEFS2(DenseMatrix, mat33, 3, 3)
 
 	BCS_MATRIX_TYPEDEFS1(DenseCol, col, DynamicDim)
 	BCS_MATRIX_TYPEDEFS1(DenseCol, col2, 2)
-	BCS_MATRIX_TYPEDEFS1(DenseCol, col3, 2)
+	BCS_MATRIX_TYPEDEFS1(DenseCol, col3, 3)
 
 	BCS_MATRIX_TYPEDEFS1(DenseRow, row, DynamicDim)
 	BCS_MATRIX_TYPEDEFS1(DenseRow, row2, 2)
-	BCS_MATRIX_TYPEDEFS1(DenseRow, row3, 2)
+	BCS_MATRIX_TYPEDEFS1(DenseRow, row3, 3)
 
 
 }

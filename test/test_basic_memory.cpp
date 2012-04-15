@@ -19,14 +19,14 @@ using namespace bcs::test;
 // explicit template instantiation for syntax check
 
 template class bcs::monitored_allocator<int>;
-template class bcs::block<int, aligned_allocator<int> >;
-template class bcs::block<int, monitored_allocator<int> >;
+template class bcs::Block<int, aligned_allocator<int> >;
+template class bcs::Block<int, monitored_allocator<int> >;
 
-template class bcs::scoped_block<int, aligned_allocator<int> >;
-template class bcs::scoped_block<int, monitored_allocator<int> >;
+template class bcs::ScopedBlock<int, aligned_allocator<int> >;
+template class bcs::ScopedBlock<int, monitored_allocator<int> >;
 
-typedef class bcs::block<int, monitored_allocator<int> > blk_t;
-typedef class bcs::scoped_block<int, monitored_allocator<int> > scblk_t;
+typedef class bcs::Block<int, monitored_allocator<int> > blk_t;
+typedef class bcs::ScopedBlock<int, monitored_allocator<int> > scblk_t;
 
 
 bcs::memory_allocation_monitor bcs::global_memory_allocation_monitor;
@@ -120,7 +120,7 @@ TEST( BasicMem, BlockBase )
 	int dst[N] = {-1, -1, -1, -1, -1};
 	int tmp[N] = {-1, -1, -1, -1, -1};
 
-	typedef block_base<int> bbt;
+	typedef BlockBase<int> bbt;
 
 	bbt B0(0, BCS_NULL);
 	ASSERT_EQ(0, B0.size());
