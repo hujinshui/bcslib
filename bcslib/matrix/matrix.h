@@ -17,6 +17,7 @@
 #include <bcslib/matrix/matrix_fwd.h>
 #include <bcslib/matrix/matrix_manip.h>
 #include <bcslib/matrix/ref_matrix.h>
+//#include <bcslib/matrix/stepvec.h>
 #include <bcslib/matrix/dense_matrix.h>
 
 #endif /* MATRIX_H_ */

@@ -19,8 +19,6 @@
 namespace bcs
 {
 
-
-
 	/********************************************
 	 *
 	 *  RefMatrix
@@ -67,8 +65,19 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		RefMatrix(T *data, index_type m, index_type n)
-		: m_base(data), m_nrows(m), m_ncols(n)
 		{
+			reset(data, m, n);
+		}
+
+		BCS_ENSURE_INLINE
+		void reset(T *data, index_type m, index_type n)
+		{
+			if (RowDim >= 1) check_arg(m == RowDim);
+			if (ColDim >= 1) check_arg(n == ColDim);
+
+			m_base = data;
+			m_nrows = m;
+			m_ncols = n;
 		}
 
 		template<class OtherDerived>
@@ -124,6 +133,11 @@ namespace bcs
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
 			return nrows() == 0 || ncolumns() == 0;
+		}
+
+		BCS_ENSURE_INLINE bool is_vector() const
+		{
+			return nrows() == 1 || ncolumns() == 1;
 		}
 
 		BCS_ENSURE_INLINE const_pointer ptr_base() const
@@ -227,6 +241,13 @@ namespace bcs
 	};
 
 
+
+	/********************************************
+	 *
+	 *  CRefMatrix
+	 *
+	 ********************************************/
+
 	template<typename T, int RowDim, int ColDim>
 	class CRefMatrix : public IDenseMatrix<CRefMatrix<T, RowDim, ColDim>, T>
 	{
@@ -254,8 +275,8 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		CRefMatrix(const T *data, index_type m, index_type n)
-		: m_base(data), m_nrows(m), m_ncols(n)
 		{
+			reset(data, m, n);
 		}
 
 		BCS_ENSURE_INLINE
@@ -268,6 +289,17 @@ namespace bcs
 		CRefMatrix(const RefMatrix<T, RowDim, ColDim>& other)
 		: m_base(other.ptr_base()), m_nrows(other.nrows()), m_ncols(other.ncolumns())
 		{
+		}
+
+		BCS_ENSURE_INLINE
+		void reset(const T *data, index_type m, index_type n)
+		{
+			if (RowDim >= 1) check_arg(m == RowDim);
+			if (ColDim >= 1) check_arg(n == ColDim);
+
+			m_base = data;
+			m_nrows = m;
+			m_ncols = n;
 		}
 
 		template<class DstDerived>
@@ -319,6 +351,11 @@ namespace bcs
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
 			return nrows() == 0 || ncolumns() == 0;
+		}
+
+		BCS_ENSURE_INLINE bool is_vector() const
+		{
+			return nrows() == 1 || ncolumns() == 1;
 		}
 
 		BCS_ENSURE_INLINE const_pointer ptr_base() const
@@ -398,6 +435,12 @@ namespace bcs
 
 	}; // end class CRefMatrix
 
+
+	/********************************************
+	 *
+	 *  Ref/CRef Vectors
+	 *
+	 ********************************************/
 
 	template<typename T, int RowDim>
 	class RefCol : public RefMatrix<T, RowDim, 1>
@@ -498,6 +541,7 @@ namespace bcs
 		CRefRow(T *data, index_t m) : base_mat_t(data, 1, m) { }
 
 	}; // end class CRefRow
+
 
 }
 

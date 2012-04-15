@@ -43,6 +43,27 @@ namespace bcs
 
 	const int DynamicDim = 0;
 
+	// tag types
+
+	struct VertDir
+	{
+		BCS_ENSURE_INLINE static index_t nrows(index_t len) { return len; }
+		BCS_ENSURE_INLINE static index_t ncols(index_t len) { return 1; }
+	};
+
+	struct HorzDir
+	{
+		BCS_ENSURE_INLINE static index_t nrows(index_t len) { return 1; }
+		BCS_ENSURE_INLINE static index_t ncols(index_t len) { return len; }
+	};
+
+	template<typename T>
+	struct is_direction_type { static const bool value = false; };
+
+	template<> struct is_direction_type<VertDir> { static const bool value = true; };
+	template<> struct is_direction_type<HorzDir> { static const bool value = true; };
+
+
 	namespace detail
 	{
 		template<typename T, bool IsConst> struct adapt_const;
@@ -101,6 +122,11 @@ namespace bcs
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
 			return derived().is_empty();
+		}
+
+		BCS_ENSURE_INLINE bool is_vector() const
+		{
+			return derived().is_vector();
 		}
 
 		template<class DstDerived>
@@ -162,6 +188,11 @@ namespace bcs
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
 			return derived().is_empty();
+		}
+
+		BCS_ENSURE_INLINE bool is_vector() const
+		{
+			return derived().is_vector();
 		}
 
 		BCS_ENSURE_INLINE value_type elem(index_type i, index_type j) const
@@ -237,6 +268,11 @@ namespace bcs
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
 			return derived().is_empty();
+		}
+
+		BCS_ENSURE_INLINE bool is_vector() const
+		{
+			return derived().is_vector();
 		}
 
 		BCS_ENSURE_INLINE const_pointer ptr_base() const
@@ -364,6 +400,11 @@ namespace bcs
 		BCS_ENSURE_INLINE bool is_empty() const
 		{
 			return derived().is_empty();
+		}
+
+		BCS_ENSURE_INLINE bool is_vector() const
+		{
+			return derived().is_vector();
 		}
 
 		BCS_ENSURE_INLINE const_pointer ptr_base() const
