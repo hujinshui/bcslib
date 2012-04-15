@@ -84,9 +84,16 @@ namespace bcs
 		BCS_ENSURE_INLINE
 		const RefMatrix& operator = (IMatrixBase<OtherDerived, T>& other)
 		{
-			check_arg( is_same_size(*this, other) );
-			other.eval_to(*this);
+			detail::check_rhs_view(*this, other);
+			assign(other);
 			return *this;
+		}
+
+		template<class OtherDerived>
+		BCS_ENSURE_INLINE
+		void assign(IMatrixBase<OtherDerived, T>& other)
+		{
+			other.eval_to(*this);
 		}
 
 		template<class DstDerived>

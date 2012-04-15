@@ -336,7 +336,7 @@ namespace bcs
 				{
 					this->resize(other.nrows(), other.ncolumns());
 				}
-				copy_from(other.ptr_base());
+				assign(other);
 			}
 			return *this;
 		}
@@ -349,8 +349,21 @@ namespace bcs
 			{
 				this->resize(other.nrows(), other.ncolumns());
 			}
-			other.eval_to(*this);
+			assign(other);
 			return *this;
+		}
+
+		BCS_ENSURE_INLINE
+		void assign(const DenseMatrix& other)
+		{
+			copy_from(other.ptr_base());
+		}
+
+		template<class OtherDerived>
+		BCS_ENSURE_INLINE
+		void assign(const IMatrixBase<OtherDerived, T>& other)
+		{
+			other.eval_to(*this);
 		}
 
 		template<class DstDerived>
