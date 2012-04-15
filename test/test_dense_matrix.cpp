@@ -15,6 +15,11 @@ using namespace bcs::test;
 
 // explicit template for syntax check
 
+template class bcs::RefMatrix<double, DynamicDim, DynamicDim>;
+template class bcs::RefMatrix<double, DynamicDim, 1>;
+template class bcs::RefMatrix<double, 1, DynamicDim>;
+template class bcs::RefMatrix<double, 2, 2>;
+
 template class bcs::DenseMatrix<double, DynamicDim, DynamicDim>;
 template class bcs::DenseMatrix<double, DynamicDim, 1>;
 template class bcs::DenseMatrix<double, 1, DynamicDim>;
@@ -58,6 +63,74 @@ bool verify_dense_matrix(const IDenseMatrix<Derived, T>& A, index_t m, index_t n
 
 	return true;
 }
+
+
+TEST( MatrixBasics, RefMatrix)
+{
+	const index_t m = 2;
+	const index_t n = 3;
+
+	double src[m * n] = {1, 2, 3, 4, 5, 6};
+	double dst[m * n] = {0, 0, 0, 0, 0, 0};
+
+	bcs_cref_mat(double, S, src, m, n);
+	bcs_ref_mat(double, D, dst, m, n);
+
+	ASSERT_TRUE( verify_dense_matrix(S, m, n) );
+	ASSERT_TRUE( verify_dense_matrix(D, m, n) );
+
+	ASSERT_TRUE( S.ptr_base() == src );
+	ASSERT_TRUE( D.ptr_base() == dst );
+
+	D.fill(7.0);
+	ASSERT_TRUE( elems_equal(6, dst, 7.0) );
+
+	D.copy_from(src);
+	ASSERT_TRUE( elems_equal(6, dst, src) );
+}
+
+
+TEST( MatrixBasics, RefVector )
+{
+	const index_t len = 6;
+
+	double src[len] = {1, 2, 3, 4, 5, 6};
+	double dst[len] = {0, 0, 0, 0, 0, 0};
+
+	bcs_cref_col(double, S, src, len);
+	bcs_ref_col(double, D, dst, len);
+
+	ASSERT_TRUE( verify_dense_matrix(S, len, 1) );
+	ASSERT_TRUE( verify_dense_matrix(D, len, 1) );
+
+	ASSERT_TRUE( S.ptr_base() == src );
+	ASSERT_TRUE( D.ptr_base() == dst );
+
+	D.fill(7.0);
+	ASSERT_TRUE( elems_equal(6, dst, 7.0) );
+
+	D.copy_from(src);
+	ASSERT_TRUE( elems_equal(6, dst, src) );
+
+	D.zero();
+	ASSERT_TRUE( elems_equal(6, dst, 0.0) );
+
+	bcs_cref_row(double, Sr, src, len);
+	bcs_ref_row(double, Dr, dst, len);
+
+	ASSERT_TRUE( verify_dense_matrix(Sr, 1, len) );
+	ASSERT_TRUE( verify_dense_matrix(Dr, 1, len) );
+
+	ASSERT_TRUE( Sr.ptr_base() == src );
+	ASSERT_TRUE( Dr.ptr_base() == dst );
+
+	Dr.fill(7.0);
+	ASSERT_TRUE( elems_equal(6, dst, 7.0) );
+
+	Dr.copy_from(src);
+	ASSERT_TRUE( elems_equal(6, dst, src) );
+}
+
 
 
 TEST( MatrixBasics, Matrix_DynRowDim_DynColDim )

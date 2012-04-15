@@ -43,6 +43,8 @@ namespace bcs
 	template<class Derived, typename T> class IDenseMatrixBlock;
 	template<class Derived, typename T> class IDenseMatrix;
 
+	const int DynamicDim = 0;
+
 
 	/********************************************
 	 *

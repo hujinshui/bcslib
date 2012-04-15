@@ -84,6 +84,7 @@ BASE_HEADERS = \
 	
 MATRIX_HEADERS = \
 	$(INC)/matrix/matrix_base.h \
+	$(INC)/matrix/ref_matrix.h \
 	$(INC)/matrix/dense_matrix.h	
 
 
