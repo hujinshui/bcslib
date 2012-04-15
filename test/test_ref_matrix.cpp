@@ -24,6 +24,17 @@ template class bcs::CRefMatrix<double, DynamicDim, 1>;
 template class bcs::CRefMatrix<double, 1, DynamicDim>;
 template class bcs::CRefMatrix<double, 2, 2>;
 
+template class bcs::RefCol<double, DynamicDim>;
+template class bcs::RefCol<double, 3>;
+template class bcs::RefRow<double, DynamicDim>;
+template class bcs::RefRow<double, 3>;
+
+template class bcs::CRefCol<double, DynamicDim>;
+template class bcs::CRefCol<double, 3>;
+template class bcs::CRefRow<double, DynamicDim>;
+template class bcs::CRefRow<double, 3>;
+
+
 // auxiliary functions
 
 template<class Derived, typename T>
@@ -105,6 +116,49 @@ TEST( RefClasses, RefMatrix)
 	ASSERT_TRUE( is_equal(S2, S3) );
 	ASSERT_TRUE( elems_equal(6, dst, tar) );
 }
+
+
+TEST( RefClasses, RefVector )
+{
+	const index_t len = 6;
+
+	double src[len] = {1, 2, 3, 4, 5, 6};
+	double dst[len] = {-1, -1, -1, -1, -1};
+
+	CRefRow<double> crow(src, len);
+	RefRow<double> row(dst, len);
+
+	ASSERT_TRUE( verify_dense_matrix(crow, 1, len) );
+	ASSERT_TRUE( verify_dense_matrix(row, 1, len) );
+
+	ASSERT_TRUE( crow.ptr_base() == src );
+	ASSERT_TRUE( row.ptr_base() == dst );
+
+	row.zero();
+
+	ASSERT_TRUE( elems_equal(len, dst, 0.0) );
+
+	row.copy_from(src);
+
+	ASSERT_TRUE( elems_equal(len, dst, src) );
+	ASSERT_TRUE( is_equal(row, crow) );
+
+	CRefCol<double> ccol(src, len);
+	RefCol<double> col(dst, len);
+
+	ASSERT_TRUE( verify_dense_matrix(ccol, len, 1) );
+	ASSERT_TRUE( verify_dense_matrix(col, len, 1) );
+
+	ASSERT_TRUE( is_equal(ccol, col) );
+
+	col.fill(2.0);
+
+	ASSERT_TRUE( elems_equal(len, dst, 2.0) );
+}
+
+
+
+
 
 
 
