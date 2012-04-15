@@ -142,6 +142,18 @@ namespace bcs
 			m_ncols = n;
 		}
 
+		BCS_ENSURE_INLINE
+		void move_forward(index_t step)
+		{
+			m_ptr += step;
+		}
+
+		BCS_ENSURE_INLINE
+		void move_backward(index_t step)
+		{
+			m_ptr -= step;
+		}
+
 	private:
 		BCS_ENSURE_INLINE
 		void check_input_dims(index_t m, index_t n)
