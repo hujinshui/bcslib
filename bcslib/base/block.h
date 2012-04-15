@@ -24,7 +24,7 @@ namespace bcs
      ********************************************/
 
 	template<typename T>
-	class block_base
+	class BlockBase
 	{
 	public:
 		typedef T value_type;
@@ -40,13 +40,13 @@ namespace bcs
 		typedef index_t index_type;
 
 	public:
-		block_base(index_type len, pointer data)
+		BlockBase(index_type len, pointer data)
 		: m_len(len), m_data(data)
 		{
 		}
 
 	protected:
-		block_base() { }
+		BlockBase() { }
 
 		void reset(index_type len, pointer data)
 		{
@@ -120,7 +120,7 @@ namespace bcs
 				copy_elems((size_type)m_len, m_data, dst);
 		}
 
-		void swap(block_base& r)
+		void swap(BlockBase& r)
 		{
 			using std::swap;
 			swap(m_len, r.m_len);
@@ -135,7 +135,7 @@ namespace bcs
 
 
 	template<typename T>
-	inline bool is_equal(const block_base<T>& B1, const block_base<T>& B2)
+	inline bool is_equal(const BlockBase<T>& B1, const BlockBase<T>& B2)
 	{
 		return B1.nelems() == B2.nelems() && elems_equal(B1.nelems(), B1.pbase(), B2.pbase());
 	}
@@ -144,12 +144,12 @@ namespace bcs
 
     /********************************************
      *
-     *   block
+     *   Block
      *
      ********************************************/
 
 	template<typename T, typename Allocator=aligned_allocator<T> >
-	class block : public block_base<T>
+	class Block : public BlockBase<T>
 	{
 	public:
 		typedef T value_type;
@@ -166,48 +166,48 @@ namespace bcs
 		typedef index_t index_type;
 
 	private:
-		typedef block_base<T> base_type;
+		typedef BlockBase<T> base_type;
 
 	public:
-		explicit block(const allocator_type& allocator = allocator_type())
+		explicit Block(const allocator_type& allocator = allocator_type())
 		: m_allocator(allocator)
 		{
 			init(0);
 		}
 
-		explicit block(index_type len, const allocator_type& allocator = allocator_type())
+		explicit Block(index_type len, const allocator_type& allocator = allocator_type())
 		: m_allocator(allocator)
 		{
 			init(len);
 		}
 
-		block(index_type len, const value_type& v, const allocator_type& allocator = allocator_type())
+		Block(index_type len, const value_type& v, const allocator_type& allocator = allocator_type())
 		: m_allocator(allocator)
 		{
 			init(len);
 			this->fill(v);
 		}
 
-		block(index_type len, const_pointer src, const allocator_type& allocator = allocator_type())
+		Block(index_type len, const_pointer src, const allocator_type& allocator = allocator_type())
 		: m_allocator(allocator)
 		{
 			init(len);
 			this->copy_from(src);
 		}
 
-		block(const block& s, const allocator_type& allocator = allocator_type())
+		Block(const Block& s, const allocator_type& allocator = allocator_type())
 		: base_type(), m_allocator(allocator)
 		{
 			init(s.nelems());
 			this->copy_from(s.pbase());
 		}
 
-		~block()
+		~Block()
 		{
 			release();
 		}
 
-		void swap(block& r)
+		void swap(Block& r)
 		{
 			using std::swap;
 
@@ -215,11 +215,11 @@ namespace bcs
 			swap(m_allocator, r.m_allocator);
 		}
 
-		block& operator = (const block& r)
+		Block& operator = (const Block& r)
 		{
 			if (this != &r)
 			{
-				block tmp(r);
+				Block tmp(r);
 				swap(tmp);
 			}
 			return *this;
@@ -258,17 +258,17 @@ namespace bcs
 	private:
 		allocator_type m_allocator;
 
-	}; // end class block
+	}; // end class Block
 
 
     /********************************************
      *
-     *   scoped_block
+     *   ScopedBlock
      *
      ********************************************/
 
 	template<typename T, typename Allocator=aligned_allocator<T> >
-	class scoped_block : public block_base<T>, private noncopyable
+	class ScopedBlock : public BlockBase<T>, private noncopyable
 	{
 	public:
 		typedef T value_type;
@@ -285,30 +285,30 @@ namespace bcs
 		typedef index_t index_type;
 
 	private:
-		typedef block_base<T> base_type;
+		typedef BlockBase<T> base_type;
 
 	public:
-		explicit scoped_block(index_type len, const allocator_type& allocator = allocator_type())
+		explicit ScopedBlock(index_type len, const allocator_type& allocator = allocator_type())
 		: m_allocator(allocator)
 		{
 			init(len);
 		}
 
-		scoped_block(index_type len, const value_type& v, const allocator_type& allocator = allocator_type())
+		ScopedBlock(index_type len, const value_type& v, const allocator_type& allocator = allocator_type())
 		: m_allocator(allocator)
 		{
 			init(len);
 			this->fill(v);
 		}
 
-		scoped_block(index_type len, const_pointer src, const allocator_type& allocator = allocator_type())
+		ScopedBlock(index_type len, const_pointer src, const allocator_type& allocator = allocator_type())
 		: m_allocator(allocator)
 		{
 			init(len);
 			this->copy_from(src);
 		}
 
-		~scoped_block()
+		~ScopedBlock()
 		{
 			release();
 		}
@@ -337,7 +337,7 @@ namespace bcs
 	private:
 		allocator_type m_allocator;
 
-	}; // end class scoped_block
+	}; // end class ScopedBlock
 
 }
 

@@ -8,6 +8,7 @@
 
 #include "bcs_test_basics.h"
 
+#include <bcslib/matrix/ref_matrix.h>
 #include <bcslib/matrix/dense_matrix.h>
 
 using namespace bcs;
@@ -30,9 +31,20 @@ template class bcs::DenseRow<double, 3>;
 template class bcs::DenseCol<double, DynamicDim>;
 template class bcs::DenseCol<double, 3>;
 
+#ifdef BCS_USE_STATIC_ASSERT
+static_assert(sizeof(bcs::mat22_f64) == sizeof(double) * 4, "Incorrect size for fixed-size matrices");
+static_assert(sizeof(bcs::mat23_f64) == sizeof(double) * 6, "Incorrect size for fixed-size matrices");
+static_assert(sizeof(bcs::mat32_f64) == sizeof(double) * 6, "Incorrect size for fixed-size matrices");
+static_assert(sizeof(bcs::mat33_f64) == sizeof(double) * 9, "Incorrect size for fixed-size matrices");
+static_assert(sizeof(bcs::col2_f64) == sizeof(double) * 2, "Incorrect size for fixed-size matrices");
+static_assert(sizeof(bcs::col3_f64) == sizeof(double) * 3, "Incorrect size for fixed-size matrices");
+static_assert(sizeof(bcs::row2_f64) == sizeof(double) * 2, "Incorrect size for fixed-size matrices");
+static_assert(sizeof(bcs::row3_f64) == sizeof(double) * 3, "Incorrect size for fixed-size matrices");
+#endif
+
 
 template<class Derived, typename T>
-bool verify_dense_matrix(const IDenseMatrix<Derived, T>& A, index_t m, index_t n)
+static bool verify_dense_matrix(const IDenseMatrix<Derived, T>& A, index_t m, index_t n)
 {
 	if (!(A.nrows() == m)) return false;
 	if (!(A.ncolumns() == n)) return false;
@@ -62,73 +74,6 @@ bool verify_dense_matrix(const IDenseMatrix<Derived, T>& A, index_t m, index_t n
 	}
 
 	return true;
-}
-
-
-TEST( MatrixBasics, RefMatrix)
-{
-	const index_t m = 2;
-	const index_t n = 3;
-
-	double src[m * n] = {1, 2, 3, 4, 5, 6};
-	double dst[m * n] = {0, 0, 0, 0, 0, 0};
-
-	bcs_cref_mat(double, S, src, m, n);
-	bcs_ref_mat(double, D, dst, m, n);
-
-	ASSERT_TRUE( verify_dense_matrix(S, m, n) );
-	ASSERT_TRUE( verify_dense_matrix(D, m, n) );
-
-	ASSERT_TRUE( S.ptr_base() == src );
-	ASSERT_TRUE( D.ptr_base() == dst );
-
-	D.fill(7.0);
-	ASSERT_TRUE( elems_equal(6, dst, 7.0) );
-
-	D.copy_from(src);
-	ASSERT_TRUE( elems_equal(6, dst, src) );
-}
-
-
-TEST( MatrixBasics, RefVector )
-{
-	const index_t len = 6;
-
-	double src[len] = {1, 2, 3, 4, 5, 6};
-	double dst[len] = {0, 0, 0, 0, 0, 0};
-
-	bcs_cref_col(double, S, src, len);
-	bcs_ref_col(double, D, dst, len);
-
-	ASSERT_TRUE( verify_dense_matrix(S, len, 1) );
-	ASSERT_TRUE( verify_dense_matrix(D, len, 1) );
-
-	ASSERT_TRUE( S.ptr_base() == src );
-	ASSERT_TRUE( D.ptr_base() == dst );
-
-	D.fill(7.0);
-	ASSERT_TRUE( elems_equal(6, dst, 7.0) );
-
-	D.copy_from(src);
-	ASSERT_TRUE( elems_equal(6, dst, src) );
-
-	D.zero();
-	ASSERT_TRUE( elems_equal(6, dst, 0.0) );
-
-	bcs_cref_row(double, Sr, src, len);
-	bcs_ref_row(double, Dr, dst, len);
-
-	ASSERT_TRUE( verify_dense_matrix(Sr, 1, len) );
-	ASSERT_TRUE( verify_dense_matrix(Dr, 1, len) );
-
-	ASSERT_TRUE( Sr.ptr_base() == src );
-	ASSERT_TRUE( Dr.ptr_base() == dst );
-
-	Dr.fill(7.0);
-	ASSERT_TRUE( elems_equal(6, dst, 7.0) );
-
-	Dr.copy_from(src);
-	ASSERT_TRUE( elems_equal(6, dst, src) );
 }
 
 
