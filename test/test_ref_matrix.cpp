@@ -8,6 +8,7 @@
 
 #include "bcs_test_basics.h"
 #include <bcslib/matrix/matrix.h>
+#include <bcslib/base/type_traits.h>
 
 using namespace bcs;
 using namespace bcs::test;
@@ -34,6 +35,15 @@ template class bcs::CRefCol<double, 3>;
 template class bcs::CRefRow<double, DynamicDim>;
 template class bcs::CRefRow<double, 3>;
 
+template class bcs::StepVector<double, VertDir, DynamicDim>;
+template class bcs::StepVector<double, HorzDir, DynamicDim>;
+template class bcs::StepVector<double, VertDir, 3>;
+template class bcs::StepVector<double, HorzDir, 3>;
+
+template class bcs::CStepVector<double, VertDir, DynamicDim>;
+template class bcs::CStepVector<double, HorzDir, DynamicDim>;
+template class bcs::CStepVector<double, VertDir, 3>;
+template class bcs::CStepVector<double, HorzDir, 3>;
 
 // auxiliary functions
 
@@ -70,6 +80,100 @@ static bool verify_dense_matrix(const IDenseMatrix<Derived, T>& A, index_t m, in
 
 	return true;
 }
+
+
+template<typename T, typename Dir, int Dim>
+static bool verify_stepvec(const CStepVector<T, Dir, Dim>& A, index_t len, index_t step)
+{
+	index_t m = 0;
+	index_t n = 0;
+
+	if (bcs::is_same<Dir, VertDir>::value) { m = len; n = 1; }
+	else if (bcs::is_same<Dir, HorzDir>::value) { m = 1; n = len; }
+	else throw std::runtime_error("Dir is neither Vert nor Horz");
+
+	if (!(A.nrows() == m)) return false;
+	if (!(A.ncolumns() == n)) return false;
+	if (!(A.nelems() == len)) return false;
+	if (!(A.size() == size_t(len))) return false;
+	if (!(A.step() == step)) return false;
+	if (!(A.is_empty() == (len == 0))) return false;
+	if (!(A.is_vector())) return false;
+
+	if (len > 0)
+	{
+		const T *p = &(A[0]);
+
+		if (bcs::is_same<Dir, VertDir>::value)
+		{
+			for (index_t i = 0; i < len; ++i)
+			{
+				if (A[i] != p[i * step]) return false;
+				if (A(i, 0) != p[i * step]) return false;
+				if (A.elem(i, 0) != p[i * step]) return false;
+			}
+		}
+		else
+		{
+			for (index_t i = 0; i < len; ++i)
+			{
+				if (A[i] != p[i * step]) return false;
+				if (A(0, i) != p[i * step]) return false;
+				if (A.elem(0, i) != p[i * step]) return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+template<typename T, typename Dir, int Dim>
+static bool verify_stepvec(const StepVector<T, Dir, Dim>& A, index_t len, index_t step)
+{
+	index_t m = 0;
+	index_t n = 0;
+
+	if (bcs::is_same<Dir, VertDir>::value) { m = len; n = 1; }
+	else if (bcs::is_same<Dir, HorzDir>::value) { m = 1; n = len; }
+	else throw std::runtime_error("Dir is neither Vert nor Horz");
+
+	if (!(A.nrows() == m)) return false;
+	if (!(A.ncolumns() == n)) return false;
+	if (!(A.nelems() == len)) return false;
+	if (!(A.size() == size_t(len))) return false;
+	if (!(A.step() == step)) return false;
+	if (!(A.is_empty() == (len == 0))) return false;
+	if (!(A.is_vector())) return false;
+
+	if (len > 0)
+	{
+		const T *p = &(A[0]);
+
+		if (bcs::is_same<Dir, VertDir>::value)
+		{
+			for (index_t i = 0; i < len; ++i)
+			{
+				if (A[i] != p[i * step]) return false;
+				if (A(i, 0) != p[i * step]) return false;
+				if (A.elem(i, 0) != p[i * step]) return false;
+			}
+		}
+		else
+		{
+			for (index_t i = 0; i < len; ++i)
+			{
+				if (A[i] != p[i * step]) return false;
+				if (A(0, i) != p[i * step]) return false;
+				if (A.elem(0, i) != p[i * step]) return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+
 
 
 // test cases
@@ -158,6 +262,21 @@ TEST( RefClasses, RefVector )
 }
 
 
+TEST( RefClasses, StepVector )
+{
+	const index_t len = 5;
+	const index_t step = 2;
+	const index_t ulen = 9;
+
+	double src[ulen] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	double dst[ulen] = {9, 8, 7, 6, 5, 4, 3, 2, 1};
+
+	CStepVector<double, VertDir> ccol(src, len, step);
+	StepVector<double, VertDir> col(dst, len, step);
+
+	ASSERT_TRUE( verify_stepvec(ccol, len, step) );
+	ASSERT_TRUE( verify_stepvec(col, len, step) );
+}
 
 
 

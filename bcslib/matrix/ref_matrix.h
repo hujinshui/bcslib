@@ -84,7 +84,7 @@ namespace bcs
 		BCS_ENSURE_INLINE
 		const RefMatrix& operator = (IMatrixBase<OtherDerived, T>& other)
 		{
-			detail::check_rhs_view(*this, other);
+			detail::check_assign_fits(*this, other);
 			assign(other);
 			return *this;
 		}
@@ -114,6 +114,16 @@ namespace bcs
 		BCS_ENSURE_INLINE eval_return_type eval() const
 		{
 			return *this;
+		}
+
+		BCS_ENSURE_INLINE void move_forward(index_t x)
+		{
+			m_base += x;
+		}
+
+		BCS_ENSURE_INLINE void move_backward(index_t x)
+		{
+			m_base -= x;
 		}
 
 	public:
@@ -327,6 +337,16 @@ namespace bcs
 		BCS_ENSURE_INLINE eval_return_type eval() const
 		{
 			return *this;
+		}
+
+		BCS_ENSURE_INLINE void move_forward(index_t x)
+		{
+			m_base += x;
+		}
+
+		BCS_ENSURE_INLINE void move_backward(index_t x)
+		{
+			m_base -= x;
 		}
 
 	private:
