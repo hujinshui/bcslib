@@ -87,6 +87,7 @@ MATRIX_HEADERS = \
 	$(INC)/matrix/matrix_fwd.h \
 	$(INC)/matrix/matrix_manip.h \
 	$(INC)/matrix/ref_matrix.h \
+	$(INC)/matrix/stepvec.h \
 	$(INC)/matrix/dense_matrix.h \
 	$(INC)/matrix/matrix.h \
 	$(INC)/matrix/bits/matrix_helpers.h

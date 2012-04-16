@@ -31,7 +31,7 @@ namespace bcs
 
 		template<class LDerived, typename LT, class RDerived, typename RT>
 		BCS_ENSURE_INLINE
-		inline void check_rhs_view(
+		inline void check_assign_fits(
 				const IMatrixBase<LDerived, LT>& lhs,
 				const IMatrixBase<RDerived, RT>& rhs)
 		{
