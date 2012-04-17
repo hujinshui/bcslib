@@ -90,7 +90,7 @@ namespace bcs
 		BCS_ENSURE_INLINE
 		void assign(IMatrixBase<OtherDerived, T>& other)
 		{
-			evaluate_to(other, *this);
+			evaluate_to(other.derived(), *this);
 		}
 
 		template<class DstDerived>
