@@ -264,8 +264,6 @@ namespace bcs
 		static const int RowDimension = RowDim;
 		static const int ColDimension = ColDim;
 		static const bool IsReadOnly = false;
-
-		typedef const DenseMatrix<T, RowDim, ColDim>& eval_return_type;
 	};
 
 
@@ -284,7 +282,6 @@ namespace bcs
 		typedef IDenseMatrix<DenseMatrix<T, RowDim, ColDim>, T> base_type;
 		static const int RowDimension = RowDim;
 		static const int ColDimension = ColDim;
-		typedef const DenseMatrix<T, RowDim, ColDim>& eval_return_type;
 
 	public:
 
@@ -324,7 +321,7 @@ namespace bcs
 		DenseMatrix(const IMatrixBase<OtherDerived, T>& other)
 		: m_internal(other.nrows(), other.ncolumns())
 		{
-			other.eval_to(*this);
+			evaluate_to(other, *this);
 		}
 
 		BCS_ENSURE_INLINE
@@ -363,24 +360,13 @@ namespace bcs
 		BCS_ENSURE_INLINE
 		void assign(const IMatrixBase<OtherDerived, T>& other)
 		{
-			other.eval_to(*this);
+			evaluate_to(other, *this);
 		}
 
 		template<class DstDerived>
 		BCS_ENSURE_INLINE void eval_to(IDenseMatrix<DstDerived, T>& dst) const
 		{
 			if (dst.ptr_base() != this->ptr_base()) bcs::copy(*this, dst);
-		}
-
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to_block(IDenseMatrixBlock<DstDerived, T>& dst) const
-		{
-			bcs::copy(*this, dst);
-		}
-
-		BCS_ENSURE_INLINE eval_return_type eval() const
-		{
-			return *this;
 		}
 
 	public:

@@ -33,8 +33,6 @@ namespace bcs
 		static const int RowDimension = RowDim;
 		static const int ColDimension = ColDim;
 		static const bool IsReadOnly = false;
-
-		typedef const RefMatrix<T, RowDim, ColDim>& eval_return_type;
 	};
 
 
@@ -53,7 +51,6 @@ namespace bcs
 		typedef IDenseMatrix<RefMatrix<T, RowDim, ColDim>, T> base_type;
 		static const int RowDimension = RowDim;
 		static const int ColDimension = ColDim;
-		typedef const RefMatrix<T, RowDim, ColDim>& eval_return_type;
 
 	public:
 
@@ -93,7 +90,7 @@ namespace bcs
 		BCS_ENSURE_INLINE
 		void assign(IMatrixBase<OtherDerived, T>& other)
 		{
-			other.eval_to(*this);
+			evaluate_to(other, *this);
 		}
 
 		template<class DstDerived>
@@ -103,17 +100,6 @@ namespace bcs
 			{
 				bcs::copy(*this, dst);
 			}
-		}
-
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to_block(IDenseMatrixBlock<DstDerived, T>& dst) const
-		{
-			bcs::copy(*this, dst);
-		}
-
-		BCS_ENSURE_INLINE eval_return_type eval() const
-		{
-			return *this;
 		}
 
 		BCS_ENSURE_INLINE void move_forward(index_t x)
@@ -253,8 +239,6 @@ namespace bcs
 		static const int RowDimension = RowDim;
 		static const int ColDimension = ColDim;
 		static const bool IsReadOnly = true;
-
-		typedef const CRefMatrix<T, RowDim, ColDim>& eval_return_type;
 	};
 
 
@@ -280,7 +264,6 @@ namespace bcs
 		typedef IDenseMatrix<CRefMatrix<T, RowDim, ColDim>, T> base_type;
 		static const int RowDimension = RowDim;
 		static const int ColDimension = ColDim;
-		typedef const CRefMatrix<T, RowDim, ColDim>& eval_return_type;
 
 	public:
 
@@ -326,17 +309,6 @@ namespace bcs
 			{
 				bcs::copy(*this, dst);
 			}
-		}
-
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to_block(IDenseMatrixBlock<DstDerived, T>& dst) const
-		{
-			bcs::copy(*this, dst);
-		}
-
-		BCS_ENSURE_INLINE eval_return_type eval() const
-		{
-			return *this;
 		}
 
 		BCS_ENSURE_INLINE void move_forward(index_t x)

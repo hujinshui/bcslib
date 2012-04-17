@@ -33,8 +33,6 @@ namespace bcs
 		static const int RowDimension = Dim;
 		static const int ColDimension = 1;
 		static const bool IsReadOnly = false;
-
-		typedef DenseMatrix<T, Dim, 1> eval_return_type;
 	};
 
 	template<typename T, int Dim>
@@ -45,8 +43,6 @@ namespace bcs
 		static const int RowDimension = 1;
 		static const int ColDimension = Dim;
 		static const bool IsReadOnly = false;
-
-		typedef DenseMatrix<T, 1, Dim> eval_return_type;
 	};
 
 
@@ -93,7 +89,6 @@ namespace bcs
 		typedef IDenseMatrix<StepVector<T, Dir, Dim>, T> base_type;
 		static const int RowDimension = matrix_traits<StepVector>::RowDimension;
 		static const int ColDimension = matrix_traits<StepVector>::ColDimension;
-		typedef typename matrix_traits<StepVector>::eval_return_type eval_return_type;
 
 	public:
 
@@ -126,8 +121,6 @@ namespace bcs
 
 		template<class DstDerived>
 		inline void eval_to(IDenseMatrix<DstDerived, T>& dst) const;
-
-		inline eval_return_type eval() const;
 
 		BCS_ENSURE_INLINE void move_forward(index_t x)
 		{
@@ -281,7 +274,6 @@ namespace bcs
 		typedef IDenseMatrix<StepVector<T, Dir, Dim>, T> base_type;
 		static const int RowDimension = matrix_traits<CStepVector>::RowDimension;
 		static const int ColDimension = matrix_traits<CStepVector>::ColDimension;
-		typedef typename matrix_traits<CStepVector>::eval_return_type eval_return_type;
 
 	public:
 
@@ -306,8 +298,6 @@ namespace bcs
 
 		template<class DstDerived>
 		inline void eval_to(IDenseMatrix<DstDerived, T>& dst) const;
-
-		inline eval_return_type eval() const;
 
 		BCS_ENSURE_INLINE void move_forward(index_t x)
 		{
