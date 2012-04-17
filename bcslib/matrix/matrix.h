@@ -20,4 +20,7 @@
 #include <bcslib/matrix/stepvec.h>
 #include <bcslib/matrix/dense_matrix.h>
 
+#include <bcslib/matrix/matrix_capture.h>
+
+
 #endif /* MATRIX_H_ */

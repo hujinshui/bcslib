@@ -125,7 +125,7 @@ namespace bcs
 			{
 				std::printf(fmt, X.elem(i, j));
 			}
-			std::printf("%s", delim);
+			if (delim) std::printf("%s", delim);
 		}
 	}
 

@@ -73,6 +73,9 @@ static bool verify_dense_matrix(const IDenseMatrix<Derived, T>& A, index_t m, in
 		}
 	}
 
+	DenseMatrixCapture<Derived, T> cap(A.derived());
+	if ( &(cap.get()) != &(A.derived()) ) return false;
+
 	return true;
 }
 

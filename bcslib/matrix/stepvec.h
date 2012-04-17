@@ -103,24 +103,53 @@ namespace bcs
 		BCS_ENSURE_INLINE StepVector& operator = (const IMatrixBase<OtherDerived, T>& other)
 		{
 			detail::check_assign_fits(*this, other);
-			assign(other);
+			assign(other.derived());
+			return *this;
 		}
 
 		template<class OtherDerived>
 		BCS_ENSURE_INLINE StepVector& operator = (const IDenseMatrixView<OtherDerived, T>& other)
 		{
 			detail::check_assign_fits(*this, other);
-			assign(other);
+			assign(other.derived());
+			return *this;
 		}
 
 		template<class OtherDerived>
-		inline void assign(const IMatrixBase<OtherDerived, T>& other);
+		inline void assign(const IMatrixBase<OtherDerived, T>& other)
+		{
+			DenseMatrixCapture<OtherDerived, T> cap(other);
+			assign(cap.get());
+		}
 
 		template<class OtherDerived>
-		inline void assign(const IDenseMatrixView<OtherDerived, T>& other);
+		inline void assign(const IDenseMatrixView<OtherDerived, T>& other)
+		{
+			if (other.ncolumns() == 1)
+			{
+				for (index_t i = 0; i < m_len; ++i)
+					m_base[i * m_step] = other.elem(i, 1);
+			}
+			else
+			{
+				for (index_t i = 0; i < m_len; ++i)
+					m_base[i * m_step] = other.elem(1, i);
+			}
+		}
+
+		template<class OtherDerived>
+		inline void assign(const IDenseMatrix<OtherDerived, T>& other)
+		{
+			for (index_t i = 0; i < m_len; ++i)
+				m_base[i * m_step] = other[i];
+		}
 
 		template<class DstDerived>
-		inline void eval_to(IDenseMatrix<DstDerived, T>& dst) const;
+		inline void eval_to(IDenseMatrix<DstDerived, T>& dst)
+		{
+			for (index_t i = 0; i < m_len; ++i)
+				dst[i] = m_base[i * m_step];
+		}
 
 		BCS_ENSURE_INLINE void move_forward(index_t x)
 		{
@@ -297,7 +326,11 @@ namespace bcs
 		}
 
 		template<class DstDerived>
-		inline void eval_to(IDenseMatrix<DstDerived, T>& dst) const;
+		inline void eval_to(IDenseMatrix<DstDerived, T>& dst) const
+		{
+			for (index_t i = 0; i < m_len; ++i)
+				dst[i] = m_base[i * m_step];
+		}
 
 		BCS_ENSURE_INLINE void move_forward(index_t x)
 		{
@@ -372,6 +405,8 @@ namespace bcs
 		index_t m_step;
 
 	}; // end class CStepVector
+
+
 
 }
 
