@@ -321,7 +321,7 @@ namespace bcs
 		DenseMatrix(const IMatrixBase<OtherDerived, T>& other)
 		: m_internal(other.nrows(), other.ncolumns())
 		{
-			evaluate_to(other, *this);
+			evaluate_to(other.derived(), *this);
 		}
 
 		BCS_ENSURE_INLINE
@@ -360,7 +360,7 @@ namespace bcs
 		BCS_ENSURE_INLINE
 		void assign(const IMatrixBase<OtherDerived, T>& other)
 		{
-			evaluate_to(other, *this);
+			evaluate_to(other.derived(), *this);
 		}
 
 		template<class DstDerived>
