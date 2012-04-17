@@ -97,7 +97,6 @@ namespace bcs
 
 		static const index_type RowDimension = matrix_traits<Derived>::RowDimension;
 		static const index_type ColDimension = matrix_traits<Derived>::ColDimension;
-		typedef typename matrix_traits<Derived>::eval_return_type eval_return_type;
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
@@ -135,17 +134,6 @@ namespace bcs
 			derived().eval_to(dst);
 		}
 
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to_block(IDenseMatrixBlock<DstDerived, T>& dst) const
-		{
-			derived().eval_to_block(dst);
-		}
-
-		BCS_ENSURE_INLINE eval_return_type eval() const
-		{
-			return derived().eval();
-		}
-
 	}; // end class IMatrixBase
 
 
@@ -163,7 +151,6 @@ namespace bcs
 		typedef IMatrixBase<Derived, T> base_type;
 		using base_type::RowDimension;
 		using base_type::ColDimension;
-		typedef typename base_type::eval_return_type eval_return_type;
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
@@ -211,17 +198,6 @@ namespace bcs
 			derived().eval_to(dst);
 		}
 
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to_block(IDenseMatrixBlock<DstDerived, T>& dst) const
-		{
-			derived().eval_to_block(dst);
-		}
-
-		BCS_ENSURE_INLINE eval_return_type eval() const
-		{
-			return derived().eval();
-		}
-
 	}; // end class IDenseMatrixView
 
 
@@ -238,7 +214,6 @@ namespace bcs
 		typedef IDenseMatrixView<Derived, T> base_type;
 		using base_type::RowDimension;
 		using base_type::ColDimension;
-		typedef typename base_type::eval_return_type eval_return_type;
 
 	private:
 		typedef typename detail::adapt_const<pointer, matrix_traits<Derived>::IsReadOnly>::type nc_pointer;
@@ -326,17 +301,6 @@ namespace bcs
 			derived().eval_to(dst);
 		}
 
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to_block(IDenseMatrixBlock<DstDerived, T>& dst) const
-		{
-			derived().eval_to_block(dst);
-		}
-
-		BCS_ENSURE_INLINE eval_return_type eval() const
-		{
-			return derived().eval();
-		}
-
 		BCS_ENSURE_INLINE void zero()
 		{
 			derived().zero();
@@ -369,7 +333,6 @@ namespace bcs
 		typedef IDenseMatrixBlock<Derived, T> base_type;
 		using base_type::RowDimension;
 		using base_type::ColDimension;
-		typedef typename base_type::eval_return_type eval_return_type;
 
 	private:
 		typedef typename detail::adapt_const<pointer, matrix_traits<Derived>::IsReadOnly>::type nc_pointer;
@@ -468,17 +431,6 @@ namespace bcs
 			derived().eval_to(dst);
 		}
 
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to_block(IDenseMatrixBlock<DstDerived, T>& dst) const
-		{
-			derived().eval_to_block(dst);
-		}
-
-		BCS_ENSURE_INLINE eval_return_type eval() const
-		{
-			return derived().eval();
-		}
-
 		BCS_ENSURE_INLINE void zero()
 		{
 			derived().zero();
@@ -509,6 +461,13 @@ namespace bcs
 	inline bool is_same_size(const IMatrixBase<Derived1, T1>& A, const IMatrixBase<Derived2, T2>& B)
 	{
 		return A.nrows() == B.nrows() && A.ncolumns() == B.ncolumns();
+	}
+
+	template<typename T, class SDerived, class DDerived>
+	BCS_ENSURE_INLINE
+	inline void evaluate_to(const IMatrixBase<SDerived, T>& S, IDenseMatrix<DDerived, T>& D)
+	{
+		S.eval_to(D);
 	}
 
 }
