@@ -78,6 +78,9 @@ static bool verify_dense_matrix(const IDenseMatrix<Derived, T>& A, index_t m, in
 		}
 	}
 
+	DenseMatrixCapture<Derived, T> cap(A.derived());
+	if ( &(cap.get()) != &(A.derived()) ) return false;
+
 	return true;
 }
 
@@ -262,7 +265,7 @@ TEST( RefClasses, RefVector )
 }
 
 
-TEST( RefClasses, StepVector )
+TEST( RefClasses, StepColumn )
 {
 	const index_t len = 5;
 	const index_t step = 2;
@@ -276,9 +279,72 @@ TEST( RefClasses, StepVector )
 
 	ASSERT_TRUE( verify_stepvec(ccol, len, step) );
 	ASSERT_TRUE( verify_stepvec(col, len, step) );
+
+	col.fill(0.0);
+
+	double r1[ulen] = {0, 8, 0, 6, 0, 4, 0, 2, 0};
+	ASSERT_TRUE( elems_equal(size_t(ulen), dst, r1) );
+
+	col.copy_from(src);
+
+	double r2[ulen] = {1, 8, 2, 6, 3, 4, 4, 2, 5};
+	ASSERT_TRUE( elems_equal(size_t(ulen), dst, r2) );
+
+	zero_elems(size_t(ulen), dst);
+	col = RefRow<double>(src, len);
+	col = RefCol<double>(src, len);
+
+	double r3[ulen] = {1, 0, 2, 0, 3, 0, 4, 0, 5};
+	ASSERT_TRUE( elems_equal(size_t(ulen), dst, r3) );
+
+	zero_elems(size_t(ulen), dst);
+	col = ccol;
+
+	double r4[ulen] = {1, 0, 3, 0, 5, 0, 7, 0, 9};
+	ASSERT_TRUE( elems_equal(size_t(ulen), dst, r4) );
+
 }
 
 
+TEST( RefClasses, StepRow )
+{
+	const index_t len = 5;
+	const index_t step = 2;
+	const index_t ulen = 9;
+
+	double src[ulen] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	double dst[ulen] = {9, 8, 7, 6, 5, 4, 3, 2, 1};
+
+	CStepVector<double, HorzDir> ccol(src, len, step);
+	StepVector<double, HorzDir> col(dst, len, step);
+
+	ASSERT_TRUE( verify_stepvec(ccol, len, step) );
+	ASSERT_TRUE( verify_stepvec(col, len, step) );
+
+	col.fill(0.0);
+
+	double r1[ulen] = {0, 8, 0, 6, 0, 4, 0, 2, 0};
+	ASSERT_TRUE( elems_equal(size_t(ulen), dst, r1) );
+
+	col.copy_from(src);
+
+	double r2[ulen] = {1, 8, 2, 6, 3, 4, 4, 2, 5};
+	ASSERT_TRUE( elems_equal(size_t(ulen), dst, r2) );
+
+	zero_elems(size_t(ulen), dst);
+	col = RefRow<double>(src, len);
+	col = RefCol<double>(src, len);
+
+	double r3[ulen] = {1, 0, 2, 0, 3, 0, 4, 0, 5};
+	ASSERT_TRUE( elems_equal(size_t(ulen), dst, r3) );
+
+	zero_elems(size_t(ulen), dst);
+	col = ccol;
+
+	double r4[ulen] = {1, 0, 3, 0, 5, 0, 7, 0, 9};
+	ASSERT_TRUE( elems_equal(size_t(ulen), dst, r4) );
+
+}
 
 
 

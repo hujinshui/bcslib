@@ -74,7 +74,8 @@ namespace bcs
 	inline void copy(const IDenseMatrix<LDerived, T>& src, IDenseMatrix<RDerived, T>& dst);
 
 	template<typename T, class Derived>
-	void printf_mat(const char *fmt, const IDenseMatrixView<Derived, T>& X, const char *pre_line, const char *delim);
+	void printf_mat(const char *fmt, const IDenseMatrixView<Derived, T>& X,
+			const char *pre_line=BCS_NULL, const char *delim="\n");
 
 
 }
