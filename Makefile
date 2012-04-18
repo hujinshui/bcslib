@@ -78,6 +78,7 @@ CORE_H = \
 	$(INC)/core/iterator.h \
 	$(INC)/core/mem_op.h \
 	$(INC)/engine/mem_op_impl.h \
+	$(INC)/engine/mem_op_impl_static.h \
 	$(INC)/core/block.h \
 	$(INC)/core.h
 
