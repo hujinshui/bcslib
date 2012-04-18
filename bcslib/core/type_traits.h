@@ -13,7 +13,7 @@
 #ifndef BCSLIB_TYPE_TRAITS_H_
 #define BCSLIB_TYPE_TRAITS_H_
 
-#include <bcslib/base/basic_defs.h>
+#include <bcslib/config/config.h>
 
 #ifdef BCS_USE_C11_STDLIB
 #include <type_traits>

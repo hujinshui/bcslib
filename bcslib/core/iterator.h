@@ -1,7 +1,7 @@
 /**
- * @file iterator_wrappers.h
+ * @file iterators.h
  *
- * Some useful wrapper classes for extending the functionality of iterators
+ * Some useful adaptor classes to help iterator implementation
  * 
  * @author Dahua Lin
  */
@@ -10,12 +10,11 @@
 #pragma once
 #endif
 
-#ifndef BCSLIB_ITERATOR_WRAPPERS_H
-#define BCSLIB_ITERATOR_WRAPPERS_H
+#ifndef BCSLIB_ITERATORS_H
+#define BCSLIB_ITERATORS_H
 
-#include <bcslib/base/basic_defs.h>
+#include <bcslib/core/basic_defs.h>
 #include <iterator>
-
 
 namespace bcs
 {
@@ -56,7 +55,7 @@ namespace bcs
 	 */
 
 	template<class Impl>
-	class forward_iterator_wrapper
+	class forward_iterator_adaptor
 	{
 	public:
 		typedef std::forward_iterator_tag iterator_category;
@@ -66,20 +65,20 @@ namespace bcs
 		typedef ptrdiff_t difference_type;
 
 	public:
-		forward_iterator_wrapper()
+		forward_iterator_adaptor()
 		{
 		}
 
-		forward_iterator_wrapper(const Impl& impl) : m_impl(impl)
+		forward_iterator_adaptor(const Impl& impl) : m_impl(impl)
 		{
 		}
 
-		bool operator == (const forward_iterator_wrapper& rhs) const
+		bool operator == (const forward_iterator_adaptor& rhs) const
 		{
 			return m_impl == rhs.m_impl;
 		}
 
-		bool operator != (const forward_iterator_wrapper& rhs) const
+		bool operator != (const forward_iterator_adaptor& rhs) const
 		{
 			return !(m_impl == rhs.m_impl);
 		}
@@ -94,13 +93,13 @@ namespace bcs
 			return m_impl.ptr();
 		}
 
-		forward_iterator_wrapper& operator ++ ()
+		forward_iterator_adaptor& operator ++ ()
 		{
 			m_impl.move_next();
 			return *this;
 		}
 
-		forward_iterator_wrapper operator ++ (int)
+		forward_iterator_adaptor operator ++ (int)
 		{
 			Impl cimpl = m_impl;
 			m_impl.move_next();
@@ -110,12 +109,12 @@ namespace bcs
 	protected:
 		Impl m_impl;
 
-	}; // end class forward_iterator_wrapper
+	}; // end class forward_iterator_adaptor
 
 
 
 	template<class Impl>
-	class bidirectional_iterator_wrapper : public forward_iterator_wrapper<Impl>
+	class bidirectional_iterator_adaptor : public forward_iterator_adaptor<Impl>
 	{
 	public:
 		typedef std::bidirectional_iterator_tag iterator_category;
@@ -125,33 +124,33 @@ namespace bcs
 		typedef ptrdiff_t difference_type;
 
 	public:
-		bidirectional_iterator_wrapper()
+		bidirectional_iterator_adaptor()
 		{
 		}
 
-		bidirectional_iterator_wrapper(const Impl& impl) : forward_iterator_wrapper<Impl>(impl)
+		bidirectional_iterator_adaptor(const Impl& impl) : forward_iterator_adaptor<Impl>(impl)
 		{
 		}
 
-		bidirectional_iterator_wrapper& operator -- ()
+		bidirectional_iterator_adaptor& operator -- ()
 		{
 			this->m_impl.move_prev();
 			return *this;
 		}
 
-		bidirectional_iterator_wrapper operator -- (int)
+		bidirectional_iterator_adaptor operator -- (int)
 		{
 			Impl cimpl = this->m_impl;
 			this->m_impl.move_prev();
 			return cimpl;
 		}
 
-	}; // end class bidirectional_iterator_wrapper
+	}; // end class bidirectional_iterator_adaptor
 
 
 
 	template<class Impl>
-	class random_access_iterator_wrapper : public bidirectional_iterator_wrapper<Impl>
+	class random_access_iterator_adaptor : public bidirectional_iterator_adaptor<Impl>
 	{
 	public:
 		typedef std::random_access_iterator_tag iterator_category;
@@ -161,60 +160,60 @@ namespace bcs
 		typedef ptrdiff_t difference_type;
 
 	public:
-		random_access_iterator_wrapper()
+		random_access_iterator_adaptor()
 		{
 		}
 
-		random_access_iterator_wrapper(const Impl& impl) : bidirectional_iterator_wrapper<Impl>(impl)
+		random_access_iterator_adaptor(const Impl& impl) : bidirectional_iterator_adaptor<Impl>(impl)
 		{
 		}
 
-		bool operator < (const random_access_iterator_wrapper& rhs) const
+		bool operator < (const random_access_iterator_adaptor& rhs) const
 		{
 			return this->m_impl < rhs.m_impl;
 		}
 
-		bool operator <= (const random_access_iterator_wrapper& rhs) const
+		bool operator <= (const random_access_iterator_adaptor& rhs) const
 		{
 			return !(this->m_impl > rhs.m_impl);
 		}
 
-		bool operator > (const random_access_iterator_wrapper& rhs) const
+		bool operator > (const random_access_iterator_adaptor& rhs) const
 		{
 			return this->impl > rhs.m_impl;
 		}
 
-		bool operator >= (const random_access_iterator_wrapper& rhs) const
+		bool operator >= (const random_access_iterator_adaptor& rhs) const
 		{
 			return !(this->m_impl < rhs.m_impl);
 		}
 
-		random_access_iterator_wrapper operator + (difference_type n) const
+		random_access_iterator_adaptor operator + (difference_type n) const
 		{
 			Impl impl(this->m_impl);
 			impl.move_forward(n);
 			return impl;
 		}
 
-		random_access_iterator_wrapper operator - (difference_type n) const
+		random_access_iterator_adaptor operator - (difference_type n) const
 		{
 			Impl impl(this->m_impl);
 			impl.move_backward(n);
 			return impl;
 		}
 
-		difference_type operator - (const random_access_iterator_wrapper& rhs) const
+		difference_type operator - (const random_access_iterator_adaptor& rhs) const
 		{
 			return this->m_impl - rhs.m_impl;
 		}
 
-		random_access_iterator_wrapper& operator += (difference_type n)
+		random_access_iterator_adaptor& operator += (difference_type n)
 		{
 			this->m_impl.move_forward(n);
 			return *this;
 		}
 
-		random_access_iterator_wrapper& operator -= (difference_type n)
+		random_access_iterator_adaptor& operator -= (difference_type n)
 		{
 			this->m_impl.move_backward(n);
 			return *this;
@@ -225,12 +224,13 @@ namespace bcs
 			return this->m_impl.element_at(n);
 		}
 
-	}; // end class random_access_iterator_wrapper
+	}; // end class random_access_iterator_adaptor
+
 
 	template<class Impl>
-	inline random_access_iterator_wrapper<Impl> operator + (
-			typename random_access_iterator_wrapper<Impl>::difference_type n,
-			const random_access_iterator_wrapper<Impl>& rhs)
+	inline random_access_iterator_adaptor<Impl> operator + (
+			typename random_access_iterator_adaptor<Impl>::difference_type n,
+			const random_access_iterator_adaptor<Impl>& rhs)
 	{
 		return rhs + n;
 	}

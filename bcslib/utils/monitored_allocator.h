@@ -13,7 +13,7 @@
 #ifndef BCSLIB_MONITORED_ALLOCATOR_H
 #define BCSLIB_MONITORED_ALLOCATOR_H
 
-#include <bcslib/base/basic_defs.h>
+#include <bcslib/core/basic_defs.h>
 #include <stdexcept>
 #include <limits>
 #include <map>

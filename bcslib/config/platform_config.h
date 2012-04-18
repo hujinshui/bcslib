@@ -1,7 +1,7 @@
 /**
- * @file config.h
+ * @file platform_config.h
  *
- * The configuration file for Basic Computation Supporting Library
+ * The platform-specific configuration for BCSLib
  *
  * @author dhlin
  */
@@ -10,51 +10,9 @@
 #pragma once
 #endif
 
-#ifndef BCSLIB_CONFIG_H
-#define BCSLIB_CONFIG_H
+#ifndef BCSLIB_PLATFORM_CONFIG_H
+#define BCSLIB_PLATFORM_CONFIG_H
 
-/************************************************
- *
- *  User controls
- *
- ************************************************/
-
-/**
- * Whether to use SSE2:
- *
- * Note: SSE2 contains a large set of useful vectorized
- * computation instructions
- */
-#define BCSLIB_USE_SSE2
-
-/**
- * Whether to use SSE3:
- *
- * Note: SSE3 contains HADDPS and HADDPD (useful to speed up sum)
- */
-#define BCSLIB_USE_SSE3
-
-
-/**
- * Whether to use SSE4.1:
- *
- * Note: SSE4.1 contains DPPS and DPPD (useful to speed up dot product)
- */
-#define BCSLIB_USE_SSE41
-
-
-/**
- * Whether to turn off extensive checks (e.g. array bound)
- */
-// #define BCSLIB_NO_DEBUG
-
-
-
-/************************************************
- *
- *  Compiler detection
- *
- ************************************************/
 
 #define BCSLIB_MSVC 0x01
 #define BCSLIB_GCC 0x02

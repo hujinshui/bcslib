@@ -116,7 +116,7 @@ namespace bcs
 		typedef index_t value_type;
 		typedef size_t size_type;
 		typedef index_t index_type;
-		typedef forward_iterator_wrapper<_detail::_range_iter_impl> const_iterator;
+		typedef forward_iterator_adaptor<_detail::_range_iter_impl> const_iterator;
 
 	public:
 		range()
@@ -249,7 +249,7 @@ namespace bcs
 		typedef index_t value_type;
 		typedef size_t size_type;
 		typedef index_t index_type;
-		typedef forward_iterator_wrapper<_detail::_step_range_iter_impl> const_iterator;
+		typedef forward_iterator_adaptor<_detail::_step_range_iter_impl> const_iterator;
 
 	public:
 		step_range()
@@ -410,7 +410,7 @@ namespace bcs
 		typedef index_t value_type;
 		typedef size_t size_type;
 		typedef index_t index_type;
-		typedef forward_iterator_wrapper<_detail::_rep_iter_impl> const_iterator;
+		typedef forward_iterator_adaptor<_detail::_rep_iter_impl> const_iterator;
 
 	public:
 		rep_range()

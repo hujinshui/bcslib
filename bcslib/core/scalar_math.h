@@ -14,7 +14,8 @@
 #pragma once
 #endif
 
-#include <bcslib/base/basic_defs.h>
+#include <bcslib/core/basic_types.h>
+#include <bcslib/core/syntax.h>
 #include <cmath>
 
 #ifndef BCSLIB_CMATH_H_
@@ -77,47 +78,42 @@ namespace bcs
 		{
 			return T(1) / sqrt(x);
 		}
-
-		template<typename T>
-		inline BCS_ENSURE_INLINE T clamp(T x, T lb, T ub)
-		{
-			return x < lb ? lb : (x > ub ? ub : x);
-		}
-
-		// Part of the new stuff in C++0x (Unfortunately, many are not available for MSVC yet)
-
-#ifdef BCS_HAS_C99_MATH
-
-		using ::cbrt;
-		using ::copysign;
-		using ::hypot;
-
-		using ::exp2;
-		using ::log2;
-		using ::expm1;
-		using ::log1p;
-
-		using ::round;
-		using ::trunc;
-
-		using ::asinh;
-		using ::acosh;
-		using ::atanh;
-
-		using ::erf;
-		using ::erfc;
-		using ::lgamma;
-		using ::tgamma;
-
-		// These two are not found by Mac's gcc 4.2
-		// using ::isinf;
-		// using ::isnan;
-
-		// TODO: alternative implementation of C99 math
-#endif
-
-
 	}
+
+	// Comparison
+
+	template<typename T>
+	inline BCS_ENSURE_INLINE T clamp(T x, T lb, T ub)
+	{
+		return x < lb ? lb : (x > ub ? ub : x);
+	}
+
+	template<typename T>
+	inline BCS_ENSURE_INLINE const T& min(const T& a, const T& b)
+	{
+		return a < b ? a : b;
+	}
+
+	template<typename T>
+	inline BCS_ENSURE_INLINE const T& max(const T& a, const T& b)
+	{
+		return a > b ? a : b;
+	}
+
+	template<typename T>
+	inline BCS_ENSURE_INLINE T& lbound(T &x, const T &lb)
+	{
+		if (x < lb) x = lb;
+		return x;
+	}
+
+	template<typename T>
+	inline BCS_ENSURE_INLINE T& ubound(T &x, const T &ub)
+	{
+		if (x > ub) x = ub;
+		return x;
+	}
+
 }
 
 #endif

@@ -85,7 +85,7 @@ namespace bcs
 		struct MatrixInternal<T, DynamicDim, ColDim>
 		{
 			index_t n_rows;
-			Block<T> blk;
+			block<T> blk;
 
 			BCS_ENSURE_INLINE
 			MatrixInternal() : n_rows(0) { }
@@ -141,7 +141,7 @@ namespace bcs
 		struct MatrixInternal<T, RowDim, DynamicDim>
 		{
 			index_t n_cols;
-			Block<T> blk;
+			block<T> blk;
 
 			BCS_ENSURE_INLINE
 			MatrixInternal() : n_cols(0) { }
@@ -198,7 +198,7 @@ namespace bcs
 		{
 			index_t n_rows;
 			index_t n_cols;
-			Block<T> blk;
+			block<T> blk;
 
 			BCS_ENSURE_INLINE
 			MatrixInternal() : n_rows(0), n_cols(0) { }
