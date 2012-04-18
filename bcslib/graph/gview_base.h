@@ -249,7 +249,7 @@ namespace bcs
 	struct natural_vertex_iterator
 	{
 		typedef _detail::natural_gentity_iterator_impl<gvertex<TInt> > impl_type;
-		typedef bidirectional_iterator_wrapper<impl_type> type;
+		typedef bidirectional_iterator_adaptor<impl_type> type;
 
 		static type get_default()
 		{
@@ -266,7 +266,7 @@ namespace bcs
 	struct natural_edge_iterator
 	{
 		typedef _detail::natural_gentity_iterator_impl<gedge<TInt> > impl_type;
-		typedef bidirectional_iterator_wrapper<impl_type> type;
+		typedef bidirectional_iterator_adaptor<impl_type> type;
 
 		static type get_default()
 		{

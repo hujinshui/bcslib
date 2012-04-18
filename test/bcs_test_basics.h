@@ -11,9 +11,9 @@
 
 #include <gtest/gtest.h>
 
-#include <bcslib/base/basic_defs.h>
-#include <bcslib/base/basic_math.h>
+#include <bcslib/core/basic_defs.h>
 #include <cstdio>
+#include <cmath>
 
 namespace bcs { namespace test {
 
