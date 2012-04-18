@@ -22,6 +22,7 @@
 #define BCS_DEFAULT_ALIGNMENT 16
 
 #include <bcslib/engine/mem_op_impl.h>
+#include <bcslib/engine/mem_op_impl_static.h>
 
 namespace bcs
 {
@@ -30,6 +31,30 @@ namespace bcs
 	 *	Basic memory operations
 	 *
 	 ********************************************/
+
+	template<typename T, size_t N>
+	struct mem
+	{
+		BCS_ENSURE_INLINE static void copy(const T *src, T *dst)
+		{
+			engine::mem<T, N>::copy(src, dst);
+		}
+
+		BCS_ENSURE_INLINE static void zero(T *dst)
+		{
+			engine::mem<T, N>::zero(dst);
+		}
+
+		BCS_ENSURE_INLINE static void fill(T *dst, const T &v)
+		{
+			engine::mem<T, N>::fill(dst, v);
+		}
+
+		BCS_ENSURE_INLINE static bool equal(const T *x, const T *y)
+		{
+			return engine::mem<T, N>::equal(x, y);
+		}
+	};
 
 	template<typename T>
 	BCS_ENSURE_INLINE
@@ -106,163 +131,6 @@ namespace bcs
 	{
 		return engine::elems_equal_2d(inner_dim, outer_dim, s1, s1_ext, v);
 	}
-
-
-	/********************************************
-	 *
-	 *	memory operations with known size
-	 *
-	 ********************************************/
-
-	template<typename T, size_t N> struct mem;
-
-	template<typename T>
-	struct mem<T, 1>
-	{
-		BCS_ENSURE_INLINE static void copy(const T *src, T *dst)
-		{
-			*dst = *src;
-		}
-
-		BCS_ENSURE_INLINE static void zero(T *dst)
-		{
-			*dst = T(0);
-		}
-
-		BCS_ENSURE_INLINE static void fill(T *dst, const T &v)
-		{
-			*dst = v;
-		}
-
-		BCS_ENSURE_INLINE static bool equal(const T *x, const T *y)
-		{
-			return *x == *y;
-		}
-	};
-
-	template<typename T>
-	struct mem<T, 2>
-	{
-		BCS_ENSURE_INLINE static void copy(const T *src, T *dst)
-		{
-			dst[0] = src[0];
-			dst[1] = src[1];
-		}
-
-		BCS_ENSURE_INLINE static void zero(T *dst)
-		{
-			dst[0] = T(0);
-			dst[1] = T(0);
-		}
-
-		BCS_ENSURE_INLINE static void fill(T *dst, const T &v)
-		{
-			dst[0] = v;
-			dst[1] = v;
-		}
-
-		BCS_ENSURE_INLINE static bool equal(const T *x, const T *y)
-		{
-			return x[0] == y[0] && x[1] == y[1];
-		}
-	};
-
-	template<typename T>
-	struct mem<T, 3>
-	{
-		BCS_ENSURE_INLINE static void copy(const T *src, T *dst)
-		{
-			dst[0] = src[0];
-			dst[1] = src[1];
-			dst[2] = src[2];
-		}
-
-		BCS_ENSURE_INLINE static void zero(T *dst)
-		{
-			dst[0] = T(0);
-			dst[1] = T(0);
-			dst[2] = T(0);
-		}
-
-		BCS_ENSURE_INLINE static void fill(T *dst, const T &v)
-		{
-			dst[0] = v;
-			dst[1] = v;
-			dst[2] = v;
-		}
-
-		BCS_ENSURE_INLINE static bool equal(const T *x, const T *y)
-		{
-			return x[0] == y[0] && x[1] == y[1] && x[2] == y[2];
-		}
-	};
-
-	template<typename T>
-	struct mem<T, 4>
-	{
-		BCS_ENSURE_INLINE static void copy(const T *src, T *dst)
-		{
-			dst[0] = src[0];
-			dst[1] = src[1];
-			dst[2] = src[2];
-			dst[3] = src[3];
-		}
-
-		BCS_ENSURE_INLINE static void zero(T *dst)
-		{
-			dst[0] = T(0);
-			dst[1] = T(0);
-			dst[2] = T(0);
-			dst[3] = T(0);
-		}
-
-		BCS_ENSURE_INLINE static void fill(T *dst, const T &v)
-		{
-			dst[0] = v;
-			dst[1] = v;
-			dst[2] = v;
-			dst[3] = v;
-		}
-
-		BCS_ENSURE_INLINE static bool equal(const T *x, const T *y)
-		{
-			return x[0] == y[0] && x[1] == y[1] && x[2] == y[2] && x[3] == y[3];
-		}
-	};
-
-	template<typename T, size_t N>
-	struct mem
-	{
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(N > 4, "Generic mem<T, N> should be instantiated only when N > 4");
-#endif
-
-		inline static void copy(const T *src, T *dst)
-		{
-			mem<T, N/2>::copy(src, dst);
-			mem<T, N-N/2>::copy(src + N/2, dst + N/2);
-		}
-
-		inline static void zero(T *dst)
-		{
-			mem<T, N/2>::zero(dst);
-			mem<T, N-N/2>::zero(dst + N/2);
-		}
-
-		inline static void fill(T *dst, const T &v)
-		{
-			mem<T, N/2>::fill(dst, v);
-			mem<T, N-N/2>::fill(dst + N/2, v);
-		}
-
-		inline static bool equal(const T *x, const T *y)
-		{
-			return mem<T, N/2>::equal(x, y) && mem<T, N-N/2>::equal(x+N/2, y+N/2);
-		}
-	};
-
-
-
 
 
 	/********************************************
