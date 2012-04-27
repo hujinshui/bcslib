@@ -36,6 +36,23 @@ namespace bcs
 		noncopyable& operator= (const noncopyable& );
 	};
 
+
+	template<typename T, bool IsReadOnly> struct access_types;
+
+	template<typename T>
+	struct access_types<T, false>
+	{
+		typedef T* pointer;
+		typedef T& reference;
+	};
+
+	template<typename T>
+	struct access_types<T, true>
+	{
+		typedef const T* pointer;
+		typedef const T& reference;
+	};
+
 }
 
 

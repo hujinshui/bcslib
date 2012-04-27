@@ -13,87 +13,169 @@
 #ifndef BCSLIB_MATRIX_HELPERS_H_
 #define BCSLIB_MATRIX_HELPERS_H_
 
-#include <bcslib/matrix/matrix_base.h>
+#include <bcslib/core/basic_defs.h>
 
 namespace bcs
 {
 	namespace detail
 	{
-		template<class Derived, typename T>
-		BCS_ENSURE_INLINE
-		inline void check_matrix_indices(const IMatrixBase<Derived, T>& mat, index_t i, index_t j)
-		{
-#ifndef BCSLIB_NO_DEBUG
-			check_arg(i >= 0 && i < mat.nrows() && j >= 0 && j < mat.ncolumns(),
-					"Index out of boundary.");
-#endif
-		}
+		template<bool SingleRow, bool SingleCol> struct dim_helper;
 
-		template<class LDerived, typename LT, class RDerived, typename RT>
-		BCS_ENSURE_INLINE
-		inline void check_assign_fits(
-				const IMatrixBase<LDerived, LT>& lhs,
-				const IMatrixBase<RDerived, RT>& rhs)
+		template<> struct dim_helper<false, false>
 		{
-			bool is_fit;
-			if (lhs.is_vector())
+			BCS_ENSURE_INLINE static index_t nelems(index_t m, index_t n)
 			{
-				is_fit = rhs.is_vector() && lhs.nelems() == rhs.nelems();
+				return m * n;
 			}
-			else
+
+			BCS_ENSURE_INLINE static bool is_empty(index_t m, index_t n)
 			{
-				is_fit = is_same_size(lhs, rhs);
+				return m == 0 || n == 0;
 			}
-			check_arg(is_fit, "The right hand side assignment does not fit the view");
-		}
 
-
-		template<bool SingleRow, bool SingleColumn> struct offset_helper;
-
-		template<> struct offset_helper<false, false>
-		{
-			BCS_ENSURE_INLINE
-			static inline index_t calc(index_t lead_dim, index_t i, index_t j)
+			BCS_ENSURE_INLINE static bool is_scalar(index_t m, index_t n)
 			{
-				return i + lead_dim * j;
+				return m == 1 && n == 1;
+			}
+
+			BCS_ENSURE_INLINE static bool is_vector(index_t m, index_t n)
+			{
+				return m == 1 || n == 1;
+			}
+
+			BCS_ENSURE_INLINE static bool is_row(index_t m)
+			{
+				return m == 1;
+			}
+
+			BCS_ENSURE_INLINE static bool is_column(index_t n)
+			{
+				return n == 1;
+			}
+
+			BCS_ENSURE_INLINE static index_t offset(const index_t leadim, index_t i, index_t j)
+			{
+				return i + leadim * j;
 			}
 		};
 
-		template<> struct offset_helper<false, true>
+
+		template<> struct dim_helper<false, true>
 		{
-			BCS_ENSURE_INLINE
-			static inline index_t calc(index_t lead_dim, index_t i, index_t)
+			BCS_ENSURE_INLINE static index_t nelems(index_t m, index_t n)
+			{
+				return m;
+			}
+
+			BCS_ENSURE_INLINE static bool is_empty(index_t m, index_t n)
+			{
+				return m == 0;
+			}
+
+			BCS_ENSURE_INLINE static bool is_scalar(index_t m, index_t n)
+			{
+				return m == 1;
+			}
+
+			BCS_ENSURE_INLINE static bool is_vector(index_t m, index_t n)
+			{
+				return true;
+			}
+
+			BCS_ENSURE_INLINE static bool is_row(index_t m)
+			{
+				return m == 1;
+			}
+
+			BCS_ENSURE_INLINE static bool is_column(index_t n)
+			{
+				return true;
+			}
+
+			BCS_ENSURE_INLINE static index_t offset(const index_t leaddim, index_t i, index_t j)
 			{
 				return i;
 			}
 		};
 
-		template<> struct offset_helper<true, false>
+
+		template<> struct dim_helper<true, false>
 		{
-			BCS_ENSURE_INLINE
-			static inline index_t calc(index_t lead_dim, index_t, index_t j)
+			BCS_ENSURE_INLINE static index_t nelems(index_t m, index_t n)
 			{
-				return j;
+				return n;
+			}
+
+			BCS_ENSURE_INLINE static bool is_empty(index_t m, index_t n)
+			{
+				return n == 0;
+			}
+
+			BCS_ENSURE_INLINE static bool is_scalar(index_t m, index_t n)
+			{
+				return n == 1;
+			}
+
+			BCS_ENSURE_INLINE static bool is_vector(index_t m, index_t n)
+			{
+				return true;
+			}
+
+			BCS_ENSURE_INLINE static bool is_row(index_t m)
+			{
+				return true;
+			}
+
+			BCS_ENSURE_INLINE static bool is_column(index_t n)
+			{
+				return n == 1;
+			}
+
+			BCS_ENSURE_INLINE static index_t offset(const index_t leaddim, index_t i, index_t j)
+			{
+				return leaddim * j;
 			}
 		};
 
 
-		template<> struct offset_helper<true, true>
+		template<> struct dim_helper<true, true>
 		{
-			BCS_ENSURE_INLINE
-			static inline index_t calc(index_t lead_dim, index_t, index_t)
+			BCS_ENSURE_INLINE static index_t nelems(index_t m, index_t n)
+			{
+				return 1;
+			}
+
+			BCS_ENSURE_INLINE static bool is_empty(index_t m, index_t n)
+			{
+				return false;
+			}
+
+			BCS_ENSURE_INLINE static bool is_scalar(index_t m, index_t n)
+			{
+				return true;
+			}
+
+			BCS_ENSURE_INLINE static bool is_vector(index_t m, index_t n)
+			{
+				return true;
+			}
+
+			BCS_ENSURE_INLINE static bool is_row(index_t m)
+			{
+				return true;
+			}
+
+			BCS_ENSURE_INLINE static bool is_column(index_t n)
+			{
+				return true;
+			}
+
+			BCS_ENSURE_INLINE static index_t offset(const index_t leaddim, index_t i, index_t j)
 			{
 				return 0;
 			}
 		};
 
-
-		template<int RowDim, int ColDim>
-		BCS_ENSURE_INLINE
-		inline index_t calc_offset(index_t lead_dim, index_t i, index_t j)
-		{
-			return offset_helper<RowDim == 1, ColDim == 1>::calc(lead_dim, i, j);
-		}
 
 	}
 

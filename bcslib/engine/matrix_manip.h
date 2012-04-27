@@ -14,11 +14,9 @@
 #define BCSLIB_MATRIX_MANIP_H_
 
 #include <bcslib/matrix/matrix_base.h>
-#include <bcslib/base/mem_op.h>
 #include <cstdio>
 
-namespace bcs
-{
+namespace bcs {
 
 	template<typename T, class Derived1, class Derived2>
 	inline bool is_equal(const IDenseMatrixView<Derived1, T>& A, const IDenseMatrixView<Derived2, T>& B)
@@ -113,7 +111,7 @@ namespace bcs
 	}
 
 	template<typename T, class Derived>
-	void printf_mat(const char *fmt, const IDenseMatrixView<Derived, T>& X, const char *pre_line, const char *delim)
+	inline void printf_mat(const char *fmt, const IDenseMatrixView<Derived, T>& X, const char *pre_line, const char *delim)
 	{
 		index_t m = X.nrows();
 		index_t n = X.ncolumns();
