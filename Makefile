@@ -82,6 +82,18 @@ CORE_H = \
 	$(INC)/core/block.h \
 	$(INC)/core.h
 
+MATRIX_H = $(CORE_H) \
+	$(INC)/matrix/matrix_base.h \
+	$(INC)/matrix/matrix_fwd.h \
+	$(INC)/matrix/matrix_xpr.h \
+	$(INC)/matrix/dense_matrix.h \
+	$(INC)/matrix/ref_matrix.h \
+	$(INC)/matrix/bits/matrix_helpers.h \
+	$(INC)/matrix/bits/dense_matrix_internal.h \
+	$(INC)/matrix/bits/ref_matrix_internal.h \
+	$(INC)/matrix.h
+	
+	
 
 #---------- Target groups -------------------
 
@@ -90,7 +102,7 @@ all: test
 # all: test bench
 
 .PHONY: test
-test: test_core
+test: test_core test_matrix
 
 .PHONY: clean
 
@@ -100,9 +112,14 @@ clean:
 
 #------ Core tests ----------
 
-.PHONY: test_basics
+.PHONY: test_core
 test_core: $(BIN)/test_memory
 
+
+#------ Matrix tests --------
+
+.PHONY: test_matrix
+test_matrix: $(BIN)/test_matrix_basics
 
 
 #_________________________________________________________________________
@@ -124,6 +141,21 @@ TEST_MEMORY_SOURCES = \
 	
 $(BIN)/test_memory: $(CORE_H) $(TEST_MEMORY_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MEMORY_SOURCES) $(MAIN_TEST_POST) -o $@
+
+
+#----------------------------------------------------------
+#
+#   Matrix test (details)
+#
+#----------------------------------------------------------
+
+TEST_MATRIX_BASICS_SOURCES = \
+	test/matrix/test_dense_matrix.cpp \
+	test/matrix/test_ref_matrix.cpp
+	
+$(BIN)/test_matrix_basics: $(MATRIX_H) $(TEST_MATRIX_BASICS_SOURCES)
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
+
 
 
 

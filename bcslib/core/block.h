@@ -320,6 +320,14 @@ namespace bcs
 	}; // end class block
 
 
+	template<typename T, class Allocator>
+	BCS_ENSURE_INLINE
+	void swap(block<T, Allocator>& a, block<T, Allocator>& b)
+	{
+		a.swap(b);
+	}
+
+
     /********************************************
      *
      *   ScopedBlock
@@ -440,7 +448,7 @@ namespace bcs
 
     /********************************************
      *
-     *   ScopedBlock
+     *   static block
      *
      ********************************************/
 
@@ -503,6 +511,16 @@ namespace bcs
 			return *this;
 		}
 
+		void swap(static_block& r)
+		{
+			using std::swap;
+
+			T tmp[N];
+			mem<T, Size>::copy(m_arr, tmp);
+			mem<T, Size>::copy(r.m_arr, m_arr);
+			mem<T, Size>::copy(tmp, r.m_arr);
+		}
+
 	public:
 		size_type size() const
 		{
@@ -550,7 +568,19 @@ namespace bcs
 	}; // end class static_block
 
 
-	// Specialized operations on static blocks
+	template<typename T, index_t N>
+	BCS_ENSURE_INLINE
+	inline void swap(static_block<T, N>& a, static_block<T, N>& b)
+	{
+		a.swap(b);
+	}
+
+
+    /********************************************
+     *
+     *   specialized functions
+     *
+     ********************************************/
 
 	template<typename T, index_t N>
 	BCS_ENSURE_INLINE

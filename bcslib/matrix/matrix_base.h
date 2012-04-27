@@ -1,7 +1,7 @@
 /**
  * @file matrix_base.h
  *
- * Basic definitions for vectors and matrices
+ * Basic concepts and related definitions for matrices
  *
  * @author Dahua Lin
  */
@@ -13,18 +13,35 @@
 #ifndef BCSLIB_MATRIX_BASE_H_
 #define BCSLIB_MATRIX_BASE_H_
 
-#include <bcslib/base/basic_defs.h>
-#include <bcslib/base/basic_math.h>
-#include <bcslib/base/arg_check.h>
+#include <bcslib/core.h>
+#include <bcslib/utils/arg_check.h>
+#include <bcslib/matrix/bits/matrix_helpers.h>
 
 
-
-#define MAT_TRAITS_DEFS(T) \
+#define BCS_MAT_TRAITS_DEFS_FOR_BASE(D, T) \
 	typedef T value_type; \
-	typedef T* pointer; \
+	typedef typename mat_access<D>::const_pointer const_pointer; \
+	typedef typename mat_access<D>::const_reference const_reference; \
+	typedef typename mat_access<D>::pointer pointer; \
+	typedef typename mat_access<D>::reference reference; \
+	typedef size_t size_type; \
+	typedef index_t difference_type; \
+	typedef index_t index_type;
+
+#define BCS_MAT_TRAITS_CDEFS(T) \
+	typedef T value_type; \
 	typedef const T* const_pointer; \
-	typedef T& reference; \
 	typedef const T& const_reference; \
+	typedef size_t size_type; \
+	typedef index_t difference_type; \
+	typedef index_t index_type;
+
+#define BCS_MAT_TRAITS_DEFS(T) \
+	typedef T value_type; \
+	typedef const T* const_pointer; \
+	typedef const T& const_reference; \
+	typedef T* pointer; \
+	typedef T& reference; \
 	typedef size_t size_type; \
 	typedef index_t difference_type; \
 	typedef index_t index_type;
@@ -36,69 +53,81 @@ namespace bcs
 
 	template<class Derived> struct matrix_traits;
 
-	template<class Derived, typename T> class IMatrixBase;
-	template<class Derived, typename T> class IDenseMatrixView;
-	template<class Derived, typename T> class IDenseMatrixBlock;
+	template<class Derived> struct dim_helper
+	{
+		static const bool with_single_row = (matrix_traits<Derived>::compile_time_num_rows == 1);
+		static const bool with_single_col = (matrix_traits<Derived>::compile_time_num_cols == 1);
+		typedef detail::dim_helper<with_single_row, with_single_col> type;
+	};
+
+
+	template<class Derived, typename T> class IMatrixXpr;
+	template<class Derived, typename T> class IMatrixView;
+	template<class Derived, typename T> class IRegularMatrix;
 	template<class Derived, typename T> class IDenseMatrix;
 
 	template<class Derived, typename T> class DenseMatrixCapture;
 
 	const int DynamicDim = 0;
 
-	// tag types
-
-	struct VertDir
+	template<class Derived>
+	struct mat_access
 	{
-		BCS_ENSURE_INLINE static index_t nrows(index_t len) { return len; }
-		BCS_ENSURE_INLINE static index_t ncols(index_t len) { return 1; }
+		typedef typename matrix_traits<Derived>::value_type value_type;
+		static const bool is_readonly = matrix_traits<Derived>::is_readonly;
+
+		typedef const value_type* const_pointer;
+		typedef const value_type& const_reference;
+		typedef typename access_types<value_type, is_readonly>::pointer pointer;
+		typedef typename access_types<value_type, is_readonly>::reference reference;
 	};
-
-	struct HorzDir
-	{
-		BCS_ENSURE_INLINE static index_t nrows(index_t len) { return 1; }
-		BCS_ENSURE_INLINE static index_t ncols(index_t len) { return len; }
-	};
-
-	template<typename T>
-	struct is_direction_type { static const bool value = false; };
-
-	template<> struct is_direction_type<VertDir> { static const bool value = true; };
-	template<> struct is_direction_type<HorzDir> { static const bool value = true; };
-
-
-	namespace detail
-	{
-		template<typename T, bool IsConst> struct adapt_const;
-
-		template<typename T>
-		struct adapt_const<T, false> {  typedef T type; };
-
-		template<typename T>
-		struct adapt_const<T*, true> { typedef const T* type; };
-
-		template<typename T>
-		struct adapt_const<T&, true> { typedef const T& type; };
-	}
 
 
 	/********************************************
 	 *
-	 *  CRTP Bases for matrices
+	 *  Concepts
+	 *
+	 *  Each concept is associated with a
+	 *  class as a static polymorphism base
 	 *
 	 ********************************************/
 
 	/**
-	 * The interfaces shared by everything that can evaluate into a matrix
+	 * Concept: Matrix Expression
+	 * ------------------------------
+	 *
+	 *   Any entity that is a 2D map of values or can be
+	 *   evaluated into a 2D map of values is called a
+	 *   2D array.
+	 *
+	 * 	 Each 2D array class (say C), must inherit, directly
+	 * 	 or indirectly, the IBase2DXpr class, implementing
+	 * 	 all the delegate member functions.
+	 *
+	 *   A specialized version of array_traits<C> must be provided,
+	 *   which should contain the following static members:
+	 *
+	 *   - num_dimensions:				an int value, which must be set to 2
+	 *   - compile_time_num_rows:		compile-time number of rows
+	 *   - compile_time_num_cols:		compile-time number of columns
+	 *
+	 *	 - is_linear_indexable:		whether it supports linear indexing, i.e. A[i]
+	 *	 - is_continuous:			whether it has a continuous memory layout
+	 *   - is_sparse:				whether it adopts a sparse representation
+	 *   - is_readonly:				whether it is read-only
+	 *   - is_lazy:					whether it is a pure expression that has
+	 *   							not been evaluated
+	 *
+	 *	 - value_type:			the type of element value
+	 *	 - index_type:			the (default) type of index
+	 *
 	 */
 	template<class Derived, typename T>
-	class IMatrixBase
+	class IMatrixXpr
 	{
 	public:
-		MAT_TRAITS_DEFS(T)
+		BCS_MAT_TRAITS_DEFS_FOR_BASE(Derived, T)
 		BCS_CRTP_REF
-
-		static const index_type RowDimension = matrix_traits<Derived>::RowDimension;
-		static const index_type ColDimension = matrix_traits<Derived>::ColDimension;
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
@@ -120,39 +149,82 @@ namespace bcs
 			return derived().ncolumns();
 		}
 
-		BCS_ENSURE_INLINE bool is_empty() const
-		{
-			return derived().is_empty();
-		}
-
-		BCS_ENSURE_INLINE bool is_vector() const
-		{
-			return derived().is_vector();
-		}
-
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to(IDenseMatrix<DstDerived, T>& dst) const
-		{
-			derived().eval_to(dst);
-		}
-
 	}; // end class IMatrixBase
 
+	template<class Derived, typename T>
+	BCS_ENSURE_INLINE
+	inline bool is_empty(const IMatrixXpr<Derived, T>& X)
+	{
+		typedef typename dim_helper<Derived>::type dim_helper_t;
+		return dim_helper_t::is_empty(X.nrows(), X.ncolumns());
+	}
+
+	template<class Derived, typename T>
+	BCS_ENSURE_INLINE
+	inline bool is_scalar(const IMatrixXpr<Derived, T>& X)
+	{
+		typedef typename dim_helper<Derived>::type dim_helper_t;
+		return dim_helper_t::is_scalar(X.nrows(), X.ncolumns());
+	}
+
+	template<class Derived, typename T>
+	BCS_ENSURE_INLINE
+	inline bool is_vector(const IMatrixXpr<Derived, T>& X)
+	{
+		typedef typename dim_helper<Derived>::type dim_helper_t;
+		return dim_helper_t::is_vector(X.nrows(), X.ncolumns());
+	}
+
+	template<class Derived, typename T>
+	BCS_ENSURE_INLINE
+	inline bool is_column(const IMatrixXpr<Derived, T>& X)
+	{
+		typedef typename dim_helper<Derived>::type dim_helper_t;
+		return dim_helper_t::is_column(X.ncolumns());
+	}
+
+	template<class Derived, typename T>
+	BCS_ENSURE_INLINE
+	inline bool is_row(const IMatrixXpr<Derived, T>& X)
+	{
+		typedef typename dim_helper<Derived>::type dim_helper_t;
+		return dim_helper_t::is_row(X.nrows());
+	}
+
+	template<class Derived1, typename T1, class Derived2, typename T2>
+	BCS_ENSURE_INLINE
+	inline bool is_same_size(const IMatrixXpr<Derived1, T1>& A, const IMatrixXpr<Derived2, T2>& B)
+	{
+		return A.nrows() == B.nrows() && A.ncolumns() == B.ncolumns();
+	}
+
+	template<class Derived, typename T>
+	BCS_ENSURE_INLINE
+	inline void check_subscripts_in_range(const IMatrixXpr<Derived, T>& X, index_t i, index_t j)
+	{
+#ifndef BCSLIB_NO_DEBUG
+		check_range(i >= 0 && i < X.nrows() && j >= 0 && j < X.ncolumns(),
+				"Matrix element access subscripts are out of range.");
+#endif
+	}
+
+	BCS_ENSURE_INLINE
+	inline void check_with_compile_time_dims(bool cond)
+	{
+		check_arg(cond,
+				"Attempted to set a run-time size that is not consistent with compile-time specification.");
+	}
 
 
 	/**
 	 * The interfaces for matrix views
 	 */
 	template<class Derived, typename T>
-	class IDenseMatrixView : public IMatrixBase<Derived, T>
+	class IMatrixView : public IMatrixXpr<Derived, T>
 	{
 	public:
-		MAT_TRAITS_DEFS(T)
+		BCS_MAT_TRAITS_DEFS_FOR_BASE(Derived, T)
 		BCS_CRTP_REF
-
-		typedef IMatrixBase<Derived, T> base_type;
-		using base_type::RowDimension;
-		using base_type::ColDimension;
 
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
@@ -172,16 +244,6 @@ namespace bcs
 		BCS_ENSURE_INLINE index_type ncolumns() const
 		{
 			return derived().ncolumns();
-		}
-
-		BCS_ENSURE_INLINE bool is_empty() const
-		{
-			return derived().is_empty();
-		}
-
-		BCS_ENSURE_INLINE bool is_vector() const
-		{
-			return derived().is_vector();
 		}
 
 		BCS_ENSURE_INLINE value_type elem(index_type i, index_type j) const
@@ -191,35 +253,23 @@ namespace bcs
 
 		BCS_ENSURE_INLINE value_type operator() (index_type i, index_type j) const
 		{
-			return derived().operator()(i, j);
-		}
-
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to(IDenseMatrix<DstDerived, T>& dst) const
-		{
-			derived().eval_to(dst);
+			check_subscripts_in_range(*this, i, j);
+			return elem(i, j);
 		}
 
 	}; // end class IDenseMatrixView
+
 
 
 	/**
 	 * The interfaces for matrix blocks
 	 */
 	template<class Derived, typename T>
-	class IDenseMatrixBlock : public IDenseMatrixView<Derived, T>
+	class IRegularMatrix : public IMatrixView<Derived, T>
 	{
 	public:
-		MAT_TRAITS_DEFS(T)
+		BCS_MAT_TRAITS_DEFS_FOR_BASE(Derived, T)
 		BCS_CRTP_REF
-
-		typedef IDenseMatrixView<Derived, T> base_type;
-		using base_type::RowDimension;
-		using base_type::ColDimension;
-
-	private:
-		typedef typename detail::adapt_const<pointer, matrix_traits<Derived>::IsReadOnly>::type nc_pointer;
-		typedef typename detail::adapt_const<reference, matrix_traits<Derived>::IsReadOnly>::type nc_reference;
 
 	public:
 		BCS_ENSURE_INLINE index_type nelems() const
@@ -242,37 +292,73 @@ namespace bcs
 			return derived().ncolumns();
 		}
 
-		BCS_ENSURE_INLINE bool is_empty() const
+		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j) const
 		{
-			return derived().is_empty();
+			return derived().elem(i, j);
 		}
 
-		BCS_ENSURE_INLINE bool is_vector() const
+		BCS_ENSURE_INLINE reference elem(index_type i, index_type j)
 		{
-			return derived().is_vector();
+			return derived().elem(i, j);
 		}
 
-		BCS_ENSURE_INLINE const_pointer ptr_base() const
+		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
-			return derived().ptr_base();
+			check_subscripts_in_range(derived(), i, j);
+			return elem(i, j);
 		}
 
-		BCS_ENSURE_INLINE nc_pointer ptr_base()
+		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
 		{
-			return derived().ptr_base();
+			check_subscripts_in_range(derived(), i, j);
+			return elem(i, j);
 		}
 
-		BCS_ENSURE_INLINE const_pointer col_ptr(index_type j) const
+	}; // end class IRegularMatrix
+
+
+	/**
+	 * The interfaces for matrix blocks
+	 */
+	template<class Derived, typename T>
+	class IDenseMatrix : public IRegularMatrix<Derived, T>
+	{
+	public:
+		BCS_MAT_TRAITS_DEFS_FOR_BASE(Derived, T)
+		BCS_CRTP_REF
+
+	public:
+		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return derived().col_ptr(j);
+			return derived().nelems();
 		}
 
-		BCS_ENSURE_INLINE nc_pointer col_ptr(index_type j)
+		BCS_ENSURE_INLINE size_type size() const
 		{
-			return derived().col_ptr(j);
+			return derived().size();
 		}
 
-		BCS_ENSURE_INLINE index_type lead_dim() const
+		BCS_ENSURE_INLINE index_type nrows() const
+		{
+			return derived().nrows();
+		}
+
+		BCS_ENSURE_INLINE index_type ncolumns() const
+		{
+			return derived().ncolumns();
+		}
+
+		BCS_ENSURE_INLINE const_pointer ptr_data() const
+		{
+			return derived().ptr_data();
+		}
+
+		BCS_ENSURE_INLINE pointer ptr_data()
+		{
+			return derived().ptr_data();
+		}
+
+		BCS_ENSURE_INLINE index_t lead_dim() const
 		{
 			return derived().lead_dim();
 		}
@@ -282,194 +368,61 @@ namespace bcs
 			return derived().elem(i, j);
 		}
 
-		BCS_ENSURE_INLINE nc_reference elem(index_type i, index_type j)
+		BCS_ENSURE_INLINE reference elem(index_type i, index_type j)
 		{
 			return derived().elem(i, j);
 		}
 
 		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
 		{
-			return derived().operator()(i, j);
+			check_subscripts_in_range(derived(), i, j);
+			return elem(i, j);
 		}
 
-		BCS_ENSURE_INLINE nc_reference operator() (index_type i, index_type j)
+		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
 		{
-			return derived().operator()(i, j);
+			check_subscripts_in_range(derived(), i, j);
+			return elem(i, j);
 		}
 
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to(IDenseMatrix<DstDerived, T>& dst) const
+		BCS_ENSURE_INLINE void resize(index_type m, index_type n)
 		{
-			derived().eval_to(dst);
-		}
-
-		BCS_ENSURE_INLINE void zero()
-		{
-			derived().zero();
-		}
-
-		BCS_ENSURE_INLINE void fill(const_reference v)
-		{
-			derived().fill(v);
-		}
-
-		BCS_ENSURE_INLINE void copy_from(const_pointer src)
-		{
-			derived().copy_from(src);
+			derived().resize();
 		}
 
 	}; // end class IDenseMatrixBlock
 
 
-
-	/**
-	 * The interfaces for matrices with continuous layout
-	 */
 	template<class Derived, typename T>
-	class IDenseMatrix : public IDenseMatrixBlock<Derived, T>
-	{
-	public:
-		MAT_TRAITS_DEFS(T)
-		BCS_CRTP_REF
-
-		typedef IDenseMatrixBlock<Derived, T> base_type;
-		using base_type::RowDimension;
-		using base_type::ColDimension;
-
-	private:
-		typedef typename detail::adapt_const<pointer, matrix_traits<Derived>::IsReadOnly>::type nc_pointer;
-		typedef typename detail::adapt_const<reference, matrix_traits<Derived>::IsReadOnly>::type nc_reference;
-
-	public:
-
-		BCS_ENSURE_INLINE index_type nelems() const
-		{
-			return derived().nelems();
-		}
-
-		BCS_ENSURE_INLINE size_type size() const
-		{
-			return derived().size();
-		}
-
-		BCS_ENSURE_INLINE index_type nrows() const
-		{
-			return derived().nrows();
-		}
-
-		BCS_ENSURE_INLINE index_type ncolumns() const
-		{
-			return derived().ncolumns();
-		}
-
-		BCS_ENSURE_INLINE bool is_empty() const
-		{
-			return derived().is_empty();
-		}
-
-		BCS_ENSURE_INLINE bool is_vector() const
-		{
-			return derived().is_vector();
-		}
-
-		BCS_ENSURE_INLINE const_pointer ptr_base() const
-		{
-			return derived().ptr_base();
-		}
-
-		BCS_ENSURE_INLINE nc_pointer ptr_base()
-		{
-			return derived().ptr_base();
-		}
-
-		BCS_ENSURE_INLINE const_pointer col_ptr(index_type j) const
-		{
-			return derived().col_ptr(j);
-		}
-
-		BCS_ENSURE_INLINE nc_pointer col_ptr(index_type j)
-		{
-			return derived().col_ptr(j);
-		}
-
-		BCS_ENSURE_INLINE index_type lead_dim() const
-		{
-			return derived().lead_dim();
-		}
-
-		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j) const
-		{
-			return derived().elem(i, j);
-		}
-
-		BCS_ENSURE_INLINE nc_reference elem(index_type i, index_type j)
-		{
-			return derived().elem(i, j);
-		}
-
-		BCS_ENSURE_INLINE const_reference operator[] (index_type idx) const
-		{
-			return derived().operator[](idx);
-		}
-
-		BCS_ENSURE_INLINE nc_reference operator[] (index_type idx)
-		{
-			return derived().operator[](idx);
-		}
-
-		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
-		{
-			return derived().operator()(i, j);
-		}
-
-		BCS_ENSURE_INLINE nc_reference operator() (index_type i, index_type j)
-		{
-			return derived().operator()(i, j);
-		}
-
-		template<class DstDerived>
-		BCS_ENSURE_INLINE void eval_to(IDenseMatrix<DstDerived, T>& dst) const
-		{
-			derived().eval_to(dst);
-		}
-
-		BCS_ENSURE_INLINE void zero()
-		{
-			derived().zero();
-		}
-
-		BCS_ENSURE_INLINE void fill(const_reference v)
-		{
-			derived().fill(v);
-		}
-
-		BCS_ENSURE_INLINE void copy_from(const_pointer src)
-		{
-			derived().copy_from(src);
-		}
-
-	}; // end class IDenseMatrix
-
-
-
-	/********************************************
-	 *
-	 *  Generic operations
-	 *
-	 ********************************************/
-
-	template<class Derived1, typename T1, class Derived2, typename T2>
 	BCS_ENSURE_INLINE
-	inline bool is_same_size(const IMatrixBase<Derived1, T1>& A, const IMatrixBase<Derived2, T2>& B)
+	typename mat_access<Derived>::const_pointer
+	col_ptr(const IDenseMatrix<Derived, T>& X, index_t j)
 	{
-		return A.nrows() == B.nrows() && A.ncolumns() == B.ncolumns();
+		return X.ptr_data() + X.lead_dim() * j;
 	}
 
-	template<typename T, class SDerived, class DDerived>
+	template<class Derived, typename T>
 	BCS_ENSURE_INLINE
-	inline void evaluate_to(const IMatrixBase<SDerived, T>& S, IDenseMatrix<DDerived, T>& D)
+	typename mat_access<Derived>::pointer
+	col_ptr(IDenseMatrix<Derived, T>& X, index_t j)
 	{
-		S.eval_to(D);
+		return X.ptr_data() + X.lead_dim() * j;
+	}
+
+	template<class Derived, typename T>
+	BCS_ENSURE_INLINE
+	typename mat_access<Derived>::const_pointer
+	row_ptr(const IDenseMatrix<Derived, T>& X, index_t j)
+	{
+		return X.ptr_data() + j;
+	}
+
+	template<class Derived, typename T>
+	BCS_ENSURE_INLINE
+	typename mat_access<Derived>::pointer
+	row_ptr(IDenseMatrix<Derived, T>& X, index_t j)
+	{
+		return X.ptr_data() + j;
 	}
 
 }

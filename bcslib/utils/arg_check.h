@@ -13,7 +13,7 @@
 #ifndef BCSLIB_ARG_CHECK_H_
 #define BCSLIB_ARG_CHECK_H_
 
-#include <bcslib/base/basic_defs.h>
+#include <bcslib/core/basic_defs.h>
 #include <stdexcept>
 
 namespace bcs
@@ -90,9 +90,9 @@ namespace bcs
 	}
 
 	template<typename T>
-	BCS_ENSURE_INLINE inline const T& check_forward(const T& val, const T& expect)
+	BCS_ENSURE_INLINE inline const T& check_forward(const T& val, bool cond)
 	{
-		check_arg(val == expect);
+		check_arg(cond);
 		return val;
 	}
 
