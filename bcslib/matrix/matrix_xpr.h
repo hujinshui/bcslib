@@ -18,12 +18,12 @@
 namespace bcs
 {
 
+
 	/******************************************************
 	 *
 	 *  The concept of expression optimizer
 	 *
 	 *  - typedef result_expr_type;
-	 *  - typedef return_type;
 	 *  - a static optimize function;
 	 *
 	 * The concept of expression evaluator
@@ -34,7 +34,17 @@ namespace bcs
 	 *
 	 ******************************************************/
 
-	template<class Expr> struct expr_optimizer;
+	template<class Expr>
+	struct expr_optimizer
+	{
+		typedef Expr result_expr_type;
+
+		BCS_ENSURE_INLINE
+		static const result_expr_type& optimize(const Expr& expr)
+		{
+			return expr;  // by default, do nothing for optimization
+		}
+	};
 
 	template<class Expr> struct expr_evaluator;
 
@@ -50,7 +60,6 @@ namespace bcs
 				dst.derived());
 	}
 
-
 	// forward declaration of generic expression types
 
 	template<typename Fun, class Arg> struct unary_ewise_expr;
@@ -61,7 +70,6 @@ namespace bcs
 
 	template<typename Fun, class Arg> struct unary_rowwise_redux_expr;
 	template<typename Fun, class LArg, class RArg> struct binary_rowwise_redux_expr;
-
 
 }
 
