@@ -33,6 +33,23 @@ namespace bcs
 		copy(src.derived(), dst.derived());
 	}
 
+	template<typename T, class Expr, class DMat>
+	BCS_ENSURE_INLINE
+	inline void assign_to(const IMatrixXpr<Expr, T>& expr, IRegularMatrix<DMat, T>& dst)
+	{
+		check_arg( is_same_size(expr, dst),
+				"The sizes of expression and destination are inconsistent." );
+
+		evaluate_to(expr.derived(), dst.derived());
+	}
+
+	template<typename T, class Expr, class DMat>
+	BCS_ENSURE_INLINE
+	inline void assign_to(const IMatrixXpr<Expr, T>& expr, IDenseMatrix<DMat, T>& dst)
+	{
+		dst.resize(expr.nrows(), expr.ncolumns());
+		evaluate_to(expr.derived(), dst.derived());
+	}
 
 }
 

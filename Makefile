@@ -87,13 +87,18 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/matrix_fwd.h \
 	$(INC)/matrix/matrix_xpr.h \
 	$(INC)/matrix/matrix_manip.h \
+	$(INC)/matrix/column_traverser.h \
 	$(INC)/matrix/matrix_assign.h \
 	$(INC)/matrix/dense_matrix.h \
 	$(INC)/matrix/ref_matrix.h \
+	$(INC)/matrix/ewise_matrix_expr.h \
+	$(INC)/matrix/ewise_matrix_eval.h \
+	$(INC)/matrix/matrix_arithmetic.h \
 	$(INC)/matrix/bits/matrix_helpers.h \
 	$(INC)/matrix/bits/matrix_manip_helpers.h \
 	$(INC)/matrix/bits/dense_matrix_internal.h \
 	$(INC)/matrix/bits/ref_matrix_internal.h \
+	$(INC)/matrix/bits/ewise_matrix_eval_internal.h \
 	$(INC)/matrix.h
 	
 
