@@ -18,6 +18,23 @@
 
 namespace bcs
 {
+	class invalid_operation : public std::exception
+	{
+	public:
+		invalid_operation(const char *msg)
+		: m_msg(msg)
+		{
+		}
+
+		virtual const char* what() const throw()
+		{
+			return m_msg;
+		}
+
+	private:
+		const char *m_msg;
+	};
+
 
 	class invalid_argument : public std::exception
 	{

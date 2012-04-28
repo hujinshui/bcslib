@@ -19,10 +19,10 @@
 #include <limits> 		// for allocator's max_size method
 
 
-#define BCS_DEFAULT_ALIGNMENT 16
+#define BCS_DEFAULT_ALIGNMENT 32
 
-#include <bcslib/engine/mem_op_impl.h>
-#include <bcslib/engine/mem_op_impl_static.h>
+#include <bcslib/core/bits/mem_op_impl.h>
+#include <bcslib/core/bits/mem_op_impl_static.h>
 
 namespace bcs
 {
@@ -32,104 +32,104 @@ namespace bcs
 	 *
 	 ********************************************/
 
-	template<typename T, size_t N>
+	template<typename T, int N>
 	struct mem
 	{
-		BCS_ENSURE_INLINE static void copy(const T *src, T *dst)
+		BCS_ENSURE_INLINE static void copy(const T* __restrict__ src, T* __restrict__ dst)
 		{
-			engine::mem<T, N>::copy(src, dst);
+			detail::mem<T, N>::copy(src, dst);
 		}
 
-		BCS_ENSURE_INLINE static void zero(T *dst)
+		BCS_ENSURE_INLINE static void zero(T* __restrict__ dst)
 		{
-			engine::mem<T, N>::zero(dst);
+			detail::mem<T, N>::zero(dst);
 		}
 
-		BCS_ENSURE_INLINE static void fill(T *dst, const T &v)
+		BCS_ENSURE_INLINE static void fill(T* __restrict__ dst, const T &v)
 		{
-			engine::mem<T, N>::fill(dst, v);
+			detail::mem<T, N>::fill(dst, v);
 		}
 
-		BCS_ENSURE_INLINE static bool equal(const T *x, const T *y)
+		BCS_ENSURE_INLINE static bool equal(const T* __restrict__ x, const T* __restrict__ y)
 		{
-			return engine::mem<T, N>::equal(x, y);
+			return detail::mem<T, N>::equal(x, y);
 		}
 	};
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	inline void copy_elems(const size_t n, const T *src, T *dst)
+	inline void copy_elems(const index_t n, const T* __restrict__ src, T* __restrict__ dst)
 	{
-		engine::copy_elems(n, src, dst);
+		detail::copy_elems(n, src, dst);
 	}
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	inline void zero_elems(const size_t n, T *dst)
+	inline void zero_elems(const index_t n, T* __restrict__ dst)
 	{
-		engine::zero_elems(n, dst);
+		detail::zero_elems(n, dst);
 	}
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	static void fill_elems(const size_t n, T *dst, const T& v)
+	static void fill_elems(const index_t n, T* __restrict__ dst, const T& v)
 	{
-		engine::fill_elems(n, dst, v);
+		detail::fill_elems(n, dst, v);
 	}
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	static bool elems_equal(const size_t n, const T *s1, const T *s2)
+	static bool elems_equal(const index_t n, const T* __restrict__ s1, const T* __restrict__ s2)
 	{
-		return engine::elems_equal(n, s1, s2);
+		return detail::elems_equal(n, s1, s2);
 	}
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	static bool elems_equal(const size_t n, const T *s, const T& v)
+	static bool elems_equal(const index_t n, const T* __restrict__ s, const T& v)
 	{
-		return engine::elems_equal(n, s, v);
+		return detail::elems_equal(n, s, v);
 	}
 
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	inline void copy_elems_2d(const size_t inner_dim, const size_t outer_dim,
-			const T *src, size_t src_ext, T *dst, size_t dst_ext)
+	inline void copy_elems_2d(const index_t inner_dim, const index_t outer_dim,
+			const T* __restrict__ src, index_t src_ext, T* __restrict__ dst, index_t dst_ext)
 	{
-		engine::copy_elems_2d(inner_dim, outer_dim, src, src_ext, dst, dst_ext);
+		detail::copy_elems_2d(inner_dim, outer_dim, src, src_ext, dst, dst_ext);
 	}
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	inline void zero_elems_2d(const size_t inner_dim, const size_t outer_dim,
-			T *dst, const size_t dst_ext)
+	inline void zero_elems_2d(const index_t inner_dim, const index_t outer_dim,
+			T* __restrict__ dst, const index_t dst_ext)
 	{
-		engine::zero_elems_2d(inner_dim, outer_dim, dst, dst_ext);
+		detail::zero_elems_2d(inner_dim, outer_dim, dst, dst_ext);
 	}
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	inline void fill_elems_2d(const size_t inner_dim, const size_t outer_dim,
-			T *dst, const size_t dst_ext, const T& v)
+	inline void fill_elems_2d(const index_t inner_dim, const index_t outer_dim,
+			T* __restrict__ dst, const index_t dst_ext, const T& v)
 	{
-		engine::fill_elems_2d(inner_dim, outer_dim, dst, dst_ext, v);
+		detail::fill_elems_2d(inner_dim, outer_dim, dst, dst_ext, v);
 	}
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	inline bool elems_equal_2d(const size_t inner_dim, const size_t outer_dim,
-			const T *s1, size_t s1_ext, const T *s2, size_t s2_ext)
+	inline bool elems_equal_2d(const index_t inner_dim, const index_t outer_dim,
+			const T* __restrict__ s1, index_t s1_ext, const T* __restrict__ s2, index_t s2_ext)
 	{
-		return engine::elems_equal_2d(inner_dim, outer_dim, s1, s1_ext, s2, s2_ext);
+		return detail::elems_equal_2d(inner_dim, outer_dim, s1, s1_ext, s2, s2_ext);
 	}
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	inline bool elems_equal_2d(const size_t inner_dim, const size_t outer_dim,
-			const T *s1, size_t s1_ext, const T& v)
+	inline bool elems_equal_2d(const index_t inner_dim, const index_t outer_dim,
+			const T* __restrict__ s1, index_t s1_ext, const T& v)
 	{
-		return engine::elems_equal_2d(inner_dim, outer_dim, s1, s1_ext, v);
+		return detail::elems_equal_2d(inner_dim, outer_dim, s1, s1_ext, v);
 	}
 
 
@@ -142,13 +142,13 @@ namespace bcs
 	BCS_ENSURE_INLINE
 	inline void* aligned_allocate(size_t nbytes, unsigned int alignment)
 	{
-		return engine::aligned_allocate(nbytes, alignment);
+		return detail::aligned_allocate(nbytes, alignment);
 	}
 
 	BCS_ENSURE_INLINE
 	inline void aligned_release(void *p)
 	{
-		engine::aligned_release(p);
+		detail::aligned_release(p);
 	}
 
     template<typename T>

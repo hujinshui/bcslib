@@ -75,5 +75,10 @@ namespace bcs
 #define BCS_ENSURE_INLINE __attribute__((always_inline))
 #endif
 
+#if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
+#define __restrict__ __restrict
+#endif
+
+
 
 #endif 

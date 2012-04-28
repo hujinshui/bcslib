@@ -37,11 +37,6 @@ namespace bcs { namespace detail {
 			check_arg(m == CTRows && n == CTCols);
 		}
 
-		inline void assign(const dense_matrix_internal& s)
-		{
-			m_blk = s.m_blk;
-		}
-
 		inline void swap(dense_matrix_internal& s)
 		{
 			m_blk.swap(s.m_blk);
@@ -78,15 +73,6 @@ namespace bcs { namespace detail {
 		BCS_ENSURE_INLINE
 		dense_matrix_internal(index_t m, index_t n)
 		: m_blk(check_forward(m, m == CTRows) * n), m_ncols(n) { }
-
-		inline void assign(const dense_matrix_internal& s)
-		{
-			if (this != &s)
-			{
-				m_blk = s.m_blk;
-				m_ncols = s.m_ncols;
-			}
-		}
 
 		inline void swap(dense_matrix_internal& s)
 		{
@@ -133,15 +119,6 @@ namespace bcs { namespace detail {
 		dense_matrix_internal(index_t m, index_t n)
 		: m_blk(m * check_forward(n, n == CTCols)), m_nrows(m) { }
 
-		inline void assign(const dense_matrix_internal& s)
-		{
-			if (this != &s)
-			{
-				m_blk = s.m_blk;
-				m_nrows = s.m_nrows;
-			}
-		}
-
 		inline void swap(dense_matrix_internal& s)
 		{
 			m_blk.swap(s.m_blk);
@@ -186,16 +163,6 @@ namespace bcs { namespace detail {
 		BCS_ENSURE_INLINE
 		dense_matrix_internal(index_t m, index_t n)
 		: m_blk(m * n), m_nrows(m), m_ncols(n) { }
-
-		inline void assign(const dense_matrix_internal& s)
-		{
-			if (this != &s)
-			{
-				m_blk = s.m_blk;
-				m_nrows = s.m_nrows;
-				m_ncols = s.m_ncols;
-			}
-		}
 
 		inline void swap(dense_matrix_internal& s)
 		{

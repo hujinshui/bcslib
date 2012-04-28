@@ -77,8 +77,8 @@ CORE_H = \
 	$(INC)/core/type_traits.h \
 	$(INC)/core/iterator.h \
 	$(INC)/core/mem_op.h \
-	$(INC)/engine/mem_op_impl.h \
-	$(INC)/engine/mem_op_impl_static.h \
+	$(INC)/core/bits/mem_op_impl.h \
+	$(INC)/core/bits/mem_op_impl_static.h \
 	$(INC)/core/block.h \
 	$(INC)/core.h
 
@@ -86,13 +86,15 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/matrix_base.h \
 	$(INC)/matrix/matrix_fwd.h \
 	$(INC)/matrix/matrix_xpr.h \
+	$(INC)/matrix/matrix_manip.h \
+	$(INC)/matrix/matrix_assign.h \
 	$(INC)/matrix/dense_matrix.h \
 	$(INC)/matrix/ref_matrix.h \
 	$(INC)/matrix/bits/matrix_helpers.h \
+	$(INC)/matrix/bits/matrix_manip_helpers.h \
 	$(INC)/matrix/bits/dense_matrix_internal.h \
 	$(INC)/matrix/bits/ref_matrix_internal.h \
 	$(INC)/matrix.h
-	
 	
 
 #---------- Target groups -------------------
@@ -151,7 +153,9 @@ $(BIN)/test_memory: $(CORE_H) $(TEST_MEMORY_SOURCES)
 
 TEST_MATRIX_BASICS_SOURCES = \
 	test/matrix/test_dense_matrix.cpp \
-	test/matrix/test_ref_matrix.cpp
+	test/matrix/test_ref_matrix.cpp \
+	test/matrix/test_matrix_manip.cpp \
+	test/matrix/test_matrix_assign.cpp
 	
 $(BIN)/test_matrix_basics: $(MATRIX_H) $(TEST_MATRIX_BASICS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@

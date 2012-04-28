@@ -53,6 +53,18 @@ namespace bcs
 
 	template<class Derived> struct matrix_traits;
 
+	template<class Derived, typename T> class IMatrixXpr;
+	template<class Derived, typename T> class IMatrixView;
+	template<class Derived, typename T> class IRegularMatrix;
+	template<class Derived, typename T> class IDenseMatrix;
+
+
+	/********************************************
+	 *
+	 *  Meta-programming helpers
+	 *
+	 ********************************************/
+
 	template<class Derived> struct dim_helper
 	{
 		static const bool with_single_row = (matrix_traits<Derived>::compile_time_num_rows == 1);
@@ -60,15 +72,44 @@ namespace bcs
 		typedef detail::dim_helper<with_single_row, with_single_col> type;
 	};
 
-
-	template<class Derived, typename T> class IMatrixXpr;
-	template<class Derived, typename T> class IMatrixView;
-	template<class Derived, typename T> class IRegularMatrix;
-	template<class Derived, typename T> class IDenseMatrix;
-
-	template<class Derived, typename T> class DenseMatrixCapture;
-
 	const int DynamicDim = 0;
+
+	template<class Mat1>
+	struct ct_rows
+	{
+		static const int value = matrix_traits<Mat1>::compile_time_num_rows;
+	};
+
+	template<class Mat1>
+	struct ct_cols
+	{
+		static const int value = matrix_traits<Mat1>::compile_time_num_cols;
+	};
+
+	template<class Mat1, class Mat2>
+	struct binary_ct_rows
+	{
+		static const int v1 = matrix_traits<Mat1>::compile_time_num_rows;
+		static const int v2 = matrix_traits<Mat2>::compile_time_num_rows;
+		static const int value = v1 > v2 ? v1 : v2;
+
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(!(v1 > 0 && v2 > 0 && v1 != v2), "Incompatible compile-time dimensions.");
+#endif
+	};
+
+	template<class Mat1, class Mat2>
+	struct binary_ct_cols
+	{
+		static const int v1 = matrix_traits<Mat1>::compile_time_num_cols;
+		static const int v2 = matrix_traits<Mat2>::compile_time_num_cols;
+		static const int value = v1 > v2 ? v1 : v2;
+
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(!(v1 > 0 && v2 > 0 && v1 != v2), "Incompatible compile-time dimensions.");
+#endif
+	};
+
 
 	template<class Derived>
 	struct mat_access
@@ -81,6 +122,7 @@ namespace bcs
 		typedef typename access_types<value_type, is_readonly>::pointer pointer;
 		typedef typename access_types<value_type, is_readonly>::reference reference;
 	};
+
 
 
 	/********************************************
@@ -214,6 +256,7 @@ namespace bcs
 		check_arg(cond,
 				"Attempted to set a run-time size that is not consistent with compile-time specification.");
 	}
+
 
 
 	/**
@@ -387,7 +430,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE void resize(index_type m, index_type n)
 		{
-			derived().resize();
+			derived().resize(m, n);
 		}
 
 	}; // end class IDenseMatrixBlock

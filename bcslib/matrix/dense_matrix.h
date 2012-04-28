@@ -66,13 +66,13 @@ namespace bcs
 		BCS_ENSURE_INLINE dense_matrix(index_t m, index_t n, const T& v)
 		: m_internal(m, n)
 		{
-			fill_elems(size(), ptr_data(), v);
+			fill_elems(nelems(), ptr_data(), v);
 		}
 
 		BCS_ENSURE_INLINE dense_matrix(index_t m, index_t n, const T* src)
 		: m_internal(m, n)
 		{
-			copy_elems(size(), src, ptr_data());
+			copy_elems(nelems(), src, ptr_data());
 		}
 
 		BCS_ENSURE_INLINE dense_matrix(const dense_matrix& s)
@@ -80,16 +80,35 @@ namespace bcs
 		{
 		}
 
+		template<class Other>
+		BCS_ENSURE_INLINE dense_matrix(const IMatrixView<Other, T>& r)
+		: m_internal(r.nrows(), r.ncolumns())
+		{
+			copy(r.derived(), *this);
+		}
+
 		BCS_ENSURE_INLINE void swap(dense_matrix& s)
 		{
 			m_internal.swap(s.m_internal);
 		}
 
-		BCS_ENSURE_INLINE dense_matrix& operator = (const dense_matrix& s)
+	public:
+		BCS_ENSURE_INLINE dense_matrix& operator = (const dense_matrix& r)
 		{
-			m_internal = s.m_internal;
+			if (this != &r)
+			{
+				assign_to(r, *this);
+			}
 			return *this;
 		}
+
+		template<class Other>
+		BCS_ENSURE_INLINE dense_matrix& operator = (const IMatrixView<Other, T>& r)
+		{
+			assign_to(r.derived(), *this);
+			return *this;
+		}
+
 
 	public:
 		BCS_ENSURE_INLINE index_type nelems() const
@@ -182,17 +201,34 @@ namespace bcs
 		typedef dense_matrix<T, CTRows, 1> base_mat_t;
 
 	public:
-		dense_col() : base_mat_t(CTRows, 1) { }
+		BCS_ENSURE_INLINE dense_col() : base_mat_t(CTRows, 1) { }
 
-		explicit dense_col(index_t m) : base_mat_t(m, 1) { }
+		BCS_ENSURE_INLINE explicit dense_col(index_t m) : base_mat_t(m, 1) { }
 
-		dense_col(index_t m, const T& v) : base_mat_t(m, 1, v) { }
+		BCS_ENSURE_INLINE dense_col(index_t m, const T& v) : base_mat_t(m, 1, v) { }
 
-		dense_col(index_t m, const T* src) : base_mat_t(m, 1, src) { }
+		BCS_ENSURE_INLINE dense_col(index_t m, const T* src) : base_mat_t(m, 1, src) { }
 
-		dense_col(const base_mat_t& s) : base_mat_t(s) { }
+		BCS_ENSURE_INLINE dense_col(const base_mat_t& s) : base_mat_t(s) { }
 
-		dense_col(const dense_col& s) : base_mat_t(s) { }
+		BCS_ENSURE_INLINE dense_col(const dense_col& s) : base_mat_t(s) { }
+
+		template<class Other>
+		BCS_ENSURE_INLINE dense_col(const IMatrixView<Other, T>& r) : base_mat_t(r) { }
+
+	public:
+		BCS_ENSURE_INLINE dense_col& operator = (const base_mat_t& r)
+		{
+			base_mat_t::operator = (r);
+			return *this;
+		}
+
+		template<class Other>
+		BCS_ENSURE_INLINE dense_col& operator = (const IMatrixView<Other, T>& r)
+		{
+			base_mat_t::operator = (r.derived());
+			return *this;
+		}
 	};
 
 
@@ -202,17 +238,31 @@ namespace bcs
 		typedef dense_matrix<T, 1, CTCols> base_mat_t;
 
 	public:
-		dense_row() : base_mat_t(1, CTCols) { }
+		BCS_ENSURE_INLINE dense_row() : base_mat_t(1, CTCols) { }
 
-		explicit dense_row(index_t n) : base_mat_t(1, n) { }
+		BCS_ENSURE_INLINE explicit dense_row(index_t n) : base_mat_t(1, n) { }
 
-		dense_row(index_t n, const T& v) : base_mat_t(1, n, v) { }
+		BCS_ENSURE_INLINE dense_row(index_t n, const T& v) : base_mat_t(1, n, v) { }
 
-		dense_row(index_t n, const T* src) : base_mat_t(1, n, src) { }
+		BCS_ENSURE_INLINE dense_row(index_t n, const T* src) : base_mat_t(1, n, src) { }
 
-		dense_row(const base_mat_t& s) : base_mat_t(s) { }
+		BCS_ENSURE_INLINE dense_row(const base_mat_t& s) : base_mat_t(s) { }
 
-		dense_row(const dense_row& s) : base_mat_t(s) { }
+		BCS_ENSURE_INLINE dense_row(const dense_row& s) : base_mat_t(s) { }
+
+	public:
+		BCS_ENSURE_INLINE dense_row& operator = (const base_mat_t& r)
+		{
+			base_mat_t::operator = (r);
+			return *this;
+		}
+
+		template<class Other>
+		BCS_ENSURE_INLINE dense_row& operator = (const IMatrixView<Other, T>& r)
+		{
+			base_mat_t::operator = (r.derived());
+			return *this;
+		}
 	};
 
 

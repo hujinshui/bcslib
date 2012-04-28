@@ -12,13 +12,13 @@
 using namespace bcs;
 
 
-static void test_elemwise1d(const size_t N)
+static void test_elemwise1d(const index_t N)
 {
 	int *src = new int[N];
-	for (size_t i = 0; i < N; ++i) src[i] = 2 * int(i) + 1;
+	for (index_t i = 0; i < N; ++i) src[i] = 2 * int(i) + 1;
 
 	int *p = new int[N];
-	for (size_t i = 0; i < N; ++i) p[i] = 0;
+	for (index_t i = 0; i < N; ++i) p[i] = 0;
 
 	int specval = 712;
 
@@ -55,14 +55,14 @@ TEST( MemOp, ElemWise1D_N12 ) { test_elemwise1d(12); }
 
 TEST( MemOp, ElemWise2D )
 {
-	const size_t m0 = 3;
-	const size_t n0 = 5;
+	const index_t m0 = 3;
+	const index_t n0 = 5;
 
-	const size_t m = 3;
-	const size_t n = 4;
+	const index_t m = 3;
+	const index_t n = 4;
 
-	const size_t in_dim = 3;
-	const size_t out_dim = 2;
+	const index_t in_dim = 3;
+	const index_t out_dim = 2;
 
 	int src0[m0 * n0] = {1, 2, 3, 4, 5,   6, 7, 8, 9, 10,   11, 12, 13, 14, 15};
 	const int *src = src0;
@@ -91,14 +91,14 @@ TEST( MemOp, ElemWise2D )
 	delete [] p;
 }
 
-template<size_t N>
+template<int N>
 static void test_static_elemwise1d()
 {
 	int src[N];
-	for (size_t i = 0; i < N; ++i) src[i] = 2 * int(i) + 1;
+	for (int i = 0; i < N; ++i) src[i] = 2 * int(i) + 1;
 
 	int p[N];
-	for (size_t i = 0; i < N; ++i) p[i] = 0;
+	for (int i = 0; i < N; ++i) p[i] = 0;
 
 	int specval = 712;
 
