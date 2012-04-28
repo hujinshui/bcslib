@@ -13,8 +13,6 @@
 #ifndef BCSLIB_EWISE_MATRIX_EVAL_INTERNAL_H_
 #define BCSLIB_EWISE_MATRIX_EVAL_INTERNAL_H_
 
-#include <bcslib/matrix/ewise_matrix_expr.h>
-#include <bcslib/matrix/dense_matrix.h>
 #include <bcslib/matrix/column_traverser.h>
 
 namespace bcs { namespace detail {
