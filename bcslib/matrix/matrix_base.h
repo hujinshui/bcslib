@@ -124,6 +124,14 @@ namespace bcs
 	};
 
 
+	template<class Derived, template<class D, typename T> class Interface>
+	struct has_matrix_interface
+	{
+		typedef Interface<Derived, typename matrix_traits<Derived>::value_type> expect_base;
+		static const bool value = is_base_of<expect_base, Derived>::value;
+	};
+
+
 
 	/********************************************
 	 *
@@ -157,8 +165,6 @@ namespace bcs
 	 *	 - is_continuous:			whether it has a continuous memory layout
 	 *   - is_sparse:				whether it adopts a sparse representation
 	 *   - is_readonly:				whether it is read-only
-	 *   - is_lazy:					whether it is a pure expression that has
-	 *   							not been evaluated
 	 *
 	 *	 - value_type:			the type of element value
 	 *	 - index_type:			the (default) type of index

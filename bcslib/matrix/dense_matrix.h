@@ -36,7 +36,6 @@ namespace bcs
 		static const bool is_continuous = true;
 		static const bool is_sparse = false;
 		static const bool is_readonly = false;
-		static const bool is_lazy = false;
 
 		typedef T value_type;
 		typedef index_t index_type;
@@ -87,6 +86,13 @@ namespace bcs
 			copy(r.derived(), *this);
 		}
 
+		template<class Expr>
+		BCS_ENSURE_INLINE dense_matrix(const IMatrixXpr<Expr, T>& r)
+		: m_internal(r.nrows(), r.ncolumns())
+		{
+			evaluate_to(r.derived(), *this);
+		}
+
 		BCS_ENSURE_INLINE void swap(dense_matrix& s)
 		{
 			m_internal.swap(s.m_internal);
@@ -109,6 +115,12 @@ namespace bcs
 			return *this;
 		}
 
+		template<class Expr>
+		BCS_ENSURE_INLINE dense_matrix& operator = (const IMatrixXpr<Expr, T>& r)
+		{
+			assign_to(r.derived(), *this);
+			return *this;
+		}
 
 	public:
 		BCS_ENSURE_INLINE index_type nelems() const
@@ -229,6 +241,13 @@ namespace bcs
 			base_mat_t::operator = (r.derived());
 			return *this;
 		}
+
+		template<class Expr>
+		BCS_ENSURE_INLINE dense_col& operator = (const IMatrixXpr<Expr, T>& r)
+		{
+			base_mat_t::operator = (r.derived());
+			return *this;
+		}
 	};
 
 
@@ -259,6 +278,13 @@ namespace bcs
 
 		template<class Other>
 		BCS_ENSURE_INLINE dense_row& operator = (const IMatrixView<Other, T>& r)
+		{
+			base_mat_t::operator = (r.derived());
+			return *this;
+		}
+
+		template<class Expr>
+		BCS_ENSURE_INLINE dense_row& operator = (const IMatrixXpr<Expr, T>& r)
 		{
 			base_mat_t::operator = (r.derived());
 			return *this;

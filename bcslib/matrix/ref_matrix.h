@@ -39,7 +39,6 @@ namespace bcs
 		static const bool is_continuous = true;
 		static const bool is_sparse = false;
 		static const bool is_readonly = true;
-		static const bool is_lazy = false;
 
 		typedef T value_type;
 		typedef index_t index_type;
@@ -147,7 +146,6 @@ namespace bcs
 		static const bool is_continuous = true;
 		static const bool is_sparse = false;
 		static const bool is_readonly = false;
-		static const bool is_lazy = false;
 
 		typedef T value_type;
 		typedef index_t index_type;
@@ -363,7 +361,6 @@ namespace bcs
 		static const bool is_continuous = false;
 		static const bool is_sparse = false;
 		static const bool is_readonly = true;
-		static const bool is_lazy = false;
 
 		typedef T value_type;
 		typedef index_t index_type;
@@ -472,7 +469,6 @@ namespace bcs
 		static const bool is_continuous = false;
 		static const bool is_sparse = false;
 		static const bool is_readonly = false;
-		static const bool is_lazy = false;
 
 		typedef T value_type;
 		typedef index_t index_type;
