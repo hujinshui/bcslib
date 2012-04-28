@@ -21,51 +21,6 @@ namespace bcs
 
 	/********************************************
 	 *
-	 *  Optimization
-	 *
-	 ********************************************/
-
-	template<typename Fun, class Arg>
-	struct expr_optimizer<unary_ewise_expr<Fun, Arg> >
-	{
-		typedef unary_ewise_expr<Fun, Arg> input_type;
-
-		typedef detail::ewise_expr_optimizer<input_type,
-				bcs::is_column_traversable<input_type>::value> optim_t;
-
-		typedef typename optim_t::output_type result_expr_type;
-		typedef typename optim_t::return_type return_type;
-
-		BCS_ENSURE_INLINE
-		static return_type optimize(const input_type& expr)
-		{
-			return optim_t::optimize(expr);
-		}
-	};
-
-
-	template<typename Fun, class LArg, class RArg>
-	struct expr_optimizer<binary_ewise_expr<Fun, LArg, RArg> >
-	{
-		typedef binary_ewise_expr<Fun, LArg, RArg> input_type;
-
-		typedef detail::ewise_expr_optimizer<input_type,
-				bcs::is_column_traversable<input_type>::value> optim_t;
-
-		typedef typename optim_t::output_type result_expr_type;
-		typedef typename optim_t::return_type return_type;
-
-		BCS_ENSURE_INLINE
-		static return_type optimize(const input_type& expr)
-		{
-			return optim_t::optimize(expr);
-		}
-	};
-
-
-
-	/********************************************
-	 *
 	 *  Evaluation
 	 *
 	 ********************************************/
@@ -75,11 +30,6 @@ namespace bcs
 	{
 		typedef unary_ewise_expr<Fun, Arg> expr_type;
 		typedef typename matrix_traits<expr_type>::value_type value_type;
-
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(bcs::is_column_traversable<expr_type>::value,
-				"The expression is properly optimized");
-#endif
 
 		template<class DMat>
 		BCS_ENSURE_INLINE
@@ -95,11 +45,6 @@ namespace bcs
 	{
 		typedef binary_ewise_expr<Fun, LArg, RArg> expr_type;
 		typedef typename matrix_traits<expr_type>::value_type value_type;
-
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(bcs::is_column_traversable<expr_type>::value,
-				"The expression is properly optimized");
-#endif
 
 		template<class DMat>
 		BCS_ENSURE_INLINE

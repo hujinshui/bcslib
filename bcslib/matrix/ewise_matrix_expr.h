@@ -204,27 +204,8 @@ namespace bcs
 	 ********************************************/
 
 	template<typename Fun, class Arg>
-	struct is_column_traversable<unary_ewise_expr<Fun, Arg> >
-	{
-		static const bool value = is_column_traversable<Arg>::value;
-	};
-
-	template<typename Fun, class LArg, class RArg>
-	struct is_column_traversable<binary_ewise_expr<Fun, LArg, RArg> >
-	{
-		static const bool value =
-				is_column_traversable<LArg>::value &&
-				is_column_traversable<RArg>::value;
-	};
-
-	template<typename Fun, class Arg>
 	class column_traverser<unary_ewise_expr<Fun, Arg> >
 	{
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(is_column_traversable<Arg>::value,
-				"Arg need to be column-traversable");
-#endif
-
 	public:
 		typedef unary_ewise_expr<Fun, Arg> expr_type;
 		typedef typename matrix_traits<expr_type>::value_type value_type;
@@ -273,14 +254,6 @@ namespace bcs
 	template<typename Fun, class LArg, class RArg>
 	class column_traverser<binary_ewise_expr<Fun, LArg, RArg> >
 	{
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(is_column_traversable<LArg>::value,
-				"LArg need to be column-traversable");
-
-		static_assert(is_column_traversable<RArg>::value,
-				"RArg need to be column-traversable");
-#endif
-
 	public:
 		typedef binary_ewise_expr<Fun, LArg, RArg> expr_type;
 		typedef typename matrix_traits<expr_type>::value_type value_type;
