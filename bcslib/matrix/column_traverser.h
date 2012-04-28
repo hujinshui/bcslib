@@ -98,7 +98,7 @@ namespace bcs
 		typedef typename matrix_traits<Expr>::value_type value_type;
 
 		BCS_ENSURE_INLINE
-		column_traverser(const Expr& mat) : internal_t(mat) { }
+		column_traverser(const Expr& mat) : m_internal(mat) { }
 
 		value_type operator[] (index_t i) const
 		{

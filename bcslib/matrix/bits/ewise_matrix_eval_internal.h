@@ -164,7 +164,7 @@ namespace bcs { namespace detail {
 			}
 			else
 			{
-				for (index_t j = 0; j < n; ++j, evec.next())
+				for (index_t j = 0; j < n; ++j, ++evec)
 				{
 					for (index_t i = 0; i < m; ++i) dst.elem(i, j) = evec[i];
 				}
@@ -190,7 +190,7 @@ namespace bcs { namespace detail {
 				value_type *pd = dst.ptr_data();
 				index_t ldim = dst.lead_dim();
 
-				for (index_t j = 0; j < n; ++j, pd += ldim, evec.next())
+				for (index_t j = 0; j < n; ++j, pd += ldim, ++evec)
 				{
 					for (index_t i = 0; i < m; ++i) pd[i] = evec[i];
 				}

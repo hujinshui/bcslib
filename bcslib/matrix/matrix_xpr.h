@@ -38,15 +38,6 @@ namespace bcs
 
 	template<class Expr> struct expr_evaluator;
 
-	template<class Expr>
-	BCS_ENSURE_INLINE
-	typename expr_optimizer<Expr>::return_type
-	optimize_expr(const IMatrixXpr<Expr, typename matrix_traits<Expr>::value_type>& expr)
-	{
-		return expr_optimizer<Expr>::optimize(expr);
-	}
-
-
 	template<typename T, class Expr, class DMat>
 	BCS_ENSURE_INLINE
 	void evaluate_to(const IMatrixXpr<Expr, T>& expr, IRegularMatrix<DMat, T>& dst)
@@ -54,7 +45,9 @@ namespace bcs
 		typedef typename expr_optimizer<Expr>::result_expr_type optim_expr_type;
 		typedef expr_evaluator<optim_expr_type> evaluator_t;
 
-		evaluator_t::evaluate(optimize_expr(expr), dst.derived());
+		evaluator_t::evaluate(
+				expr_optimizer<Expr>::optimize(expr.derived()),
+				dst.derived());
 	}
 
 
