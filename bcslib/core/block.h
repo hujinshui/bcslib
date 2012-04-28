@@ -92,14 +92,14 @@ namespace bcs
 	BCS_ENSURE_INLINE
 	inline void copy_from(IBlock<Derived, T>& blk, const T* src)
 	{
-		copy_elems(blk.size(), src, blk.ptr_begin());
+		copy_elems(blk.nelems(), src, blk.ptr_begin());
 	}
 
 	template<typename T, class Derived>
 	BCS_ENSURE_INLINE
 	void copy_to(const IBlock<Derived, T>& blk, T* dst)
 	{
-		copy_elems(blk.size(), blk.ptr_begin(), dst);
+		copy_elems(blk.nelems(), blk.ptr_begin(), dst);
 	}
 
 
@@ -107,21 +107,21 @@ namespace bcs
 	BCS_ENSURE_INLINE
 	void fill(IBlock<Derived, T>& blk, const T& v)
 	{
-		fill_elems(blk.size(), blk.ptr_begin(), v);
+		fill_elems(blk.nelems(), blk.ptr_begin(), v);
 	}
 
 	template<typename T, class Derived>
 	BCS_ENSURE_INLINE
 	void zero(IBlock<Derived, T>& blk)
 	{
-		zero_elems(blk.size(), blk.ptr_begin());
+		zero_elems(blk.nelems(), blk.ptr_begin());
 	}
 
 	template<typename T, class LDerived, class RDerived>
 	BCS_ENSURE_INLINE
 	inline bool is_equal(const IBlock<LDerived, T>& B1, const IBlock<RDerived, T>& B2)
 	{
-		return B1.nelems() == B2.nelems() && elems_equal(B1.size(), B1.ptr_begin(), B2.ptr_begin());
+		return B1.nelems() == B2.nelems() && elems_equal(B1.nelems(), B1.ptr_begin(), B2.ptr_begin());
 	}
 
 
@@ -169,7 +169,7 @@ namespace bcs
 		, m_len(len)
 		, m_ptr(alloc(len))
 		{
-			fill_elems((size_type)len, m_ptr, v);
+			fill_elems(len, m_ptr, v);
 		}
 
 		block(index_type len, const_pointer src, const allocator_type& allocator = allocator_type())
@@ -177,7 +177,7 @@ namespace bcs
 		, m_len(len)
 		, m_ptr(alloc(len))
 		{
-			copy_elems((size_type)m_len, src, m_ptr);
+			copy_elems(m_len, src, m_ptr);
 		}
 
 		block(const block& s, const allocator_type& allocator = allocator_type())
@@ -185,7 +185,7 @@ namespace bcs
 		, m_len(s.nelems())
 		, m_ptr(alloc(m_len))
 		{
-			copy_elems((size_type)m_len, s.ptr_begin(), m_ptr);
+			copy_elems(m_len, s.ptr_begin(), m_ptr);
 		}
 
 		template<class OtherDerived>
@@ -194,7 +194,7 @@ namespace bcs
 		, m_len(s.nelems())
 		, m_ptr(alloc(m_len))
 		{
-			copy_elems((size_type)m_len, s.ptr_begin(), m_ptr);
+			copy_elems(m_len, s.ptr_begin(), m_ptr);
 		}
 
 		~block()
@@ -240,7 +240,7 @@ namespace bcs
 	public:
 		size_type size() const
 		{
-			return (size_type)(m_len);
+			return static_cast<size_type>(m_len);
 		}
 
 		index_type nelems() const
@@ -303,7 +303,7 @@ namespace bcs
 		{
 			if (nelems() == r.nelems())  // no need to re-allocate memory
 			{
-				copy_elems(size(), r.ptr_begin(), this->ptr_begin());
+				copy_elems(nelems(), r.ptr_begin(), this->ptr_begin());
 			}
 			else
 			{
@@ -364,7 +364,7 @@ namespace bcs
 		, m_len(len)
 		, m_ptr(alloc(len))
 		{
-			fill_elems((size_type)len, m_ptr, v);
+			fill_elems(len, m_ptr, v);
 		}
 
 		scoped_block(index_type len, const_pointer src, const allocator_type& allocator = allocator_type())
@@ -372,7 +372,7 @@ namespace bcs
 		, m_len(len)
 		, m_ptr(alloc(len))
 		{
-			copy_elems((size_type)len, src, m_ptr);
+			copy_elems(len, src, m_ptr);
 		}
 
 		~scoped_block()
@@ -388,7 +388,7 @@ namespace bcs
 	public:
 		size_type size() const
 		{
-			return (size_type)(m_len);
+			return static_cast<size_type>(m_len);
 		}
 
 		index_type nelems() const
@@ -452,12 +452,11 @@ namespace bcs
      *
      ********************************************/
 
-	template<typename T, index_t N>
+	template<typename T, int N>
 	class static_block : public IBlock<static_block<T, N>, T>
 	{
 	public:
 		typedef T value_type;
-		static const size_t Size = N;
 
 		typedef size_t size_type;
 		typedef ptrdiff_t difference_type;
@@ -476,30 +475,30 @@ namespace bcs
 
 		explicit static_block(const value_type& v)
 		{
-			mem<T, Size>::fill(m_arr, v);
+			mem<T, N>::fill(m_arr, v);
 		}
 
 		explicit static_block(const_pointer src)
 		{
-			mem<T, Size>::copy(src, m_arr);
+			mem<T, N>::copy(src, m_arr);
 		}
 
 		static_block(const static_block& src)
 		{
-			mem<T, Size>::copy(src.m_arr, m_arr);
+			mem<T, N>::copy(src.m_arr, m_arr);
 		}
 
 		template<class OtherDerived>
 		static_block(const IBlock<OtherDerived, T>& src)
 		{
-			mem<T, Size>::copy(src.ptr_begin(), m_arr);
+			mem<T, N>::copy(src.ptr_begin(), m_arr);
 		}
 
 		static_block& operator = (const static_block& src)
 		{
 			if (this != &src)
 			{
-				mem<T, Size>::copy(src.m_arr, m_arr);
+				mem<T, N>::copy(src.m_arr, m_arr);
 			}
 			return *this;
 		}
@@ -507,7 +506,7 @@ namespace bcs
 		template<class OtherDerived>
 		static_block& operator = (const IBlock<OtherDerived, T>& src)
 		{
-			mem<T, Size>::copy(src.ptr_begin(), m_arr);
+			mem<T, N>::copy(src.ptr_begin(), m_arr);
 			return *this;
 		}
 
@@ -516,15 +515,15 @@ namespace bcs
 			using std::swap;
 
 			T tmp[N];
-			mem<T, Size>::copy(m_arr, tmp);
-			mem<T, Size>::copy(r.m_arr, m_arr);
-			mem<T, Size>::copy(tmp, r.m_arr);
+			mem<T, N>::copy(m_arr, tmp);
+			mem<T, N>::copy(r.m_arr, m_arr);
+			mem<T, N>::copy(tmp, r.m_arr);
 		}
 
 	public:
 		size_type size() const
 		{
-			return Size;
+			return static_cast<size_t>(N);
 		}
 
 		index_type nelems() const
@@ -568,7 +567,7 @@ namespace bcs
 	}; // end class static_block
 
 
-	template<typename T, index_t N>
+	template<typename T, int N>
 	BCS_ENSURE_INLINE
 	inline void swap(static_block<T, N>& a, static_block<T, N>& b)
 	{
@@ -582,14 +581,14 @@ namespace bcs
      *
      ********************************************/
 
-	template<typename T, index_t N>
+	template<typename T, int N>
 	BCS_ENSURE_INLINE
 	inline void copy_from(static_block<T, N>& blk, const T* src)
 	{
 		mem<T, N>::copy(src, blk.ptr_begin());
 	}
 
-	template<typename T, index_t N>
+	template<typename T, int N>
 	BCS_ENSURE_INLINE
 	void copy_to(const static_block<T, N>& blk, T* dst)
 	{
@@ -597,35 +596,35 @@ namespace bcs
 	}
 
 
-	template<typename T, index_t N>
+	template<typename T, int N>
 	BCS_ENSURE_INLINE
 	void fill(static_block<T, N>& blk, const T& v)
 	{
 		mem<T, N>::fill(blk.ptr_begin(), v);
 	}
 
-	template<typename T, index_t N>
+	template<typename T, int N>
 	BCS_ENSURE_INLINE
 	void zero(static_block<T, N>& blk)
 	{
 		mem<T, N>::zero(blk.ptr_begin());
 	}
 
-	template<typename T, index_t N>
+	template<typename T, int N>
 	BCS_ENSURE_INLINE
 	inline bool is_equal(const static_block<T, N>& B1, const static_block<T, N>& B2)
 	{
 		return mem<T, N>::equal(B1.ptr_begin(), B2.ptr_begin());
 	}
 
-	template<typename T, index_t N, class RDerived>
+	template<typename T, int N, class RDerived>
 	BCS_ENSURE_INLINE
 	inline bool is_equal(const static_block<T, N>& B1, const IBlock<RDerived, T>& B2)
 	{
 		return N == B2.nelems() && mem<T, N>::equal(B1.ptr_begin(), B2.ptr_begin());
 	}
 
-	template<typename T, index_t N, class LDerived>
+	template<typename T, int N, class LDerived>
 	BCS_ENSURE_INLINE
 	inline bool is_equal(const IBlock<LDerived, T>& B1, const static_block<T, N>& B2)
 	{

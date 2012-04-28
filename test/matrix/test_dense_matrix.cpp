@@ -154,7 +154,7 @@ static void test_dense_matrix(index_t m, index_t n)
 	if (m * n > 0)
 	{
 		ASSERT_TRUE( a1.ptr_data() != a2.ptr_data() );
-		ASSERT_TRUE( elems_equal(a1.size(), a1.ptr_data(), a2.ptr_data()) );
+		ASSERT_TRUE( elems_equal(a1.nelems(), a1.ptr_data(), a2.ptr_data()) );
 	}
 
 	// test constant construction
@@ -167,7 +167,7 @@ static void test_dense_matrix(index_t m, index_t n)
 	ASSERT_EQ(m * n, a3.nelems());
 	ASSERT_EQ(m, a3.lead_dim());
 
-	ASSERT_TRUE( elems_equal(a3.size(), a3.ptr_data(), cval ) );
+	ASSERT_TRUE( elems_equal(a3.nelems(), a3.ptr_data(), cval ) );
 
 	// test source construction
 
@@ -180,12 +180,12 @@ static void test_dense_matrix(index_t m, index_t n)
 
 	ASSERT_TRUE(a4.ptr_data() != p1);
 
-	ASSERT_TRUE( elems_equal(a4.size(), a4.ptr_data(), p1 ) );
+	ASSERT_TRUE( elems_equal(a4.nelems(), a4.ptr_data(), p1 ) );
 
 }
 
 template<int CTRows, int CTCols>
-static void test_dense_matrix_swap_and_assign(index_t m1, index_t n1, index_t m2, index_t n2)
+static void test_dense_matrix_swap_and_resize(index_t m1, index_t n1, index_t m2, index_t n2)
 {
 	const bool IsStatic = (CTRows > 0 && CTCols > 0);
 
@@ -206,7 +206,7 @@ static void test_dense_matrix_swap_and_assign(index_t m1, index_t n1, index_t m2
 	ASSERT_EQ(n1, 		a1.ncolumns());
 	ASSERT_EQ(m1 * n1, 	a1.nelems());
 	ASSERT_EQ(m1, 		a1.lead_dim());
-	ASSERT_TRUE( elems_equal(a1.size(), a1.ptr_data(), src1) );
+	ASSERT_TRUE( elems_equal(a1.nelems(), a1.ptr_data(), src1) );
 
 	const double *p1 = a1.ptr_data();
 
@@ -216,7 +216,7 @@ static void test_dense_matrix_swap_and_assign(index_t m1, index_t n1, index_t m2
 	ASSERT_EQ(n2, 		a2.ncolumns());
 	ASSERT_EQ(m2 * n2, 	a2.nelems());
 	ASSERT_EQ(m2, 		a2.lead_dim());
-	ASSERT_TRUE( elems_equal(a2.size(), a2.ptr_data(), src2) );
+	ASSERT_TRUE( elems_equal(a2.nelems(), a2.ptr_data(), src2) );
 
 	const double *p2 = a2.ptr_data();
 
@@ -226,11 +226,11 @@ static void test_dense_matrix_swap_and_assign(index_t m1, index_t n1, index_t m2
 
 	ASSERT_EQ(m1, a2.nrows());
 	ASSERT_EQ(n1, a2.ncolumns());
-	ASSERT_TRUE( elems_equal(a2.size(), a2.ptr_data(), src1) );
+	ASSERT_TRUE( elems_equal(a2.nelems(), a2.ptr_data(), src1) );
 
 	ASSERT_EQ(m2, a1.nrows());
 	ASSERT_EQ(n2, a1.ncolumns());
-	ASSERT_TRUE( elems_equal(a1.size(), a1.ptr_data(), src2) );
+	ASSERT_TRUE( elems_equal(a1.nelems(), a1.ptr_data(), src2) );
 
 	if (!IsStatic)
 	{
@@ -242,27 +242,17 @@ static void test_dense_matrix_swap_and_assign(index_t m1, index_t n1, index_t m2
 
 	ASSERT_EQ(m1, a1.nrows());
 	ASSERT_EQ(n1, a1.ncolumns());
-	ASSERT_TRUE( elems_equal(a1.size(), a1.ptr_data(), src1) );
+	ASSERT_TRUE( elems_equal(a1.nelems(), a1.ptr_data(), src1) );
 
 	ASSERT_EQ(m2, a2.nrows());
 	ASSERT_EQ(n2, a2.ncolumns());
-	ASSERT_TRUE( elems_equal(a2.size(), a2.ptr_data(), src2) );
+	ASSERT_TRUE( elems_equal(a2.nelems(), a2.ptr_data(), src2) );
 
 	if (!IsStatic)
 	{
 		ASSERT_TRUE(p1 == a1.ptr_data());
 		ASSERT_TRUE(p2 == a2.ptr_data());
 	}
-
-	// test assignment
-
-	a1 = a2;
-
-	ASSERT_EQ(m2, a1.nrows());
-	ASSERT_EQ(n2, a1.ncolumns());
-	ASSERT_TRUE( elems_equal(a1.size(), a1.ptr_data(), src2) );
-
-	ASSERT_TRUE( a1.ptr_data() != a2.ptr_data() );
 
 	// test resize
 
@@ -312,7 +302,7 @@ void test_dense_col(index_t len)
 	ASSERT_EQ(1, v2.ncolumns());
 	ASSERT_EQ(len, v2.nelems());
 
-	ASSERT_TRUE( elems_equal((size_t)len, v2.ptr_data(), cval) );
+	ASSERT_TRUE( elems_equal(len, v2.ptr_data(), cval) );
 
 	dense_col<double, CTLen> v3(len, src);
 
@@ -320,7 +310,7 @@ void test_dense_col(index_t len)
 	ASSERT_EQ(1, v3.ncolumns());
 	ASSERT_EQ(len, v3.nelems());
 
-	ASSERT_TRUE( elems_equal((size_t)len, v3.ptr_data(), src) );
+	ASSERT_TRUE( elems_equal(len, v3.ptr_data(), src) );
 
 	dense_matrix<double, CTLen, 1> a3(v3);
 	dense_col<double, CTLen> v4(a3);
@@ -329,15 +319,7 @@ void test_dense_col(index_t len)
 	ASSERT_EQ(1, v4.ncolumns());
 	ASSERT_EQ(len, v4.nelems());
 
-	ASSERT_TRUE( elems_equal((size_t)len, v4.ptr_data(), src) );
-
-	v0 = v4;
-
-	ASSERT_EQ(len, v0.nrows());
-	ASSERT_EQ(1, v0.ncolumns());
-	ASSERT_EQ(len, v0.nelems());
-
-	ASSERT_TRUE( elems_equal((size_t)len, v0.ptr_data(), src) );
+	ASSERT_TRUE( elems_equal(len, v4.ptr_data(), src) );
 }
 
 
@@ -367,7 +349,7 @@ void test_dense_row(index_t len)
 	ASSERT_EQ(1, v2.nrows());
 	ASSERT_EQ(len, v2.nelems());
 
-	ASSERT_TRUE( elems_equal((size_t)len, v2.ptr_data(), cval) );
+	ASSERT_TRUE( elems_equal(len, v2.ptr_data(), cval) );
 
 	dense_row<double, CTLen> v3(len, src);
 
@@ -375,7 +357,7 @@ void test_dense_row(index_t len)
 	ASSERT_EQ(1, v3.nrows());
 	ASSERT_EQ(len, v3.nelems());
 
-	ASSERT_TRUE( elems_equal((size_t)len, v3.ptr_data(), src) );
+	ASSERT_TRUE( elems_equal(len, v3.ptr_data(), src) );
 
 	dense_matrix<double, 1, CTLen> a3(v3);
 	dense_row<double, CTLen> v4(a3);
@@ -384,15 +366,7 @@ void test_dense_row(index_t len)
 	ASSERT_EQ(1, v4.nrows());
 	ASSERT_EQ(len, v4.nelems());
 
-	ASSERT_TRUE( elems_equal((size_t)len, v4.ptr_data(), src) );
-
-	v0 = v4;
-
-	ASSERT_EQ(len, v0.ncolumns());
-	ASSERT_EQ(1, v0.nrows());
-	ASSERT_EQ(len, v0.nelems());
-
-	ASSERT_TRUE( elems_equal((size_t)len, v0.ptr_data(), src) );
+	ASSERT_TRUE( elems_equal(len, v4.ptr_data(), src) );
 }
 
 
@@ -400,53 +374,53 @@ void test_dense_row(index_t len)
 TEST( DenseMatrix, DRowDCol )
 {
 	test_dense_matrix<DynamicDim, DynamicDim>(3, 4);
-	test_dense_matrix_swap_and_assign<DynamicDim, DynamicDim>(3, 4, 5, 6);
+	test_dense_matrix_swap_and_resize<DynamicDim, DynamicDim>(3, 4, 5, 6);
 }
 
 TEST( DenseMatrix, DRowSCol )
 {
 	test_dense_matrix<DynamicDim, 4>(3, 4);
-	test_dense_matrix_swap_and_assign<DynamicDim, 4>(3, 4, 5, 4);
+	test_dense_matrix_swap_and_resize<DynamicDim, 4>(3, 4, 5, 4);
 }
 
 TEST( DenseMatrix, SRowDCol )
 {
 	test_dense_matrix<3, DynamicDim>(3, 4);
-	test_dense_matrix_swap_and_assign<3, DynamicDim>(3, 4, 3, 6);
+	test_dense_matrix_swap_and_resize<3, DynamicDim>(3, 4, 3, 6);
 }
 
 TEST( DenseMatrix, SRowSCol )
 {
 	test_dense_matrix<3, 4>(3, 4);
-	test_dense_matrix_swap_and_assign<3, 4>(3, 4, 3, 4);
+	test_dense_matrix_swap_and_resize<3, 4>(3, 4, 3, 4);
 }
 
 TEST( DenseMatrix, DColVec )
 {
 	test_dense_matrix<DynamicDim, 1>(5, 1);
 	test_dense_col<DynamicDim>(5);
-	test_dense_matrix_swap_and_assign<DynamicDim, 1>(5, 1, 6, 1);
+	test_dense_matrix_swap_and_resize<DynamicDim, 1>(5, 1, 6, 1);
 }
 
 TEST( DenseMatrix, SColVec )
 {
 	test_dense_matrix<5, 1>(5, 1);
 	test_dense_col<5>(5);
-	test_dense_matrix_swap_and_assign<5, 1>(5, 1, 5, 1);
+	test_dense_matrix_swap_and_resize<5, 1>(5, 1, 5, 1);
 }
 
 TEST( DenseMatrix, DRowVec )
 {
 	test_dense_matrix<1, DynamicDim>(1, 5);
 	test_dense_row<DynamicDim>(5);
-	test_dense_matrix_swap_and_assign<1, DynamicDim>(1, 5, 1, 6);
+	test_dense_matrix_swap_and_resize<1, DynamicDim>(1, 5, 1, 6);
 }
 
 TEST( DenseMatrix, SRowVec )
 {
 	test_dense_matrix<1, 5>(1, 5);
 	test_dense_row<5>(5);
-	test_dense_matrix_swap_and_assign<1, 5>(1, 5, 1, 5);
+	test_dense_matrix_swap_and_resize<1, 5>(1, 5, 1, 5);
 }
 
 

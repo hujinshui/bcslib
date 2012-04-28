@@ -37,17 +37,9 @@ static_assert(bcs::is_base_of<
 #endif
 
 
-template<class Mat>
-static void test_ref_matrix(index_t m, index_t n)
+template<class Mat, typename T>
+void do_test_ref_matrix(Mat& a1, index_t m, index_t n, const T *origin)
 {
-	scoped_block<double> origin_blk(m * n);
-	for (index_t i = 0; i < m * n; ++i) origin_blk[i] = (i+1);
-	double *origin = origin_blk.ptr_begin();
-
-	// test construction
-
-	Mat a1(origin, m, n);
-
 	ASSERT_EQ(m, a1.nrows());
 	ASSERT_EQ(n, a1.ncolumns());
 	ASSERT_EQ(m * n, a1.nelems());
@@ -101,19 +93,135 @@ static void test_ref_matrix(index_t m, index_t n)
 	ASSERT_EQ(m * n, a2.nelems());
 	ASSERT_EQ(m, a2.lead_dim());
 	ASSERT_TRUE( a2.ptr_data() == a1.ptr_data() );
-
-	// test assignment
-
-	Mat a3(BCS_NULL, matrix_traits<Mat>::compile_time_num_rows, matrix_traits<Mat>::compile_time_num_cols);
-
-	a3 = a1;
-
-	ASSERT_EQ(m, a3.nrows());
-	ASSERT_EQ(n, a3.ncolumns());
-	ASSERT_EQ(m * n, a3.nelems());
-	ASSERT_EQ(m, a3.lead_dim());
-	ASSERT_TRUE( a3.ptr_data() == a1.ptr_data() );
 }
+
+
+
+template<class Mat>
+static void test_ref_matrix(index_t m, index_t n)
+{
+	scoped_block<double> origin_blk(m * n);
+	for (index_t i = 0; i < m * n; ++i) origin_blk[i] = (i+1);
+	double *origin = origin_blk.ptr_begin();
+
+	// test construction
+
+	Mat a1(origin, m, n);
+	do_test_ref_matrix(a1, m, n, origin);
+}
+
+
+template<class Vec>
+static void test_ref_vector(index_t m, index_t n)
+{
+	scoped_block<double> origin_blk(m * n);
+	for (index_t i = 0; i < m * n; ++i) origin_blk[i] = (i+1);
+	double *origin = origin_blk.ptr_begin();
+
+	// test construction
+
+	index_t len = (m > 1 ? m : n);
+
+	Vec a1(origin, len);
+	do_test_ref_matrix(a1, m, n, origin);
+}
+
+
+
+template<class Mat>
+static void test_ref_matrix_ex(index_t m, index_t n, index_t ldim)
+{
+	const int CTRows = matrix_traits<Mat>::compile_time_num_rows;
+	const int CTCols = matrix_traits<Mat>::compile_time_num_cols;
+
+
+	scoped_block<double> origin_blk(ldim * n);
+	for (index_t i = 0; i < ldim * n; ++i) origin_blk[i] = (i+1);
+	double *origin = origin_blk.ptr_begin();
+
+	// test construction
+
+	Mat a1(origin, m, n, ldim);
+
+	ASSERT_EQ(m, a1.nrows());
+	ASSERT_EQ(n, a1.ncolumns());
+	ASSERT_EQ(m * n, a1.nelems());
+	ASSERT_EQ(ldim, a1.lead_dim());
+	ASSERT_TRUE( a1.ptr_data() == origin );
+
+	ASSERT_EQ( (size_t)a1.nelems(), a1.size() );
+	ASSERT_EQ(a1.nelems() == 0, is_empty(a1));
+	ASSERT_EQ(a1.nrows() == 1, is_row(a1));
+	ASSERT_EQ(a1.ncolumns() == 1, is_column(a1));
+	ASSERT_EQ(a1.nelems() == 1, is_scalar(a1));
+	ASSERT_EQ(a1.nrows() == 1 || a1.ncolumns() == 1, is_vector(a1));
+
+	// test element access
+
+	bool elem_access_ok = true;
+
+	for (index_t j = 0; j < n; ++j)
+	{
+		for (index_t i = 0; i < m; ++i)
+		{
+			if (a1(i, j) != origin[i + j * ldim]) elem_access_ok = false;
+		}
+	}
+
+	ASSERT_TRUE( elem_access_ok );
+
+	if (CTCols == 1)
+	{
+		bool linear_indexing_ok = true;
+
+		for (index_t i = 0; i < m; ++i)
+		{
+			if (a1[i] != origin[i]) linear_indexing_ok = false;
+		}
+
+		ASSERT_TRUE(linear_indexing_ok);
+	}
+
+	if (CTRows == 1)
+	{
+		bool linear_indexing_ok = true;
+
+		for (index_t i = 0; i < n; ++i)
+		{
+			if (a1[i] != origin[i * ldim]) linear_indexing_ok = false;
+		}
+
+		ASSERT_TRUE(linear_indexing_ok);
+	}
+
+	// test slice pointers
+
+	bool colptr_ok = true;
+	for (index_t j = 0; j < n; ++j)
+	{
+		if (col_ptr(a1, j) != origin + j * ldim) colptr_ok = false;
+	}
+	ASSERT_TRUE( colptr_ok );
+
+	bool rowptr_ok = true;
+	for (index_t i = 0; i < m; ++i)
+	{
+		if (row_ptr(a1, i) != origin + i) rowptr_ok = false;
+	}
+	ASSERT_TRUE( rowptr_ok );
+
+	// test copy construction
+
+	Mat a2(a1);
+
+	ASSERT_EQ(m, a2.nrows());
+	ASSERT_EQ(n, a2.ncolumns());
+	ASSERT_EQ(m * n, a2.nelems());
+	ASSERT_EQ(ldim, a2.lead_dim());
+	ASSERT_TRUE( a2.ptr_data() == a1.ptr_data() );
+}
+
+
 
 
 TEST( RefMatrix, ConstDRowDCol )
@@ -155,5 +263,123 @@ TEST( RefMatrix, SRowSCol )
 {
 	test_ref_matrix<ref_matrix<double, 3, 4> >(3, 4);
 }
+
+
+TEST( RefVector, ConstColDyn )
+{
+	test_ref_vector<cref_col<double, DynamicDim> >(5, 1);
+}
+
+TEST( RefVector, ColDyn )
+{
+	test_ref_vector<ref_col<double, DynamicDim> >(5, 1);
+}
+
+TEST( RefVector, ConstColSta )
+{
+	test_ref_vector<cref_col<double, 5> >(5, 1);
+}
+
+TEST( RefVector, ColSta )
+{
+	test_ref_vector<ref_col<double, 5> >(5, 1);
+}
+
+TEST( RefVector, ConstRowDyn )
+{
+	test_ref_vector<cref_row<double, DynamicDim> >(1, 5);
+}
+
+TEST( RefVector, RowDyn )
+{
+	test_ref_vector<ref_row<double, DynamicDim> >(1, 5);
+}
+
+TEST( RefVector, ConstRowSta )
+{
+	test_ref_vector<cref_row<double, 5> >(1, 5);
+}
+
+TEST( RefVector, RowSta )
+{
+	test_ref_vector<ref_row<double, 5> >(1, 5);
+}
+
+
+
+
+TEST( RefMatrixEx, ConstDRowDCol )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, DynamicDim, DynamicDim> >(3, 4, 7);
+}
+
+TEST( RefMatrixEx, DRowDCol )
+{
+	test_ref_matrix_ex<ref_matrix_ex<double, DynamicDim, DynamicDim> >(3, 4, 7);
+}
+
+TEST( RefMatrixEx, ConstDRowSCol )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, DynamicDim, 4> >(3, 4, 7);
+}
+
+TEST( RefMatrixEx, ConstDRowSCol1 )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, DynamicDim, 1> >(3, 1, 7);
+}
+
+TEST( RefMatrixEx, DRowSCol )
+{
+	test_ref_matrix_ex<ref_matrix_ex<double, DynamicDim, 4> >(3, 4, 7);
+}
+
+TEST( RefMatrixEx, DRowSCol1 )
+{
+	test_ref_matrix_ex<ref_matrix_ex<double, DynamicDim, 1> >(3, 1, 7);
+}
+
+TEST( RefMatrixEx, ConstSRowDCol )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, 3, DynamicDim> >(3, 4, 7);
+}
+
+TEST( RefMatrixEx, ConstSRowDCol1 )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, 1, DynamicDim> >(1, 4, 7);
+}
+
+TEST( RefMatrixEx, SRowDCol )
+{
+	test_ref_matrix_ex<ref_matrix_ex<double, 3, DynamicDim> >(3, 4, 7);
+}
+
+TEST( RefMatrixEx, SRowDCol1 )
+{
+	test_ref_matrix_ex<ref_matrix_ex<double, 1, DynamicDim> >(1, 4, 7);
+}
+
+TEST( RefMatrixEx, ConstSRowSCol )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, 3, 4> >(3, 4, 7);
+}
+
+TEST( RefMatrixEx, ConstSRowSCol1 )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, 1, 1> >(1, 1, 7);
+}
+
+TEST( RefMatrixEx, SRowSCol )
+{
+	test_ref_matrix_ex<ref_matrix_ex<double, 3, 4> >(3, 4, 7);
+}
+
+TEST( RefMatrixEx, SRowSCol1 )
+{
+	test_ref_matrix_ex<ref_matrix_ex<double, 1, 1> >(1, 1, 7);
+}
+
+
+
+
 
 

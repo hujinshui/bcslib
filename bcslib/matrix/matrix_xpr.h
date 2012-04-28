@@ -125,16 +125,6 @@ namespace bcs
 	}
 
 
-	// assignment
-
-	template<typename T, class Expr, class Mat>
-	BCS_ENSURE_INLINE
-	void assign_to(const IMatrixXpr<Expr, T>& expr, IDenseMatrix<Mat, T>& dst)
-	{
-		dst.resize(expr.nrows(), expr.ncolumns());
-		evaluate_to(expr.derived(), dst.derived());
-	}
-
 	// operator tags
 
 	struct plus_t { };

@@ -63,7 +63,7 @@ TEST( Blocks, Block )
 		blk_t B2(N1, 7);
 		ASSERT_EQ(N1, B2.nelems());
 		ASSERT_TRUE(B2.ptr_begin() != BCS_NULL);
-		EXPECT_TRUE( elems_equal(size_t(N1), B2.ptr_begin(), 7) );
+		EXPECT_TRUE( elems_equal(N1, B2.ptr_begin(), 7) );
 
 		CHECK_MEM_PENDING(2);
 
@@ -71,7 +71,7 @@ TEST( Blocks, Block )
 		ASSERT_EQ(N2, B3.nelems());
 		ASSERT_TRUE(B3.ptr_begin() != BCS_NULL);
 		ASSERT_TRUE(B3.ptr_begin() != src);
-		EXPECT_TRUE( elems_equal(size_t(N2), B3.ptr_begin(), src) );
+		EXPECT_TRUE( elems_equal(N2, B3.ptr_begin(), src) );
 
 		CHECK_MEM_PENDING(3);
 
@@ -79,7 +79,7 @@ TEST( Blocks, Block )
 		ASSERT_EQ(N2, B4.nelems());
 		ASSERT_TRUE(B4.ptr_begin() != BCS_NULL);
 		ASSERT_TRUE(B4.ptr_begin() != B3.ptr_begin());
-		EXPECT_TRUE( elems_equal(size_t(N2), B4.ptr_begin(), src) );
+		EXPECT_TRUE( elems_equal(N2, B4.ptr_begin(), src) );
 
 		CHECK_MEM_PENDING(4);
 
@@ -88,7 +88,7 @@ TEST( Blocks, Block )
 		ASSERT_EQ(N1, B4.nelems());
 		ASSERT_TRUE(B4.ptr_begin() != BCS_NULL);
 		ASSERT_TRUE(B4.ptr_begin() != B2.ptr_begin());
-		EXPECT_TRUE( elems_equal(size_t(N1), B4.ptr_begin(), B2.ptr_begin()) );
+		EXPECT_TRUE( elems_equal(N1, B4.ptr_begin(), B2.ptr_begin()) );
 
 		CHECK_MEM_PENDING(4);
 
@@ -144,26 +144,26 @@ TEST( Blocks, BlockMemOp )
 
 	blk_t B1(N, 0);
 	ASSERT_EQ(N, B1.nelems());
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), 0) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), 0) );
 	const int *pb = B1.ptr_begin();
 
 	fill(B1, 2);
 	ASSERT_EQ(N, B1.nelems());
 	ASSERT_TRUE( B1.ptr_begin() == pb );
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), 2) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), 2) );
 
 	copy_from(B1, src);
 	ASSERT_EQ(N, B1.nelems());
 	ASSERT_TRUE( B1.ptr_begin() == pb );
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), src) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), src) );
 
 	copy_to(B1, dst);
 	ASSERT_EQ(N, B1.nelems());
-	ASSERT_TRUE( elems_equal(size_t(N), dst, src) );
+	ASSERT_TRUE( elems_equal(N, dst, src) );
 
 	zero(B1);
 	ASSERT_EQ(N, B1.nelems());
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), 0) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), 0) );
 
 }
 
@@ -193,7 +193,7 @@ TEST( Blocks, ScopedBlock )
 		scblk_t B2(N1, 7);
 		ASSERT_EQ(N1, B2.nelems());
 		ASSERT_TRUE(B2.ptr_begin() != BCS_NULL);
-		EXPECT_TRUE( elems_equal(size_t(N1), B2.ptr_begin(), 7) );
+		EXPECT_TRUE( elems_equal(N1, B2.ptr_begin(), 7) );
 
 		CHECK_MEM_PENDING(2);
 
@@ -201,7 +201,7 @@ TEST( Blocks, ScopedBlock )
 		ASSERT_EQ(N2, B3.nelems());
 		ASSERT_TRUE(B3.ptr_begin() != BCS_NULL);
 		ASSERT_TRUE(B3.ptr_begin() != src);
-		EXPECT_TRUE( elems_equal(size_t(N2), B3.ptr_begin(), src) );
+		EXPECT_TRUE( elems_equal(N2, B3.ptr_begin(), src) );
 
 		CHECK_MEM_PENDING(3);
 	}
@@ -219,26 +219,26 @@ TEST( Blocks, ScopedBlockMemOp )
 
 	scblk_t B1(N, 0);
 	ASSERT_EQ(N, B1.nelems());
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), 0) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), 0) );
 	const int *pb = B1.ptr_begin();
 
 	fill(B1, 2);
 	ASSERT_EQ(N, B1.nelems());
 	ASSERT_TRUE( B1.ptr_begin() == pb );
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), 2) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), 2) );
 
 	copy_from(B1, src);
 	ASSERT_EQ(N, B1.nelems());
 	ASSERT_TRUE( B1.ptr_begin() == pb );
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), src) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), src) );
 
 	copy_to(B1, dst);
 	ASSERT_EQ(N, B1.nelems());
-	ASSERT_TRUE( elems_equal(size_t(N), dst, src) );
+	ASSERT_TRUE( elems_equal(N, dst, src) );
 
 	zero(B1);
 	ASSERT_EQ(N, B1.nelems());
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), 0) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), 0) );
 
 }
 
@@ -258,13 +258,13 @@ TEST( Blocks, StaticBlock )
 	stblk_t B2(7);
 	ASSERT_EQ(N, B2.nelems());
 	ASSERT_TRUE(B2.ptr_begin() != BCS_NULL);
-	EXPECT_TRUE( elems_equal(size_t(N), B2.ptr_begin(), 7) );
+	EXPECT_TRUE( elems_equal(N, B2.ptr_begin(), 7) );
 
 	stblk_t B3(src);
 	ASSERT_EQ(N, B3.nelems());
 	ASSERT_TRUE(B3.ptr_begin() != BCS_NULL);
 	ASSERT_TRUE(B3.ptr_begin() != src);
-	EXPECT_TRUE( elems_equal(size_t(N), B3.ptr_begin(), src) );
+	EXPECT_TRUE( elems_equal(N, B3.ptr_begin(), src) );
 
 }
 
@@ -279,26 +279,26 @@ TEST( Blocks, StaticBlockMemOp )
 
 	stblk_t B1(0);
 	ASSERT_EQ(N, B1.nelems());
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), 0) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), 0) );
 	const int *pb = B1.ptr_begin();
 
 	fill(B1, 2);
 	ASSERT_EQ(N, B1.nelems());
 	ASSERT_TRUE( B1.ptr_begin() == pb );
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), 2) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), 2) );
 
 	copy_from(B1, src);
 	ASSERT_EQ(N, B1.nelems());
 	ASSERT_TRUE( B1.ptr_begin() == pb );
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), src) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), src) );
 
 	copy_to(B1, dst);
 	ASSERT_EQ(N, B1.nelems());
-	ASSERT_TRUE( elems_equal(size_t(N), dst, src) );
+	ASSERT_TRUE( elems_equal(N, dst, src) );
 
 	zero(B1);
 	ASSERT_EQ(N, B1.nelems());
-	ASSERT_TRUE( elems_equal(size_t(N), B1.ptr_begin(), 0) );
+	ASSERT_TRUE( elems_equal(N, B1.ptr_begin(), 0) );
 
 }
 

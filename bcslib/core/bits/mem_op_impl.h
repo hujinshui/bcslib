@@ -22,7 +22,7 @@
 #include <malloc.h>
 #endif
 
-namespace bcs { namespace engine  {
+namespace bcs { namespace detail  {
 
 	/********************************************
 	 *
@@ -32,11 +32,11 @@ namespace bcs { namespace engine  {
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	inline void copy_elems(const size_t n, const T *src, T *dst)
+	inline void copy_elems(const index_t n, const T* __restrict__ src, T* __restrict__ dst)
 	{
 		if (n >> 3) // n >= 8
 		{
-			std::memcpy(dst, src, n * sizeof(T));
+			std::memcpy(dst, src, static_cast<size_t>(n) * sizeof(T));
 		}
 		else
 		{
@@ -68,23 +68,23 @@ namespace bcs { namespace engine  {
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	inline void zero_elems(const size_t n, T *dst)
+	inline void zero_elems(const index_t n, T* __restrict__ dst)
 	{
-		std::memset(dst, 0, n * sizeof(T));
+		std::memset(dst, 0, static_cast<size_t>(n) * sizeof(T));
 	}
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	static void fill_elems(const size_t n, T *dst, const T& v)
+	static void fill_elems(const index_t n, T* __restrict__ dst, const T& v)
 	{
-		for (size_t i = 0; i < n; ++i) dst[i] = v;
+		for (index_t i = 0; i < n; ++i) dst[i] = v;
 	}
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	static bool elems_equal(const size_t n, const T *s1, const T *s2)
+	static bool elems_equal(const index_t n, const T* __restrict__ s1, const T* __restrict__ s2)
 	{
-		for (size_t i = 0; i < n; ++i)
+		for (index_t i = 0; i < n; ++i)
 		{
 			if (s1[i] != s2[i]) return false;
 		}
@@ -93,9 +93,9 @@ namespace bcs { namespace engine  {
 
 	template<typename T>
 	BCS_ENSURE_INLINE
-	static bool elems_equal(const size_t n, const T *s, const T& v)
+	static bool elems_equal(const index_t n, const T* __restrict__ s, const T& v)
 	{
-		for (size_t i = 0; i < n; ++i)
+		for (index_t i = 0; i < n; ++i)
 		{
 			if (s[i] != v) return false;
 		}
@@ -104,18 +104,18 @@ namespace bcs { namespace engine  {
 
 
 	template<typename T>
-	inline void copy_elems_2d(const size_t inner_dim, const size_t outer_dim,
-			const T *src, size_t src_ext, T *dst, size_t dst_ext)
+	inline void copy_elems_2d(const index_t inner_dim, const index_t outer_dim,
+			const T* __restrict__ src, index_t src_ext, T* __restrict__ dst, index_t dst_ext)
 	{
-		for (size_t j = 0; j < outer_dim; ++j, src += src_ext, dst += dst_ext)
+		for (index_t j = 0; j < outer_dim; ++j, src += src_ext, dst += dst_ext)
 		{
 			copy_elems(inner_dim, src, dst);
 		}
 	}
 
 	template<typename T>
-	inline void zero_elems_2d(const size_t inner_dim, const size_t outer_dim,
-			T *dst, const size_t dst_ext)
+	inline void zero_elems_2d(const index_t inner_dim, const index_t outer_dim,
+			T* __restrict__ dst, const index_t dst_ext)
 	{
 		if (inner_dim == dst_ext)
 		{
@@ -123,30 +123,30 @@ namespace bcs { namespace engine  {
 		}
 		else
 		{
-			for (size_t j = 0; j < outer_dim; ++j, dst += dst_ext)
+			for (index_t j = 0; j < outer_dim; ++j, dst += dst_ext)
 			{
-				std::memset(dst, 0, inner_dim * sizeof(T));
+				zero_elems(inner_dim, dst);
 			}
 		}
 	}
 
 	template<typename T>
-	inline void fill_elems_2d(const size_t inner_dim, const size_t outer_dim,
-			T *dst, const size_t dst_ext, const T& v)
+	inline void fill_elems_2d(const index_t inner_dim, const index_t outer_dim,
+			T* __restrict__ dst, const index_t dst_ext, const T& v)
 	{
-		for (size_t j = 0; j < outer_dim; ++j, dst += dst_ext)
+		for (index_t j = 0; j < outer_dim; ++j, dst += dst_ext)
 		{
-			for (size_t i = 0; i < inner_dim; ++i) dst[i] = v;
+			for (index_t i = 0; i < inner_dim; ++i) dst[i] = v;
 		}
 	}
 
 	template<typename T>
-	inline bool elems_equal_2d(const size_t inner_dim, const size_t outer_dim,
-			const T *s1, size_t s1_ext, const T *s2, size_t s2_ext)
+	inline bool elems_equal_2d(const index_t inner_dim, const index_t outer_dim,
+			const T* __restrict__ s1, index_t s1_ext, const T* __restrict__ s2, index_t s2_ext)
 	{
-		for (size_t i = 0; i < outer_dim; ++i, s1 += s1_ext, s2 += s2_ext)
+		for (index_t i = 0; i < outer_dim; ++i, s1 += s1_ext, s2 += s2_ext)
 		{
-			for (size_t i = 0; i < inner_dim; ++i)
+			for (index_t i = 0; i < inner_dim; ++i)
 			{
 				if (s1[i] != s2[i]) return false;
 			}
@@ -155,12 +155,12 @@ namespace bcs { namespace engine  {
 	}
 
 	template<typename T>
-	inline bool elems_equal_2d(const size_t inner_dim, const size_t outer_dim,
-			const T *s1, size_t s1_ext, const T& v)
+	inline bool elems_equal_2d(const index_t inner_dim, const index_t outer_dim,
+			const T* __restrict__ s1, index_t s1_ext, const T& v)
 	{
-		for (size_t i = 0; i < outer_dim; ++i, s1 += s1_ext)
+		for (index_t i = 0; i < outer_dim; ++i, s1 += s1_ext)
 		{
-			for (size_t i = 0; i < inner_dim; ++i)
+			for (index_t i = 0; i < inner_dim; ++i)
 			{
 				if (s1[i] != v) return false;
 			}
