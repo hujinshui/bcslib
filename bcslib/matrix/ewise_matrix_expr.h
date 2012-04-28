@@ -15,7 +15,7 @@
 
 #include <bcslib/matrix/matrix_xpr.h>
 #include <bcslib/matrix/column_traverser.h>
-
+#include <bcslib/matrix/bits/ewise_matrix_eval_internal.h>
 
 #define DECLARE_UNARY_EWISE_FUNCTOR(Name) \
 	template<typename T> struct Name; \
@@ -305,6 +305,41 @@ namespace bcs
 		column_traverser<RArg> right_arg_traverser;
 	};
 
+
+	/********************************************
+	 *
+	 *  Evaluation
+	 *
+	 ********************************************/
+
+	template<typename Fun, class Arg>
+	struct expr_evaluator<unary_ewise_expr<Fun, Arg> >
+	{
+		typedef unary_ewise_expr<Fun, Arg> expr_type;
+		typedef typename matrix_traits<expr_type>::value_type value_type;
+
+		template<class DMat>
+		BCS_ENSURE_INLINE
+		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, value_type>& dst)
+		{
+			detail::ewise_evaluator<expr_type>::run(expr, dst.derived());
+		}
+	};
+
+
+	template<typename Fun, class LArg, class RArg>
+	struct expr_evaluator<binary_ewise_expr<Fun, LArg, RArg> >
+	{
+		typedef binary_ewise_expr<Fun, LArg, RArg> expr_type;
+		typedef typename matrix_traits<expr_type>::value_type value_type;
+
+		template<class DMat>
+		BCS_ENSURE_INLINE
+		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, value_type>& dst)
+		{
+			detail::ewise_evaluator<expr_type>::run(expr, dst.derived());
+		}
+	};
 
 
 	/********************************************

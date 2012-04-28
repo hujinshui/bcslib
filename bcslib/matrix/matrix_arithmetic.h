@@ -14,7 +14,6 @@
 #define BCSLIB_MATRIX_ARITHMETIC_H_
 
 #include <bcslib/matrix/ewise_matrix_expr.h>
-#include <bcslib/matrix/ewise_matrix_eval.h>
 #include <bcslib/engine/arithmetic_functors.h>
 
 namespace bcs

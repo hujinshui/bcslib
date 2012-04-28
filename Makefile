@@ -92,7 +92,6 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/dense_matrix.h \
 	$(INC)/matrix/ref_matrix.h \
 	$(INC)/matrix/ewise_matrix_expr.h \
-	$(INC)/matrix/ewise_matrix_eval.h \
 	$(INC)/matrix/matrix_arithmetic.h \
 	$(INC)/matrix/bits/matrix_helpers.h \
 	$(INC)/matrix/bits/matrix_manip_helpers.h \
