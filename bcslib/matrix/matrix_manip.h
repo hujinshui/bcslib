@@ -13,7 +13,7 @@
 #ifndef BCSLIB_MATRIX_MANIP_H_
 #define BCSLIB_MATRIX_MANIP_H_
 
-#include <bcslib/matrix/matrix_fwd.h>
+#include <bcslib/matrix/matrix_base.h>
 #include <bcslib/matrix/bits/matrix_manip_helpers.h>
 #include <cstdio>
 
