@@ -59,7 +59,7 @@ namespace bcs { namespace detail {
 				const T* __restrict__ a, index_t lda,
 				const T* __restrict__ b, index_t ldb)
 		{
-			if (lda == m)
+			if (lda == m && ldb == m)
 			{
 				if (IsDynamic)
 				{
@@ -72,10 +72,21 @@ namespace bcs { namespace detail {
 			}
 			else
 			{
-				for (index_t j = 0; j < n; ++j)
+				if (m == 1)
 				{
-					if (!percol_equal_helper<T, CTRows>::run(m, a + j * lda, b + j * ldb))
-						return false;
+					for (index_t j = 0; j < n; ++j)
+					{
+						if (a[j * lda] != b[j * ldb]) return false;
+					}
+				}
+				else
+				{
+					for (index_t j = 0; j < n; ++j)
+					{
+						if (!percol_equal_helper<T, CTRows>::run(m, a + j * lda, b + j * ldb))
+							return false;
+
+					}
 				}
 				return true;
 			}
@@ -136,7 +147,7 @@ namespace bcs { namespace detail {
 				const T* __restrict__ a, index_t lda,
 				      T* __restrict__ b, index_t ldb)
 		{
-			if (lda == m)
+			if (lda == m && ldb == m)
 			{
 				if (IsDynamic)
 				{
@@ -149,9 +160,19 @@ namespace bcs { namespace detail {
 			}
 			else
 			{
-				for (index_t j = 0; j < n; ++j)
+				if (m == 1)
 				{
-					percol_copy_helper<T, CTRows>::run(m, a + j * lda, b + j * ldb);
+					for (index_t j = 0; j < n; ++j)
+					{
+						b[j * ldb] = a[j * lda];
+					}
+				}
+				else
+				{
+					for (index_t j = 0; j < n; ++j)
+					{
+						percol_copy_helper<T, CTRows>::run(m, a + j * lda, b + j * ldb);
+					}
 				}
 			}
 		}
