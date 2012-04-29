@@ -13,7 +13,7 @@
 #ifndef BCSLIB_DENSE_MATRIX_H_
 #define BCSLIB_DENSE_MATRIX_H_
 
-#include <bcslib/matrix/matrix_fwd.h>
+#include <bcslib/matrix/matrix_base.h>
 #include <bcslib/matrix/bits/dense_matrix_internal.h>
 
 namespace bcs

@@ -13,7 +13,7 @@
 #ifndef BCSLIB_MATRIX_ASSIGN_H_
 #define BCSLIB_MATRIX_ASSIGN_H_
 
-#include <bcslib/matrix/matrix_fwd.h>
+#include <bcslib/matrix/matrix_base.h>
 #include <bcslib/matrix/matrix_xpr.h>
 
 namespace bcs

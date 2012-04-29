@@ -84,7 +84,6 @@ CORE_H = \
 
 MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/matrix_base.h \
-	$(INC)/matrix/matrix_fwd.h \
 	$(INC)/matrix/matrix_xpr.h \
 	$(INC)/matrix/matrix_manip.h \
 	$(INC)/matrix/column_traverser.h \

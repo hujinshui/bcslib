@@ -13,7 +13,7 @@
 #ifndef BCSLIB_REF_MATRIX_H_
 #define BCSLIB_REF_MATRIX_H_
 
-#include <bcslib/matrix/matrix_fwd.h>
+#include <bcslib/matrix/matrix_base.h>
 #include <bcslib/matrix/matrix_assign.h>
 
 #include <bcslib/matrix/bits/ref_matrix_internal.h>
