@@ -14,6 +14,8 @@
 #define BCSLIB_CORE_H_
 
 #include <bcslib/core/basic_defs.h>
+#include <bcslib/core/range.h>
+
 #include <bcslib/core/type_traits.h>
 #include <bcslib/core/iterator.h>
 #include <bcslib/core/block.h>
