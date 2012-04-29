@@ -13,9 +13,7 @@
 #ifndef BCSLIB_REF_MATRIX_H_
 #define BCSLIB_REF_MATRIX_H_
 
-#include <bcslib/matrix/matrix_base.h>
 #include <bcslib/matrix/matrix_assign.h>
-
 #include <bcslib/matrix/bits/ref_matrix_internal.h>
 
 
@@ -609,6 +607,66 @@ namespace bcs
 
 	}; // end ref_matrix_ex
 
+
+	/********************************************
+	 *
+	 *  Evaluation
+	 *
+	 ********************************************/
+
+	template<typename T, int CTRows, int CTCols>
+	struct expr_evaluator<cref_matrix<T, CTRows, CTCols> >
+	{
+		typedef cref_matrix<T, CTRows, CTCols> expr_type;
+
+		template<class DMat>
+		BCS_ENSURE_INLINE
+		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, T>& dst)
+		{
+			copy(expr, dst.derived());
+		}
+	};
+
+
+	template<typename T, int CTRows, int CTCols>
+	struct expr_evaluator<ref_matrix<T, CTRows, CTCols> >
+	{
+		typedef ref_matrix<T, CTRows, CTCols> expr_type;
+
+		template<class DMat>
+		BCS_ENSURE_INLINE
+		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, T>& dst)
+		{
+			copy(expr, dst.derived());
+		}
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct expr_evaluator<cref_matrix_ex<T, CTRows, CTCols> >
+	{
+		typedef cref_matrix_ex<T, CTRows, CTCols> expr_type;
+
+		template<class DMat>
+		BCS_ENSURE_INLINE
+		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, T>& dst)
+		{
+			copy(expr, dst.derived());
+		}
+	};
+
+
+	template<typename T, int CTRows, int CTCols>
+	struct expr_evaluator<ref_matrix_ex<T, CTRows, CTCols> >
+	{
+		typedef ref_matrix_ex<T, CTRows, CTCols> expr_type;
+
+		template<class DMat>
+		BCS_ENSURE_INLINE
+		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, T>& dst)
+		{
+			copy(expr, dst.derived());
+		}
+	};
 
 }
 

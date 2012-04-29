@@ -13,7 +13,7 @@
 #ifndef BCSLIB_ARITHMETIC_FUNCTORS_H_
 #define BCSLIB_ARITHMETIC_FUNCTORS_H_
 
-#include <bcslib/core/basic_defs.h>
+#include <bcslib/core/functor_base.h>
 
 namespace bcs
 {
@@ -259,6 +259,30 @@ namespace bcs
 			return bcs::max(x, scalar_arg);
 		}
 	};
+
+
+	DECLARE_BINARY_EWISE_FUNCTOR( binary_plus )
+	DECLARE_BINARY_EWISE_FUNCTOR( binary_minus )
+	DECLARE_BINARY_EWISE_FUNCTOR( binary_times )
+	DECLARE_BINARY_EWISE_FUNCTOR( binary_divides )
+
+	DECLARE_UNARY_EWISE_FUNCTOR( plus_scalar )
+	DECLARE_UNARY_EWISE_FUNCTOR( minus_scalar )
+	DECLARE_UNARY_EWISE_FUNCTOR( rminus_scalar )
+	DECLARE_UNARY_EWISE_FUNCTOR( times_scalar )
+	DECLARE_UNARY_EWISE_FUNCTOR( divides_scalar )
+	DECLARE_UNARY_EWISE_FUNCTOR( rdivides_scalar )
+
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_negate )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_rcp )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_abs )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_sqr )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_cube )
+
+	DECLARE_BINARY_EWISE_FUNCTOR( binary_min )
+	DECLARE_BINARY_EWISE_FUNCTOR( binary_max )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_min )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_max )
 
 }
 

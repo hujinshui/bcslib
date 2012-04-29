@@ -17,36 +17,19 @@
 #include <bcslib/matrix/column_traverser.h>
 #include <bcslib/matrix/bits/ewise_matrix_eval_internal.h>
 
-#define DECLARE_UNARY_EWISE_FUNCTOR(Name) \
-	template<typename T> struct Name; \
-	template<typename T> \
-	struct is_unary_ewise_functor<Name<T> > { static const bool value = true; };
-
-#define DECLARE_BINARY_EWISE_FUNCTOR(Name) \
-	template<typename T> struct Name; \
-	template<typename T> \
-	struct is_binary_ewise_functor<Name<T> > { static const bool value = true; };
-
-
 namespace bcs
 {
+	// forward declaration
+
+	template<typename Fun, class Arg> struct unary_ewise_expr;
+	template<typename Fun, class LArg, class RArg> struct binary_ewise_expr;
+
+
 	/********************************************
 	 *
 	 *  Generic expression classes
 	 *
 	 ********************************************/
-
-	template<typename Fun>
-	struct is_unary_ewise_functor
-	{
-		static const bool value = false;
-	};
-
-	template<typename Fun>
-	struct is_binary_ewise_functor
-	{
-		static const bool value = false;
-	};
 
 	template<typename Fun, class Arg>
 	struct matrix_traits<unary_ewise_expr<Fun, Arg> >
@@ -342,59 +325,6 @@ namespace bcs
 	};
 
 
-	/********************************************
-	 *
-	 *  Tag useful functors
-	 *
-	 ********************************************/
-
-	// arithmetic
-
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_plus )
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_minus )
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_times )
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_divides )
-
-	DECLARE_UNARY_EWISE_FUNCTOR( plus_scalar )
-	DECLARE_UNARY_EWISE_FUNCTOR( minus_scalar )
-	DECLARE_UNARY_EWISE_FUNCTOR( rminus_scalar )
-	DECLARE_UNARY_EWISE_FUNCTOR( times_scalar )
-	DECLARE_UNARY_EWISE_FUNCTOR( divides_scalar )
-	DECLARE_UNARY_EWISE_FUNCTOR( rdivides_scalar )
-
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_negate )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_rcp )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_abs )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_sqr )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_cube )
-
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_min )
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_max )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_min )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_max )
-
-	// elementary functions
-
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_sqrt )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_pow )
-
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_exp )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_log )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_log10 )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_floor )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_ceil )
-
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_sin )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_cos )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_tan )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_asin )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_acos )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_atan )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_sinh )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_cosh )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_tanh )
-
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_atan2 )
 }
 
 #endif
