@@ -386,6 +386,12 @@ namespace bcs
 	}; // end class IRegularMatrix
 
 
+
+	// sub-view functions (forward declaration)
+
+	template<class Mat> struct subviews;
+
+
 	/**
 	 * The interfaces for matrix blocks
 	 */
@@ -459,6 +465,36 @@ namespace bcs
 			derived().resize(m, n);
 		}
 
+	public:
+		BCS_ENSURE_INLINE
+		typename subviews<Derived>::const_row_type
+		row(index_type i) const
+		{
+			return subviews<Derived>::get_row(derived(), i);
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived>::row_type
+		row(index_type i)
+		{
+			return subviews<Derived>::get_row(derived(), i);
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived>::const_column_type
+		column(index_type j) const
+		{
+			return subviews<Derived>::get_column(derived(), j);
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived>::column_type
+		column(index_type j)
+		{
+			return subviews<Derived>::get_column(derived(), j);
+		}
+
+
 	}; // end class IDenseMatrixBlock
 
 
@@ -481,21 +517,21 @@ namespace bcs
 	template<class Derived, typename T>
 	BCS_ENSURE_INLINE
 	typename mat_access<Derived>::const_pointer
-	row_ptr(const IDenseMatrix<Derived, T>& X, index_t j)
+	row_ptr(const IDenseMatrix<Derived, T>& X, index_t i)
 	{
-		return X.ptr_data() + j;
+		return X.ptr_data() + i;
 	}
 
 	template<class Derived, typename T>
 	BCS_ENSURE_INLINE
 	typename mat_access<Derived>::pointer
-	row_ptr(IDenseMatrix<Derived, T>& X, index_t j)
+	row_ptr(IDenseMatrix<Derived, T>& X, index_t i)
 	{
-		return X.ptr_data() + j;
+		return X.ptr_data() + i;
 	}
 
 
-	// manipulation functions
+	// manipulation functions (forward declaration)
 
 	template<typename T, class LMat, class RMat>
 	inline bool is_equal(const IMatrixView<LMat, T>& A, const IMatrixView<RMat, T>& B);

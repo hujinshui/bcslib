@@ -85,6 +85,7 @@ CORE_H = \
 MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/matrix_base.h \
 	$(INC)/matrix/matrix_xpr.h \
+	$(INC)/matrix/matrix_subviews.h \
 	$(INC)/matrix/matrix_manip.h \
 	$(INC)/matrix/column_traverser.h \
 	$(INC)/matrix/matrix_assign.h \
@@ -94,6 +95,7 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/matrix_arithmetic.h \
 	$(INC)/matrix/matrix_elfuns.h \
 	$(INC)/matrix/bits/matrix_helpers.h \
+	$(INC)/matrix/bits/matrix_subviews_helper.h \
 	$(INC)/matrix/bits/matrix_manip_helpers.h \
 	$(INC)/matrix/bits/dense_matrix_internal.h \
 	$(INC)/matrix/bits/ref_matrix_internal.h \
@@ -127,7 +129,7 @@ test_core: $(BIN)/test_memory
 #------ Matrix tests --------
 
 .PHONY: test_matrix
-test_matrix: $(BIN)/test_matrix_basics $(BIN)/test_matrix_eval
+test_matrix: $(BIN)/test_matrix_basics $(BIN)/test_matrix_eval $(BIN)/test_matrix_subviews
 
 
 #_________________________________________________________________________
@@ -174,7 +176,11 @@ TEST_MATRIX_EVAL_SOURCES = \
 $(BIN)/test_matrix_eval: $(MATRIX_H) $(TEST_MATRIX_EVAL_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_EVAL_SOURCES) $(MAIN_TEST_POST) -o $@
 	
-	
+TEST_MATRIX_SUBVIEWS_SOURCES = \
+	test/matrix/test_matrix_slices.cpp
+
+$(BIN)/test_matrix_subviews:$(MATRIX_H) $(TEST_MATRIX_SUBVIEWS_SOURCES)
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_SUBVIEWS_SOURCES) $(MAIN_TEST_POST) -o $@
 	
 	
 	

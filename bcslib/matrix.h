@@ -16,6 +16,7 @@
 #include <bcslib/matrix/ref_matrix.h>
 #include <bcslib/matrix/dense_matrix.h>
 
+#include <bcslib/matrix/matrix_subviews.h>
 #include <bcslib/matrix/matrix_manip.h>
 #include <bcslib/matrix/matrix_assign.h>
 #include <bcslib/matrix/matrix_arithmetic.h>
