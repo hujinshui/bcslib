@@ -13,6 +13,8 @@
 #ifndef BCSLIB_BLAS_SELECT_H_
 #define BCSLIB_BLAS_SELECT_H_
 
+#include <bcslib/config/config.h>
+
 // function name macros
 
 // BLAS Level 1
