@@ -10,8 +10,8 @@
 #pragma once
 #endif
 
-#ifndef BCSLIB_EWISE_FUNCTORS_H_
-#define BCSLIB_EWISE_FUNCTORS_H_
+#ifndef BCSLIB_ARITHMETIC_FUNCTORS_H_
+#define BCSLIB_ARITHMETIC_FUNCTORS_H_
 
 #include <bcslib/core/basic_defs.h>
 
@@ -172,6 +172,17 @@ namespace bcs
 	};
 
 	template<typename T>
+	struct unary_abs
+	{
+		typedef T result_type;
+
+		BCS_ENSURE_INLINE T operator() (const T& x) const
+		{
+			return bcs::math::abs(x);
+		}
+	};
+
+	template<typename T>
 	struct unary_sqr
 	{
 		typedef T result_type;
@@ -193,6 +204,61 @@ namespace bcs
 		}
 	};
 
+
+	template<typename T>
+	struct binary_min
+	{
+		typedef T result_type;
+
+		BCS_ENSURE_INLINE T operator() (const T& x, const T& y) const
+		{
+			return bcs::min(x, y);
+		}
+	};
+
+
+	template<typename T>
+	struct unary_min
+	{
+		typedef T result_type;
+
+		T scalar_arg;
+
+		BCS_ENSURE_INLINE unary_min(const T& s) : scalar_arg(s) { }
+
+		BCS_ENSURE_INLINE T operator() (const T& x) const
+		{
+			return bcs::min(x, scalar_arg);
+		}
+	};
+
+
+	template<typename T>
+	struct binary_max
+	{
+		typedef T result_type;
+
+		BCS_ENSURE_INLINE T operator() (const T& x, const T& y) const
+		{
+			return bcs::max(x, y);
+		}
+	};
+
+
+	template<typename T>
+	struct unary_max
+	{
+		typedef T result_type;
+
+		T scalar_arg;
+
+		BCS_ENSURE_INLINE unary_max(const T& s) : scalar_arg(s) { }
+
+		BCS_ENSURE_INLINE T operator() (const T& x) const
+		{
+			return bcs::max(x, scalar_arg);
+		}
+	};
 
 }
 

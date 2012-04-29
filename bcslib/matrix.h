@@ -19,5 +19,6 @@
 #include <bcslib/matrix/matrix_manip.h>
 #include <bcslib/matrix/matrix_assign.h>
 #include <bcslib/matrix/matrix_arithmetic.h>
+#include <bcslib/matrix/matrix_elfuns.h>
 
 #endif /* MATRIX_H_ */

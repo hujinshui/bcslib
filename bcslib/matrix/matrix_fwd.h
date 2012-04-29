@@ -47,6 +47,12 @@ namespace bcs
 	template<typename T, class LMat, class RMat>
 	inline bool is_equal(const IDenseMatrix<LMat, T>& A, const IDenseMatrix<RMat, T>& B);
 
+	template<typename T, class LMat, class RMat>
+	inline bool is_approx(const IMatrixView<LMat, T>& A, const IMatrixView<RMat, T>& B, const T& tol);
+
+	template<typename T, class LMat, class RMat>
+	inline bool is_approx(const IDenseMatrix<LMat, T>& A, const IDenseMatrix<RMat, T>& B, const T& tol);
+
 	template<typename T, class SMat, class DMat>
 	inline void copy(const IDenseMatrix<SMat, T>& src, IDenseMatrix<DMat, T>& dst);
 
