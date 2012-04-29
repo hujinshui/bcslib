@@ -345,6 +345,158 @@ TEST( MatrixEWise, BinaryforNewMatWithNewMat )
 }
 
 
+static inline double complex_formula1(double x, double y, double z, double w)
+{
+	using bcs::math::sqr;
+
+	double left = sqr(sqr(x + y));
+	double right = sqr(sqr(z)) + sqr(sqr(w));
+
+	return left + right;
+}
+
+
+TEST( MatrixEWise, ComplexFormulaToCol )
+{
+	const index_t n = 32;
+
+	const double yv = 2;
+	const double zv = 3;
+
+	col_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = i + 1;
+	col_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = (2*i + 1);
+
+	MyConstMat y(n, 1, yv);
+	MyConstMat z(n, 1, zv);
+
+	col_f64 r0(n);
+	for (index_t i = 0; i < n; ++i) r0[i] = complex_formula1(x[i], yv, zv, w[i]);
+
+	col_f64 r = sqr(sqr(x + y)) + (sqr(sqr(z)) + sqr(sqr(w)));
+
+	ASSERT_EQ(n, r.nrows());
+	ASSERT_EQ(1, r.ncolumns());
+	ASSERT_TRUE( is_equal(r, r0) );
+
+	col_f64 r1;
+	r1 = sqr(sqr(x + y)) + (sqr(sqr(z)) + sqr(sqr(w)));
+
+	ASSERT_EQ(n, r1.nrows());
+	ASSERT_EQ(1, r1.ncolumns());
+	ASSERT_TRUE( is_equal(r1, r0) );
+}
+
+
+TEST( MatrixEWise, ComplexFormulaToRow )
+{
+	const index_t n = 32;
+
+	const double yv = 2;
+	const double zv = 3;
+
+	row_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = i + 1;
+	row_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = (2*i + 1);
+
+	MyConstMat y(1, n, yv);
+	MyConstMat z(1, n, zv);
+
+	row_f64 r0(n);
+	for (index_t i = 0; i < n; ++i) r0[i] = complex_formula1(x[i], yv, zv, w[i]);
+
+	row_f64 r = sqr(sqr(x + y)) + (sqr(sqr(z)) + sqr(sqr(w)));
+
+	ASSERT_EQ(1, r.nrows());
+	ASSERT_EQ(n, r.ncolumns());
+	ASSERT_TRUE( is_equal(r, r0) );
+}
+
+
+TEST( MatrixEWise, ComplexFormulaToRefCol )
+{
+	const index_t n = 32;
+
+	const double yv = 2;
+	const double zv = 3;
+
+	col_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = i + 1;
+	col_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = (2*i + 1);
+
+	MyConstMat y(n, 1, yv);
+	MyConstMat z(n, 1, zv);
+
+	col_f64 r0(n);
+	for (index_t i = 0; i < n; ++i) r0[i] = complex_formula1(x[i], yv, zv, w[i]);
+
+	scoped_block<double> r_blk(n, 0.0);
+	ref_col<double> r(r_blk.ptr_begin(), n);
+	r = sqr(sqr(x + y)) + (sqr(sqr(z)) + sqr(sqr(w)));
+
+	ASSERT_EQ(n, r.nrows());
+	ASSERT_EQ(1, r.ncolumns());
+	ASSERT_TRUE( is_equal(r, r0) );
+
+}
+
+
+TEST( MatrixEWise, ComplexFormulaToRefRow )
+{
+	const index_t n = 32;
+
+	const double yv = 2;
+	const double zv = 3;
+
+	row_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = i + 1;
+	row_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = (2*i + 1);
+
+	MyConstMat y(1, n, yv);
+	MyConstMat z(1, n, zv);
+
+	row_f64 r0(n);
+	for (index_t i = 0; i < n; ++i) r0[i] = complex_formula1(x[i], yv, zv, w[i]);
+
+	scoped_block<double> r_blk(n, 0.0);
+	ref_row<double> r(r_blk.ptr_begin(), n);
+	r = sqr(sqr(x + y)) + (sqr(sqr(z)) + sqr(sqr(w)));
+
+	ASSERT_EQ(1, r.nrows());
+	ASSERT_EQ(n, r.ncolumns());
+	ASSERT_TRUE( is_equal(r, r0) );
+
+}
+
+
+TEST( MatrixEWise, ComplexFormulaToRefMatEx)
+{
+	const index_t m = 32;
+	const index_t n = 8;
+	const index_t ldim = 48;
+
+	const double yv = 2;
+	const double zv = 3;
+
+	mat_f64 x(m, n); for (index_t i = 0; i < m * n; ++i) x[i] = i + 1;
+	mat_f64 w(m, n); for (index_t i = 0; i < m * n; ++i) w[i] = (2*i + 1);
+
+	MyConstMat y(m, n, yv);
+	MyConstMat z(m, n, zv);
+
+	mat_f64 r0(m, n);
+	for (index_t i = 0; i < m * n; ++i) r0[i] = complex_formula1(x[i], yv, zv, w[i]);
+
+	scoped_block<double> r_blk(ldim * n, 0.0);
+	ref_matrix_ex<double> r(r_blk.ptr_begin(), m, n, ldim);
+	r = sqr(sqr(x + y)) + (sqr(sqr(z)) + sqr(sqr(w)));
+
+	ASSERT_EQ(m, r.nrows());
+	ASSERT_EQ(n, r.ncolumns());
+	ASSERT_TRUE( is_equal(r, r0) );
+
+}
+
+
+
+
+
 
 
 

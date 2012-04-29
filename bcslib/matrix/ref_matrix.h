@@ -184,6 +184,14 @@ namespace bcs
 			return *this;
 		}
 
+		template<class Expr>
+		BCS_ENSURE_INLINE ref_matrix& operator = (const IMatrixXpr<Expr, T>& r)
+		{
+			assign_to(r.derived(), *this);
+			return *this;
+		}
+
+
 	public:
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
@@ -300,6 +308,13 @@ namespace bcs
 			base_mat_t::operator = (r.derived());
 			return *this;
 		}
+
+		template<class Expr>
+		BCS_ENSURE_INLINE ref_col& operator = (const IMatrixXpr<Expr, T>& r)
+		{
+			base_mat_t::operator = (r.derived());
+			return *this;
+		}
 	};
 
 
@@ -336,6 +351,13 @@ namespace bcs
 
 		template<class Other>
 		BCS_ENSURE_INLINE ref_row& operator = (const IMatrixView<Other, T>& r)
+		{
+			base_mat_t::operator = (r.derived());
+			return *this;
+		}
+
+		template<class Expr>
+		BCS_ENSURE_INLINE ref_row& operator = (const IMatrixXpr<Expr, T>& r)
 		{
 			base_mat_t::operator = (r.derived());
 			return *this;
@@ -503,6 +525,13 @@ namespace bcs
 
 		template<class Other>
 		BCS_ENSURE_INLINE ref_matrix_ex& operator = (const IMatrixView<Other, T>& r)
+		{
+			assign_to(r.derived(), *this);
+			return *this;
+		}
+
+		template<class Expr>
+		BCS_ENSURE_INLINE ref_matrix_ex& operator = (const IMatrixXpr<Expr, T>& r)
 		{
 			assign_to(r.derived(), *this);
 			return *this;
