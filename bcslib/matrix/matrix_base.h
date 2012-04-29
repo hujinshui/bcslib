@@ -494,6 +494,38 @@ namespace bcs
 			return subviews<Derived>::get_column(derived(), j);
 		}
 
+		BCS_ENSURE_INLINE
+		typename subviews<Derived>::const_multirow_type
+		rows(const range& rgn) const
+		{
+			return subviews<Derived>::get_multirow(derived(),
+					rgn.begin_index(), rgn.num());
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived>::multirow_type
+		rows(const range& rgn)
+		{
+			return subviews<Derived>::get_multirow(derived(),
+					rgn.begin_index(), rgn.num());
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived>::const_multicolumn_type
+		columns(const range& rgn) const
+		{
+			return subviews<Derived>::get_multicolumn(derived(),
+					rgn.begin_index(), rgn.num());
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived>::multicolumn_type
+		columns(const range& rgn)
+		{
+			return subviews<Derived>::get_multicolumn(derived(),
+					rgn.begin_index(), rgn.num());
+		}
+
 
 	}; // end class IDenseMatrixBlock
 

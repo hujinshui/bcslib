@@ -73,6 +73,7 @@ CORE_H = \
 	$(INC)/core/basic_types.h \
 	$(INC)/core/syntax.h \
 	$(INC)/core/scalar_math.h \
+	$(INC)/core/range.h \
 	$(INC)/core/basic_defs.h \
 	$(INC)/core/type_traits.h \
 	$(INC)/core/iterator.h \
