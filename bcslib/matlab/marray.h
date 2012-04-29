@@ -30,17 +30,17 @@ namespace bcs { namespace matlab {
 
 		index_t ndims() const
 		{
-			return (index_t)mxGetNumberOfDimensions(m_pa);
+			return static_cast<index_t>(mxGetNumberOfDimensions(m_pa));
 		}
 
 		index_t nrows() const
 		{
-			return (index_t)mxGetM(m_pa);
+			return static_cast<index_t>(mxGetM(m_pa));
 		}
 
 		index_t ncolumns() const
 		{
-			return (index_t)mxGetN(m_pa);
+			return static_cast<index_t>(mxGetN(m_pa));
 		}
 
 		void get_dims(index_t *dims) const
@@ -50,18 +50,13 @@ namespace bcs { namespace matlab {
 
 			for (index_t i = 0; i < nd; ++i)
 			{
-				dims[i] = (index_t)ret[i];
+				dims[i] = static_cast<index_t>(ret[i]);
 			}
-		}
-
-		index_t element_size() const
-		{
-			return (index_t)mxGetElementSize(m_pa);
 		}
 
 		index_t nelems() const
 		{
-			return (index_t)mxGetNumberOfElements(m_pa);
+			return static_cast<index_t>(mxGetNumberOfElements(m_pa));
 		}
 
 		bool is_empty() const
@@ -338,14 +333,14 @@ namespace bcs { namespace matlab {
 
 		// struct access
 
-		void set_field(int i, const char *fieldname, marray a)
+		void set_field(index_t i, const char *fieldname, marray a)
 		{
-			mxSetField(this->m_pa, i, fieldname, a.mx_ptr());
+			mxSetField(this->m_pa, static_cast<mwIndex>(i), fieldname, a.mx_ptr());
 		}
 
-		void set_field(int i, int fieldnum, marray a)
+		void set_field(index_t i, int fieldnum, marray a)
 		{
-			mxSetFieldByNumber(this->m_pa, i, fieldnum, a.mx_ptr());
+			mxSetFieldByNumber(this->m_pa, static_cast<mwIndex>(i), fieldnum, a.mx_ptr());
 		}
 
 		// cell access
@@ -364,21 +359,23 @@ namespace bcs { namespace matlab {
 	template<typename T>
 	inline marray create_marray(index_t m, index_t n)
 	{
-		return mxCreateNumericMatrix((mwSize)m, (mwSize)n,
+		return mxCreateNumericMatrix(
+				static_cast<mwSize>(m),
+				static_cast<mwSize>(n),
 				mtype_traits<T>::class_id, mxREAL);
 	}
 
 	template<>
 	inline marray create_marray<bool>(index_t m, index_t n)
 	{
-		return mxCreateLogicalMatrix((mwSize)m, (mwSize)n);
+		return mxCreateLogicalMatrix(static_cast<mwSize>(m), static_cast<mwSize>(n));
 	}
 
 	inline marray create_mchar_array(index_t m, index_t n)
 	{
 		mwSize dims[2];
-		dims[0] = (mwSize)m;
-		dims[1] = (mwSize)n;
+		dims[0] = static_cast<mwSize>(m);
+		dims[1] = static_cast<mwSize>(n);
 
 		return mxCreateCharArray(2, dims);
 	}
@@ -404,17 +401,18 @@ namespace bcs { namespace matlab {
 
 	inline marray create_mstruct(index_t nfields, const char **fieldnames)
 	{
-		return mxCreateStructMatrix(1, 1, (int)nfields, fieldnames);
+		return mxCreateStructMatrix(1, 1, static_cast<int>(nfields), fieldnames);
 	}
 
 	inline marray create_mstruct_array(index_t m, index_t n, index_t nfields, const char **fieldnames)
 	{
-		return mxCreateStructMatrix((mwSize)m, (mwSize)n, (int)nfields, fieldnames);
+		return mxCreateStructMatrix(static_cast<mwSize>(m), static_cast<mwSize>(n),
+				static_cast<int>(nfields), fieldnames);
 	}
 
 	inline marray create_mcell_array(index_t m, index_t n)
 	{
-		return mxCreateCellMatrix((mwSize)m, (mwSize)n);
+		return mxCreateCellMatrix(static_cast<mwSize>(m), static_cast<mwSize>(n));
 	}
 
 	inline marray duplicate(const_marray a)

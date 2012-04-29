@@ -11,9 +11,9 @@
 
 #include <mex.h>
 
-#include <bcslib/base/basic_defs.h>
-#include <string>
+#include <bcslib/core.h>
 #include <exception>
+#include <string>
 
 namespace bcs { namespace matlab {
 
