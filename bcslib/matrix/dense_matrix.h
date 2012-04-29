@@ -228,6 +228,9 @@ namespace bcs
 		template<class Other>
 		BCS_ENSURE_INLINE dense_col(const IMatrixView<Other, T>& r) : base_mat_t(r) { }
 
+		template<class Expr>
+		BCS_ENSURE_INLINE dense_col(const IMatrixXpr<Expr, T>& r) : base_mat_t(r) { }
+
 	public:
 		BCS_ENSURE_INLINE dense_col& operator = (const base_mat_t& r)
 		{
@@ -268,6 +271,9 @@ namespace bcs
 		BCS_ENSURE_INLINE dense_row(const base_mat_t& s) : base_mat_t(s) { }
 
 		BCS_ENSURE_INLINE dense_row(const dense_row& s) : base_mat_t(s) { }
+
+		template<class Expr>
+		BCS_ENSURE_INLINE dense_row(const IMatrixXpr<Expr, T>& r) : base_mat_t(r) { }
 
 	public:
 		BCS_ENSURE_INLINE dense_row& operator = (const base_mat_t& r)
