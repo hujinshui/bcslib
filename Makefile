@@ -72,6 +72,7 @@ CORE_H = \
 	$(INC)/config/config.h \
 	$(INC)/core/basic_types.h \
 	$(INC)/core/syntax.h \
+	$(INC)/core/functor_base.h \
 	$(INC)/core/scalar_math.h \
 	$(INC)/core/range.h \
 	$(INC)/core/basic_defs.h \
@@ -95,15 +96,19 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/ewise_matrix_expr.h \
 	$(INC)/matrix/matrix_arithmetic.h \
 	$(INC)/matrix/matrix_elfuns.h \
+	$(INC)/matrix/matrix_reduction.h \
+	$(INC)/matrix/matrix_partial_reduction_expr.h \
 	$(INC)/matrix/bits/matrix_helpers.h \
 	$(INC)/matrix/bits/matrix_subviews_helper.h \
 	$(INC)/matrix/bits/matrix_manip_helpers.h \
 	$(INC)/matrix/bits/dense_matrix_internal.h \
 	$(INC)/matrix/bits/ref_matrix_internal.h \
 	$(INC)/matrix/bits/ewise_matrix_eval_internal.h \
+	$(INC)/matrix/bits/matrix_reduction_internal.h \
 	$(INC)/matrix.h \
 	$(INC)/engine/arithmetic_functors.h \
-	$(INC)/engine/elementary_functors.h
+	$(INC)/engine/elementary_functors.h \
+	$(INC)/engine/reduction_functors.h
 	
 
 #---------- Target groups -------------------
@@ -130,7 +135,11 @@ test_core: $(BIN)/test_memory
 #------ Matrix tests --------
 
 .PHONY: test_matrix
-test_matrix: $(BIN)/test_matrix_basics $(BIN)/test_matrix_eval $(BIN)/test_matrix_subviews
+test_matrix: \
+	$(BIN)/test_matrix_basics \
+	$(BIN)/test_matrix_subviews \
+	$(BIN)/test_matrix_eval \
+	$(BIN)/test_matrix_reduc
 
 
 #_________________________________________________________________________
@@ -168,6 +177,12 @@ TEST_MATRIX_BASICS_SOURCES = \
 	
 $(BIN)/test_matrix_basics: $(MATRIX_H) $(TEST_MATRIX_BASICS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
+	
+TEST_MATRIX_SUBVIEWS_SOURCES = \
+	test/matrix/test_matrix_slices.cpp
+
+$(BIN)/test_matrix_subviews:$(MATRIX_H) $(TEST_MATRIX_SUBVIEWS_SOURCES)
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_SUBVIEWS_SOURCES) $(MAIN_TEST_POST) -o $@
 
 TEST_MATRIX_EVAL_SOURCES = \
 	test/matrix/test_matrix_ewise.cpp \
@@ -177,11 +192,12 @@ TEST_MATRIX_EVAL_SOURCES = \
 $(BIN)/test_matrix_eval: $(MATRIX_H) $(TEST_MATRIX_EVAL_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_EVAL_SOURCES) $(MAIN_TEST_POST) -o $@
 	
-TEST_MATRIX_SUBVIEWS_SOURCES = \
-	test/matrix/test_matrix_slices.cpp
-
-$(BIN)/test_matrix_subviews:$(MATRIX_H) $(TEST_MATRIX_SUBVIEWS_SOURCES)
-	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_SUBVIEWS_SOURCES) $(MAIN_TEST_POST) -o $@
+TEST_MATRIX_REDUC_SOURCES = \
+	test/matrix/test_matrix_reduction.cpp
+	
+$(BIN)/test_matrix_reduc: $(MATRIX_H) $(TEST_MATRIX_REDUC_SOURCES)
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_REDUC_SOURCES) $(MAIN_TEST_POST) -o $@
+	
 	
 	
 	

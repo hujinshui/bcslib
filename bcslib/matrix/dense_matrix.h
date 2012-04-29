@@ -13,7 +13,7 @@
 #ifndef BCSLIB_DENSE_MATRIX_H_
 #define BCSLIB_DENSE_MATRIX_H_
 
-#include <bcslib/matrix/matrix_base.h>
+#include <bcslib/matrix/matrix_assign.h>
 #include <bcslib/matrix/bits/dense_matrix_internal.h>
 
 namespace bcs
@@ -297,6 +297,19 @@ namespace bcs
 		}
 	};
 
+
+	template<typename T, int CTRows, int CTCols>
+	struct expr_evaluator<dense_matrix<T, CTRows, CTCols> >
+	{
+		typedef dense_matrix<T, CTRows, CTCols> expr_type;
+
+		template<class DMat>
+		BCS_ENSURE_INLINE
+		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, T>& dst)
+		{
+			copy(expr, dst.derived());
+		}
+	};
 
 
 	/********************************************

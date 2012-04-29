@@ -19,6 +19,8 @@
 
 #include <bcslib/core/basic_types.h>
 #include <bcslib/core/syntax.h>
+#include <bcslib/core/functor_base.h>
+
 #include <bcslib/core/scalar_math.h>
 #include <bcslib/core/range.h>
 

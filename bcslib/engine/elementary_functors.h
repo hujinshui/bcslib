@@ -14,7 +14,7 @@
 #ifndef BCSLIB_ELEMENTARY_FUNCTORS_H_
 #define BCSLIB_ELEMENTARY_FUNCTORS_H_
 
-#include <bcslib/core/basic_defs.h>
+#include <bcslib/core/functor_base.h>
 
 namespace bcs
 {
@@ -221,6 +221,28 @@ namespace bcs
 			return bcs::math::tanh(x);
 		}
 	};
+
+
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_sqrt )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_pow )
+
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_exp )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_log )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_log10 )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_floor )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_ceil )
+
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_sin )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_cos )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_tan )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_asin )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_acos )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_atan )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_sinh )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_cosh )
+	DECLARE_UNARY_EWISE_FUNCTOR( unary_tanh )
+
+	DECLARE_BINARY_EWISE_FUNCTOR( binary_atan2 )
 }
 
 #endif
