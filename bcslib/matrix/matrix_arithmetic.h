@@ -187,7 +187,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_negate<T>, Arg>
 	operator - (const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_negate<T>(), A);
+		return make_unary_ewise_expr(unary_negate<T>(), A.derived());
 	}
 
 	// rcp
@@ -197,7 +197,17 @@ namespace bcs
 	inline unary_ewise_expr<unary_rcp<T>, Arg>
 	rcp(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_rcp<T>(), A);
+		return make_unary_ewise_expr(unary_rcp<T>(), A.derived());
+	}
+
+	// abs
+
+	template<typename T, class Arg>
+	BCS_ENSURE_INLINE
+	inline unary_ewise_expr<unary_abs<T>, Arg>
+	abs(const IMatrixXpr<Arg, T>& A)
+	{
+		return make_unary_ewise_expr(unary_abs<T>(), A.derived());
 	}
 
 
@@ -208,7 +218,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_sqr<T>, Arg>
 	sqr(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_sqr<T>(), A);
+		return make_unary_ewise_expr(unary_sqr<T>(), A.derived());
 	}
 
 	// cube
@@ -218,10 +228,50 @@ namespace bcs
 	inline unary_ewise_expr<unary_cube<T>, Arg>
 	cube(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_cube<T>(), A);
+		return make_unary_ewise_expr(unary_cube<T>(), A.derived());
+	}
+
+	// min
+
+	template<typename T, class LArg, class RArg>
+	BCS_ENSURE_INLINE
+	inline binary_ewise_expr<binary_min<T>, LArg, RArg>
+	fmin(const IMatrixXpr<LArg, T>& A, const IMatrixXpr<RArg, T>& B)
+	{
+		return make_binary_ewise_expr(binary_min<T>(), A.derived(), B.derived());
+	}
+
+	template<typename T, class LArg>
+	BCS_ENSURE_INLINE
+	inline unary_ewise_expr<unary_min<T>, LArg>
+	fmin(const IMatrixXpr<LArg, T>& A, const T& b)
+	{
+		return make_unary_ewise_expr(unary_min<T>(b), A.derived());
+	}
+
+	// max
+
+	template<typename T, class LArg, class RArg>
+	BCS_ENSURE_INLINE
+	inline binary_ewise_expr<binary_max<T>, LArg, RArg>
+	fmax(const IMatrixXpr<LArg, T>& A, const IMatrixXpr<RArg, T>& B)
+	{
+		return make_binary_ewise_expr(binary_max<T>(), A.derived(), B.derived());
+	}
+
+	template<typename T, class LArg>
+	BCS_ENSURE_INLINE
+	inline unary_ewise_expr<unary_max<T>, LArg>
+	fmax(const IMatrixXpr<LArg, T>& A, const T& b)
+	{
+		return make_unary_ewise_expr(unary_max<T>(b), A.derived());
 	}
 
 
 }
 
 #endif /* MATRIX_ARITHMETIC_H_ */
+
+
+
+

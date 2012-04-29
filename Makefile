@@ -93,12 +93,15 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/ref_matrix.h \
 	$(INC)/matrix/ewise_matrix_expr.h \
 	$(INC)/matrix/matrix_arithmetic.h \
+	$(INC)/matrix/matrix_elfuns.h \
 	$(INC)/matrix/bits/matrix_helpers.h \
 	$(INC)/matrix/bits/matrix_manip_helpers.h \
 	$(INC)/matrix/bits/dense_matrix_internal.h \
 	$(INC)/matrix/bits/ref_matrix_internal.h \
 	$(INC)/matrix/bits/ewise_matrix_eval_internal.h \
-	$(INC)/matrix.h
+	$(INC)/matrix.h \
+	$(INC)/engine/arithmetic_functors.h \
+	$(INC)/engine/elementary_functors.h
 	
 
 #---------- Target groups -------------------
@@ -166,7 +169,8 @@ $(BIN)/test_matrix_basics: $(MATRIX_H) $(TEST_MATRIX_BASICS_SOURCES)
 
 TEST_MATRIX_EVAL_SOURCES = \
 	test/matrix/test_matrix_ewise.cpp \
-	test/matrix/test_matrix_arithmetic.cpp
+	test/matrix/test_matrix_arithmetic.cpp \
+	test/matrix/test_matrix_elfuns.cpp
 	
 $(BIN)/test_matrix_eval: $(MATRIX_H) $(TEST_MATRIX_EVAL_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_EVAL_SOURCES) $(MAIN_TEST_POST) -o $@

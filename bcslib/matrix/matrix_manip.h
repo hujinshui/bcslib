@@ -62,6 +62,57 @@ namespace bcs
 	}
 
 
+	// is_approx
+
+	template<typename T, class LMat, class RMat>
+	inline bool is_approx(const IMatrixView<LMat, T>& A, const IMatrixView<RMat, T>& B, const T& tol)
+	{
+		if (is_same_size(A, B))
+		{
+			index_t m = A.nrows();
+			index_t n = A.ncolumns();
+
+			for (index_t j = 0; j < n; ++j)
+				for (index_t i = 0; i < m; ++i)
+					if (bcs::math::abs(A.elem(i, j) - B.elem(i, j)) > tol) return false;
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+
+	template<typename T, class LMat, class RMat>
+	inline bool is_approx(const IDenseMatrix<LMat, T>& A, const IDenseMatrix<RMat, T>& B, const T& tol)
+	{
+		if (is_same_size(A, B))
+		{
+			index_t m = A.nrows();
+			index_t n = A.ncolumns();
+
+			const double *a = A.ptr_data();
+			const double *b = B.ptr_data();
+
+			for (index_t j = 0; j < n; ++j, a += A.lead_dim(), b += B.lead_dim())
+			{
+				for (index_t i = 0; i < m; ++i)
+				{
+					if (bcs::math::abs(a[i] - b[i]) > tol) return false;
+				}
+			}
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+
+
 	// copy
 
 	template<typename T, class SMat, class DMat>
