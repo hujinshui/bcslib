@@ -165,7 +165,8 @@ $(BIN)/test_matrix_basics: $(MATRIX_H) $(TEST_MATRIX_BASICS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
 
 TEST_MATRIX_EVAL_SOURCES = \
-	test/matrix/test_matrix_ewise.cpp
+	test/matrix/test_matrix_ewise.cpp \
+	test/matrix/test_matrix_arithmetic.cpp
 	
 $(BIN)/test_matrix_eval: $(MATRIX_H) $(TEST_MATRIX_EVAL_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_EVAL_SOURCES) $(MAIN_TEST_POST) -o $@
