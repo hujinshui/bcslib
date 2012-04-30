@@ -14,7 +14,6 @@
 #define BCSLIB_EWISE_MATRIX_EXPR_H_
 
 #include <bcslib/matrix/matrix_xpr.h>
-#include <bcslib/matrix/column_traverser.h>
 #include <bcslib/matrix/bits/ewise_matrix_eval_internal.h>
 
 namespace bcs
@@ -165,7 +164,7 @@ namespace bcs
 	template<typename Fun, typename T, class Arg>
 	BCS_ENSURE_INLINE
 	unary_ewise_expr<Fun, Arg>
-	make_unary_ewise_expr(const Fun& fun, const IMatrixXpr<Arg, T>& arg)
+	map_ewise(const Fun& fun, const IMatrixXpr<Arg, T>& arg)
 	{
 		return unary_ewise_expr<Fun, Arg>(fun, arg.derived());
 	}
@@ -174,7 +173,7 @@ namespace bcs
 	template<typename Fun, typename T, class LArg, class RArg>
 	BCS_ENSURE_INLINE
 	binary_ewise_expr<Fun, LArg, RArg>
-	make_binary_ewise_expr(const Fun& fun, const IMatrixXpr<LArg, T>& larg, const IMatrixXpr<RArg, T>& rarg)
+	map_ewise(const Fun& fun, const IMatrixXpr<LArg, T>& larg, const IMatrixXpr<RArg, T>& rarg)
 	{
 		return binary_ewise_expr<Fun, LArg, RArg>(fun, larg.derived(), rarg.derived());
 	}
@@ -187,105 +186,99 @@ namespace bcs
 	 ********************************************/
 
 	template<typename Fun, class Arg>
-	class column_traverser<unary_ewise_expr<Fun, Arg> >
+	class vecwise_reader<unary_ewise_expr<Fun, Arg> >
 	{
 	public:
 		typedef unary_ewise_expr<Fun, Arg> expr_type;
 		typedef typename matrix_traits<expr_type>::value_type value_type;
 
 		BCS_ENSURE_INLINE
-		column_traverser(const expr_type& expr)
+		vecwise_reader(const expr_type& expr)
 		: fun(expr.fun), arg_traverser(expr.arg)
 		{
 		}
 
-		BCS_ENSURE_INLINE value_type operator[] (index_t i) const
+		BCS_ENSURE_INLINE value_type load_scalar(index_t i) const
 		{
-			return fun(arg_traverser[i]);
+			return fun(arg_traverser.load_scalar(i));
 		}
 
-		BCS_ENSURE_INLINE column_traverser& operator ++ ()
+		BCS_ENSURE_INLINE void operator ++ ()
 		{
 			++ arg_traverser;
-			return *this;
 		}
 
-		BCS_ENSURE_INLINE column_traverser& operator -- ()
+		BCS_ENSURE_INLINE void operator -- ()
 		{
 			-- arg_traverser;
-			return *this;
 		}
 
-		BCS_ENSURE_INLINE column_traverser& operator += (index_t n)
+		BCS_ENSURE_INLINE void operator += (index_t n)
 		{
 			arg_traverser += n;
-			return *this;
 		}
 
-		BCS_ENSURE_INLINE column_traverser& operator -= (index_t n)
+		BCS_ENSURE_INLINE void operator -= (index_t n)
 		{
 			arg_traverser -= n;
-			return *this;
 		}
 
 	private:
 		Fun fun;
-		column_traverser<Arg> arg_traverser;
+		vecwise_reader<Arg> arg_traverser;
 	};
 
 
 	template<typename Fun, class LArg, class RArg>
-	class column_traverser<binary_ewise_expr<Fun, LArg, RArg> >
+	class vecwise_reader<binary_ewise_expr<Fun, LArg, RArg> >
 	{
 	public:
 		typedef binary_ewise_expr<Fun, LArg, RArg> expr_type;
 		typedef typename matrix_traits<expr_type>::value_type value_type;
 
 		BCS_ENSURE_INLINE
-		column_traverser(const expr_type& expr)
+		vecwise_reader(const expr_type& expr)
 		: fun(expr.fun)
 		, left_arg_traverser(expr.left_arg)
 		, right_arg_traverser(expr.right_arg)
 		{
 		}
 
-		BCS_ENSURE_INLINE value_type operator[] (index_t i) const
+		BCS_ENSURE_INLINE value_type load_scalar(index_t i) const
 		{
-			return fun(left_arg_traverser[i], right_arg_traverser[i]);
+			return fun(
+					left_arg_traverser.load_scalar(i),
+					right_arg_traverser.load_scalar(i));
 		}
 
-		BCS_ENSURE_INLINE column_traverser& operator ++ ()
+		BCS_ENSURE_INLINE void operator ++ ()
 		{
 			++ left_arg_traverser;
 			++ right_arg_traverser;
-			return *this;
 		}
 
-		BCS_ENSURE_INLINE column_traverser& operator -- ()
+		BCS_ENSURE_INLINE void operator -- ()
 		{
 			-- left_arg_traverser;
 			-- right_arg_traverser;
-			return *this;
 		}
 
-		BCS_ENSURE_INLINE column_traverser& operator += (index_t n)
+		BCS_ENSURE_INLINE void operator += (index_t n)
 		{
 			left_arg_traverser += n;
 			right_arg_traverser += n;
-			return *this;
 		}
 
-		BCS_ENSURE_INLINE column_traverser& operator -= (index_t n)
+		BCS_ENSURE_INLINE void operator -= (index_t n)
 		{
 			left_arg_traverser -= n;
 			right_arg_traverser -= n;
-			return *this;
 		}
 
 	private:
 		Fun fun;
-		column_traverser<LArg> left_arg_traverser;
-		column_traverser<RArg> right_arg_traverser;
+		vecwise_reader<LArg> left_arg_traverser;
+		vecwise_reader<RArg> right_arg_traverser;
 	};
 
 

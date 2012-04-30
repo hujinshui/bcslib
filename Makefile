@@ -89,7 +89,7 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/matrix_xpr.h \
 	$(INC)/matrix/matrix_subviews.h \
 	$(INC)/matrix/matrix_manip.h \
-	$(INC)/matrix/column_traverser.h \
+	$(INC)/matrix/vector_proxy.h \
 	$(INC)/matrix/matrix_assign.h \
 	$(INC)/matrix/dense_matrix.h \
 	$(INC)/matrix/ref_matrix.h \
@@ -97,10 +97,12 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/matrix_arithmetic.h \
 	$(INC)/matrix/matrix_elfuns.h \
 	$(INC)/matrix/matrix_reduction.h \
-	$(INC)/matrix/matrix_partial_reduction_expr.h \
+	$(INC)/matrix/slicewise_proxy.h \
+	$(INC)/matrix/matrix_par_reduc_expr.h \
 	$(INC)/matrix/bits/matrix_helpers.h \
 	$(INC)/matrix/bits/matrix_subviews_helper.h \
 	$(INC)/matrix/bits/matrix_manip_helpers.h \
+	$(INC)/matrix/bits/vecwise_internal.h \
 	$(INC)/matrix/bits/dense_matrix_internal.h \
 	$(INC)/matrix/bits/ref_matrix_internal.h \
 	$(INC)/matrix/bits/ewise_matrix_eval_internal.h \

@@ -14,10 +14,37 @@
 #define BCSLIB_REDUCTION_FUNCTORS_H_
 
 #include <bcslib/core/basic_defs.h>
-#include <limits>
+#include <bcslib/utils/arg_check.h>
 
 namespace bcs
 {
+	/*********************************************************************
+	 *
+	 *  Reduction functor concept
+	 *  -------------------------
+	 *
+	 *  Typedef:
+	 *
+	 *  argument_type
+	 *  accum_type
+	 *  result_type
+	 *
+	 *
+	 *  Methods:
+	 *
+	 *  fun(); 	--> result on an empty array (result_type)
+	 *
+	 *  fun(a); --> initialize the accumulator (accum_type)
+	 *
+	 *  fun(a, x); --> merge a new element to the accumulator (accum_type)
+	 *
+	 *  fun.combine(a1, a2); --> merge two accumulators (accum_type)
+	 *
+	 *  fun.get(a, n); --> get the final result (result_type)
+	 *
+	 *
+	 *********************************************************************/
+
 
 
 	/********************************************
@@ -33,8 +60,6 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = true;
-
 		BCS_ENSURE_INLINE
 		T operator() () const { return 0; }
 
@@ -43,6 +68,9 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x) const { return a + x; }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return a + a2; }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return a; }
@@ -56,13 +84,17 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = false;
+		BCS_ENSURE_INLINE
+		T operator() () const { throw invalid_operation("Attempted to get the mean of an empty array."); }
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& x) const { return x; }
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x) const { return a + x; }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return a + a2; }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t n) const { return a / n; }
@@ -76,13 +108,17 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = false;
+		BCS_ENSURE_INLINE
+		T operator() () const { throw invalid_operation("Attempted to get the minimum of an empty array."); }
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& x) const { return x; }
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x) const { return bcs::min(a, x); }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return bcs::min(a, a2); }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return a; }
@@ -96,13 +132,17 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = false;
+		BCS_ENSURE_INLINE
+		T operator() () const { throw invalid_operation("Attempted to get the maximum of an empty array."); }
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& x) const { return x; }
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x) const { return bcs::max(a, x); }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return bcs::max(a, a2); }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return a; }
@@ -122,8 +162,6 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = true;
-
 		BCS_ENSURE_INLINE
 		T operator() () const { return 0; }
 
@@ -132,6 +170,9 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x) const { return a + math::abs(x); }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return a + a2; }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return a; }
@@ -144,8 +185,6 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = true;
-
 		BCS_ENSURE_INLINE
 		T operator() () const { return 0; }
 
@@ -154,6 +193,9 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x) const { return a + math::sqr(x); }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return a + a2; }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return a; }
@@ -167,8 +209,6 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = true;
-
 		BCS_ENSURE_INLINE
 		T operator() () const { return 0; }
 
@@ -177,6 +217,9 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x) const { return a + math::sqr(x); }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return a + a2; }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return math::sqrt(a); }
@@ -190,8 +233,6 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = true;
-
 		BCS_ENSURE_INLINE
 		T operator() () const { return 0; }
 
@@ -200,6 +241,9 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x) const { return bcs::max(a, math::abs(x)); }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return bcs::max(a, a2); }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return a; }
@@ -219,8 +263,6 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = true;
-
 		BCS_ENSURE_INLINE
 		T operator() () const { return 0; }
 
@@ -229,6 +271,9 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x, const T& y) const { return a + x * y; }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return a + a2; }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return a; }
@@ -242,8 +287,6 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = true;
-
 		BCS_ENSURE_INLINE
 		T operator() () const { return 0; }
 
@@ -252,6 +295,9 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x, const T& y) const { return a + math::abs(x - y); }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return a + a2; }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return a; }
@@ -264,8 +310,6 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = true;
-
 		BCS_ENSURE_INLINE
 		T operator() () const { return 0; }
 
@@ -274,6 +318,9 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x, const T& y) const { return a + math::sqr(x - y); }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return a + a2; }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return a; }
@@ -287,8 +334,6 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = true;
-
 		BCS_ENSURE_INLINE
 		T operator() () const { return 0; }
 
@@ -297,6 +342,9 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x, const T& y) const { return a + math::sqr(x - y); }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return a + a2; }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return math::sqrt(a); }
@@ -310,8 +358,6 @@ namespace bcs
 		typedef T accum_type;
 		typedef T result_type;
 
-		static const bool has_empty_value = true;
-
 		BCS_ENSURE_INLINE
 		T operator() () const { return 0; }
 
@@ -320,6 +366,9 @@ namespace bcs
 
 		BCS_ENSURE_INLINE
 		T operator() (const T& a, const T& x, const T& y) const { return bcs::max(a, math::abs(x - y)); }
+
+		BCS_ENSURE_INLINE
+		T combine (const T& a, const T& a2) const { return bcs::max(a, a2); }
 
 		BCS_ENSURE_INLINE
 		T get(const T& a, const index_t) const { return a; }

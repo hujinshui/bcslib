@@ -14,7 +14,7 @@
 #define MATRIX_REDUCTION_INTERNAL_H_
 
 #include <bcslib/matrix/dense_matrix.h>
-#include <bcslib/matrix/column_traverser.h>
+#include <bcslib/matrix/vector_proxy.h>
 
 namespace bcs { namespace detail {
 
@@ -39,19 +39,19 @@ namespace bcs { namespace detail {
 				index_t m = A.nrows();
 				index_t n = A.ncolumns();
 
-				column_traverser<Mat> vec_a(A.derived());
+				vecwise_reader<Mat> vec_a(A.derived());
 
 				if (m > 1)
 				{
-					accum_t s = reduc(vec_a[0]);
-					for (index_t i = 1; i < m; ++i) s = reduc(s, vec_a[i]);
+					accum_t s = accum_vec(reduc, m, vec_a);
 
 					if (n > 1)
 					{
 						++ vec_a;
 						for (index_t j = 1; j < n; ++j, ++vec_a)
 						{
-							for (index_t i = 0; i < m; ++i) s = reduc(s, vec_a[i]);
+							accum_t sj = accum_vec(reduc, m, vec_a);
+							s = reduc.combine(s, sj);
 						}
 					}
 
@@ -59,12 +59,13 @@ namespace bcs { namespace detail {
 				}
 				else // m == 1
 				{
-					accum_t s = reduc(vec_a[0]);
+					accum_t s = reduc(vec_a.load_scalar(0));
 
 					if (n > 1)
 					{
 						++ vec_a;
-						for (index_t j = 1; j < n; ++j, ++vec_a) s = reduc(s, vec_a[0]);
+						for (index_t j = 1; j < n; ++j, ++vec_a)
+							s = reduc(s, vec_a.load_scalar(0));
 					}
 
 					return reduc.get(s, n);
@@ -72,7 +73,7 @@ namespace bcs { namespace detail {
 			}
 			else
 			{
-				return bcs::empty_reduc_result_of<Reductor>::get(reduc);
+				return reduc();
 			}
 		}
 	};
@@ -98,21 +99,22 @@ namespace bcs { namespace detail {
 				index_t m = A.nrows();
 				index_t n = A.ncolumns();
 
-				column_traverser<LMat> vec_a(A.derived());
-				column_traverser<RMat> vec_b(B.derived());
+				vecwise_reader<LMat> vec_a(A.derived());
+				vecwise_reader<RMat> vec_b(B.derived());
 
 				if (m > 1)
 				{
-					accum_t s = reduc(vec_a[0], vec_b[0]);
-					for (index_t i = 1; i < m; ++i) s = reduc(s, vec_a[i], vec_b[i]);
+					accum_t s = accum_vec(reduc, m, vec_a, vec_b);
 
 					if (n > 1)
 					{
 						++ vec_a;
 						++ vec_b;
+
 						for (index_t j = 1; j < n; ++j, ++vec_a, ++vec_b)
 						{
-							for (index_t i = 0; i < m; ++i) s = reduc(s, vec_a[i], vec_b[i]);
+							accum_t sj = accum_vec(reduc, m, vec_a, vec_b);
+							s = reduc.combine(s, sj);
 						}
 					}
 
@@ -120,13 +122,15 @@ namespace bcs { namespace detail {
 				}
 				else // m == 1
 				{
-					accum_t s = reduc(vec_a[0], vec_b[0]);
+					accum_t s = reduc(vec_a.load_scalar(0), vec_b.load_scalar(0));
 
 					if (n > 1)
 					{
 						++ vec_a;
 						++ vec_b;
-						for (index_t j = 1; j < n; ++j, ++vec_a, ++vec_b) s = reduc(s, vec_a[0], vec_b[0]);
+
+						for (index_t j = 1; j < n; ++j, ++vec_a, ++vec_b)
+							s = reduc(s, vec_a.load_scalar(0), vec_b.load_scalar(0));
 					}
 
 					return reduc.get(s, n);
@@ -134,7 +138,7 @@ namespace bcs { namespace detail {
 			}
 			else
 			{
-				return bcs::empty_reduc_result_of<Reductor>::get(reduc);
+				return reduc();
 			}
 		}
 	};

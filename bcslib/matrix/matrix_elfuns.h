@@ -23,7 +23,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_sqrt<T>, Arg>
 	sqrt(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_sqrt<T>(), A.derived());
+		return map_ewise(unary_sqrt<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -31,7 +31,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_pow<T>, Arg>
 	pow(const IMatrixXpr<Arg, T>& A, const T& e)
 	{
-		return make_unary_ewise_expr(unary_pow<T>(e), A.derived());
+		return map_ewise(unary_pow<T>(e), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -39,7 +39,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_exp<T>, Arg>
 	exp(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_exp<T>(), A.derived());
+		return map_ewise(unary_exp<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -47,7 +47,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_log<T>, Arg>
 	log(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_log<T>(), A.derived());
+		return map_ewise(unary_log<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -55,7 +55,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_log10<T>, Arg>
 	log10(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_log10<T>(), A.derived());
+		return map_ewise(unary_log10<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -63,7 +63,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_floor<T>, Arg>
 	floor(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_floor<T>(), A.derived());
+		return map_ewise(unary_floor<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -71,7 +71,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_ceil<T>, Arg>
 	ceil(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_ceil<T>(), A.derived());
+		return map_ewise(unary_ceil<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -79,7 +79,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_sin<T>, Arg>
 	sin(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_sin<T>(), A.derived());
+		return map_ewise(unary_sin<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -87,7 +87,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_cos<T>, Arg>
 	cos(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_cos<T>(), A.derived());
+		return map_ewise(unary_cos<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -95,7 +95,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_tan<T>, Arg>
 	tan(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_tan<T>(), A.derived());
+		return map_ewise(unary_tan<T>(), A.derived());
 	}
 
 
@@ -104,7 +104,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_asin<T>, Arg>
 	asin(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_asin<T>(), A.derived());
+		return map_ewise(unary_asin<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -112,7 +112,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_acos<T>, Arg>
 	acos(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_acos<T>(), A.derived());
+		return map_ewise(unary_acos<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -120,7 +120,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_atan<T>, Arg>
 	atan(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_atan<T>(), A.derived());
+		return map_ewise(unary_atan<T>(), A.derived());
 	}
 
 	template<typename T, class LArg, class RArg>
@@ -128,7 +128,7 @@ namespace bcs
 	inline binary_ewise_expr<binary_atan2<T>, LArg, RArg>
 	atan2(const IMatrixXpr<LArg, T>& A, const IMatrixXpr<RArg, T>& B)
 	{
-		return make_binary_ewise_expr(binary_atan2<T>(), A.derived(), B.derived());
+		return map_ewise(binary_atan2<T>(), A.derived(), B.derived());
 	}
 
 	template<typename T, class Arg>
@@ -136,7 +136,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_sinh<T>, Arg>
 	sinh(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_sinh<T>(), A.derived());
+		return map_ewise(unary_sinh<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -144,7 +144,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_cosh<T>, Arg>
 	cosh(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_cosh<T>(), A.derived());
+		return map_ewise(unary_cosh<T>(), A.derived());
 	}
 
 	template<typename T, class Arg>
@@ -152,7 +152,7 @@ namespace bcs
 	inline unary_ewise_expr<unary_tanh<T>, Arg>
 	tanh(const IMatrixXpr<Arg, T>& A)
 	{
-		return make_unary_ewise_expr(unary_tanh<T>(), A.derived());
+		return map_ewise(unary_tanh<T>(), A.derived());
 	}
 
 
