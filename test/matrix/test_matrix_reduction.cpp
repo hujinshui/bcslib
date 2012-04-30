@@ -43,7 +43,7 @@ void test_sum_on_densemat(const index_t m, const index_t n)
 	dense_matrix<double, CTRows, CTCols> mat(m, n);
 
 	for (index_t j = 0; j < n; ++j)
-		for (index_t i = 0; i < m; ++i) mat(i, j) = (i+1) + j * m;
+		for (index_t i = 0; i < m; ++i) mat(i, j) = double((i+1) + j * m);
 
 	test_sum(mat);
 }
@@ -159,7 +159,7 @@ struct vec_mean_ftor
 	{
 		double s = 0;
 		for (index_t i = 0; i < n; ++i) s += a[i];
-		return s / n;
+		return s / double(n);
 	}
 };
 
@@ -177,7 +177,7 @@ void test_mean_on_densemat(const index_t m, const index_t n)
 	dense_matrix<double, CTRows, CTCols> mat(m, n);
 
 	for (index_t j = 0; j < n; ++j)
-		for (index_t i = 0; i < m; ++i) mat(i, j) = (i+1) + j * m;
+		for (index_t i = 0; i < m; ++i) mat(i, j) = double((i+1) + j * m);
 
 	test_mean(mat);
 }
@@ -232,7 +232,7 @@ TEST( MatrixReduction, MeanDenseMat11 )
 TEST( MatrixReduction, MatMaxVal )
 {
 	mat_f64 A(4, 5);
-	for (index_t i = 0; i < A.nelems(); ++i) A[i] = (i+1);
+	for (index_t i = 0; i < A.nelems(); ++i) A[i] = double(i+1);
 
 	double v0 = 20.0;
 	ASSERT_EQ(v0, max_val(A));
@@ -241,7 +241,7 @@ TEST( MatrixReduction, MatMaxVal )
 TEST( MatrixReduction, MatMinVal )
 {
 	mat_f64 A(4, 5);
-	for (index_t i = 0; i < A.nelems(); ++i) A[i] = (i+1);
+	for (index_t i = 0; i < A.nelems(); ++i) A[i] = double(i+1);
 
 	double v0 = 1.0;
 	ASSERT_EQ(v0, min_val(A));
@@ -251,7 +251,7 @@ TEST( MatrixReduction, MatL1Norm )
 {
 	mat_f64 A(4, 5);
 	for (index_t i = 0; i < A.nelems(); ++i)
-		A[i] = (i+1) * (i % 2 == 0 ? 1.0 : -1.0);
+		A[i] = double(i+1) * (i % 2 == 0 ? 1.0 : -1.0);
 
 	double v0 = 210;
 	ASSERT_EQ(v0, L1norm(A));
@@ -261,7 +261,7 @@ TEST( MatrixReduction, MatSqL2Norm )
 {
 	mat_f64 A(4, 5);
 	for (index_t i = 0; i < A.nelems(); ++i)
-		A[i] = (i+1) * (i % 2 == 0 ? 1.0 : -1.0);
+		A[i] = double(i+1) * (i % 2 == 0 ? 1.0 : -1.0);
 
 	double v0 = 2870;
 	ASSERT_EQ(v0, sqL2norm(A));
@@ -271,7 +271,7 @@ TEST( MatrixReduction, MatL2Norm )
 {
 	mat_f64 A(4, 5);
 	for (index_t i = 0; i < A.nelems(); ++i)
-		A[i] = (i+1) * (i % 2 == 0 ? 1.0 : -1.0);
+		A[i] = double(i+1) * (i % 2 == 0 ? 1.0 : -1.0);
 
 	double v0 = math::sqrt(2870.0);
 	ASSERT_NEAR(v0, L2norm(A), 1.0e-14);
@@ -282,7 +282,7 @@ TEST( MatrixReduction, MatLinfNorm )
 {
 	mat_f64 A(4, 5);
 	for (index_t i = 0; i < A.nelems(); ++i)
-		A[i] = (i+1) * (i % 2 == 0 ? 1.0 : -1.0);
+		A[i] = double(i+1) * (i % 2 == 0 ? 1.0 : -1.0);
 
 	double v0 = 20;
 	ASSERT_EQ(v0, Linfnorm(A));
@@ -327,8 +327,8 @@ void test_dot_on_densemat(const index_t m, const index_t n)
 	for (index_t j = 0; j < n; ++j)
 		for (index_t i = 0; i < m; ++i)
 		{
-			a(i, j) = (i+1) + j * m;
-			b(i, j) = (i+2) + j * m;
+			a(i, j) = double((i+1) + j * m);
+			b(i, j) = double((i+2) + j * m);
 		}
 
 	test_dot(a, b);
@@ -345,7 +345,7 @@ void test_dot_on_refex_mat(const index_t m, const index_t n)
 
 	for (index_t i = 0; i < a.nelems(); ++i)
 	{
-		a[i] = i + 2;
+		a[i] = double(i + 2);
 		b[i] = a[i] + 1;
 	}
 
@@ -460,8 +460,8 @@ TEST( MatrixReduction, MatL1NormDiff )
 
 	for (index_t i = 0; i < A.nelems(); ++i)
 	{
-		A[i] = (i+1);
-		B[i] = 12 - A[i] * 2;
+		A[i] = double(i+1);
+		B[i] = 12.0 - A[i] * 2.0;
 	}
 
 	double v0 = 426;
@@ -476,8 +476,8 @@ TEST( MatrixReduction, MatSqL2NormDiff )
 
 	for (index_t i = 0; i < A.nelems(); ++i)
 	{
-		A[i] = (i+1);
-		B[i] = 12 - A[i] * 2;
+		A[i] = double(i+1);
+		B[i] = 12.0 - A[i] * 2.0;
 	}
 
 	double v0 = 13590;
@@ -491,8 +491,8 @@ TEST( MatrixReduction, MatL2NormDiff )
 
 	for (index_t i = 0; i < A.nelems(); ++i)
 	{
-		A[i] = (i+1);
-		B[i] = 12 - A[i] * 2;
+		A[i] = double(i+1);
+		B[i] = 12.0 - A[i] * 2.0;
 	}
 
 	double v0 = math::sqrt(13590.0);
@@ -507,8 +507,8 @@ TEST( MatrixReduction, MatLinfNormDiff )
 
 	for (index_t i = 0; i < A.nelems(); ++i)
 	{
-		A[i] = (i+1);
-		B[i] = 12 - A[i] * 2;
+		A[i] = double(i+1);
+		B[i] = 12.0 - A[i] * 2.0;
 	}
 
 	double v0 = 48;

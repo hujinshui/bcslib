@@ -17,8 +17,8 @@ void test_matrix_equal(index_t m, index_t n, index_t ldim)
 	scoped_block<double> blk_a(ldim * n);
 	scoped_block<double> blk_b(ldim * n);
 
-	for (index_t i = 0; i < ldim * n; ++i) blk_a[i] = (i+1);
-	for (index_t i = 0; i < ldim * n; ++i) blk_b[i] = (i+1);
+	for (index_t i = 0; i < ldim * n; ++i) blk_a[i] = double(i+1);
+	for (index_t i = 0; i < ldim * n; ++i) blk_b[i] = double(i+1);
 
 	double *pa = blk_a.ptr_begin();
 	double *pb = blk_b.ptr_begin();
@@ -87,7 +87,7 @@ void test_matrix_copy(index_t m, index_t n, index_t ldim)
 	scoped_block<double> blk_b(ldim * n);
 	scoped_block<double> blk_r(ldim * n);
 
-	for (index_t i = 0; i < ldim * n; ++i) blk_a[i] = (i+1);
+	for (index_t i = 0; i < ldim * n; ++i) blk_a[i] = double(i+1);
 	for (index_t i = 0; i < ldim * n; ++i) blk_b[i] = 0;
 
 	for (index_t i = 0; i < ldim * n; ++i) blk_r[i] = 0;

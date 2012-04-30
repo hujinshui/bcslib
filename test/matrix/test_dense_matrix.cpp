@@ -111,7 +111,7 @@ static void test_dense_matrix(index_t m, index_t n)
 	double* p1 = a1.ptr_data();
 
 	for (index_t j = 0; j < n; ++j)
-		for (index_t i = 0; i < m; ++i) p1[i + j * m] = i + j * 1000;
+		for (index_t i = 0; i < m; ++i) p1[i + j * m] = double(i + j * 1000);
 
 	bool elem_access_ok = true;
 
@@ -192,8 +192,8 @@ static void test_dense_matrix_swap_and_resize(index_t m1, index_t n1, index_t m2
 	scoped_block<double> src1_blk(m1 * n1);
 	scoped_block<double> src2_blk(m2 * n2);
 
-	for (index_t i = 0; i < m1 * n1; ++i) src1_blk[i] = (i+1);
-	for (index_t i = 0; i < m2 * n2; ++i) src2_blk[i] = 2 * (i+1);
+	for (index_t i = 0; i < m1 * n1; ++i) src1_blk[i] = double(i+1);
+	for (index_t i = 0; i < m2 * n2; ++i) src2_blk[i] = double(2 * (i+1));
 
 	const double *src1 = src1_blk.ptr_begin();
 	const double *src2 = src2_blk.ptr_begin();
@@ -280,7 +280,7 @@ template<int CTLen>
 void test_dense_col(index_t len)
 {
 	scoped_block<double> src_blk(len);
-	for (index_t i = 0; i < len; ++i) src_blk[i] = (i+1);
+	for (index_t i = 0; i < len; ++i) src_blk[i] = double(i+1);
 	const double *src = src_blk.ptr_begin();
 
 	dense_col<double, CTLen> v0;
@@ -327,7 +327,7 @@ template<int CTLen>
 void test_dense_row(index_t len)
 {
 	scoped_block<double> src_blk(len);
-	for (index_t i = 0; i < len; ++i) src_blk[i] = (i+1);
+	for (index_t i = 0; i < len; ++i) src_blk[i] = double(i+1);
 	const double *src = src_blk.ptr_begin();
 
 	dense_row<double, CTLen> v0;

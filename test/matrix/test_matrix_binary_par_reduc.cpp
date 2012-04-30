@@ -61,8 +61,8 @@ void test_slicewise_dot_on_dense(index_t m, index_t n)
 
 	for (index_t i = 0; i < m * n; ++i)
 	{
-		A[i] = (3 * i + 2);
-		B[i] = i + 1;
+		A[i] = double(3 * i + 2);
+		B[i] = double(i + 1);
 	}
 
 	test_slicewise_dot(A, B);
@@ -78,8 +78,8 @@ void test_slicewise_dot_on_refex(index_t m, index_t n)
 
 	for (index_t i = 0; i < ldim * n; ++i)
 	{
-		Amat[i] = (3 * i + 2);
-		Bmat[i] = i + 1;
+		Amat[i] = double(3 * i + 2);
+		Bmat[i] = double(i + 1);
 	}
 
 	ref_matrix_ex<double, CTRows, CTCols> A(Amat.ptr_data(), m, n, ldim);
@@ -190,8 +190,8 @@ TEST( MatrixBinaryParReduc, SliceWiseL1NormDiff )
 
 	for (index_t i = 0; i < m * n; ++i)
 	{
-		Amat[i] = (3 * i + 2);
-		Bmat[i] = 60 - i;
+		Amat[i] = double(3 * i + 2);
+		Bmat[i] = double(60 - i);
 	}
 
 	const IMatrixXpr<dense_matrix<double>, double>& A = Amat;
@@ -231,8 +231,8 @@ TEST( MatrixBinaryParReduc, SliceWiseSqL2NormDiff )
 
 	for (index_t i = 0; i < m * n; ++i)
 	{
-		Amat[i] = (3 * i + 2);
-		Bmat[i] = 60 - i;
+		Amat[i] = double(3 * i + 2);
+		Bmat[i] = double(60 - i);
 	}
 
 	const IMatrixXpr<dense_matrix<double>, double>& A = Amat;
@@ -302,8 +302,8 @@ void test_slicewise_L2norm_diff_on_dense(index_t m, index_t n)
 
 	for (index_t i = 0; i < m * n; ++i)
 	{
-		A[i] = (3 * i + 2);
-		B[i] = 60 - i;
+		A[i] = double(3 * i + 2);
+		B[i] = double(60 - i);
 	}
 
 	test_slicewise_L2norm_diff(A, B);
@@ -316,8 +316,8 @@ void test_slicewise_L2norm_diff_on_refex(index_t m, index_t n)
 	index_t ldim = m + 2;
 	dense_matrix<double> Amat(ldim, n);
 	dense_matrix<double> Bmat(ldim, n);
-	for (index_t i = 0; i < ldim * n; ++i) Amat[i] = (3 * i + 2);
-	for (index_t i = 0; i < ldim * n; ++i) Bmat[i] = (60 - i);
+	for (index_t i = 0; i < ldim * n; ++i) Amat[i] = double(3 * i + 2);
+	for (index_t i = 0; i < ldim * n; ++i) Bmat[i] = double(60 - i);
 
 	ref_matrix_ex<double, CTRows, CTCols> A(Amat.ptr_data(), m, n, ldim);
 	ref_matrix_ex<double, CTRows, CTCols> B(Bmat.ptr_data(), m, n, ldim);
@@ -426,8 +426,8 @@ TEST( MatrixBinaryParReduc, SliceWiseLinfNormDiff )
 
 	for (index_t i = 0; i < m * n; ++i)
 	{
-		Amat[i] = (3 * i + 2);
-		Bmat[i] = 60 - i;
+		Amat[i] = double(3 * i + 2);
+		Bmat[i] = double(60 - i);
 	}
 
 	const IMatrixXpr<dense_matrix<double>, double>& A = Amat;

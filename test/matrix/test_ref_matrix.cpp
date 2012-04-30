@@ -101,7 +101,7 @@ template<class Mat>
 static void test_ref_matrix(index_t m, index_t n)
 {
 	scoped_block<double> origin_blk(m * n);
-	for (index_t i = 0; i < m * n; ++i) origin_blk[i] = (i+1);
+	for (index_t i = 0; i < m * n; ++i) origin_blk[i] = double(i+1);
 	double *origin = origin_blk.ptr_begin();
 
 	// test construction
@@ -115,7 +115,7 @@ template<class Vec>
 static void test_ref_vector(index_t m, index_t n)
 {
 	scoped_block<double> origin_blk(m * n);
-	for (index_t i = 0; i < m * n; ++i) origin_blk[i] = (i+1);
+	for (index_t i = 0; i < m * n; ++i) origin_blk[i] = double(i+1);
 	double *origin = origin_blk.ptr_begin();
 
 	// test construction
@@ -136,7 +136,7 @@ static void test_ref_matrix_ex(index_t m, index_t n, index_t ldim)
 
 
 	scoped_block<double> origin_blk(ldim * n);
-	for (index_t i = 0; i < ldim * n; ++i) origin_blk[i] = (i+1);
+	for (index_t i = 0; i < ldim * n; ++i) origin_blk[i] = double(i+1);
 	double *origin = origin_blk.ptr_begin();
 
 	// test construction

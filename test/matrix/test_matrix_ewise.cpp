@@ -21,21 +21,26 @@ using namespace bcs;
 
 class MyConstMat;
 
-template<>
-struct matrix_traits<MyConstMat>
+namespace bcs
 {
-	static const int num_dimensions = 2;
-	static const int compile_time_num_rows = DynamicDim;
-	static const int compile_time_num_cols = DynamicDim;
 
-	static const bool is_linear_indexable = false;
-	static const bool is_continuous = false;
-	static const bool is_sparse = false;
-	static const bool is_readonly = true;
+	template<>
+	struct matrix_traits<MyConstMat>
+	{
+		static const int num_dimensions = 2;
+		static const int compile_time_num_rows = DynamicDim;
+		static const int compile_time_num_cols = DynamicDim;
 
-	typedef double value_type;
-	typedef index_t index_type;
-};
+		static const bool is_linear_indexable = false;
+		static const bool is_continuous = false;
+		static const bool is_sparse = false;
+		static const bool is_readonly = true;
+
+		typedef double value_type;
+		typedef index_t index_type;
+	};
+
+}
 
 class MyConstMat : public IMatrixXpr<MyConstMat, double>
 {
@@ -75,29 +80,34 @@ private:
 };
 
 
-template<>
-struct expr_optimizer<MyConstMat>
+namespace bcs
 {
-	typedef MyConstMat result_expr_type;
 
-	BCS_ENSURE_INLINE
-	static const result_expr_type& optimize(const MyConstMat& e)
+	template<>
+	struct expr_optimizer<MyConstMat>
 	{
-		return e;
-	}
-};
+		typedef MyConstMat result_expr_type;
+
+		BCS_ENSURE_INLINE
+		static const result_expr_type& optimize(const MyConstMat& e)
+		{
+			return e;
+		}
+	};
 
 
-template<>
-struct expr_evaluator<MyConstMat>
-{
-	template<class DMap>
-	BCS_ENSURE_INLINE
-	static void evaluate(const MyConstMat& e, IRegularMatrix<DMap, double>& dst)
+	template<>
+	struct expr_evaluator<MyConstMat>
 	{
-		fill(dst, e.scalar());
-	}
-};
+		template<class DMap>
+		BCS_ENSURE_INLINE
+		static void evaluate(const MyConstMat& e, IRegularMatrix<DMap, double>& dst)
+		{
+			fill(dst, e.scalar());
+		}
+	};
+
+}
 
 
 /************************************************
@@ -113,10 +123,10 @@ TEST( MatrixEWise, UnaryforDenseMat )
 	const index_t n = 4;
 
 	mat_f64 A(m, n);
-	for (index_t i = 0; i < m * n; ++i) A[i] = (i+1);
+	for (index_t i = 0; i < m * n; ++i) A[i] = double(i+1);
 
 	mat_f64 C0(m, n);
-	for (index_t i = 0; i < m * n; ++i) C0[i] = (i+1) * (i+1);
+	for (index_t i = 0; i < m * n; ++i) C0[i] = double((i+1) * (i+1));
 
 	mat_f64 C = sqr(A);
 
@@ -192,13 +202,13 @@ TEST( MatrixEWise, BinaryforDenseMatWithDenseMat )
 	const index_t n = 4;
 
 	mat_f64 A(m, n);
-	for (index_t i = 0; i < m * n; ++i) A[i] = (i+1);
+	for (index_t i = 0; i < m * n; ++i) A[i] = double(i+1);
 
 	mat_f64 B(m, n);
-	for (index_t i = 0; i < m * n; ++i) B[i] = (i+1) * 2;
+	for (index_t i = 0; i < m * n; ++i) B[i] = double((i+1) * 2);
 
 	mat_f64 C0(m, n);
-	for (index_t i = 0; i < m * n; ++i) C0[i] = (i+1) * 3;
+	for (index_t i = 0; i < m * n; ++i) C0[i] = double((i+1) * 3);
 
 	mat_f64 C = A + B;
 
@@ -232,13 +242,13 @@ TEST( MatrixEWise, BinaryforDenseMatWithNewMat )
 	const index_t n = 4;
 
 	mat_f64 A(m, n);
-	for (index_t i = 0; i < m * n; ++i) A[i] = (i+1);
+	for (index_t i = 0; i < m * n; ++i) A[i] = double(i+1);
 
 	const double cval = 3.0;
 	MyConstMat B(m, n, cval);
 
 	mat_f64 C0(m, n);
-	for (index_t i = 0; i < m * n; ++i) C0[i] = (i+1) + cval;
+	for (index_t i = 0; i < m * n; ++i) C0[i] = double(i+1) + cval;
 
 	mat_f64 C = A + B;
 
@@ -275,10 +285,10 @@ TEST( MatrixEWise, BinaryforNewMatWithDenseMat )
 	MyConstMat A(m, n, cval);
 
 	mat_f64 B(m, n);
-	for (index_t i = 0; i < m * n; ++i) B[i] = (i+1) * 2;
+	for (index_t i = 0; i < m * n; ++i) B[i] = double((i+1) * 2);
 
 	mat_f64 C0(m, n);
-	for (index_t i = 0; i < m * n; ++i) C0[i] = (i+1) * 2 + cval;
+	for (index_t i = 0; i < m * n; ++i) C0[i] = double((i+1) * 2) + cval;
 
 	mat_f64 C = A + B;
 
@@ -361,8 +371,8 @@ TEST( MatrixEWise, ComplexFormulaToCol )
 	const double yv = 2;
 	const double zv = 3;
 
-	col_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = i + 1;
-	col_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = (2*i + 1);
+	col_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = double(i + 1);
+	col_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = double(2*i + 1);
 
 	MyConstMat y(n, 1, yv);
 	MyConstMat z(n, 1, zv);
@@ -392,8 +402,8 @@ TEST( MatrixEWise, ComplexFormulaToRow )
 	const double yv = 2;
 	const double zv = 3;
 
-	row_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = i + 1;
-	row_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = (2*i + 1);
+	row_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = double(i + 1);
+	row_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = double(2*i + 1);
 
 	MyConstMat y(1, n, yv);
 	MyConstMat z(1, n, zv);
@@ -416,8 +426,8 @@ TEST( MatrixEWise, ComplexFormulaToRefCol )
 	const double yv = 2;
 	const double zv = 3;
 
-	col_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = i + 1;
-	col_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = (2*i + 1);
+	col_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = double(i + 1);
+	col_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = double(2*i + 1);
 
 	MyConstMat y(n, 1, yv);
 	MyConstMat z(n, 1, zv);
@@ -443,8 +453,8 @@ TEST( MatrixEWise, ComplexFormulaToRefRow )
 	const double yv = 2;
 	const double zv = 3;
 
-	row_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = i + 1;
-	row_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = (2*i + 1);
+	row_f64 x(n); for (index_t i = 0; i < n; ++i) x[i] = double(i + 1);
+	row_f64 w(n); for (index_t i = 0; i < n; ++i) w[i] = double(2*i + 1);
 
 	MyConstMat y(1, n, yv);
 	MyConstMat z(1, n, zv);
@@ -472,8 +482,8 @@ TEST( MatrixEWise, ComplexFormulaToRefMatEx)
 	const double yv = 2;
 	const double zv = 3;
 
-	mat_f64 x(m, n); for (index_t i = 0; i < m * n; ++i) x[i] = i + 1;
-	mat_f64 w(m, n); for (index_t i = 0; i < m * n; ++i) w[i] = (2*i + 1);
+	mat_f64 x(m, n); for (index_t i = 0; i < m * n; ++i) x[i] = double(i + 1);
+	mat_f64 w(m, n); for (index_t i = 0; i < m * n; ++i) w[i] = double(2*i + 1);
 
 	MyConstMat y(m, n, yv);
 	MyConstMat z(m, n, zv);
@@ -525,7 +535,7 @@ static void test_unary_ewise_sqr_on_dense(index_t m, index_t n)
 
 	for (index_t i = 0; i < m * n; ++i)
 	{
-		Amat[i] = (i+1);
+		Amat[i] = double(i+1);
 	}
 
 	test_unary_ewise_sqr(Amat);
@@ -540,7 +550,7 @@ static void test_unary_ewise_sqr_on_refex(index_t m, index_t n)
 
 	for (index_t i = 0; i < m * n; ++i)
 	{
-		Amat[i] = (i+1);
+		Amat[i] = double(i+1);
 	}
 
 	ref_matrix_ex<double, CTRows, CTCols> A(Amat.ptr_data(), m, n, ldim);
@@ -673,8 +683,8 @@ static void test_binary_ewise_plus_on_dense(index_t m, index_t n)
 
 	for (index_t i = 0; i < m * n; ++i)
 	{
-		Amat[i] = (i+1);
-		Bmat[i] = 3 * i - 4;
+		Amat[i] = double(i+1);
+		Bmat[i] = double(3 * i - 4);
 	}
 
 	test_binary_ewise_plus(Amat, Bmat);
@@ -691,8 +701,8 @@ static void test_binary_ewise_plus_on_refex(index_t m, index_t n)
 
 	for (index_t i = 0; i < m * n; ++i)
 	{
-		Amat[i] = (i+1);
-		Bmat[i] = 3 * i - 4;
+		Amat[i] = double(i+1);
+		Bmat[i] = double(3 * i - 4);
 	}
 
 	ref_matrix_ex<double, CTRows, CTCols> A(Amat.ptr_data(), m, n, ldim);

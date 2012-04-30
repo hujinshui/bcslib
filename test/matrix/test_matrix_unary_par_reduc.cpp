@@ -56,7 +56,7 @@ template<int CTRows, int CTCols>
 void test_slicewise_sum_on_dense(index_t m, index_t n)
 {
 	dense_matrix<double, CTRows, CTCols> A(m, n);
-	for (index_t i = 0; i < m * n; ++i) A[i] = (3 * i + 2);
+	for (index_t i = 0; i < m * n; ++i) A[i] = double(3 * i + 2);
 
 	test_slicewise_sum(A);
 }
@@ -67,7 +67,7 @@ void test_slicewise_sum_on_refex(index_t m, index_t n)
 {
 	index_t ldim = m + 2;
 	dense_matrix<double> Amat(ldim, n);
-	for (index_t i = 0; i < ldim * n; ++i) Amat[i] = (3 * i + 2);
+	for (index_t i = 0; i < ldim * n; ++i) Amat[i] = double(3 * i + 2);
 
 	ref_matrix_ex<double, CTRows, CTCols> A(Amat.ptr_data(), m, n, ldim);
 	test_slicewise_sum(A);
@@ -182,7 +182,7 @@ void test_slicewise_mean(const IMatrixXpr<Mat, T>& A)
 	{
 		T s(0);
 		for (index_t i = 0; i < m; ++i) s += Amat(i, j);
-		cw0[j] = s / m;
+		cw0[j] = s / T(m);
 	}
 
 	ASSERT_TRUE( is_equal(cw, cw0) );
@@ -197,7 +197,7 @@ void test_slicewise_mean(const IMatrixXpr<Mat, T>& A)
 	{
 		T s(0);
 		for (index_t j = 0; j < n; ++j) s += Amat(i, j);
-		rw0[i] = s / n;
+		rw0[i] = s / T(n);
 	}
 
 	ASSERT_TRUE( is_equal(rw, rw0) );
@@ -208,7 +208,7 @@ template<int CTRows, int CTCols>
 void test_slicewise_mean_on_dense(index_t m, index_t n)
 {
 	dense_matrix<double, CTRows, CTCols> A(m, n);
-	for (index_t i = 0; i < m * n; ++i) A[i] = (3 * i + 2);
+	for (index_t i = 0; i < m * n; ++i) A[i] = double(3 * i + 2);
 
 	test_slicewise_mean(A);
 }
@@ -267,7 +267,7 @@ TEST( MatrixUnaryParReduc, SliceWiseMin )
 	const index_t n = 9;
 
 	dense_matrix<double> Amat(m, n);
-	for (index_t i = 0; i < m * n; ++i) Amat[i] = (3 * i + 2);
+	for (index_t i = 0; i < m * n; ++i) Amat[i] = double(3 * i + 2);
 
 	const IMatrixXpr<dense_matrix<double>, double>& A = Amat;
 
@@ -299,7 +299,7 @@ TEST( MatrixUnaryParReduc, SliceWiseMax )
 	const index_t n = 9;
 
 	dense_matrix<double> Amat(m, n);
-	for (index_t i = 0; i < m * n; ++i) Amat[i] = (3 * i + 2);
+	for (index_t i = 0; i < m * n; ++i) Amat[i] = double(3 * i + 2);
 
 	const IMatrixXpr<dense_matrix<double>, double>& A = Amat;
 
@@ -331,7 +331,7 @@ TEST( MatrixUnaryParReduc, SliceWiseL1Norm )
 	const index_t n = 9;
 
 	dense_matrix<double> Amat(m, n);
-	for (index_t i = 0; i < m * n; ++i) Amat[i] = (3 * i + 2);
+	for (index_t i = 0; i < m * n; ++i) Amat[i] = double(3 * i + 2);
 
 	const IMatrixXpr<dense_matrix<double>, double>& A = Amat;
 
@@ -363,7 +363,7 @@ TEST( MatrixUnaryParReduc, SliceWiseSqL2Norm )
 	const index_t n = 9;
 
 	dense_matrix<double> Amat(m, n);
-	for (index_t i = 0; i < m * n; ++i) Amat[i] = (3 * i + 2);
+	for (index_t i = 0; i < m * n; ++i) Amat[i] = double(3 * i + 2);
 
 	const IMatrixXpr<dense_matrix<double>, double>& A = Amat;
 
@@ -422,7 +422,7 @@ template<int CTRows, int CTCols>
 void test_slicewise_L2norm_on_dense(index_t m, index_t n)
 {
 	dense_matrix<double, CTRows, CTCols> A(m, n);
-	for (index_t i = 0; i < m * n; ++i) A[i] = (3 * i + 2);
+	for (index_t i = 0; i < m * n; ++i) A[i] = double(3 * i + 2);
 
 	test_slicewise_L2norm(A);
 }
@@ -433,7 +433,7 @@ void test_slicewise_L2norm_on_refex(index_t m, index_t n)
 {
 	index_t ldim = m + 2;
 	dense_matrix<double> Amat(ldim, n);
-	for (index_t i = 0; i < ldim * n; ++i) Amat[i] = (3 * i + 2);
+	for (index_t i = 0; i < ldim * n; ++i) Amat[i] = double(3 * i + 2);
 
 	ref_matrix_ex<double, CTRows, CTCols> A(Amat.ptr_data(), m, n, ldim);
 	test_slicewise_L2norm(A);
@@ -538,7 +538,8 @@ TEST( MatrixUnaryParReduc, SliceWiseLinfNorm )
 	const index_t n = 9;
 
 	dense_matrix<double> Amat(m, n);
-	for (index_t i = 0; i < m * n; ++i) Amat[i] = (3 * i + 2) * (i % 2 == 0 ? 1.0 : -1.0);
+	for (index_t i = 0; i < m * n; ++i)
+		Amat[i] = double(3 * i + 2) * (i % 2 == 0 ? 1.0 : -1.0);
 
 	const IMatrixXpr<dense_matrix<double>, double>& A = Amat;
 

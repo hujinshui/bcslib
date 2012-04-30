@@ -19,7 +19,7 @@ static bool verify_matrix_values(const IMatrixView<Mat, double>& A, double base_
 	{
 		for (index_t i = 0; i < A.nrows(); ++i)
 		{
-			double expect_val = (i + j * A.nrows() + 1) * base_v;
+			double expect_val = double(i + j * A.nrows() + 1) * base_v;
 			if (A.elem(i, j) != expect_val) return false;
 		}
 	}
@@ -33,7 +33,7 @@ static void fill_matrix_values(IRegularMatrix<Mat, double>& A, double base_v)
 	{
 		for (index_t i = 0; i < A.nrows(); ++i)
 		{
-			double expect_val = (i + j * A.nrows() + 1) * base_v;
+			double expect_val = double(i + j * A.nrows() + 1) * base_v;
 			A.elem(i, j) = expect_val;
 		}
 	}
