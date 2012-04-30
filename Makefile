@@ -89,6 +89,7 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/matrix_xpr.h \
 	$(INC)/matrix/matrix_subviews.h \
 	$(INC)/matrix/matrix_manip.h \
+	$(INC)/matrix/vector_proxy_base.h \
 	$(INC)/matrix/vector_proxy.h \
 	$(INC)/matrix/matrix_assign.h \
 	$(INC)/matrix/dense_matrix.h \

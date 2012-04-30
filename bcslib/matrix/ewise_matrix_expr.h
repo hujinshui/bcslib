@@ -181,12 +181,14 @@ namespace bcs
 
 	/********************************************
 	 *
-	 *  Column traversing
+	 *  vector proxies
 	 *
 	 ********************************************/
 
+
 	template<typename Fun, class Arg>
 	class vecwise_reader<unary_ewise_expr<Fun, Arg> >
+	: public IVecReader<vecwise_reader<unary_ewise_expr<Fun, Arg> >, typename Fun::result_type>
 	{
 	public:
 		typedef unary_ewise_expr<Fun, Arg> expr_type;
@@ -231,6 +233,7 @@ namespace bcs
 
 	template<typename Fun, class LArg, class RArg>
 	class vecwise_reader<binary_ewise_expr<Fun, LArg, RArg> >
+	: public IVecReader<vecwise_reader<binary_ewise_expr<Fun, LArg, RArg> >, typename Fun::result_type>
 	{
 	public:
 		typedef binary_ewise_expr<Fun, LArg, RArg> expr_type;

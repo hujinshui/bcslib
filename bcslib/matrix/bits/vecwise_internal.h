@@ -13,9 +13,21 @@
 #ifndef VECWISE_INTERNAL_H_
 #define VECWISE_INTERNAL_H_
 
+#include <bcslib/matrix/vector_proxy_base.h>
 #include <bcslib/matrix/dense_matrix.h>
 
 namespace bcs { namespace detail {
+
+	template<class Expr, typename IsContinuous> struct vec_reader_impl;
+
+
+
+
+
+
+
+
+
 
 	struct const_vecwise_dense_tag { };
 	struct const_vecwise_view_tag { };

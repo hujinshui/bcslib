@@ -18,9 +18,15 @@
 
 namespace bcs
 {
+	// forward declaration
+
+	template<class Expr> class vecwise_reader;
+	template<class Expr> class vecwise_writer;
+
 
 	template<class Expr>
 	class vecwise_reader
+	: public IVecReader<vecwise_reader<Expr>, typename matrix_traits<Expr>::value_type>
 	{
 #ifdef BCS_USE_STATIC_ASSERT
 		static_assert(bcs::has_matrix_interface<Expr, IMatrixXpr>::value,
@@ -77,6 +83,7 @@ namespace bcs
 
 	template<class Expr>
 	class vecwise_writer
+	: public IVecWriter<vecwise_writer<Expr>, typename matrix_traits<Expr>::value_type>
 	{
 #ifdef BCS_USE_STATIC_ASSERT
 		static_assert(bcs::has_matrix_interface<Expr, IRegularMatrix>::value,
@@ -127,46 +134,6 @@ namespace bcs
 	private:
 		internal_t m_internal;
 	};
-
-
-	template<class SMat, class DMat>
-	BCS_ENSURE_INLINE
-	inline void copy_vec(const index_t len, vecwise_reader<SMat>& reader, vecwise_writer<DMat>& writer)
-	{
-		static_assert(bcs::is_same<
-				typename matrix_traits<SMat>::value_type,
-				typename matrix_traits<DMat>::value_type>::value,
-				"SMat and DMat must have the same value type.");
-
-		for (index_t i = 0; i < len; ++i)
-		{
-			writer.store_scalar(i, reader.load_scalar(i));
-		}
-	}
-
-	template<class Reductor, class Mat>
-	BCS_ENSURE_INLINE
-	inline typename Reductor::accum_type accum_vec(Reductor reduc, const index_t len,
-			vecwise_reader<Mat>& vec)
-	{
-		// pre-condition: len > 0
-
-		typename Reductor::accum_type s = reduc(vec.load_scalar(0));
-		for (index_t i = 1; i < len; ++i) s = reduc(s, vec.load_scalar(i));
-		return s;
-	}
-
-	template<class Reductor, class LMat, class RMat>
-	BCS_ENSURE_INLINE
-	inline typename Reductor::accum_type accum_vec(Reductor reduc, const index_t len,
-			vecwise_reader<LMat>& lvec, vecwise_reader<RMat>& rvec)
-	{
-		// pre-condition: len > 0
-
-		typename Reductor::accum_type s = reduc(lvec.load_scalar(0), rvec.load_scalar(0));
-		for (index_t i = 1; i < len; ++i) s = reduc(s, lvec.load_scalar(i), rvec.load_scalar(i));
-		return s;
-	}
 
 }
 

@@ -377,7 +377,7 @@ namespace bcs
 		static const int compile_time_num_rows = CTRows;
 		static const int compile_time_num_cols = CTCols;
 
-		static const bool is_linear_indexable = true;
+		static const bool is_linear_indexable = (CTRows == 1 || CTCols == 1);
 		static const bool is_continuous = false;
 		static const bool is_sparse = false;
 		static const bool is_readonly = true;
@@ -485,7 +485,7 @@ namespace bcs
 		static const int compile_time_num_rows = CTRows;
 		static const int compile_time_num_cols = CTCols;
 
-		static const bool is_linear_indexable = true;
+		static const bool is_linear_indexable = (CTRows == 1 || CTCols == 1);
 		static const bool is_continuous = false;
 		static const bool is_sparse = false;
 		static const bool is_readonly = false;
