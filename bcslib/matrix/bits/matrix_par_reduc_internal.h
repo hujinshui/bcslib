@@ -166,10 +166,11 @@ namespace bcs { namespace detail {
 				if (m == 1)
 				{
 					accum_t s = reduc(a.load_scalar(0));
+
 					if (n > 1)
 					{
 						++ a;
-						for (index_t j = 0; j < n; ++j, ++a) s = reduc(s, a.load_scalar(0));
+						for (index_t j = 1; j < n; ++j, ++a) s = reduc(s, a.load_scalar(0));
 					}
 					dst(0, 0) = reduc.get(s, n);
 				}
@@ -231,7 +232,8 @@ namespace bcs { namespace detail {
 					if (n > 1)
 					{
 						++ a; ++ b;
-						for (index_t j = 0; j < n; ++j, ++a, ++b) s = reduc(s, a.load_scalar(0));
+						for (index_t j = 1; j < n; ++j, ++a, ++b)
+							s = reduc(s, a.load_scalar(0), b.load_scalar(0));
 					}
 					dst(0, 0) = reduc.get(s, n);
 				}

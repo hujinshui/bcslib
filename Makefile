@@ -199,7 +199,8 @@ $(BIN)/test_matrix_eval: $(MATRIX_H) $(TEST_MATRIX_EVAL_SOURCES)
 	
 TEST_MATRIX_REDUC_SOURCES = \
 	test/matrix/test_matrix_reduction.cpp \
-	test/matrix/test_matrix_par_reduc.cpp
+	test/matrix/test_matrix_unary_par_reduc.cpp \
+	test/matrix/test_matrix_binary_par_reduc.cpp
 	
 $(BIN)/test_matrix_reduc: $(MATRIX_H) $(TEST_MATRIX_REDUC_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_REDUC_SOURCES) $(MAIN_TEST_POST) -o $@
