@@ -55,6 +55,16 @@ namespace bcs
 
 	// generic functions
 
+	template<typename T, class DMat>
+	BCS_ENSURE_INLINE
+	inline void fill_vec(const index_t len, IVecWriter<DMat, T>& writer, const T& v)
+	{
+		for (index_t i = 0; i < len; ++i)
+		{
+			writer.store_scalar(i, v);
+		}
+	}
+
 
 	template<typename T, class SMat, class DMat>
 	BCS_ENSURE_INLINE

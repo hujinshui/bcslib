@@ -30,18 +30,18 @@
 
 #define BCS_MAT_TRAITS_CDEFS(T) \
 	typedef T value_type; \
-	typedef const T* const_pointer; \
-	typedef const T& const_reference; \
+	typedef const value_type* const_pointer; \
+	typedef const value_type& const_reference; \
 	typedef size_t size_type; \
 	typedef index_t difference_type; \
 	typedef index_t index_type;
 
 #define BCS_MAT_TRAITS_DEFS(T) \
 	typedef T value_type; \
-	typedef const T* const_pointer; \
-	typedef const T& const_reference; \
-	typedef T* pointer; \
-	typedef T& reference; \
+	typedef const value_type* const_pointer; \
+	typedef const value_type& const_reference; \
+	typedef value_type* pointer; \
+	typedef value_type& reference; \
 	typedef size_t size_type; \
 	typedef index_t difference_type; \
 	typedef index_t index_type;
@@ -275,14 +275,6 @@ namespace bcs
 				"Matrix element access subscripts are out of range.");
 #endif
 	}
-
-	BCS_ENSURE_INLINE
-	inline void check_with_compile_time_dims(bool cond)
-	{
-		check_arg(cond,
-				"Attempted to set a run-time size that is not consistent with compile-time specification.");
-	}
-
 
 
 	/**

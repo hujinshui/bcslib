@@ -24,4 +24,7 @@
 #include <bcslib/matrix/matrix_reduction.h>
 #include <bcslib/matrix/matrix_par_reduc.h>
 
+#include <bcslib/matrix/repeat_vectors.h>
+#include <bcslib/matrix/matrix_broadcast.h>
+
 #endif /* MATRIX_H_ */

@@ -94,6 +94,7 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/matrix_assign.h \
 	$(INC)/matrix/dense_matrix.h \
 	$(INC)/matrix/ref_matrix.h \
+	$(INC)/matrix/matrix_capture.h \
 	$(INC)/matrix/ewise_matrix_expr.h \
 	$(INC)/matrix/matrix_arithmetic.h \
 	$(INC)/matrix/matrix_elfuns.h \
@@ -101,6 +102,8 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/slicewise_proxy.h \
 	$(INC)/matrix/matrix_par_reduc_expr.h \
 	$(INC)/matrix/matrix_par_reduc.h \
+	$(INC)/matrix/repeat_vectors.h \
+	$(INC)/matrix/matrix_broadcast.h \
 	$(INC)/matrix/bits/matrix_helpers.h \
 	$(INC)/matrix/bits/matrix_subviews_helper.h \
 	$(INC)/matrix/bits/matrix_manip_helpers.h \
@@ -110,6 +113,7 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/bits/ewise_matrix_eval_internal.h \
 	$(INC)/matrix/bits/matrix_reduction_internal.h \
 	$(INC)/matrix/bits/matrix_par_reduc_internal.h \
+	$(INC)/matrix/bits/repeat_vectors_internal.h \
 	$(INC)/matrix.h \
 	$(INC)/engine/arithmetic_functors.h \
 	$(INC)/engine/elementary_functors.h \
@@ -192,7 +196,9 @@ $(BIN)/test_matrix_subviews:$(MATRIX_H) $(TEST_MATRIX_SUBVIEWS_SOURCES)
 TEST_MATRIX_EVAL_SOURCES = \
 	test/matrix/test_matrix_ewise.cpp \
 	test/matrix/test_matrix_arithmetic.cpp \
-	test/matrix/test_matrix_elfuns.cpp
+	test/matrix/test_matrix_elfuns.cpp \
+	test/matrix/test_repeat_vecs.cpp \
+	test/matrix/test_matrix_broadcast.cpp
 	
 $(BIN)/test_matrix_eval: $(MATRIX_H) $(TEST_MATRIX_EVAL_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_EVAL_SOURCES) $(MAIN_TEST_POST) -o $@

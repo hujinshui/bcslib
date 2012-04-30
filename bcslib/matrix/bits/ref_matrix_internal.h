@@ -32,7 +32,8 @@ namespace bcs { namespace detail {
 		ref_matrix_internal(T *pdata, index_t m, index_t n)
 		: m_pdata(pdata)
 		{
-			check_with_compile_time_dims(m == CTRows && n == CTCols);
+			check_arg(m == CTRows && n == CTCols,
+					"Attempted to construct a static ref_matrix with incorrect dimensions.");
 		}
 
 		BCS_ENSURE_INLINE index_t nrows() const { return CTRows; }
@@ -55,7 +56,8 @@ namespace bcs { namespace detail {
 		ref_matrix_internal(T *pdata, index_t m, index_t n)
 		: m_pdata(pdata), m_nrows(m)
 		{
-			check_with_compile_time_dims(n == CTCols);
+			check_arg(n == CTCols,
+					"Attempted to construct a ref_matrix with incorrect dimension (n != CTCols).");
 		}
 
 		BCS_ENSURE_INLINE index_t nrows() const { return m_nrows; }
@@ -80,7 +82,8 @@ namespace bcs { namespace detail {
 		ref_matrix_internal(T *pdata, index_t m, index_t n)
 		: m_pdata(pdata), m_ncols(n)
 		{
-			check_with_compile_time_dims(m == CTRows);
+			check_arg(m == CTRows,
+					"Attempted to construct a ref_matrix with incorrect dimension (m != CTRows).");
 		}
 
 		BCS_ENSURE_INLINE index_t nrows() const { return CTRows; }
@@ -136,7 +139,8 @@ namespace bcs { namespace detail {
 		ref_matrix_internal_ex(T *pdata, index_t m, index_t n, index_t ldim)
 		: m_pdata(pdata), m_leaddim(ldim)
 		{
-			check_with_compile_time_dims(m == CTRows && n == CTCols);
+			check_arg(m == CTRows && n == CTCols,
+					"Attempted to construct a ref_matrix_ex with incorrect dimensions.");
 		}
 
 		BCS_ENSURE_INLINE index_t nrows() const { return CTRows; }
@@ -160,7 +164,8 @@ namespace bcs { namespace detail {
 		ref_matrix_internal_ex(T *pdata, index_t m, index_t n, index_t ldim)
 		: m_pdata(pdata), m_nrows(m), m_leaddim(ldim)
 		{
-			check_with_compile_time_dims(n == CTCols);
+			check_arg(n == CTCols,
+					"Attempted to construct a ref_matrix_ex with incorrect dimension (n != CTCols)");
 		}
 
 		BCS_ENSURE_INLINE index_t nrows() const { return m_nrows; }
@@ -186,7 +191,8 @@ namespace bcs { namespace detail {
 		ref_matrix_internal_ex(T *pdata, index_t m, index_t n, index_t ldim)
 		: m_pdata(pdata), m_ncols(n), m_leaddim(ldim)
 		{
-			check_with_compile_time_dims(m == CTRows);
+			check_arg(m == CTRows,
+					"Attempted to construct a ref_matrix_ex with incorrect dimension (m != CTRows)");
 		}
 
 		BCS_ENSURE_INLINE index_t nrows() const { return CTRows; }

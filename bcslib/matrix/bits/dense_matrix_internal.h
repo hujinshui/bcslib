@@ -34,7 +34,8 @@ namespace bcs { namespace detail {
 		BCS_ENSURE_INLINE
 		dense_matrix_internal(index_t m, index_t n)
 		{
-			check_arg(m == CTRows && n == CTCols);
+			check_arg(m == CTRows && n == CTCols,
+					"Attempted to construct a static dense_matrix with incorrect dimensions.");
 		}
 
 		inline void swap(dense_matrix_internal& s)
@@ -55,7 +56,7 @@ namespace bcs { namespace detail {
 		void resize(index_t m, index_t n)
 		{
 			check_arg(m == CTRows && n == CTCols,
-					"Attempted to change a fixed dimension.");
+					"Attempted to change a fixed dimension in resize.");
 		}
 
 	private:
@@ -72,7 +73,9 @@ namespace bcs { namespace detail {
 
 		BCS_ENSURE_INLINE
 		dense_matrix_internal(index_t m, index_t n)
-		: m_blk(check_forward(m, m == CTRows) * n), m_ncols(n) { }
+		: m_blk(n * check_forward(m, m == CTRows,
+				"Invalid construction of dense_matrix (m != CTRows)") )
+		, m_ncols(n) { }
 
 		inline void swap(dense_matrix_internal& s)
 		{
@@ -93,7 +96,7 @@ namespace bcs { namespace detail {
 		void resize(index_t m, index_t n)
 		{
 			check_arg(m == CTRows,
-					"Attempted to change a fixed dimension.");
+					"Attempted to change a fixed dimension in resize.");
 
 			if (n != m_ncols)
 			{
@@ -117,7 +120,9 @@ namespace bcs { namespace detail {
 
 		BCS_ENSURE_INLINE
 		dense_matrix_internal(index_t m, index_t n)
-		: m_blk(m * check_forward(n, n == CTCols)), m_nrows(m) { }
+		: m_blk(m * check_forward(n, n == CTCols,
+				"Invalid construction of dense_matrix (n != CTCols)") )
+		, m_nrows(m) { }
 
 		inline void swap(dense_matrix_internal& s)
 		{
@@ -138,7 +143,7 @@ namespace bcs { namespace detail {
 		void resize(index_t m, index_t n)
 		{
 			check_arg(n == CTCols,
-					"Attempted to change a fixed dimension.");
+					"Attempted to change a fixed dimension in resize.");
 
 			if (m != m_nrows)
 			{
