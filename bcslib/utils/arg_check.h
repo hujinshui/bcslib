@@ -74,27 +74,12 @@ namespace bcs
 
 	// generic argument checking
 
-	BCS_ENSURE_INLINE inline void check_arg(bool cond)
-	{
-		if (!cond)
-		{
-			throw invalid_argument("Invalid argument");
-		}
-	}
 
 	BCS_ENSURE_INLINE inline void check_arg(bool cond, const char* message)
 	{
 		if (!cond)
 		{
 			throw invalid_argument(message);
-		}
-	}
-
-	BCS_ENSURE_INLINE inline void check_range(bool cond)
-	{
-		if (!cond)
-		{
-			throw out_of_range("Out of range");
 		}
 	}
 
@@ -107,9 +92,9 @@ namespace bcs
 	}
 
 	template<typename T>
-	BCS_ENSURE_INLINE inline const T& check_forward(const T& val, bool cond)
+	BCS_ENSURE_INLINE inline const T& check_forward(const T& val, bool cond, const char *message)
 	{
-		check_arg(cond);
+		check_arg(cond, message);
 		return val;
 	}
 

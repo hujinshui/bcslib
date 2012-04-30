@@ -45,7 +45,8 @@ namespace bcs { namespace detail {
 
 		BCS_ENSURE_INLINE
 		vecwise_reader_impl(const Expr& mat)
-		: m_ptr(mat.ptr_data()),  m_stride(mat.lead_dim()) { }
+		: m_ptr(mat.ptr_data()),  m_stride(mat.lead_dim())
+		{ }
 
 		BCS_ENSURE_INLINE
 		value_type load_scalar(index_t i) const { return m_ptr[i]; }
