@@ -42,43 +42,6 @@ namespace bcs
 		static const bool value = false;
 	};
 
-	// convenient functions
-
-	namespace detail
-	{
-		template<class Reductor, bool AllowEmpty> struct empty_reduc_result_of;
-
-		template<class Reductor>
-		struct empty_reduc_result_of<Reductor, true>
-		{
-			BCS_ENSURE_INLINE
-			static typename Reductor::result_type
-			get(const Reductor& reduc) { return reduc(); }
-		};
-
-		template<class Reductor>
-		struct empty_reduc_result_of<Reductor, false>
-		{
-			BCS_ENSURE_INLINE
-			static typename Reductor::result_type
-			get(const Reductor& reduc)
-			{ throw bcs::invalid_argument("Attempted to reduce on empty matrix."); }
-		};
-	}
-
-	template<class Reductor>
-	struct empty_reduc_result_of
-	{
-		BCS_ENSURE_INLINE
-		static typename Reductor::result_type
-		get(const Reductor& reduc)
-		{
-			return detail::empty_reduc_result_of<
-					Reductor, Reductor::has_empty_value>::get(reduc);
-		}
-	};
-
-
 }
 
 
