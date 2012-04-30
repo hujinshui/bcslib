@@ -100,6 +100,7 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/matrix_reduction.h \
 	$(INC)/matrix/slicewise_proxy.h \
 	$(INC)/matrix/matrix_par_reduc_expr.h \
+	$(INC)/matrix/matrix_par_reduc.h \
 	$(INC)/matrix/bits/matrix_helpers.h \
 	$(INC)/matrix/bits/matrix_subviews_helper.h \
 	$(INC)/matrix/bits/matrix_manip_helpers.h \
@@ -108,6 +109,7 @@ MATRIX_H = $(CORE_H) \
 	$(INC)/matrix/bits/ref_matrix_internal.h \
 	$(INC)/matrix/bits/ewise_matrix_eval_internal.h \
 	$(INC)/matrix/bits/matrix_reduction_internal.h \
+	$(INC)/matrix/bits/matrix_par_reduc_internal.h \
 	$(INC)/matrix.h \
 	$(INC)/engine/arithmetic_functors.h \
 	$(INC)/engine/elementary_functors.h \
@@ -196,7 +198,8 @@ $(BIN)/test_matrix_eval: $(MATRIX_H) $(TEST_MATRIX_EVAL_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_EVAL_SOURCES) $(MAIN_TEST_POST) -o $@
 	
 TEST_MATRIX_REDUC_SOURCES = \
-	test/matrix/test_matrix_reduction.cpp
+	test/matrix/test_matrix_reduction.cpp \
+	test/matrix/test_matrix_par_reduc.cpp
 	
 $(BIN)/test_matrix_reduc: $(MATRIX_H) $(TEST_MATRIX_REDUC_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_REDUC_SOURCES) $(MAIN_TEST_POST) -o $@
