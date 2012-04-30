@@ -20,9 +20,82 @@ namespace bcs
 {
 	// forward declaration
 
+	template<class Expr> class vec_reader;
+
 	template<class Expr> class vecwise_reader;
 	template<class Expr> class vecwise_writer;
 
+
+	/********************************************
+	 *
+	 *   single-vector read/write
+	 *
+	 ********************************************/
+
+	template<class Expr>
+	struct is_accessible_as_vector
+	{
+		static const bool value = matrix_traits<Expr>::is_linear_indexable;
+	};
+
+
+	template<class Expr>
+	class vec_reader
+	: public IVecReader<vec_reader<Expr>, typename matrix_traits<Expr>::value_type>
+	{
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(matrix_traits<Expr>::is_linear_indexable, "Expr must be linearly indexable");
+#endif
+
+	public:
+		typedef typename matrix_traits<Expr>::value_type value_type;
+
+		BCS_ENSURE_INLINE
+		explicit vec_reader(const Expr& expr) : m_vec(expr) { }
+
+		BCS_ENSURE_INLINE
+		value_type load_scalar(index_t i) const
+		{
+			return m_vec[i];
+		}
+
+	private:
+		const Expr& m_vec;
+	};
+
+
+	template<class Expr>
+	class vec_writer
+	: public IVecWriter<vec_writer<Expr>, typename matrix_traits<Expr>::value_type>
+	{
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(matrix_traits<Expr>::is_linear_indexable, "Expr must be linearly indexable");
+		static_assert((!matrix_traits<Expr>::is_readonly), "Expr must NOT be readonly");
+#endif
+
+	public:
+		typedef typename matrix_traits<Expr>::value_type value_type;
+
+		BCS_ENSURE_INLINE
+		explicit vec_writer(Expr& expr) : m_vec(expr) { }
+
+		BCS_ENSURE_INLINE
+		void store_scalar(index_t i, const value_type& v)
+		{
+			m_vec[i] = v;
+		}
+
+	private:
+		Expr& m_vec;
+	};
+
+
+
+	/********************************************
+	 *
+	 *   vecwise read/write
+	 *
+	 ********************************************/
 
 	template<class Expr>
 	class vecwise_reader
@@ -49,7 +122,7 @@ namespace bcs
 		typedef typename matrix_traits<Expr>::value_type value_type;
 
 		BCS_ENSURE_INLINE
-		vecwise_reader(const Expr& mat) : m_internal(mat) { }
+		explicit vecwise_reader(const Expr& mat) : m_internal(mat) { }
 
 		BCS_ENSURE_INLINE value_type load_scalar(index_t i) const
 		{
@@ -104,7 +177,7 @@ namespace bcs
 		typedef typename matrix_traits<Expr>::value_type value_type;
 
 		BCS_ENSURE_INLINE
-		vecwise_writer(Expr& mat) : m_internal(mat) { }
+		explicit vecwise_writer(Expr& mat) : m_internal(mat) { }
 
 		BCS_ENSURE_INLINE void store_scalar(index_t i, const value_type& v)
 		{

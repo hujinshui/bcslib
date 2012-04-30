@@ -18,16 +18,6 @@
 
 namespace bcs { namespace detail {
 
-	template<class Expr, typename IsContinuous> struct vec_reader_impl;
-
-
-
-
-
-
-
-
-
 
 	struct const_vecwise_dense_tag { };
 	struct const_vecwise_view_tag { };
