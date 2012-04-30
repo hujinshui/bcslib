@@ -24,18 +24,19 @@ namespace bcs { namespace detail {
 	 *
 	 ********************************************/
 
-	template<class Expr>
-	struct ewise_evaluator
-	{
-		typedef vecwise_reader<Expr> reader_t;
+	template<class Expr, class DMat, bool DoLinear>
+	struct ewise_evaluator;
 
+
+	template<class Expr, class DMat>
+	struct ewise_evaluator<Expr, DMat, false>
+	{
 		typedef typename matrix_traits<Expr>::value_type value_type;
 
-		template<class DMat>
-		static void run(const Expr& expr, IRegularMatrix<DMat, value_type>& dst)
+		static void run(const Expr& expr, DMat& dst)
 		{
-			reader_t reader(expr);
-			vecwise_writer<DMat> writer(dst.derived());
+			vecwise_reader<Expr> reader(expr);
+			vecwise_writer<DMat> writer(dst);
 
 			index_t m = expr.nrows();
 			index_t n = expr.ncolumns();
@@ -53,8 +54,28 @@ namespace bcs { namespace detail {
 			}
 		}
 
-	};  // ewise_evaluator
+	};
 
+
+	template<class Expr, class DMat>
+	struct ewise_evaluator<Expr, DMat, true>
+	{
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(is_accessible_as_vector<Expr>::value, "Expr must be accessible-as-vector");
+		static_assert(matrix_traits<DMat>::is_linear_indexable, "DMat must be linearly indexable");
+#endif
+
+		typedef typename matrix_traits<Expr>::value_type value_type;
+
+		static void run(const Expr& expr, DMat& dst)
+		{
+			vec_reader<Expr> reader(expr);
+			vec_writer<DMat> writer(dst);
+
+			copy_vec(expr.nelems(), reader, writer);
+		}
+
+	};
 
 
 } }

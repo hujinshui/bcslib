@@ -100,8 +100,6 @@ struct expr_evaluator<MyConstMat>
 };
 
 
-
-
 /************************************************
  *
  *  Test cases
@@ -494,6 +492,307 @@ TEST( MatrixEWise, ComplexFormulaToRefMatEx)
 }
 
 
+/************************************************
+ *
+ *  Layout-specific Tests
+ *
+ ************************************************/
+
+
+template<class Mat>
+static void test_unary_ewise_sqr(const IMatrixXpr<Mat, double>& A)
+{
+	dense_matrix<double> Amat(A);
+
+	dense_matrix<double> Cmat(sqr(A));
+
+	index_t m = A.nrows();
+	index_t n = A.ncolumns();
+	dense_matrix<double> C0(m, n);
+
+	for (index_t j = 0; j < n; ++j)
+	{
+		for (index_t i = 0; i < m; ++i) C0(i, j) = Amat(i, j) * Amat(i, j);
+	}
+
+	ASSERT_TRUE( is_equal(Cmat, C0) );
+}
+
+template<int CTRows, int CTCols>
+static void test_unary_ewise_sqr_on_dense(index_t m, index_t n)
+{
+	dense_matrix<double, CTRows, CTCols> Amat(m, n);
+
+	for (index_t i = 0; i < m * n; ++i)
+	{
+		Amat[i] = (i+1);
+	}
+
+	test_unary_ewise_sqr(Amat);
+}
+
+
+template<int CTRows, int CTCols>
+static void test_unary_ewise_sqr_on_refex(index_t m, index_t n)
+{
+	index_t ldim = m + 2;
+	dense_matrix<double> Amat(ldim, n);
+
+	for (index_t i = 0; i < m * n; ++i)
+	{
+		Amat[i] = (i+1);
+	}
+
+	ref_matrix_ex<double, CTRows, CTCols> A(Amat.ptr_data(), m, n, ldim);
+
+	test_unary_ewise_sqr(A);
+}
+
+
+TEST( MatrixEWise2,  UnaryContinuDD )
+{
+	test_unary_ewise_sqr_on_dense<DynamicDim, DynamicDim>(5, 6);
+}
+
+TEST( MatrixEWise2,  UnaryContinuDS )
+{
+	test_unary_ewise_sqr_on_dense<DynamicDim, 6>(5, 6);
+}
+
+TEST( MatrixEWise2,  UnaryContinuD1 )
+{
+	test_unary_ewise_sqr_on_dense<DynamicDim, 1>(5, 1);
+}
+
+TEST( MatrixEWise2,  UnaryContinuSD )
+{
+	test_unary_ewise_sqr_on_dense<5, DynamicDim>(5, 6);
+}
+
+TEST( MatrixEWise2,  UnaryContinuSS )
+{
+	test_unary_ewise_sqr_on_dense<5, 6>(5, 6);
+}
+
+TEST( MatrixEWise2,  UnaryContinuS1 )
+{
+	test_unary_ewise_sqr_on_dense<5, 1>(5, 1);
+}
+
+TEST( MatrixEWise2,  UnaryContinu1D )
+{
+	test_unary_ewise_sqr_on_dense<1, DynamicDim>(1, 6);
+}
+
+TEST( MatrixEWise2,  UnaryContinu1S )
+{
+	test_unary_ewise_sqr_on_dense<1, 6>(1, 6);
+}
+
+TEST( MatrixEWise2,  UnaryContinu11 )
+{
+	test_unary_ewise_sqr_on_dense<1, 1>(1, 1);
+}
+
+
+TEST( MatrixEWise2,  UnaryRefExDD )
+{
+	test_unary_ewise_sqr_on_refex<DynamicDim, DynamicDim>(5, 6);
+}
+
+TEST( MatrixEWise2,  UnaryRefExDS )
+{
+	test_unary_ewise_sqr_on_refex<DynamicDim, 6>(5, 6);
+}
+
+TEST( MatrixEWise2,  UnaryRefExD1 )
+{
+	test_unary_ewise_sqr_on_refex<DynamicDim, 1>(5, 1);
+}
+
+TEST( MatrixEWise2,  UnaryRefExSD )
+{
+	test_unary_ewise_sqr_on_refex<5, DynamicDim>(5, 6);
+}
+
+TEST( MatrixEWise2,  UnaryRefExSS )
+{
+	test_unary_ewise_sqr_on_refex<5, 6>(5, 6);
+}
+
+TEST( MatrixEWise2,  UnaryRefExS1 )
+{
+	test_unary_ewise_sqr_on_refex<5, 1>(5, 1);
+}
+
+TEST( MatrixEWise2,  UnaryRefEx1D )
+{
+	test_unary_ewise_sqr_on_refex<1, DynamicDim>(1, 6);
+}
+
+TEST( MatrixEWise2,  UnaryRefEx1S )
+{
+	test_unary_ewise_sqr_on_refex<1, 6>(1, 6);
+}
+
+TEST( MatrixEWise2,  UnaryRefEx11 )
+{
+	test_unary_ewise_sqr_on_refex<1, 1>(1, 1);
+}
+
+
+
+
+template<class LMat, class RMat>
+static void test_binary_ewise_plus(
+		const IMatrixXpr<LMat, double>& A, const IMatrixXpr<RMat, double>& B)
+{
+	dense_matrix<double> Amat(A);
+	dense_matrix<double> Bmat(B);
+
+	dense_matrix<double> Cmat(A + B);
+
+	index_t m = A.nrows();
+	index_t n = A.ncolumns();
+	dense_matrix<double> C0(m, n);
+
+	for (index_t j = 0; j < n; ++j)
+	{
+		for (index_t i = 0; i < m; ++i) C0(i, j) = Amat(i, j) + Bmat(i, j);
+	}
+
+	ASSERT_TRUE( is_equal(Cmat, C0) );
+}
+
+
+template<int CTRows, int CTCols>
+static void test_binary_ewise_plus_on_dense(index_t m, index_t n)
+{
+	dense_matrix<double, CTRows, CTCols> Amat(m, n);
+	dense_matrix<double, CTRows, CTCols> Bmat(m, n);
+
+	for (index_t i = 0; i < m * n; ++i)
+	{
+		Amat[i] = (i+1);
+		Bmat[i] = 3 * i - 4;
+	}
+
+	test_binary_ewise_plus(Amat, Bmat);
+}
+
+
+template<int CTRows, int CTCols>
+static void test_binary_ewise_plus_on_refex(index_t m, index_t n)
+{
+	index_t ldim = m + 2;
+
+	dense_matrix<double> Amat(ldim, n);
+	dense_matrix<double> Bmat(ldim, n);
+
+	for (index_t i = 0; i < m * n; ++i)
+	{
+		Amat[i] = (i+1);
+		Bmat[i] = 3 * i - 4;
+	}
+
+	ref_matrix_ex<double, CTRows, CTCols> A(Amat.ptr_data(), m, n, ldim);
+	ref_matrix_ex<double, CTRows, CTCols> B(Bmat.ptr_data(), m, n, ldim);
+
+	test_binary_ewise_plus(A, B);
+}
+
+
+TEST( MatrixEWise2,  BinaryContinuDD )
+{
+	test_binary_ewise_plus_on_dense<DynamicDim, DynamicDim>(5, 6);
+}
+
+TEST( MatrixEWise2,  BinaryContinuDS )
+{
+	test_binary_ewise_plus_on_dense<DynamicDim, 6>(5, 6);
+}
+
+TEST( MatrixEWise2,  BinaryContinuD1 )
+{
+	test_binary_ewise_plus_on_dense<DynamicDim, 1>(5, 1);
+}
+
+TEST( MatrixEWise2,  BinaryContinuSD )
+{
+	test_binary_ewise_plus_on_dense<5, DynamicDim>(5, 6);
+}
+
+TEST( MatrixEWise2,  BinaryContinuSS )
+{
+	test_binary_ewise_plus_on_dense<5, 6>(5, 6);
+}
+
+TEST( MatrixEWise2,  BinaryContinuS1 )
+{
+	test_binary_ewise_plus_on_dense<5, 1>(5, 1);
+}
+
+TEST( MatrixEWise2,  BinaryContinu1D )
+{
+	test_binary_ewise_plus_on_dense<1, DynamicDim>(1, 6);
+}
+
+TEST( MatrixEWise2,  BinaryContinu1S )
+{
+	test_binary_ewise_plus_on_dense<1, 6>(1, 6);
+}
+
+TEST( MatrixEWise2,  BinaryContinu11 )
+{
+	test_binary_ewise_plus_on_dense<1, 1>(1, 1);
+}
+
+
+
+TEST( MatrixEWise2,  BinaryRefExDD )
+{
+	test_binary_ewise_plus_on_refex<DynamicDim, DynamicDim>(5, 6);
+}
+
+TEST( MatrixEWise2,  BinaryRefExDS )
+{
+	test_binary_ewise_plus_on_refex<DynamicDim, 6>(5, 6);
+}
+
+TEST( MatrixEWise2,  BinaryRefExD1 )
+{
+	test_binary_ewise_plus_on_refex<DynamicDim, 1>(5, 1);
+}
+
+TEST( MatrixEWise2,  BinaryRefExSD )
+{
+	test_binary_ewise_plus_on_refex<5, DynamicDim>(5, 6);
+}
+
+TEST( MatrixEWise2,  BinaryRefExSS )
+{
+	test_binary_ewise_plus_on_refex<5, 6>(5, 6);
+}
+
+TEST( MatrixEWise2,  BinaryRefExS1 )
+{
+	test_binary_ewise_plus_on_refex<5, 1>(5, 1);
+}
+
+TEST( MatrixEWise2,  BinaryRefEx1D )
+{
+	test_binary_ewise_plus_on_refex<1, DynamicDim>(1, 6);
+}
+
+TEST( MatrixEWise2,  BinaryRefEx1S )
+{
+	test_binary_ewise_plus_on_refex<1, 6>(1, 6);
+}
+
+TEST( MatrixEWise2,  BinaryRefEx11 )
+{
+	test_binary_ewise_plus_on_refex<1, 1>(1, 1);
+}
 
 
 
