@@ -90,6 +90,7 @@ namespace bcs
 		return s;
 	}
 
+
 }
 
 #endif /* VECTOR_PROXY_BASE_H_ */

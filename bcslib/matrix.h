@@ -22,5 +22,6 @@
 #include <bcslib/matrix/matrix_arithmetic.h>
 #include <bcslib/matrix/matrix_elfuns.h>
 #include <bcslib/matrix/matrix_reduction.h>
+#include <bcslib/matrix/matrix_par_reduc.h>
 
 #endif /* MATRIX_H_ */
