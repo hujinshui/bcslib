@@ -131,7 +131,7 @@ namespace bcs
 
 	template<typename T, class LMat, class RMat >
 	BCS_ENSURE_INLINE
-	T dot_prod(const IMatrixXpr<LMat, T>& A, const IMatrixXpr<RMat, T>& B)
+	T dot(const IMatrixXpr<LMat, T>& A, const IMatrixXpr<RMat, T>& B)
 	{
 		return reduce(dot_reductor<T>(), A, B);
 	}
