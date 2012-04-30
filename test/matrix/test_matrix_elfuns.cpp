@@ -16,7 +16,7 @@ TEST( MatrixElFuns, Sqrt )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::sqrt(a[i]);
 	col_f64 c = sqrt(a);
@@ -30,7 +30,7 @@ TEST( MatrixElFuns, Pow )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::sqr(a[i]);
 	col_f64 c = pow(a, 2.0);
@@ -44,7 +44,7 @@ TEST( MatrixElFuns, Exp )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::exp(a[i]);
 	col_f64 c = exp(a);
@@ -58,7 +58,7 @@ TEST( MatrixElFuns, Log )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::log(a[i]);
 	col_f64 c = log(a);
@@ -72,7 +72,7 @@ TEST( MatrixElFuns, Log10 )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::log10(a[i]);
 	col_f64 c = log10(a);
@@ -86,7 +86,7 @@ TEST( MatrixElFuns, Floor )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1) * 3.6;
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1) * 3.6;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::floor(a[i]);
 	col_f64 c = floor(a);
@@ -99,7 +99,7 @@ TEST( MatrixElFuns, Ceil )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1) * 3.6;
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1) * 3.6;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::ceil(a[i]);
 	col_f64 c = ceil(a);
@@ -113,7 +113,7 @@ TEST( MatrixElFuns, Sin )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::sin(a[i]);
 	col_f64 c = sin(a);
@@ -127,7 +127,7 @@ TEST( MatrixElFuns, Cos )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::cos(a[i]);
 	col_f64 c = cos(a);
@@ -141,7 +141,7 @@ TEST( MatrixElFuns, Tan )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::tan(a[i]);
 	col_f64 c = tan(a);
@@ -155,7 +155,7 @@ TEST( MatrixElFuns, Asin )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::asin(a[i]);
 	col_f64 c = asin(a);
@@ -169,7 +169,7 @@ TEST( MatrixElFuns, Acos )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::acos(a[i]);
 	col_f64 c = acos(a);
@@ -183,7 +183,7 @@ TEST( MatrixElFuns, Atan )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::atan(a[i]);
 	col_f64 c = atan(a);
@@ -197,8 +197,8 @@ TEST( MatrixElFuns, Atan2 )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = (i + 1) * 1.6 + i;
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(i + 1) * 1.6 + 2.5;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::atan2(a[i], b[i]);
 	col_f64 c = atan2(a, b);
@@ -212,7 +212,7 @@ TEST( MatrixElFuns, Sinh )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::sinh(a[i]);
 	col_f64 c = sinh(a);
@@ -226,7 +226,7 @@ TEST( MatrixElFuns, Cosh )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::cosh(a[i]);
 	col_f64 c = cosh(a);
@@ -240,7 +240,7 @@ TEST( MatrixElFuns, Tanh )
 	const int len = 16;
 	const double tol = 1.0e-14;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = math::tanh(a[i]);
 	col_f64 c = tanh(a);

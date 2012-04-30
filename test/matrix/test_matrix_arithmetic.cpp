@@ -22,8 +22,8 @@ TEST( MatrixArith, PlusMatMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = 2 * (100. - i);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(2 * (100 - i));
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] + b[i];
 	col_f64 c = a + b;
@@ -35,7 +35,7 @@ TEST( MatrixArith, PlusMatSca )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
 	const double b = 2.0;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] + b;
@@ -49,7 +49,7 @@ TEST( MatrixArith, PlusScaMat )
 	const int len = 16;
 
 	const double a = 2.0;
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = 2 * (100. - i);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(2 * (100 - i));
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a + b[i];
 	col_f64 c = a + b;
@@ -62,8 +62,8 @@ TEST( MatrixArith, InplacePlusMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = 2 * (100. - i);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(2 * (100 - i));
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] + b[i];
 	col_f64 c(a);
@@ -77,7 +77,7 @@ TEST( MatrixArith, InplacePlusSca )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
 	const double b = 2.0;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] + b;
@@ -98,8 +98,8 @@ TEST( MatrixArith, MinusMatMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = 2 * (100. - i);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(2 * (100 - i));
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] - b[i];
 	col_f64 c = a - b;
@@ -111,7 +111,7 @@ TEST( MatrixArith, MinusMatSca )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
 	const double b = 2.0;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] - b;
@@ -125,7 +125,7 @@ TEST( MatrixArith, MinusScaMat )
 	const int len = 16;
 
 	const double a = 2.0;
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = 2 * (100. - i);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(2 * (100 - i));
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a - b[i];
 	col_f64 c = a - b;
@@ -138,8 +138,8 @@ TEST( MatrixArith, InplaceMinusMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = 2 * (100. - i);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(2 * (100 - i));
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] - b[i];
 	col_f64 c(a);
@@ -153,7 +153,7 @@ TEST( MatrixArith, InplaceMinusSca )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
 	const double b = 2.0;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] - b;
@@ -174,8 +174,8 @@ TEST( MatrixArith, TimesMatMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = 2 * (100. - i);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(2 * (100 - i));
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] * b[i];
 	col_f64 c = a * b;
@@ -187,7 +187,7 @@ TEST( MatrixArith, TimesMatSca )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
 	const double b = 2.0;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] * b;
@@ -201,7 +201,7 @@ TEST( MatrixArith, TimesScaMat )
 	const int len = 16;
 
 	const double a = 2.0;
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = 2 * (100. - i);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(2 * (100 - i));
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a * b[i];
 	col_f64 c = a * b;
@@ -214,8 +214,8 @@ TEST( MatrixArith, InplaceTimesMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = 2 * (100. - i);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(2 * (100 - i));
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] * b[i];
 	col_f64 c(a);
@@ -229,7 +229,7 @@ TEST( MatrixArith, InplaceTimesSca )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
 	const double b = 2.0;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] * b;
@@ -250,7 +250,7 @@ TEST( MatrixArith, DividesMatMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
 	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = (i % 2 == 0 ? 2.0 : 4.0);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] / b[i];
@@ -263,7 +263,7 @@ TEST( MatrixArith, DividesMatSca )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
 	const double b = 2.0;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] / b;
@@ -290,7 +290,7 @@ TEST( MatrixArith, InplaceDividesMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
 	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = (i % 2 == 0 ? 2.0 : 4.0);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] / b[i];
@@ -305,7 +305,7 @@ TEST( MatrixArith, InplaceDividesSca )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
 	const double b = 2.0;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] / b;
@@ -326,7 +326,7 @@ TEST( MatrixArith, NegateMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i+1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i+1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = -a[i];
 	col_f64 c = -a;
@@ -341,7 +341,7 @@ TEST( MatrixArith, RcpMat )
 
 	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i % 2 == 0 ? 2.0 : 4.0);
 
-	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = 1 / a[i];
+	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = 1.0 / a[i];
 	col_f64 c = rcp(a);
 
 	ASSERT_TRUE( is_equal(c, c0) );
@@ -355,7 +355,7 @@ TEST( MatrixArith, AbsMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1) * (i % 2 == 0 ? 1.0 : -1.0);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1) * (i % 2 == 0 ? 1.0 : -1.0);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = my_abs(a[i]);
 	col_f64 c = abs(a);
@@ -368,7 +368,7 @@ TEST( MatrixArith, SqrMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(i + 1);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = a[i] * a[i];
 	col_f64 c = sqr(a);
@@ -406,8 +406,8 @@ TEST( MatrixArith, MinMatMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (2 * i + 1);
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = (3 * i - 10);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(2 * i + 1);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(3 * i - 10);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = my_min(a[i], b[i]);
 	col_f64 c = fmin(a, b);
@@ -419,7 +419,7 @@ TEST( MatrixArith, MinMatSca )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (2 * i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(2 * i + 1);
 	const double b = 15.0;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = my_min(a[i], b);
@@ -433,8 +433,8 @@ TEST( MatrixArith, MaxMatMat )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (2 * i + 1);
-	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = (3 * i - 10);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(2 * i + 1);
+	col_f64 b(len); for (index_t i = 0; i < len; ++i) b[i] = double(3 * i - 10);
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = my_max(a[i], b[i]);
 	col_f64 c = fmax(a, b);
@@ -446,7 +446,7 @@ TEST( MatrixArith, MaxMatSca )
 {
 	const int len = 16;
 
-	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = (2 * i + 1);
+	col_f64 a(len); for (index_t i = 0; i < len; ++i) a[i] = double(2 * i + 1);
 	const double b = 15.0;
 
 	col_f64 c0(len); for (index_t i = 0; i < len; ++i) c0[i] = my_max(a[i], b);

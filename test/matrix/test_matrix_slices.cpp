@@ -43,7 +43,7 @@ template<int CTRows, int CTCols>
 void test_densemat_single_slices(const index_t m, const index_t n)
 {
 	dense_matrix<double, CTRows, CTCols> A(m, n);
-	for (index_t i = 0; i < m * n; ++i) A[i] = (i+1);
+	for (index_t i = 0; i < m * n; ++i) A[i] = double(i+1);
 
 	test_matrix_single_slices(A);
 }
@@ -57,7 +57,7 @@ void test_refmatex_single_slices(const index_t m, const index_t n)
 	ref_matrix_ex<double, CTRows, CTCols> A(blk.ptr_begin(), m, n, ldim);
 	for (index_t j = 0; j < n; ++j)
 		for (index_t i = 0; i < m; ++i)
-			A(i, j) = (i + j * m + 1);
+			A(i, j) = double(i + j * m + 1);
 
 	test_matrix_single_slices(A);
 }
@@ -194,7 +194,7 @@ template<int CTRows, int CTCols>
 void test_densemat_multi_slices(const index_t m, const index_t n)
 {
 	dense_matrix<double, CTRows, CTCols> A(m, n);
-	for (index_t i = 0; i < m * n; ++i) A[i] = (i+1);
+	for (index_t i = 0; i < m * n; ++i) A[i] = double(i+1);
 
 	test_matrix_multi_slices(A);
 }
@@ -208,7 +208,7 @@ void test_refmatex_multi_slices(const index_t m, const index_t n)
 	ref_matrix_ex<double, CTRows, CTCols> A(blk.ptr_begin(), m, n, ldim);
 	for (index_t j = 0; j < n; ++j)
 		for (index_t i = 0; i < m; ++i)
-			A(i, j) = (i + j * m + 1);
+			A(i, j) = double(i + j * m + 1);
 
 	test_matrix_multi_slices(A);
 }

@@ -97,7 +97,7 @@ namespace bcs
 		T combine (const T& a, const T& a2) const { return a + a2; }
 
 		BCS_ENSURE_INLINE
-		T get(const T& a, const index_t n) const { return a / n; }
+		T get(const T& a, const index_t n) const { return a / static_cast<T>(n); }
 	};
 
 
