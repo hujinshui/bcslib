@@ -554,6 +554,40 @@ namespace bcs
 		return X.ptr_data() + i;
 	}
 
+	namespace detail
+	{
+		template<class Derived, bool IsLinearIndexable> struct linear_acc_helper;
+
+		template<class Derived>
+		struct linear_acc_helper<Derived, true>
+		{
+			BCS_ENSURE_INLINE
+			typename matrix_traits<Derived>::value_type
+			static get_value(const Derived& mat, const index_t i) { return mat[i]; }
+		};
+
+		template<class Derived>
+		struct linear_acc_helper<Derived, true>
+		{
+			BCS_ENSURE_INLINE
+			typename matrix_traits<Derived>::value_type
+			static get_value(const Derived& mat, const index_t i)
+			{
+				throw invalid_operation(
+						"Attempted to access a non-linear-indexable matrix in a linear fashion");
+			}
+		};
+
+	}
+
+	template<typename T, class Derived>
+	BCS_ENSURE_INLINE
+	T get_by_linear_index(const IMatrixView<Derived, T>& mat, index_t idx)
+	{
+		return detail::linear_acc_helper<Derived, matrix_traits<Derived>::is_linear_indexable>::get_value(mat, idx);
+	}
+
+
 
 	// manipulation functions (forward declaration)
 
