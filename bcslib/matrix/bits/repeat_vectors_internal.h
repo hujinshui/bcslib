@@ -52,33 +52,33 @@ namespace bcs { namespace detail {
 
 		BCS_ENSURE_INLINE
 		explicit repeat_rows_vecwise(const Arg& row)
-		: m_cap(row), m_icol(0), m_current(m_cap.get()[0])
+		: m_cap(row), m_icol(0)
 		{
 		}
 
 		BCS_ENSURE_INLINE value_type load_scalar(index_t i) const
 		{
-			return m_current;
+			return m_cap.get()[m_icol];
 		}
 
 		BCS_ENSURE_INLINE void operator ++ ()
 		{
-			m_current = m_cap.get()[++m_icol];
+			++m_icol;
 		}
 
 		BCS_ENSURE_INLINE void operator -- ()
 		{
-			m_current = m_cap.get()[--m_icol];
+			--m_icol;
 		}
 
 		BCS_ENSURE_INLINE void operator += (index_t n)
 		{
-			m_current = m_cap.get()[m_icol += n];
+			m_icol += n;
 		}
 
 		BCS_ENSURE_INLINE void operator -= (index_t n)
 		{
-			m_current = m_cap.get()[m_icol -= n];
+			m_icol -= n;
 		}
 
 	private:
@@ -90,7 +90,6 @@ namespace bcs { namespace detail {
 
 		capture_t m_cap;
 		index_t m_icol;
-		value_type m_current;
 	};
 
 

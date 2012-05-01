@@ -124,7 +124,6 @@ MATRIX_H = $(CORE_H) \
 
 .PHONY: all
 all: test
-# all: test bench
 
 .PHONY: test
 test: test_core test_matrix
