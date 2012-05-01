@@ -200,6 +200,7 @@ namespace bcs
 		~block()
 		{
 			dealloc(m_ptr);
+			m_ptr = BCS_NULL;  // make sure that it alarms when access after destructed
 		}
 
 		void swap(block& r)
