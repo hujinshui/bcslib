@@ -94,6 +94,21 @@ namespace bcs
 
 	template<typename T>
 	BCS_ENSURE_INLINE
+	inline void unpack_vector(const index_t len, const T *__restrict__ a, T *__restrict__ b, const index_t bstep)
+	{
+		for (index_t i = 0; i < len; ++i) b[i * bstep] = a[i];
+	}
+
+	template<typename T>
+	BCS_ENSURE_INLINE
+	inline void pack_vector(const index_t len, const T *__restrict__ a, const index_t astep, T *__restrict__ b)
+	{
+		for (index_t i = 0; i < len; ++i) b[i] = a[i * astep];
+	}
+
+
+	template<typename T>
+	BCS_ENSURE_INLINE
 	inline void copy_elems_2d(const index_t inner_dim, const index_t outer_dim,
 			const T* __restrict__ src, index_t src_ext, T* __restrict__ dst, index_t dst_ext)
 	{
