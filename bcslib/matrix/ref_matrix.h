@@ -646,7 +646,7 @@ namespace bcs
 
 		template<class DMat>
 		BCS_ENSURE_INLINE
-		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, T>& dst)
+		static void evaluate(const expr_type& expr, IDenseMatrix<DMat, T>& dst)
 		{
 			copy(expr, dst.derived());
 		}
@@ -660,7 +660,7 @@ namespace bcs
 
 		template<class DMat>
 		BCS_ENSURE_INLINE
-		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, T>& dst)
+		static void evaluate(const expr_type& expr, IDenseMatrix<DMat, T>& dst)
 		{
 			copy(expr, dst.derived());
 		}
@@ -673,7 +673,7 @@ namespace bcs
 
 		template<class DMat>
 		BCS_ENSURE_INLINE
-		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, T>& dst)
+		static void evaluate(const expr_type& expr, IDenseMatrix<DMat, T>& dst)
 		{
 			copy(expr, dst.derived());
 		}
@@ -687,7 +687,7 @@ namespace bcs
 
 		template<class DMat>
 		BCS_ENSURE_INLINE
-		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, T>& dst)
+		static void evaluate(const expr_type& expr, IDenseMatrix<DMat, T>& dst)
 		{
 			copy(expr, dst.derived());
 		}

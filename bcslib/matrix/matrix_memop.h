@@ -74,7 +74,7 @@ namespace bcs
 	// copy
 
 	template<typename T, class SMat, class DMat>
-	inline void copy(const IMatrixView<SMat, T>& src, IRegularMatrix<DMat, T>& dst)
+	inline void copy(const IMatrixView<SMat, T>& src, IDenseMatrix<DMat, T>& dst)
 	{
 		typedef typename detail::copy_helper<SMat, DMat>::type helper_t;
 		helper_t::run(src.derived(), dst.derived());
@@ -83,7 +83,7 @@ namespace bcs
 	// fill
 
 	template<typename T, class Mat>
-	inline void fill(IRegularMatrix<Mat, T>& dst, const T& v)
+	inline void fill(IDenseMatrix<Mat, T>& dst, const T& v)
 	{
 		typedef typename detail::fill_helper<Mat>::type helper_t;
 		helper_t::run(dst.derived(), v);
@@ -93,7 +93,7 @@ namespace bcs
 	// zero
 
 	template<typename T, class Mat>
-	inline void zero(IRegularMatrix<Mat, T>& dst)
+	inline void zero(IDenseMatrix<Mat, T>& dst)
 	{
 		typedef typename detail::zero_helper<Mat>::type helper_t;
 		helper_t::run(dst.derived());

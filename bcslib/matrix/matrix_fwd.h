@@ -45,7 +45,6 @@ namespace bcs
 
 	template<class Derived, typename T> class IMatrixXpr;
 	template<class Derived, typename T> class IMatrixView;
-	template<class Derived, typename T> class IRegularMatrix;
 	template<class Derived, typename T> class IDenseMatrix;
 
 	// forward declaration of some important types
@@ -95,16 +94,16 @@ namespace bcs
 	inline bool is_approx(const IMatrixView<LMat, T>& A, const IMatrixView<RMat, T>& B, const T tol);
 
 	template<typename T, class SExpr, class DMat>
-	inline void evaluate_to(const IMatrixXpr<SExpr, T>& src, IRegularMatrix<DMat, T>& dst);
+	inline void evaluate_to(const IMatrixXpr<SExpr, T>& src, IDenseMatrix<DMat, T>& dst);
 
 	template<typename T, class SMat, class DMat>
-	inline void copy(const IMatrixView<SMat, T>& src, IRegularMatrix<DMat, T>& dst);
+	inline void copy(const IMatrixView<SMat, T>& src, IDenseMatrix<DMat, T>& dst);
 
 	template<typename T, class DMat>
-	inline void fill(IRegularMatrix<DMat, T>& dst, const T& v);
+	inline void fill(IDenseMatrix<DMat, T>& dst, const T& v);
 
 	template<typename T, class DMat>
-	inline void zero(IRegularMatrix<DMat, T>& dst);
+	inline void zero(IDenseMatrix<DMat, T>& dst);
 
 }
 

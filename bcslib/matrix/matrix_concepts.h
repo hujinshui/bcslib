@@ -151,68 +151,11 @@ namespace bcs
 	}; // end class IDenseMatrixView
 
 
-
 	/**
 	 * The interfaces for matrix blocks
 	 */
 	template<class Derived, typename T>
-	class IRegularMatrix : public IMatrixView<Derived, T>
-	{
-	public:
-		BCS_MAT_TRAITS_DEFS_FOR_BASE(Derived, T)
-		BCS_CRTP_REF
-
-	public:
-		BCS_ENSURE_INLINE index_type nelems() const
-		{
-			return derived().nelems();
-		}
-
-		BCS_ENSURE_INLINE size_type size() const
-		{
-			return derived().size();
-		}
-
-		BCS_ENSURE_INLINE index_type nrows() const
-		{
-			return derived().nrows();
-		}
-
-		BCS_ENSURE_INLINE index_type ncolumns() const
-		{
-			return derived().ncolumns();
-		}
-
-		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j) const
-		{
-			return derived().elem(i, j);
-		}
-
-		BCS_ENSURE_INLINE reference elem(index_type i, index_type j)
-		{
-			return derived().elem(i, j);
-		}
-
-		BCS_ENSURE_INLINE const_reference operator() (index_type i, index_type j) const
-		{
-			check_subscripts_in_range(derived(), i, j);
-			return elem(i, j);
-		}
-
-		BCS_ENSURE_INLINE reference operator() (index_type i, index_type j)
-		{
-			check_subscripts_in_range(derived(), i, j);
-			return elem(i, j);
-		}
-
-	}; // end class IRegularMatrix
-
-
-	/**
-	 * The interfaces for matrix blocks
-	 */
-	template<class Derived, typename T>
-	class IDenseMatrix : public IRegularMatrix<Derived, T>
+	class IDenseMatrix : public IMatrixView<Derived, T>
 	{
 	public:
 		BCS_MAT_TRAITS_DEFS_FOR_BASE(Derived, T)

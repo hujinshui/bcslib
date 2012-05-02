@@ -172,12 +172,6 @@ namespace bcs
 	};
 
 	template<class Mat>
-	struct is_regular_mat
-	{
-		static const bool value = has_matrix_interface<Mat, IRegularMatrix>::value;
-	};
-
-	template<class Mat>
 	struct is_dense_mat
 	{
 		static const bool value = has_matrix_interface<Mat, IDenseMatrix>::value;
@@ -243,6 +237,13 @@ namespace bcs
 	};
 
 	template<class Mat>
+	struct is_readable_colwise
+	{
+		static const bool value = is_dense_mat<Mat>::value;
+	};
+
+
+	template<class Mat>
 	struct is_accessible_as_single_vector
 	{
 		static const bool value =
@@ -250,17 +251,12 @@ namespace bcs
 				!is_readonly_mat<Mat>::value;
 	};
 
-	template<class Mat>
-	struct is_readable_colwise
-	{
-		static const bool value = is_regular_mat<Mat>::value;
-	};
 
 	template<class Mat>
 	struct is_accessible_colwise
 	{
 		static const bool value =
-				is_regular_mat<Mat>::value &&
+				is_readable_colwise<Mat>::value &&
 				!is_readonly_mat<Mat>::value;
 	};
 
