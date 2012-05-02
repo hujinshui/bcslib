@@ -13,7 +13,6 @@
 #ifndef BCSLIB_MATRIX_PROPERTIES_H_
 #define BCSLIB_MATRIX_PROPERTIES_H_
 
-#include <bcslib/matrix/matrix_ctf.h>
 #include <bcslib/matrix/matrix_concepts.h>
 
 namespace bcs

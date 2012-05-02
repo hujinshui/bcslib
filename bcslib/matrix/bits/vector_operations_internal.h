@@ -17,7 +17,6 @@
 
 #include <bcslib/matrix/vector_accessors.h>
 #include <bcslib/matrix/vecproc_schemes.h>
-#include <cstring>
 
 namespace bcs { namespace detail {
 

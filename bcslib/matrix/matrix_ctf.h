@@ -219,12 +219,6 @@ namespace bcs
 	struct has_continuous_layout { static const bool value = false; };
 
 	template<class Mat>
-	struct is_continuous_mat
-	{
-		static const bool value = is_dense_mat<Mat>::value && has_continuous_layout<Mat>::value;
-	};
-
-	template<class Mat>
 	struct is_always_aligned { static const bool value = false; };
 
 	template<class Mat>
