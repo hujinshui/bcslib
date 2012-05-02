@@ -13,8 +13,9 @@
 #ifndef BCSLIB_DENSE_MATRIX_INTERNAL_H_
 #define BCSLIB_DENSE_MATRIX_INTERNAL_H_
 
-#include <bcslib/matrix/matrix_base.h>
-#include <bcslib/matrix/bits/matrix_helpers.h>
+#include <bcslib/matrix/matrix_properties.h>
+#include <bcslib/matrix/bits/offset_helper.h>
+
 #include <bcslib/core/block.h>
 
 #include <algorithm>

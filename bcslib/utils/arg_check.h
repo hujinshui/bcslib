@@ -98,6 +98,27 @@ namespace bcs
 		return val;
 	}
 
+
+	template<bool Cond, typename T> struct conditional_enabled_value;
+
+	template<typename T> struct conditional_enabled_value<true, T>
+	{
+		BCS_ENSURE_INLINE
+		static const T& get(const T& v, const char *msg)
+		{
+			return v;
+		}
+	};
+
+	template<typename T> struct conditional_enabled_value<false, T>
+	{
+		BCS_ENSURE_INLINE
+		static const T& get(const T& v, const char *msg)
+		{
+			throw invalid_operation(msg);
+		}
+	};
+
 }
 
 

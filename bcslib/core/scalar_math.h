@@ -27,7 +27,7 @@ namespace bcs
 	{
 		// inclusion C++03 standard ones
 
-		using std::abs;
+		using std::fabs;
 		using std::sqrt;
 		using std::pow;
 

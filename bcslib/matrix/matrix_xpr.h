@@ -13,7 +13,7 @@
 #ifndef BCSLIB_MATRIX_XPR_H_
 #define BCSLIB_MATRIX_XPR_H_
 
-#include <bcslib/matrix/matrix_base.h>
+#include <bcslib/matrix/matrix_concepts.h>
 
 namespace bcs
 {
@@ -45,8 +45,6 @@ namespace bcs
 			return expr;  // by default, do nothing for optimization
 		}
 	};
-
-	template<class Expr> struct expr_evaluator;
 
 	template<typename T, class Expr, class DMat>
 	BCS_ENSURE_INLINE

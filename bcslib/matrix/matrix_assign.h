@@ -13,43 +13,53 @@
 #ifndef BCSLIB_MATRIX_ASSIGN_H_
 #define BCSLIB_MATRIX_ASSIGN_H_
 
-#include <bcslib/matrix/matrix_base.h>
 #include <bcslib/matrix/matrix_xpr.h>
 
 namespace bcs
 {
-	template<typename T, class SMat, class DMat>
-	BCS_ENSURE_INLINE
-	inline void assign_to(const IMatrixView<SMat, T>& src, IRegularMatrix<DMat, T>& dst)
+	namespace detail
 	{
-		copy(src.derived(), dst.derived());
+		template<bool IsResizale> struct ensure_same_size_helper;
+
+		template<> struct ensure_same_size_helper<true>
+		{
+			template<typename T, class Expr, class DMat>
+			BCS_ENSURE_INLINE
+			static void run(const IMatrixXpr<Expr, T>& expr, DMat& dst)
+			{
+				dst.resize(expr.nrows(), expr.ncolumns());
+			}
+		};
+
+		template<> struct ensure_same_size_helper<false>
+		{
+			template<typename T, class Expr, class DMat>
+			BCS_ENSURE_INLINE
+			static void run(const IMatrixXpr<Expr, T>& expr, DMat& dst)
+			{
+				check_same_size(expr, dst,
+						"The sizes of expression and destination are inconsistent.");
+			}
+		};
 	}
 
-	template<typename T, class SMat, class DMat>
+	template<typename T, class Expr, class DMat>
 	BCS_ENSURE_INLINE
-	inline void assign_to(const IMatrixView<SMat, T>& src, IDenseMatrix<DMat, T>& dst)
+	inline void ensure_same_size(const IMatrixXpr<Expr, T>& expr, IRegularMatrix<DMat, T>& dst)
 	{
-		dst.resize(src.nrows(), src.ncolumns());
-		copy(src.derived(), dst.derived());
+		typedef detail::ensure_same_size_helper<matrix_traits<DMat>::is_resizable> helper_t;
+		helper_t::run(expr, dst.derived());
 	}
+
 
 	template<typename T, class Expr, class DMat>
 	BCS_ENSURE_INLINE
 	inline void assign_to(const IMatrixXpr<Expr, T>& expr, IRegularMatrix<DMat, T>& dst)
 	{
-		check_arg( is_same_size(expr, dst),
-				"The sizes of expression and destination are inconsistent." );
-
+		ensure_same_size(expr, dst);
 		evaluate_to(expr.derived(), dst.derived());
 	}
 
-	template<typename T, class Expr, class DMat>
-	BCS_ENSURE_INLINE
-	inline void assign_to(const IMatrixXpr<Expr, T>& expr, IDenseMatrix<DMat, T>& dst)
-	{
-		dst.resize(expr.nrows(), expr.ncolumns());
-		evaluate_to(expr.derived(), dst.derived());
-	}
 
 }
 
