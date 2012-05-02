@@ -13,7 +13,7 @@
 #ifndef BCSLIB_MATRIX_SUBVIEWS_HELPER_H_
 #define BCSLIB_MATRIX_SUBVIEWS_HELPER_H_
 
-#include <bcslib/matrix/matrix_base.h>
+#include <bcslib/matrix/matrix_fwd.h>
 
 namespace bcs { namespace detail {
 

@@ -13,7 +13,7 @@
 #ifndef BCSLIB_MATRIX_SUBVIEWS_H_
 #define BCSLIB_MATRIX_SUBVIEWS_H_
 
-#include <bcslib/matrix/bits/matrix_subviews_helper.h>
+#include <bcslib/matrix/bits/matrix_subviews_internal.h>
 
 namespace bcs
 {
@@ -22,7 +22,7 @@ namespace bcs
 	struct subviews
 	{
 		static const bool is_readonly = matrix_traits<Mat>::is_readonly;
-		static const bool is_continuous = matrix_traits<Mat>::is_continuous;
+		static const bool is_continuous = has_continuous_layout<Mat>::value;
 		static const int comptime_rows = matrix_traits<Mat>::compile_time_num_rows;
 		static const int comptime_cols = matrix_traits<Mat>::compile_time_num_cols;
 
