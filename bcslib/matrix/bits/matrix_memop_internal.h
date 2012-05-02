@@ -33,9 +33,6 @@ namespace bcs { namespace detail {
 		BCS_ENSURE_INLINE
 		static bool test(const LMat& a, const RMat& b)
 		{
-			typename vec_reader<LMat>::type vec_a(a);
-			typename vec_reader<RMat>::type vec_b(b);
-
 			if (Size > 0)
 			{
 				return mem<T, Size>::equal(a.ptr_data(), b.ptr_data());

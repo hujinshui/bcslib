@@ -71,9 +71,11 @@ namespace bcs
 	template<typename T, int CTRows=DynamicDim, int CTCols=DynamicDim> class ref_grid2d;
 
 
-	// important structures for evaluation
+	// important structures for manipulation
 
 	template<class Mat> struct subviews;
+
+	// important structures for evaluation
 
 	template<class Expr> struct expr_optimizer;
 	template<class Expr> struct expr_evaluator;

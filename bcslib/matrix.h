@@ -15,4 +15,7 @@
 
 #include <bcslib/matrix/matrix_base.h>
 
+#include <bcslib/matrix/matrix_subviews.h>
+
+
 #endif /* MATRIX_H_ */

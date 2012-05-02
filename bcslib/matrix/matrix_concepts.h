@@ -219,7 +219,7 @@ namespace bcs
 			return elem(i, j);
 		}
 
-/*
+
 	public:
 		BCS_ENSURE_INLINE
 		typename subviews<Derived>::const_row_type
@@ -280,7 +280,7 @@ namespace bcs
 			return subviews<Derived>::get_multicolumn(derived(),
 					rgn.begin_index(), rgn.num());
 		}
-*/
+
 
 	}; // end class IDenseMatrixBlock
 

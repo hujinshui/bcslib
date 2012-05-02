@@ -13,6 +13,7 @@ using namespace bcs;
 
 // explicit template for syntax check
 
+
 template class bcs::ref_matrix<double, DynamicDim, DynamicDim>;
 template class bcs::ref_matrix<double, DynamicDim, 1>;
 template class bcs::ref_matrix<double, 1, DynamicDim>;
