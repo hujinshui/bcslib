@@ -398,7 +398,7 @@ namespace bcs
 	template<typename T, int CTRows, int CTCols>
 	struct has_continuous_layout<cref_matrix_ex<T, CTRows, CTCols> >
 	{
-		static const bool value = false;
+		static const bool value = (CTCols == 1);
 	};
 
 	template<typename T, int CTRows, int CTCols>
@@ -410,7 +410,7 @@ namespace bcs
 	template<typename T, int CTRows, int CTCols>
 	struct is_linear_accessible<cref_matrix_ex<T, CTRows, CTCols> >
 	{
-		static const bool value = false;
+		static const bool value = (CTRows == 1 || CTCols == 1);
 	};
 
 
@@ -511,7 +511,7 @@ namespace bcs
 	template<typename T, int CTRows, int CTCols>
 	struct has_continuous_layout<ref_matrix_ex<T, CTRows, CTCols> >
 	{
-		static const bool value = false;
+		static const bool value = (CTCols == 1);
 	};
 
 	template<typename T, int CTRows, int CTCols>
@@ -523,7 +523,7 @@ namespace bcs
 	template<typename T, int CTRows, int CTCols>
 	struct is_linear_accessible<ref_matrix_ex<T, CTRows, CTCols> >
 	{
-		static const bool value = false;
+		static const bool value = (CTRows == 1 || CTCols == 1);
 	};
 
 
