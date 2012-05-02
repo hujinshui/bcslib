@@ -45,7 +45,7 @@ namespace bcs
 
 	template<typename T, class Expr, class DMat>
 	BCS_ENSURE_INLINE
-	inline void ensure_same_size(const IMatrixXpr<Expr, T>& expr, IRegularMatrix<DMat, T>& dst)
+	inline void ensure_same_size(const IMatrixXpr<Expr, T>& expr, IDenseMatrix<DMat, T>& dst)
 	{
 		typedef detail::ensure_same_size_helper<matrix_traits<DMat>::is_resizable> helper_t;
 		helper_t::run(expr, dst.derived());
@@ -54,7 +54,7 @@ namespace bcs
 
 	template<typename T, class Expr, class DMat>
 	BCS_ENSURE_INLINE
-	inline void assign_to(const IMatrixXpr<Expr, T>& expr, IRegularMatrix<DMat, T>& dst)
+	inline void assign_to(const IMatrixXpr<Expr, T>& expr, IDenseMatrix<DMat, T>& dst)
 	{
 		ensure_same_size(expr, dst);
 		evaluate_to(expr.derived(), dst.derived());

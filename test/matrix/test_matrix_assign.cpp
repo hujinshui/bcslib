@@ -27,7 +27,7 @@ static bool verify_matrix_values(const IMatrixView<Mat, double>& A, double base_
 }
 
 template<class Mat>
-static void fill_matrix_values(IRegularMatrix<Mat, double>& A, double base_v)
+static void fill_matrix_values(IDenseMatrix<Mat, double>& A, double base_v)
 {
 	for (index_t j = 0; j < A.ncolumns(); ++j)
 	{

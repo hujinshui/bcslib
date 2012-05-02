@@ -42,10 +42,6 @@ static_assert(bcs::is_base_of<
 		bcs::dense_matrix<double> >::value, "Base verification failed.");
 
 static_assert(bcs::is_base_of<
-		bcs::IRegularMatrix<bcs::dense_matrix<double>, double>,
-		bcs::dense_matrix<double> >::value, "Base verification failed.");
-
-static_assert(bcs::is_base_of<
 		bcs::IDenseMatrix<bcs::dense_matrix<double>, double>,
 		bcs::dense_matrix<double> >::value, "Base verification failed.");
 #endif
