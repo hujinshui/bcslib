@@ -13,7 +13,6 @@
 #ifndef BCSLIB_DENSE_MATRIX_H_
 #define BCSLIB_DENSE_MATRIX_H_
 
-#include <bcslib/matrix/matrix_assign.h>
 #include <bcslib/matrix/bits/dense_matrix_internal.h>
 
 namespace bcs
@@ -32,13 +31,29 @@ namespace bcs
 		static const int compile_time_num_rows = CTRows;
 		static const int compile_time_num_cols = CTCols;
 
-		static const bool is_linear_indexable = true;
-		static const bool is_continuous = true;
-		static const bool is_sparse = false;
 		static const bool is_readonly = false;
+		static const bool is_resizable = (CTRows == DynamicDim || CTCols == DynamicDim);
 
 		typedef T value_type;
 		typedef index_t index_type;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct has_continuous_layout<dense_matrix<T, CTRows, CTCols> >
+	{
+		static const bool value = true;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct is_always_aligned<dense_matrix<T, CTRows, CTCols> >
+	{
+		static const bool value = true;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct is_linear_accessible<dense_matrix<T, CTRows, CTCols> >
+	{
+		static const bool value = true;
 	};
 
 
@@ -47,9 +62,6 @@ namespace bcs
 	{
 	public:
 		BCS_MAT_TRAITS_DEFS(T)
-
-	private:
-		typedef detail::dim_helper<CTRows==1, CTCols==1> _dim_helper;
 
 	public:
 		BCS_ENSURE_INLINE dense_matrix()
@@ -125,7 +137,7 @@ namespace bcs
 	public:
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return _dim_helper::nelems(nrows(), ncolumns());
+			return m_internal.nelems();
 		}
 
 		BCS_ENSURE_INLINE size_type size() const
@@ -160,7 +172,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type offset(index_type i, index_type j) const
 		{
-			return _dim_helper::offset(lead_dim(), i, j);
+			return detail::calc_offset(*this, i, j);
 		}
 
 		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j) const

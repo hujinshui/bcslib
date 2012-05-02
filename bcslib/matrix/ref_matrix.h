@@ -13,9 +13,7 @@
 #ifndef BCSLIB_REF_MATRIX_H_
 #define BCSLIB_REF_MATRIX_H_
 
-#include <bcslib/matrix/matrix_assign.h>
 #include <bcslib/matrix/bits/ref_matrix_internal.h>
-
 
 namespace bcs
 {
@@ -33,13 +31,29 @@ namespace bcs
 		static const int compile_time_num_rows = CTRows;
 		static const int compile_time_num_cols = CTCols;
 
-		static const bool is_linear_indexable = true;
-		static const bool is_continuous = true;
-		static const bool is_sparse = false;
 		static const bool is_readonly = true;
+		static const bool is_resizable = false;
 
 		typedef T value_type;
 		typedef index_t index_type;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct has_continuous_layout<cref_matrix<T, CTRows, CTCols> >
+	{
+		static const bool value = true;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct is_always_aligned<cref_matrix<T, CTRows, CTCols> >
+	{
+		static const bool value = false;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct is_linear_accessible<cref_matrix<T, CTRows, CTCols> >
+	{
+		static const bool value = true;
 	};
 
 
@@ -50,8 +64,6 @@ namespace bcs
 		BCS_MAT_TRAITS_CDEFS(T)
 
 	private:
-		typedef detail::dim_helper<CTRows==1, CTCols==1> _dim_helper;
-
 		static const int CTSize = CTRows * CTCols;
 		static const bool IsDynamic = (CTSize == 0);
 
@@ -69,7 +81,7 @@ namespace bcs
 	public:
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return _dim_helper::nelems(nrows(), ncolumns());
+			return m_internal.nelems();
 		}
 
 		BCS_ENSURE_INLINE size_type size() const
@@ -99,7 +111,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type offset(index_type i, index_type j) const
 		{
-			return _dim_helper::offset(m_internal.lead_dim(), i, j);
+			return detail::calc_offset(*this, i, j);
 		}
 
 		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j) const
@@ -112,18 +124,10 @@ namespace bcs
 			return m_internal.ptr_data()[i];
 		}
 
-		BCS_ENSURE_INLINE void resize(index_type m, index_type n)
-		{
-			check_arg(nrows() == m && ncolumns() == n,
-					"The size of a cref_matrix instance can not be changed.");
-		}
-
 	private:
 		detail::ref_matrix_internal<const T, CTRows, CTCols> m_internal;
 
 	}; // end class cref_matrix
-
-
 
 
 	/********************************************
@@ -140,13 +144,29 @@ namespace bcs
 		static const int compile_time_num_rows = CTRows;
 		static const int compile_time_num_cols = CTCols;
 
-		static const bool is_linear_indexable = true;
-		static const bool is_continuous = true;
-		static const bool is_sparse = false;
 		static const bool is_readonly = false;
+		static const bool is_resizable = false;
 
 		typedef T value_type;
 		typedef index_t index_type;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct has_continuous_layout<ref_matrix<T, CTRows, CTCols> >
+	{
+		static const bool value = true;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct is_always_aligned<ref_matrix<T, CTRows, CTCols> >
+	{
+		static const bool value = false;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct is_linear_accessible<ref_matrix<T, CTRows, CTCols> >
+	{
+		static const bool value = true;
 	};
 
 
@@ -155,9 +175,6 @@ namespace bcs
 	{
 	public:
 		BCS_MAT_TRAITS_DEFS(T)
-
-	private:
-		typedef detail::dim_helper<CTRows==1, CTCols==1> _dim_helper;
 
 	public:
 		ref_matrix(T* pdata, index_type m, index_type n)
@@ -193,7 +210,7 @@ namespace bcs
 	public:
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return _dim_helper::nelems(nrows(), ncolumns());
+			return m_internal.nelems();
 		}
 
 		BCS_ENSURE_INLINE size_type size() const
@@ -228,7 +245,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type offset(index_type i, index_type j) const
 		{
-			return _dim_helper::offset(m_internal.lead_dim(), i, j);
+			return detail::calc_offset(*this, i, j);
 		}
 
 		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j) const
@@ -249,12 +266,6 @@ namespace bcs
 		BCS_ENSURE_INLINE reference operator[] (index_type i)
 		{
 			return m_internal.ptr_data()[i];
-		}
-
-		BCS_ENSURE_INLINE void resize(index_type m, index_type n)
-		{
-			check_arg(nrows() == m && ncolumns() == n,
-					"The size of a ref_matrix instance can not be changed.");
 		}
 
 	private:
@@ -377,13 +388,29 @@ namespace bcs
 		static const int compile_time_num_rows = CTRows;
 		static const int compile_time_num_cols = CTCols;
 
-		static const bool is_linear_indexable = (CTRows == 1 || CTCols == 1);
-		static const bool is_continuous = false;
-		static const bool is_sparse = false;
 		static const bool is_readonly = true;
+		static const bool is_resizable = false;
 
 		typedef T value_type;
 		typedef index_t index_type;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct has_continuous_layout<cref_matrix_ex<T, CTRows, CTCols> >
+	{
+		static const bool value = false;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct is_always_aligned<cref_matrix_ex<T, CTRows, CTCols> >
+	{
+		static const bool value = false;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct is_linear_accessible<cref_matrix_ex<T, CTRows, CTCols> >
+	{
+		static const bool value = false;
 	};
 
 
@@ -394,10 +421,7 @@ namespace bcs
 		BCS_MAT_TRAITS_CDEFS(T)
 
 	private:
-		typedef detail::dim_helper<CTRows==1, CTCols==1> _dim_helper;
-
-		static const int CTSize = CTRows * CTCols;
-		static const bool IsDynamic = (CTSize == 0);
+		static const bool IsCTVector = (CTRows == 1 || CTCols == 1);
 
 	public:
 
@@ -408,14 +432,12 @@ namespace bcs
 		}
 
 	private:
-		typedef detail::ref_matrix_ex_offset<CTRows==1, CTCols==1> _linearidx_helper;
-
 		cref_matrix_ex& operator = (const cref_matrix_ex& );  // no assignment
 
 	public:
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return _dim_helper::nelems(nrows(), ncolumns());
+			return m_internal.nelems();
 		}
 
 		BCS_ENSURE_INLINE size_type size() const
@@ -445,7 +467,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type offset(index_type i, index_type j) const
 		{
-			return _dim_helper::offset(m_internal.lead_dim(), i, j);
+			return detail::calc_offset(*this, i, j);
 		}
 
 		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j) const
@@ -455,13 +477,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE const_reference operator[] (index_type i) const
 		{
-			return m_internal.ptr_data()[_linearidx_helper::get(lead_dim(), i)];
-		}
-
-		BCS_ENSURE_INLINE void resize(index_type m, index_type n)
-		{
-			check_arg(nrows() == m && ncolumns() == n,
-					"The size of a cref_matrix instance can not be changed.");
+			return m_internal.ptr_data()[detail::ref_ex_linear_offset(*this, i)];
 		}
 
 	private:
@@ -485,13 +501,29 @@ namespace bcs
 		static const int compile_time_num_rows = CTRows;
 		static const int compile_time_num_cols = CTCols;
 
-		static const bool is_linear_indexable = (CTRows == 1 || CTCols == 1);
-		static const bool is_continuous = false;
-		static const bool is_sparse = false;
 		static const bool is_readonly = false;
+		static const bool is_resizable = false;
 
 		typedef T value_type;
 		typedef index_t index_type;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct has_continuous_layout<ref_matrix_ex<T, CTRows, CTCols> >
+	{
+		static const bool value = false;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct is_always_aligned<ref_matrix_ex<T, CTRows, CTCols> >
+	{
+		static const bool value = false;
+	};
+
+	template<typename T, int CTRows, int CTCols>
+	struct is_linear_accessible<ref_matrix_ex<T, CTRows, CTCols> >
+	{
+		static const bool value = false;
 	};
 
 
@@ -502,8 +534,7 @@ namespace bcs
 		BCS_MAT_TRAITS_DEFS(T)
 
 	private:
-		typedef detail::dim_helper<CTRows==1, CTCols==1> _dim_helper;
-		typedef detail::ref_matrix_ex_offset<CTRows==1, CTCols==1> _linearidx_helper;
+			static const bool IsCTVector = (CTRows == 1 || CTCols == 1);
 
 	public:
 		ref_matrix_ex(T* pdata, index_type m, index_type n, index_type ldim)
@@ -538,7 +569,7 @@ namespace bcs
 	public:
 		BCS_ENSURE_INLINE index_type nelems() const
 		{
-			return _dim_helper::nelems(nrows(), ncolumns());
+			return m_internal.nelems();
 		}
 
 		BCS_ENSURE_INLINE size_type size() const
@@ -573,7 +604,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE index_type offset(index_type i, index_type j) const
 		{
-			return _dim_helper::offset(m_internal.lead_dim(), i, j);
+			return detail::calc_offset(*this, i, j);
 		}
 
 		BCS_ENSURE_INLINE const_reference elem(index_type i, index_type j) const
@@ -588,18 +619,12 @@ namespace bcs
 
 		BCS_ENSURE_INLINE const_reference operator[] (index_type i) const
 		{
-			return m_internal.ptr_data()[_linearidx_helper::get(lead_dim(), i)];
+			return m_internal.ptr_data()[detail::ref_ex_linear_offset(*this, i)];
 		}
 
 		BCS_ENSURE_INLINE reference operator[] (index_type i)
 		{
-			return m_internal.ptr_data()[_linearidx_helper::get(lead_dim(), i)];
-		}
-
-		BCS_ENSURE_INLINE void resize(index_type m, index_type n)
-		{
-			check_arg(nrows() == m && ncolumns() == n,
-					"The size of a ref_matrix instance can not be changed.");
+			return m_internal.ptr_data()[detail::ref_ex_linear_offset(*this, i)];
 		}
 
 	private:

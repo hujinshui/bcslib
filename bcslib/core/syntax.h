@@ -82,22 +82,6 @@ namespace bcs
 	template<typename T1, typename T2> struct select_type<true, T1, T2> { typedef T1 type; };
 	template<typename T1, typename T2> struct select_type<false, T1, T2> { typedef T2 type; };
 
-	template<typename T, bool ToEmbed>
-	struct variable_proxy;
-
-	template<typename T>
-	struct variable_proxy<T, false>
-	{
-		const T& value;
-		BCS_ENSURE_INLINE variable_proxy(const T& v) : value(v) { }
-	};
-
-	template<typename T>
-	struct variable_proxy<T, true>
-	{
-		const T value;
-		BCS_ENSURE_INLINE variable_proxy(const T& v) : value(v) { }
-	};
 }
 
 

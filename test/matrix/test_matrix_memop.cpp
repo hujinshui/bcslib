@@ -1,7 +1,7 @@
 /**
- * @file test_matrix_manip.cpp
+ * @file test_matrix_memop.cpp
  *
- * Unit testing for matrix manipulation
+ * Unit testing for matrix memory operations
  *
  * @author Dahua Lin
  */

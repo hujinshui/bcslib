@@ -13,18 +13,6 @@
 #ifndef BCSLIB_MATRIX_H_
 #define BCSLIB_MATRIX_H_
 
-#include <bcslib/matrix/ref_matrix.h>
-#include <bcslib/matrix/dense_matrix.h>
-
-#include <bcslib/matrix/matrix_subviews.h>
-#include <bcslib/matrix/matrix_manip.h>
-#include <bcslib/matrix/matrix_assign.h>
-#include <bcslib/matrix/matrix_arithmetic.h>
-#include <bcslib/matrix/matrix_elfuns.h>
-#include <bcslib/matrix/matrix_reduction.h>
-#include <bcslib/matrix/matrix_par_reduc.h>
-
-#include <bcslib/matrix/repeat_vectors.h>
-#include <bcslib/matrix/matrix_broadcast.h>
+#include <bcslib/matrix/matrix_base.h>
 
 #endif /* MATRIX_H_ */

@@ -13,8 +13,9 @@
 #ifndef BCSLIB_REF_MATRIX_INTERNAL_H_
 #define BCSLIB_REF_MATRIX_INTERNAL_H_
 
-#include <bcslib/matrix/matrix_base.h>
-#include <bcslib/matrix/bits/matrix_helpers.h>
+#include <bcslib/matrix/matrix_properties.h>
+#include <bcslib/matrix/bits/offset_helper.h>
+
 
 namespace bcs { namespace detail {
 
@@ -35,6 +36,8 @@ namespace bcs { namespace detail {
 			check_arg(m == CTRows && n == CTCols,
 					"Attempted to construct a static ref_matrix with incorrect dimensions.");
 		}
+
+		BCS_ENSURE_INLINE index_t nelems() const { return CTRows * CTCols; }
 
 		BCS_ENSURE_INLINE index_t nrows() const { return CTRows; }
 
@@ -59,6 +62,8 @@ namespace bcs { namespace detail {
 			check_arg(n == CTCols,
 					"Attempted to construct a ref_matrix with incorrect dimension (n != CTCols).");
 		}
+
+		BCS_ENSURE_INLINE index_t nelems() const { return m_nrows * CTCols; }
 
 		BCS_ENSURE_INLINE index_t nrows() const { return m_nrows; }
 
@@ -86,6 +91,8 @@ namespace bcs { namespace detail {
 					"Attempted to construct a ref_matrix with incorrect dimension (m != CTRows).");
 		}
 
+		BCS_ENSURE_INLINE index_t nelems() const { return CTRows * m_ncols; }
+
 		BCS_ENSURE_INLINE index_t nrows() const { return CTRows; }
 
 		BCS_ENSURE_INLINE index_t ncolumns() const { return m_ncols; }
@@ -110,6 +117,8 @@ namespace bcs { namespace detail {
 		{
 		}
 
+		BCS_ENSURE_INLINE index_t nelems() const { return m_nrows * m_ncols; }
+
 		BCS_ENSURE_INLINE index_t nrows() const { return m_nrows; }
 
 		BCS_ENSURE_INLINE index_t ncolumns() const { return m_ncols; }
@@ -131,6 +140,57 @@ namespace bcs { namespace detail {
 	 *
 	 ********************************************/
 
+	template<class Mat, bool IsRow, bool IsCol>
+	struct ref_matrix_internal_ex_linear_offset_helper;
+
+	template<class Mat>
+	struct ref_matrix_internal_ex_linear_offset_helper<Mat, false, false>
+	{
+		BCS_ENSURE_INLINE static index_t get(const Mat& a, const index_t)
+		{
+			throw invalid_operation(
+					"Accessing a (c)ref_matrix_ex object that is not a compile-time vector with linear index is not allowed.");
+		}
+	};
+
+	template<class Mat>
+	struct ref_matrix_internal_ex_linear_offset_helper<Mat, false, true>
+	{
+		BCS_ENSURE_INLINE static index_t get(const Mat& a, const index_t i)
+		{
+			return i;
+		}
+	};
+
+	template<class Mat>
+	struct ref_matrix_internal_ex_linear_offset_helper<Mat, true, false>
+	{
+		BCS_ENSURE_INLINE static index_t get(const Mat& a, const index_t i)
+		{
+			return i * a.lead_dim();
+		}
+	};
+
+	template<class Mat>
+	struct ref_matrix_internal_ex_linear_offset_helper<Mat, true, true>
+	{
+		BCS_ENSURE_INLINE static index_t get(const Mat& a, const index_t)
+		{
+			return 0;
+		}
+	};
+
+
+	template<class Mat>
+	index_t ref_ex_linear_offset(const Mat& a, const index_t i)
+	{
+		return ref_matrix_internal_ex_linear_offset_helper<Mat,
+				ct_is_row<Mat>::value,
+				ct_is_col<Mat>::value>::get(a, i);
+	}
+
+
+
 	template<typename T, int CTRows, int CTCols>
 	class ref_matrix_internal_ex
 	{
@@ -142,6 +202,8 @@ namespace bcs { namespace detail {
 			check_arg(m == CTRows && n == CTCols,
 					"Attempted to construct a ref_matrix_ex with incorrect dimensions.");
 		}
+
+		BCS_ENSURE_INLINE index_t nelems() const { return CTRows * CTCols; }
 
 		BCS_ENSURE_INLINE index_t nrows() const { return CTRows; }
 
@@ -167,6 +229,8 @@ namespace bcs { namespace detail {
 			check_arg(n == CTCols,
 					"Attempted to construct a ref_matrix_ex with incorrect dimension (n != CTCols)");
 		}
+
+		BCS_ENSURE_INLINE index_t nelems() const { return m_nrows * CTCols; }
 
 		BCS_ENSURE_INLINE index_t nrows() const { return m_nrows; }
 
@@ -195,6 +259,8 @@ namespace bcs { namespace detail {
 					"Attempted to construct a ref_matrix_ex with incorrect dimension (m != CTRows)");
 		}
 
+		BCS_ENSURE_INLINE index_t nelems() const { return CTRows * m_ncols; }
+
 		BCS_ENSURE_INLINE index_t nrows() const { return CTRows; }
 
 		BCS_ENSURE_INLINE index_t ncolumns() const { return m_ncols; }
@@ -220,6 +286,8 @@ namespace bcs { namespace detail {
 		{
 		}
 
+		BCS_ENSURE_INLINE index_t nelems() const { return m_nrows * m_ncols; }
+
 		BCS_ENSURE_INLINE index_t nrows() const { return m_nrows; }
 
 		BCS_ENSURE_INLINE index_t ncolumns() const { return m_ncols; }
@@ -233,44 +301,6 @@ namespace bcs { namespace detail {
 		index_t m_nrows;
 		index_t m_ncols;
 		index_t m_leaddim;
-	};
-
-
-	template<bool SingleRow, bool SingleCol>
-	struct ref_matrix_ex_offset;
-
-	template<> struct ref_matrix_ex_offset<false, false>
-	{
-		BCS_ENSURE_INLINE static index_t get(index_t ldim, index_t idx)
-		{
-			throw invalid_operation(
-					"Cannot get linear index from a (c)ref_matrix_ex object with non-vector form.");
-		}
-	};
-
-	template<> struct ref_matrix_ex_offset<false, true>
-	{
-		BCS_ENSURE_INLINE static index_t get(index_t ldim, index_t idx)
-		{
-			return idx;
-		}
-	};
-
-	template<> struct ref_matrix_ex_offset<true, false>
-	{
-		BCS_ENSURE_INLINE static index_t get(index_t ldim, index_t idx)
-		{
-			return idx * ldim;
-		}
-	};
-
-
-	template<> struct ref_matrix_ex_offset<true, true>
-	{
-		BCS_ENSURE_INLINE static index_t get(index_t ldim, index_t idx)
-		{
-			return 0;
-		}
 	};
 
 

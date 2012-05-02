@@ -83,41 +83,23 @@ CORE_H = \
 	$(INC)/core/bits/mem_op_impl_static.h \
 	$(INC)/core/block.h \
 	$(INC)/core.h
-
-MATRIX_H = $(CORE_H) \
-	$(INC)/matrix/matrix_base.h \
+	
+MATRIX_BASE_H = $(CORE_H) \
+	$(INC)/matrix/matrix_fwd.h \
+	$(INC)/matrix/matrix_ctf.h \
+	$(INC)/matrix/matrix_concepts.h \
+	$(INC)/matrix/matrix_properties.h \
+	$(INC)/matrix/matrix_memop.h \
 	$(INC)/matrix/matrix_xpr.h \
-	$(INC)/matrix/matrix_subviews.h \
-	$(INC)/matrix/matrix_manip.h \
-	$(INC)/matrix/vector_proxy_base.h \
-	$(INC)/matrix/vector_proxy.h \
 	$(INC)/matrix/matrix_assign.h \
-	$(INC)/matrix/dense_matrix.h \
+	$(INC)/matrix/matrix_io.h \
 	$(INC)/matrix/ref_matrix.h \
-	$(INC)/matrix/matrix_capture.h \
-	$(INC)/matrix/ewise_matrix_expr.h \
-	$(INC)/matrix/matrix_arithmetic.h \
-	$(INC)/matrix/matrix_elfuns.h \
-	$(INC)/matrix/matrix_reduction.h \
-	$(INC)/matrix/slicewise_proxy.h \
-	$(INC)/matrix/matrix_par_reduc_expr.h \
-	$(INC)/matrix/matrix_par_reduc.h \
-	$(INC)/matrix/repeat_vectors.h \
-	$(INC)/matrix/matrix_broadcast.h \
-	$(INC)/matrix/bits/matrix_helpers.h \
-	$(INC)/matrix/bits/matrix_subviews_helper.h \
-	$(INC)/matrix/bits/matrix_manip_helpers.h \
-	$(INC)/matrix/bits/vecwise_internal.h \
-	$(INC)/matrix/bits/dense_matrix_internal.h \
+	$(INC)/matrix/dense_matrix.h \
+	$(INC)/matrix/bits/matrix_memop_internal.h \
+	$(INC)/matrix/bits/offset_helper.h \
 	$(INC)/matrix/bits/ref_matrix_internal.h \
-	$(INC)/matrix/bits/ewise_matrix_eval_internal.h \
-	$(INC)/matrix/bits/matrix_reduction_internal.h \
-	$(INC)/matrix/bits/matrix_par_reduc_internal.h \
-	$(INC)/matrix/bits/repeat_vectors_internal.h \
-	$(INC)/matrix.h \
-	$(INC)/engine/arithmetic_functors.h \
-	$(INC)/engine/elementary_functors.h \
-	$(INC)/engine/reduction_functors.h
+	$(INC)/matrix/bits/dense_matrix_internal.h \
+	$(INC)/matrix.h
 	
 
 #---------- Target groups -------------------
@@ -144,10 +126,7 @@ test_core: $(BIN)/test_memory
 
 .PHONY: test_matrix
 test_matrix: \
-	$(BIN)/test_matrix_basics \
-	$(BIN)/test_matrix_subviews \
-	$(BIN)/test_matrix_eval \
-	$(BIN)/test_matrix_reduc
+	$(BIN)/test_matrix_basics
 
 
 #_________________________________________________________________________
@@ -178,12 +157,12 @@ $(BIN)/test_memory: $(CORE_H) $(TEST_MEMORY_SOURCES)
 #----------------------------------------------------------
 
 TEST_MATRIX_BASICS_SOURCES = \
-	test/matrix/test_dense_matrix.cpp \
 	test/matrix/test_ref_matrix.cpp \
-	test/matrix/test_matrix_manip.cpp \
+	test/matrix/test_dense_matrix.cpp \
+	test/matrix/test_matrix_memop.cpp \
 	test/matrix/test_matrix_assign.cpp
 	
-$(BIN)/test_matrix_basics: $(MATRIX_H) $(TEST_MATRIX_BASICS_SOURCES)
+$(BIN)/test_matrix_basics: $(MATRIX_BASE_H) $(TEST_MATRIX_BASICS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
 	
 TEST_MATRIX_SUBVIEWS_SOURCES = \
