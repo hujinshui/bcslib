@@ -83,8 +83,8 @@ namespace bcs
 	template<class Expr> struct vec_reader;  	// dispatch Expr --> linear vector reader
 	template<class Expr> struct vec_accessor;	// dispatch Expr --> linear vector accessor
 
-	template<class Expr> struct colwise_reader;		// dispatch Expr --> column-wise reader
-	template<class Expr> struct colwise_accessor; 	// dispatch Expr --> column-wise accessor
+	template<class Expr> struct colwise_reader_set;		// dispatch Expr --> column-wise reader set
+	template<class Expr> struct colwise_accessor_set; 	// dispatch Expr --> column-wise accessor set
 
 
 	// forward declaration of useful memory operations
