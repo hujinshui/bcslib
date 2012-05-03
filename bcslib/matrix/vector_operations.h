@@ -18,19 +18,47 @@
 namespace bcs
 {
 
-	template<typename T, class SVec, class DVec, class Scheme>
+	/********************************************
+	 *
+	 *  general operations
+	 *
+	 ********************************************/
+
+	template<class Scheme, typename T, class SVec, class DVec>
 	BCS_ENSURE_INLINE
-	void copy_vec(const IVecReader<SVec, T>& src, IVecWriter<DVec, T>& dst, const Scheme& sch)
+	void copy_vec(const Scheme& sch,
+			const IVecReader<SVec, T>& in, IVecAccessor<DVec, T>& out)
 	{
-		detail::vec_copy_helper<SVec, DVec, Scheme>::run(src.derived(), dst.derived(), sch);
+		detail::vec_copy_helper<Scheme>::run(sch, in.derived(), out.derived());
+	}
+
+	template<class Scheme, typename T, class SVS, class DVS>
+	inline void copy_vecs(const Scheme& sch, const index_t n,
+			const IVecReaderSet<SVS, T>& in_set, IVecAccessorSet<DVS, T>& out_set)
+	{
+		for (index_t j = 0; j < n; ++j)
+		{
+			typename SVS::reader_type in(in_set, j);
+			typename DVS::accessor_type out(out_set, j);
+			copy_vec(sch, in, out);
+		}
 	}
 
 
-	template<typename T, class DVec, class Scheme>
+	template<class Scheme, class Reductor, typename T, class Mat>
 	BCS_ENSURE_INLINE
-	void set_vec(IVecWriter<DVec, T>& dst, const T& v, const Scheme& sch)
+	inline typename Reductor::accum_type accum_vec(const Scheme& sch,
+			Reductor reduc, const IVecReader<Mat, T>& in)
 	{
-		detail::vec_set_helper<T, DVec, Scheme>::run(dst.derived(), v, sch);
+		return detail::vec_accum_helper<Scheme>::run(reduc, in);
+	}
+
+	template<class Scheme, class Reductor, typename T, class LMat, class RMat>
+	BCS_ENSURE_INLINE
+	inline typename Reductor::accum_type accum_vec(const Scheme& sch,
+			Reductor reduc, const IVecReader<LMat, T>& left_in, const IVecReader<RMat, T>& right_in)
+	{
+		return detail::vec_accum_helper<Scheme>::run(reduc, left_in, right_in);
 	}
 
 

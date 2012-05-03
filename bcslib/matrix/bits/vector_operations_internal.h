@@ -26,167 +26,162 @@ namespace bcs { namespace detail {
 	 *
 	 ********************************************/
 
-	template<class SVec, class DVec, class Scheme>
-	struct vec_copy_helper;
+	template<class Scheme> struct vec_copy_helper;
 
-	template<class SVec, class DVec>
-	struct vec_copy_helper<SVec, DVec, vecscheme_by_scalars>
+	template<>
+	struct vec_copy_helper<vecscheme_by_scalars>
 	{
-		BCS_ENSURE_INLINE
-		static void run(const SVec& svec, DVec& dvec, const vecscheme_by_scalars& sch)
+		template<class SVec, class DVec>
+		BCS_ENSURE_INLINE static void run(const vecscheme_by_scalars& sch, const SVec& in, DVec& out)
 		{
 			index_t len = sch.length;
 			for (index_t i = 0; i < len; ++i)
-			{
-				dvec.store_scalar(i, svec.load_scalar(i));
-			}
+				out.store_scalar(i, in.load_scalar(i));
 		}
 	};
 
-	template<class SVec, class DVec, int N>
-	struct vec_copy_helper<SVec, DVec, vecscheme_by_fixed_num_scalars<N> >
+
+	template<int N>
+	struct vec_copy_helper<vecscheme_by_fixed_num_scalars<N> >
 	{
-		BCS_ENSURE_INLINE
-		static void run(const SVec& svec, DVec& dvec, vecscheme_by_fixed_num_scalars<N>)
+		template<class SVec, class DVec>
+		BCS_ENSURE_INLINE static void run(vecscheme_by_fixed_num_scalars<N>, const SVec& in, DVec& out)
 		{
 			for (index_t i = 0; i < N; ++i)
-			{
-				dvec.store_scalar(i, svec.load_scalar(i));
-			}
+				out.store_scalar(i, in.load_scalar(i));
 		}
 	};
 
-	template<class SVec, class DVec>
-	struct vec_copy_helper<SVec, DVec, vecscheme_by_fixed_num_scalars<1> >
+	template<>
+	struct vec_copy_helper<vecscheme_by_fixed_num_scalars<1> >
 	{
-		BCS_ENSURE_INLINE
-		static void run(const SVec& svec, DVec& dvec, vecscheme_by_fixed_num_scalars<1>)
+		template<class SVec, class DVec>
+		BCS_ENSURE_INLINE static void run(vecscheme_by_fixed_num_scalars<1>, const SVec& in, DVec& out)
 		{
-			dvec.store_scalar(0, svec.load_scalar(0));
+			out.store_scalar(0, in.load_scalar(0));
 		}
 	};
 
-	template<class SVec, class DVec>
-	struct vec_copy_helper<SVec, DVec, vecscheme_by_fixed_num_scalars<2> >
+	template<>
+	struct vec_copy_helper<vecscheme_by_fixed_num_scalars<2> >
 	{
-		BCS_ENSURE_INLINE
-		static void run(const SVec& svec, DVec& dvec, vecscheme_by_fixed_num_scalars<2>)
+		template<class SVec, class DVec>
+		BCS_ENSURE_INLINE static void run(vecscheme_by_fixed_num_scalars<2>, const SVec& in, DVec& out)
 		{
-			dvec.store_scalar(0, svec.load_scalar(0));
-			dvec.store_scalar(1, svec.load_scalar(1));
+			out.store_scalar(0, in.load_scalar(0));
+			out.store_scalar(1, in.load_scalar(1));
 		}
 	};
 
-	template<class SVec, class DVec>
-	struct vec_copy_helper<SVec, DVec, vecscheme_by_fixed_num_scalars<3> >
+	template<>
+	struct vec_copy_helper<vecscheme_by_fixed_num_scalars<3> >
 	{
-		BCS_ENSURE_INLINE
-		static void run(const SVec& svec, DVec& dvec, vecscheme_by_fixed_num_scalars<3>)
+		template<class SVec, class DVec>
+		BCS_ENSURE_INLINE static void run(vecscheme_by_fixed_num_scalars<3>, const SVec& in, DVec& out)
 		{
-			dvec.store_scalar(0, svec.load_scalar(0));
-			dvec.store_scalar(1, svec.load_scalar(1));
-			dvec.store_scalar(2, svec.load_scalar(2));
+			out.store_scalar(0, in.load_scalar(0));
+			out.store_scalar(1, in.load_scalar(1));
+			out.store_scalar(2, in.load_scalar(2));
 		}
 	};
 
-	template<class SVec, class DVec>
-	struct vec_copy_helper<SVec, DVec, vecscheme_by_fixed_num_scalars<4> >
+	template<>
+	struct vec_copy_helper<vecscheme_by_fixed_num_scalars<4> >
 	{
-		BCS_ENSURE_INLINE
-		static void run(const SVec& svec, DVec& dvec, vecscheme_by_fixed_num_scalars<4>)
+		template<class SVec, class DVec>
+		BCS_ENSURE_INLINE static void run(vecscheme_by_fixed_num_scalars<4>, const SVec& in, DVec& out)
 		{
-			dvec.store_scalar(0, svec.load_scalar(0));
-			dvec.store_scalar(1, svec.load_scalar(1));
-			dvec.store_scalar(2, svec.load_scalar(2));
-			dvec.store_scalar(3, svec.load_scalar(3));
+			out.store_scalar(0, in.load_scalar(0));
+			out.store_scalar(1, in.load_scalar(1));
+			out.store_scalar(2, in.load_scalar(2));
+			out.store_scalar(3, in.load_scalar(3));
 		}
 	};
-
 
 
 	/********************************************
 	 *
-	 *  set
+	 *  accum
+	 *
+	 *  pre-condition: len > 0
 	 *
 	 ********************************************/
 
-	template<typename T, class DVec, class Scheme>
-	struct vec_set_helper;
+	template<class Scheme> struct vec_accum_helper;
 
-	template<typename T, class DVec>
-	struct vec_set_helper<T, DVec, vecscheme_by_scalars>
+	template<>
+	struct vec_accum_helper<vecscheme_by_scalars>
 	{
-		BCS_ENSURE_INLINE
-		static void run(DVec& dvec, const T val, const vecscheme_by_scalars& sch)
+		template<class Reductor, class Vec>
+		inline static typename Reductor::accum_type
+		run(const vecscheme_by_scalars& sch, Reductor reduc, const Vec& in)
 		{
+			typename Reductor::accum_type a = reduc(in.load_scalar(0));
+
 			index_t len = sch.length;
-			for (index_t i = 0; i < len; ++i)
-			{
-				dvec.store_scalar(i, val);
-			}
-		}
-	};
+			for (index_t i = 1; i < len; ++i) a = reduc(a, in.load_scalar(i));
 
-	template<typename T, class DVec, int N>
-	struct vec_set_helper<T, DVec, vecscheme_by_fixed_num_scalars<N> >
-	{
-		BCS_ENSURE_INLINE
-		static void run(DVec& dvec, const T val, vecscheme_by_fixed_num_scalars<N>)
+			return a;
+		}
+
+		template<class Reductor, class LVec, class RVec>
+		inline static typename Reductor::accum_type
+		run(const vecscheme_by_scalars& sch, Reductor reduc, const LVec& left_in, const RVec& right_in)
 		{
-			for (index_t i = 0; i < N; ++i)
-			{
-				dvec.store_scalar(i, val);
-			}
+			typename Reductor::accum_type a = reduc(left_in.load_scalar(0), right_in.load_scalar(0));
+
+			index_t len = sch.length;
+			for (index_t i = 1; i < len; ++i) a = reduc(a, left_in.load_scalar(i), right_in.load_scalar(i));
+
+			return a;
 		}
 	};
 
 
-	template<typename T, class DVec>
-	struct vec_set_helper<T, DVec, vecscheme_by_fixed_num_scalars<1> >
+	template<int N>
+	struct vec_accum_helper<vecscheme_by_fixed_num_scalars<N> >
 	{
-		BCS_ENSURE_INLINE
-		static void run(DVec& dvec, const T val, vecscheme_by_fixed_num_scalars<1>)
+		template<class Reductor, class Vec>
+		inline static typename Reductor::accum_type
+		run(const vecscheme_by_scalars& sch, Reductor reduc, const Vec& in)
 		{
-			dvec.store_scalar(0, val);
+			typename Reductor::accum_type a = reduc(in.load_scalar(0));
+			for (index_t i = 1; i < N; ++i) a = reduc(a, in.load_scalar(i));
+			return a;
+		}
+
+		template<class Reductor, class LVec, class RVec>
+		inline static typename Reductor::accum_type
+		run(const vecscheme_by_scalars& sch, Reductor reduc, const LVec& left_in, const RVec& right_in)
+		{
+			typename Reductor::accum_type a = reduc(left_in.load_scalar(0), right_in.load_scalar(0));
+			for (index_t i = 1; i < N; ++i) a = reduc(a, left_in.load_scalar(i), right_in.load_scalar(i));
+			return a;
 		}
 	};
 
-	template<typename T, class DVec>
-	struct vec_set_helper<T, DVec, vecscheme_by_fixed_num_scalars<2> >
+
+	template<int N>
+	struct vec_accum_helper<vecscheme_by_fixed_num_scalars<1> >
 	{
-		BCS_ENSURE_INLINE
-		static void run(DVec& dvec, const T val, vecscheme_by_fixed_num_scalars<2>)
+		template<class Reductor, class Vec>
+		inline static typename Reductor::accum_type
+		run(const vecscheme_by_scalars& sch, Reductor reduc, const Vec& in)
 		{
-			dvec.store_scalar(0, val);
-			dvec.store_scalar(1, val);
+			return reduc(in.load_scalar(0));
+		}
+
+		template<class Reductor, class LVec, class RVec>
+		inline static typename Reductor::accum_type
+		run(const vecscheme_by_scalars& sch, Reductor reduc, const LVec& left_in, const RVec& right_in)
+		{
+			return reduc(left_in.load_scalar(0), right_in.load_scalar(0));
 		}
 	};
 
-	template<typename T, class DVec>
-	struct vec_set_helper<T, DVec, vecscheme_by_fixed_num_scalars<3> >
-	{
-		BCS_ENSURE_INLINE
-		static void run(DVec& dvec, const T val, vecscheme_by_fixed_num_scalars<3>)
-		{
-			dvec.store_scalar(0, val);
-			dvec.store_scalar(1, val);
-			dvec.store_scalar(2, val);
-		}
-	};
-
-	template<typename T, class DVec>
-	struct vec_set_helper<T, DVec, vecscheme_by_fixed_num_scalars<4> >
-	{
-		BCS_ENSURE_INLINE
-		static void run(DVec& dvec, const T val, vecscheme_by_fixed_num_scalars<4>)
-		{
-			dvec.store_scalar(0, val);
-			dvec.store_scalar(1, val);
-			dvec.store_scalar(2, val);
-			dvec.store_scalar(3, val);
-		}
-	};
 
 } }
 
 #endif /* VECTOR_OPERATIONS_INTERNAL_H_ */
+
+
