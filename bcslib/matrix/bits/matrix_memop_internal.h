@@ -116,7 +116,7 @@ namespace bcs { namespace detail {
 		typedef typename matrix_traits<LMat>::value_type T;
 
 		static const bool AreBothDense = is_dense_mat<LMat>::value && is_dense_mat<RMat>::value;
-		static const bool AreBothCont = is_continuous_mat<LMat>::value && is_continuous_mat<RMat>::value;
+		static const bool AreBothCont = has_continuous_layout<LMat>::value && has_continuous_layout<RMat>::value;
 
 		typedef typename select_type<AreBothDense,
 					typename select_type<AreBothCont,
@@ -218,7 +218,7 @@ namespace bcs { namespace detail {
 		typedef typename matrix_traits<LMat>::value_type T;
 
 		static const bool AreBothDense = is_dense_mat<LMat>::value && is_dense_mat<RMat>::value;
-		static const bool AreBothCont = is_continuous_mat<LMat>::value && is_continuous_mat<RMat>::value;
+		static const bool AreBothCont = has_continuous_layout<LMat>::value && has_continuous_layout<RMat>::value;
 
 		typedef typename select_type<AreBothDense,
 					typename select_type<AreBothCont,
@@ -320,7 +320,7 @@ namespace bcs { namespace detail {
 		typedef typename matrix_traits<DMat>::value_type T;
 
 		typedef typename select_type<is_dense_mat<DMat>::value,
-					typename select_type<is_continuous_mat<DMat>::value,
+					typename select_type<has_continuous_layout<DMat>::value,
 						fill_helper_directmem<T, DMat>,
 						fill_helper_colwise_directmem<T, DMat> >::type,
 					fill_helper_regular<T, DMat> >::type type;
@@ -419,7 +419,7 @@ namespace bcs { namespace detail {
 		typedef typename matrix_traits<DMat>::value_type T;
 
 		typedef typename select_type<is_dense_mat<DMat>::value,
-					typename select_type<is_continuous_mat<DMat>::value,
+					typename select_type<has_continuous_layout<DMat>::value,
 						zero_helper_directmem<T, DMat>,
 						zero_helper_colwise_directmem<T, DMat> >::type,
 					zero_helper_regular<T, DMat> >::type type;
