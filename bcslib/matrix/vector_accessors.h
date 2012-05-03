@@ -299,16 +299,13 @@ namespace bcs
 		explicit dense_colwise_reader_set(const Mat& a)
 		: m_mat(a) { }
 
-
-		BCS_ENSURE_INLINE const Mat& mat() const { return m_mat; }
-
 	public:
 		class reader_type : public IVecReader<reader_type, T>, private noncopyable
 		{
 		public:
 			BCS_ENSURE_INLINE
 			reader_type(const dense_colwise_reader_set& host, const index_t j)
-			: m_internal(col_ptr(host.mat(), j))
+			: m_internal(col_ptr(host.m_mat, j))
 			{
 			}
 
@@ -344,15 +341,13 @@ namespace bcs
 		explicit dense_colwise_accessor_set(Mat& a)
 		: m_mat(a) { }
 
-		BCS_ENSURE_INLINE Mat& mat() { return m_mat; }
-
 	public:
 		class accessor_type : public IVecReader<accessor_type, T>, private noncopyable
 		{
 		public:
 			BCS_ENSURE_INLINE
 			accessor_type(dense_colwise_accessor_set& host, const index_t j)
-			: m_internal(col_ptr(host.mat(), j))
+			: m_internal(col_ptr(host.m_mat, j))
 			{
 			}
 
@@ -393,15 +388,13 @@ namespace bcs
 		explicit view_colwise_reader_set(const Mat& mat)
 		: m_mat(mat) { }
 
-		BCS_ENSURE_INLINE const Mat& mat() const { return m_mat; }
-
 	public:
 		class reader_type : public IVecReader<reader_type, T>, private noncopyable
 		{
 		public:
 			BCS_ENSURE_INLINE
 			reader_type(const view_colwise_reader_set& host, const index_t j)
-			: m_mat(host.mat()), m_icol(j)
+			: m_mat(host.m_mat), m_icol(j)
 			{
 			}
 
@@ -437,15 +430,13 @@ namespace bcs
 		BCS_ENSURE_INLINE
 		explicit cache_colwise_reader_set(const Mat& a) : m_cache(a) { }
 
-		BCS_ENSURE_INLINE const Mat& cached_mat() const { return m_cache; }
-
 	public:
 		class reader_type : public IVecReader<reader_type, T>, private noncopyable
 		{
 		public:
 			BCS_ENSURE_INLINE
-			reader_type(const cache_colwise_reader& host, const index_t j)
-			: m_internal(col_ptr(host.cached_mat(), j))
+			reader_type(const cache_colwise_reader_set& host, const index_t j)
+			: m_internal(col_ptr(host.m_cache, j))
 			{
 			}
 
@@ -475,7 +466,7 @@ namespace bcs
 	 *
 	 ********************************************/
 
-	struct as_linear_vector_tag { };
+	struct as_single_vector_tag { };
 	struct by_columns_tag { };
 	struct by_short_columns_tag { };
 
@@ -497,10 +488,10 @@ namespace bcs
 	const int CachedByColumnAccessCost = CachedAccessCost + DenseByColumnAccessCost;
 	const int CachedByShortColumnAccessCost = CachedAccessCost + DenseByShortColumnAccessCost;
 
-
+	const int ShortColumnBound = 2;
 
 	template<class Expr>
-	struct vecacc_cost<Expr, as_linear_vector_tag>
+	struct vecacc_cost<Expr, as_single_vector_tag>
 	{
 		static const int value =
 				(has_continuous_layout<Expr>::value ?
@@ -532,6 +523,13 @@ namespace bcs
 						(is_mat_view<Expr>::value ?
 								GeneralByShortColumnAccessCost :
 								CachedByShortColumnAccessCost) );
+	};
+
+
+	template<class Expr1, class Expr2, typename Tag>
+	struct vecacc2_cost
+	{
+		static const int value = vecacc_cost<Expr1, Tag>::value + vecacc_cost<Expr2, Tag>::value;
 	};
 
 

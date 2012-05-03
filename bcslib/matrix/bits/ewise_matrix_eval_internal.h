@@ -13,7 +13,8 @@
 #ifndef BCSLIB_EWISE_MATRIX_EVAL_INTERNAL_H_
 #define BCSLIB_EWISE_MATRIX_EVAL_INTERNAL_H_
 
-#include <bcslib/matrix/vector_proxy.h>
+#include <bcslib/matrix/ewise_matrix_expr.h>
+#include <bcslib/matrix/vector_operations.h>
 
 namespace bcs { namespace detail {
 
@@ -24,58 +25,79 @@ namespace bcs { namespace detail {
 	 *
 	 ********************************************/
 
-	template<class Expr, class DMat, bool DoLinear>
-	struct ewise_evaluator;
+	template<class Expr, class DMat>
+	BCS_ENSURE_INLINE
+	inline void ewise_evaluate_as_single_vector(const Expr& src, DMat& dst)
+	{
+		typename vec_reader<Expr>::type in;
+		typename vec_accessor<DMat>::type out;
 
+		typename vecscheme_as_single_vec<Expr>::type sch =
+				vecscheme_as_single_vec<Expr>::get(src);
+
+		copy_vec(sch, in, out);
+	}
 
 	template<class Expr, class DMat>
-	struct ewise_evaluator<Expr, DMat, false>
+	BCS_ENSURE_INLINE
+	inline void ewise_evaluate_by_columns(const Expr& src, DMat& dst)
 	{
-		typedef typename matrix_traits<Expr>::value_type value_type;
+		typename colwise_reader_set<Expr>::type in_set(src);
+		typename colwise_accessor_set<DMat>::type out_set(dst);
 
-		static void run(const Expr& expr, DMat& dst)
-		{
-			vecwise_reader<Expr> reader(expr);
-			vecwise_writer<DMat> writer(dst);
+		typename vecscheme_by_columns<Expr>::type sch =
+				vecscheme_by_columns<Expr>::get(src);
 
-			index_t m = expr.nrows();
-			index_t n = expr.ncolumns();
+		copy_vecs(sch, src.ncolumns(), in_set, out_set);
+	}
 
-			if (n == 1)
-			{
-				copy_vec(m, reader, writer);
-			}
-			else
-			{
-				for (index_t j = 0; j < n; ++j, ++reader, ++writer)
-				{
-					copy_vec(m, reader, writer);
-				}
-			}
-		}
 
-	};
-
+	template<class Expr, class DMat, bool IsDMatLinearAccessible>
+	struct ewise_evaluator;
 
 	template<class Expr, class DMat>
 	struct ewise_evaluator<Expr, DMat, true>
 	{
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(is_accessible_as_vector<Expr>::value, "Expr must be accessible-as-vector");
-		static_assert(matrix_traits<DMat>::is_linear_indexable, "DMat must be linearly indexable");
-#endif
+		// (compile-time) calculation to select the better way to perform calculation
 
-		typedef typename matrix_traits<Expr>::value_type value_type;
+		static const bool has_short_columns =
+				binary_ct_rows<Expr, DMat>::value <= ShortColumnBound;
 
-		static void run(const Expr& expr, DMat& dst)
+		static const bool prefer_by_columns_way =
+				(has_short_columns ?
+						(vecacc2_cost<Expr, DMat, by_short_columns_tag>::value <
+						 vecacc2_cost<Expr, DMat, as_single_vector_tag>::value)
+						:
+						(vecacc2_cost<Expr, DMat, by_columns_tag>::value <
+						 vecacc2_cost<Expr, DMat, as_single_vector_tag>::value)
+				);
+
+		BCS_ENSURE_INLINE
+		static void evaluate(const Expr& src, DMat& dst)
 		{
-			vec_reader<Expr> reader(expr);
-			vec_writer<DMat> writer(dst);
-
-			copy_vec(expr.nelems(), reader, writer);
+			if (prefer_by_columns_way)
+			{
+				ewise_evaluate_by_columns(src, dst);
+			}
+			else
+			{
+				ewise_evaluate_as_single_vector(src, dst);
+			}
 		}
-
 	};
+
+	template<class Expr, class DMat>
+	struct ewise_evaluator<Expr, DMat, false>
+	{
+		BCS_ENSURE_INLINE
+		static void evaluate(const Expr& src, DMat& dst)
+		{
+			ewise_evaluate_by_columns(src, dst);
+		}
+	};
+
+
+
 
 
 } }
