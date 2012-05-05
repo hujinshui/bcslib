@@ -40,9 +40,9 @@ namespace bcs
 		}
 
 		BCS_ENSURE_INLINE
-		value_type load_scalar(const index_t i) const
+		value_type get(const index_t i) const
 		{
-			return fun(arg_reader.load_scalar(i));
+			return fun(arg_reader.get(i));
 		}
 
 	private:
@@ -69,31 +69,35 @@ namespace bcs
 		}
 
 		BCS_ENSURE_INLINE
-		value_type load_scalar(const index_t i) const
+		value_type get(const index_t i) const
 		{
-			return fun(left_in.load_scalar(i), right_in.load_scalar(i));
+			return fun(left_in.get(i), right_in.get(i));
 		}
 
 	private:
 		Fun fun;
-		typename vec_reader<Arg>::type left_in;
-		typename vec_reader<Arg>::type right_in;
+		typename vec_reader<LArg>::type left_in;
+		typename vec_reader<RArg>::type right_in;
 	};
 
 
 	template<typename Fun, class Arg>
-	class unary_ewise_colwise_reader_set
-	: public IVecReaderSet<unary_ewise_colwise_reader_set<Fun, Arg>, typename Fun::result_type>
+	class unary_ewise_colreaders
+	: public IVecReaderBank<unary_ewise_colreaders<Fun, Arg>, typename Fun::result_type>
 	, private noncopyable
 	{
 	public:
 		typedef unary_ewise_expr<Fun, Arg> expr_type;
 		typedef typename Fun::result_type value_type;
-		typedef typename colwise_reader_set<Arg>::type arg_reader_set_type;
 
+	private:
+		typedef typename colwise_reader_bank<Arg>::type arg_reader_bank_t;
+		typedef typename arg_reader_bank_t::reader_type arg_col_reader_t;
+
+	public:
 		BCS_ENSURE_INLINE
-		explicit unary_ewise_colwise_reader_set(const expr_type& expr)
-		: m_fun(expr.fun), m_arg_rset(expr.arg)
+		explicit unary_ewise_colreaders(const expr_type& expr)
+		: m_fun(expr.fun), m_arg_banks(expr.arg)
 		{
 		}
 
@@ -102,44 +106,50 @@ namespace bcs
 		{
 		public:
 			BCS_ENSURE_INLINE
-			reader_type(const unary_ewise_colwise_reader_set& host, const index_t j)
-			: m_host(host), m_in(host.m_arg_rset, j)
+			reader_type(const unary_ewise_colreaders& host, const index_t j)
+			: m_fun(host.m_fun), m_in(host.m_arg_banks, j)
 			{
 			}
 
 			BCS_ENSURE_INLINE
-			T load_scalar(const index_t i) const
+			value_type get(const index_t i) const
 			{
-				return m_host.m_fun(m_in.load_scalar(i));
+				return m_fun(m_in.get(i));
 			}
 
 		private:
-			const unary_ewise_colwise_reader_set& m_host;
-			typename arg_reader_set_type::reader_type m_in;
+			const Fun& m_fun;
+			arg_col_reader_t m_in;
 		};
 
 	private:
 		Fun m_fun;
-		arg_reader_set_type m_arg_rset;
+		arg_reader_bank_t m_arg_banks;
 	};
 
 
 	template<typename Fun, class LArg, class RArg>
-	class binary_ewise_colwise_reader_set
-	: public IVecReaderSet<binary_ewise_colwise_reader_set<Fun, LArg, RArg>, typename Fun::result_type>
+	class binary_ewise_colreaders
+	: public IVecReaderBank<binary_ewise_colreaders<Fun, LArg, RArg>, typename Fun::result_type>
 	, private noncopyable
 	{
 	public:
 		typedef binary_ewise_expr<Fun, LArg, RArg> expr_type;
 		typedef typename Fun::result_type value_type;
-		typedef typename colwise_reader_set<LArg>::type left_arg_reader_set_type;
-		typedef typename colwise_reader_set<RArg>::type right_arg_reader_set_type;
 
+	private:
+		typedef typename colwise_reader_bank<LArg>::type left_arg_reader_bank_t;
+		typedef typename colwise_reader_bank<RArg>::type right_arg_reader_bank_t;
+
+		typedef typename left_arg_reader_bank_t::reader_type left_arg_col_reader_t;
+		typedef typename right_arg_reader_bank_t::reader_type right_arg_col_reader_t;
+
+	public:
 		BCS_ENSURE_INLINE
-		explicit binary_ewise_colwise_reader_set(const expr_type& expr)
+		explicit binary_ewise_colreaders(const expr_type& expr)
 		: m_fun(expr.fun)
-		, m_left_arg_rset(expr.left_arg)
-		, m_right_arg_rset(expr.right_arg)
+		, m_left_arg_banks(expr.left_arg)
+		, m_right_arg_banks(expr.right_arg)
 		{
 		}
 
@@ -148,30 +158,32 @@ namespace bcs
 		{
 		public:
 			BCS_ENSURE_INLINE
-			reader_type(const binary_ewise_colwise_reader_set& H, const index_t j)
-			: m_host(H)
-			, m_left_in(H.m_left_arg_rset, j)
-			, m_right_in(H.m_right_arg_rset, j)
+			reader_type(const binary_ewise_colreaders& host, const index_t j)
+			: m_fun(host.m_fun)
+			, m_left_in(host.m_left_arg_banks, j)
+			, m_right_in(host.m_right_arg_banks, j)
 			{
 			}
 
 			BCS_ENSURE_INLINE
-			T load_scalar(const index_t i) const
+			value_type get(const index_t i) const
 			{
-				return m_host.m_fun(m_left_in.load_scalar(i), m_right_in.load_scalar(i));
+				return m_fun(m_left_in.get(i), m_right_in.get(i));
 			}
 
 		private:
-			const binary_ewise_colwise_reader_set& m_host;
-			typename left_arg_reader_set_type::reader_type m_left_in;
-			typename right_arg_reader_set_type::reader_type m_right_in;
+			const Fun& m_fun;
+			left_arg_col_reader_t m_left_in;
+			right_arg_col_reader_t m_right_in;
 		};
 
 	private:
 		Fun m_fun;
-		left_arg_reader_set_type m_left_arg_rset;
-		right_arg_reader_set_type m_right_arg_rset;
+		left_arg_reader_bank_t m_left_arg_banks;
+		right_arg_reader_bank_t m_right_arg_banks;
 	};
+
+
 
 
 	/********************************************
@@ -208,15 +220,15 @@ namespace bcs
 	};
 
 	template<typename Fun, class Arg>
-	struct colwise_reader_set<unary_ewise_expr<Fun, Arg> >
+	struct colwise_reader_bank<unary_ewise_expr<Fun, Arg> >
 	{
-		typedef unary_ewise_colwise_reader_set<Fun, Arg> type;
+		typedef unary_ewise_colreaders<Fun, Arg> type;
 	};
 
 	template<typename Fun, class LArg, class RArg>
-	struct colwise_reader_set<binary_ewise_expr<Fun, LArg, RArg> >
+	struct colwise_reader_bank<binary_ewise_expr<Fun, LArg, RArg> >
 	{
-		typedef binary_ewise_colwise_reader_set<Fun, LArg, RArg> type;
+		typedef binary_ewise_colreaders<Fun, LArg, RArg> type;
 	};
 
 

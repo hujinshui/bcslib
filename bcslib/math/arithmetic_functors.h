@@ -13,7 +13,9 @@
 #ifndef BCSLIB_ARITHMETIC_FUNCTORS_H_
 #define BCSLIB_ARITHMETIC_FUNCTORS_H_
 
-#include <bcslib/core/functor_base.h>
+#include <bcslib/core/functional.h>
+#include <bcslib/math/scalar_math.h>
+#include <algorithm>
 
 namespace bcs
 {
@@ -212,7 +214,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE T operator() (const T& x, const T& y) const
 		{
-			return bcs::min(x, y);
+			return std::min(x, y);
 		}
 	};
 
@@ -228,7 +230,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE T operator() (const T& x) const
 		{
-			return bcs::min(x, scalar_arg);
+			return std::min(x, scalar_arg);
 		}
 	};
 
@@ -240,7 +242,7 @@ namespace bcs
 
 		BCS_ENSURE_INLINE T operator() (const T& x, const T& y) const
 		{
-			return bcs::max(x, y);
+			return std::max(x, y);
 		}
 	};
 
@@ -256,33 +258,33 @@ namespace bcs
 
 		BCS_ENSURE_INLINE T operator() (const T& x) const
 		{
-			return bcs::max(x, scalar_arg);
+			return std::max(x, scalar_arg);
 		}
 	};
 
 
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_plus )
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_minus )
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_times )
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_divides )
+	DECLARE_EWISE_FUNCTOR( binary_plus, 2 )
+	DECLARE_EWISE_FUNCTOR( binary_minus, 2 )
+	DECLARE_EWISE_FUNCTOR( binary_times, 2 )
+	DECLARE_EWISE_FUNCTOR( binary_divides, 2 )
 
-	DECLARE_UNARY_EWISE_FUNCTOR( plus_scalar )
-	DECLARE_UNARY_EWISE_FUNCTOR( minus_scalar )
-	DECLARE_UNARY_EWISE_FUNCTOR( rminus_scalar )
-	DECLARE_UNARY_EWISE_FUNCTOR( times_scalar )
-	DECLARE_UNARY_EWISE_FUNCTOR( divides_scalar )
-	DECLARE_UNARY_EWISE_FUNCTOR( rdivides_scalar )
+	DECLARE_EWISE_FUNCTOR( plus_scalar, 1 )
+	DECLARE_EWISE_FUNCTOR( minus_scalar, 1 )
+	DECLARE_EWISE_FUNCTOR( rminus_scalar, 1 )
+	DECLARE_EWISE_FUNCTOR( times_scalar, 1 )
+	DECLARE_EWISE_FUNCTOR( divides_scalar, 1 )
+	DECLARE_EWISE_FUNCTOR( rdivides_scalar, 1 )
 
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_negate )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_rcp )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_abs )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_sqr )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_cube )
+	DECLARE_EWISE_FUNCTOR( unary_negate, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_rcp, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_abs, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_sqr, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_cube, 1 )
 
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_min )
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_max )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_min )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_max )
+	DECLARE_EWISE_FUNCTOR( binary_min, 2 )
+	DECLARE_EWISE_FUNCTOR( binary_max, 2 )
+	DECLARE_EWISE_FUNCTOR( unary_min, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_max, 1 )
 
 }
 

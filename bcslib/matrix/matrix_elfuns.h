@@ -14,7 +14,7 @@
 #define BCSLIB_MATRIX_ELFUNS_H_
 
 #include <bcslib/matrix/ewise_matrix_expr.h>
-#include <bcslib/engine/elementary_functors.h>
+#include <bcslib/math/elementary_functors.h>
 
 namespace bcs
 {

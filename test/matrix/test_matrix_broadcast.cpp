@@ -89,7 +89,6 @@ TEST( MatrixBroadcast, AddCols11  )
 }
 
 
-
 template<int CTRows, int CTCols>
 void test_bsx_addrows(index_t m, index_t n)
 {

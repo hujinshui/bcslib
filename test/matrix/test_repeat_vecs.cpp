@@ -24,7 +24,16 @@ void test_repeat_dense_cols(index_t m, index_t n)
 		for (index_t i = 0; i < m; ++i) R0(i, j) = col(i, 0);
 	}
 
-	dense_matrix<double, CTRows, CTCols> R(repeat_cols(col, n));
+	dense_matrix<double, CTRows, CTCols> R;
+
+	if (CTCols == DynamicDim)
+	{
+		R = repeat_cols(col, n);
+	}
+	else
+	{
+		R = repcols<CTCols>::of(col);
+	}
 
 	ASSERT_EQ( m, R.nrows() );
 	ASSERT_EQ( n, R.ncolumns() );
@@ -91,7 +100,17 @@ void test_repeat_dense_rows(index_t m, index_t n)
 		for (index_t i = 0; i < m; ++i) R0(i, j) = row(0, j);
 	}
 
-	dense_matrix<double, CTRows, CTCols> R(repeat_rows(row, m));
+	dense_matrix<double, CTRows, CTCols> R;
+
+	if (CTRows == DynamicDim)
+	{
+		R = repeat_rows(row, m);
+	}
+	else
+	{
+		R = reprows<CTRows>::of(row);
+	}
+
 
 	ASSERT_EQ( m, R.nrows() );
 	ASSERT_EQ( n, R.ncolumns() );
@@ -163,7 +182,15 @@ void test_repeat_refex_cols(index_t m, index_t n)
 
 	dense_matrix<double> R_(ldim, n, 0.0);
 	ref_matrix_ex<double, CTRows, CTCols> R(R_.ptr_data(), m, n, ldim);
-	R = repeat_cols(col, n);
+
+	if (CTCols == DynamicDim)
+	{
+		R = repeat_cols(col, n);
+	}
+	else
+	{
+		R = repcols<CTCols>::of(col);
+	}
 
 	ASSERT_EQ( m, R.nrows() );
 	ASSERT_EQ( n, R.ncolumns() );
@@ -235,13 +262,20 @@ void test_repeat_refex_rows(index_t m, index_t n)
 
 	dense_matrix<double> R_(ldim, n, 0.0);
 	ref_matrix_ex<double, CTRows, CTCols> R(R_.ptr_data(), m, n, ldim);
-	R = repeat_rows(row, m);
+
+	if (CTRows == DynamicDim)
+	{
+		R = repeat_rows(row, m);
+	}
+	else
+	{
+		R = reprows<CTRows>::of(row);
+	}
 
 	ASSERT_EQ( m, R.nrows() );
 	ASSERT_EQ( n, R.ncolumns() );
 
 	ASSERT_TRUE( is_equal(R, R0) );
-
 }
 
 

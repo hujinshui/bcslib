@@ -83,8 +83,8 @@ namespace bcs
 	template<class Expr> struct vec_reader;  	// dispatch Expr --> linear vector reader
 	template<class Expr> struct vec_accessor;	// dispatch Expr --> linear vector accessor
 
-	template<class Expr> struct colwise_reader_set;		// dispatch Expr --> column-wise reader set
-	template<class Expr> struct colwise_accessor_set; 	// dispatch Expr --> column-wise accessor set
+	template<class Expr> struct colwise_reader_bank;	// dispatch Expr --> column-wise reader bank
+	template<class Expr> struct colwise_accessor_bank; 	// dispatch Expr --> column-wise accessor bank
 
 
 	// forward declaration of useful memory operations
@@ -93,7 +93,7 @@ namespace bcs
 	inline bool is_equal(const IMatrixView<LMat, T>& A, const IMatrixView<RMat, T>& B);
 
 	template<typename T, class LMat, class RMat>
-	inline bool is_approx(const IMatrixView<LMat, T>& A, const IMatrixView<RMat, T>& B, const T tol);
+	inline bool is_approx(const IMatrixView<LMat, T>& A, const IMatrixView<RMat, T>& B, const T& tol);
 
 	template<typename T, class SExpr, class DMat>
 	inline void evaluate_to(const IMatrixXpr<SExpr, T>& src, IDenseMatrix<DMat, T>& dst);

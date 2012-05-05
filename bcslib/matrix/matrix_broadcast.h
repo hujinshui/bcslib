@@ -17,7 +17,7 @@
 #include <bcslib/matrix/slicewise_proxy.h>
 #include <bcslib/matrix/repeat_vectors.h>
 
-#include <bcslib/engine/arithmetic_functors.h>
+#include <bcslib/math/arithmetic_functors.h>
 
 
 namespace bcs
@@ -48,7 +48,7 @@ namespace bcs
 	map_ewise(Fun f, const_colwise_proxy<LMat, T> A, const IMatrixXpr<RVec, T>& b)
 	{
 #ifdef BCS_USE_STATIC_ASSERT
-		static_assert(is_binary_ewise_functor<Fun>::value, "Fun must be a binary-ewise-functor");
+		static_assert(is_ewise_functor<Fun, 2>::value, "Fun must be a binary-ewise-functor");
 #endif
 		return map_ewise( f, A.ref(), repeat_cols(b.derived(), A.ref().ncolumns()) );
 	}
@@ -60,7 +60,7 @@ namespace bcs
 	map_ewise(Fun f, const_rowwise_proxy<LMat, T> A, const IMatrixXpr<RVec, T>& b)
 	{
 #ifdef BCS_USE_STATIC_ASSERT
-		static_assert(is_binary_ewise_functor<Fun>::value, "Fun must be a binary-ewise-functor");
+		static_assert(is_ewise_functor<Fun, 2>::value, "Fun must be a binary-ewise-functor");
 #endif
 		return map_ewise( f, A.ref(), repeat_rows(b.derived(), A.ref().nrows()) );
 	}

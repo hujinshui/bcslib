@@ -27,7 +27,6 @@ namespace bcs
 	{
 		// inclusion C++03 standard ones
 
-		using std::fabs;
 		using std::sqrt;
 		using std::pow;
 
@@ -56,7 +55,17 @@ namespace bcs
 		template<typename T>
 		inline BCS_ENSURE_INLINE T abs(T x)
 		{
-			return x > 0 ? x : -x;
+			return std::abs(x);
+		}
+
+		inline BCS_ENSURE_INLINE float abs(float x)
+		{
+			return std::fabs(x);
+		}
+
+		inline BCS_ENSURE_INLINE double abs(double x)
+		{
+			return std::fabs(x);
 		}
 
 		template<typename T>
@@ -64,6 +73,7 @@ namespace bcs
 		{
 			return x > y ? x - y : y - x;
 		}
+
 
 		template<typename T>
 		inline BCS_ENSURE_INLINE T sqr(T x)
