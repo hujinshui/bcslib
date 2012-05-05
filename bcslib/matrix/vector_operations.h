@@ -13,53 +13,58 @@
 #ifndef BCSLIB_VECTOR_OPERATIONS_H_
 #define BCSLIB_VECTOR_OPERATIONS_H_
 
-#include <bcslib/matrix/bits/vector_operations_internal.h>
+#include <bcslib/matrix/vector_accessors.h>
 
 namespace bcs
 {
 
 	/********************************************
 	 *
-	 *  general operations
+	 *  transfer
 	 *
 	 ********************************************/
 
-	template<class Scheme, typename T, class SVec, class DVec>
-	BCS_ENSURE_INLINE
-	void copy_vec(const Scheme& sch,
-			const IVecReader<SVec, T>& in, IVecAccessor<DVec, T>& out)
+	template<int N, class SVec, class DVec>
+	struct transfer_vec
 	{
-		detail::vec_copy_helper<Scheme>::run(sch, in.derived(), out.derived());
-	}
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(N >= 2, "The value of N must have N >= 2");
+#endif
 
-	template<class Scheme, typename T, class SVS, class DVS>
-	inline void copy_vecs(const Scheme& sch, const index_t n,
-			const IVecReaderSet<SVS, T>& in_set, IVecAccessorSet<DVS, T>& out_set)
-	{
-		for (index_t j = 0; j < n; ++j)
+		BCS_ENSURE_INLINE
+		static void run(const index_t, const SVec& in, DVec& out)
 		{
-			typename SVS::reader_type in(in_set, j);
-			typename DVS::accessor_type out(out_set, j);
-			copy_vec(sch, in, out);
+			for (index_t i = 0; i < N; ++i)
+			{
+				out.set(i, in.get(i));
+			}
 		}
-	}
+	};
 
 
-	template<class Scheme, class Reductor, typename T, class Mat>
-	BCS_ENSURE_INLINE
-	inline typename Reductor::accum_type accum_vec(const Scheme& sch,
-			Reductor reduc, const IVecReader<Mat, T>& in)
+	template<class SVec, class DVec>
+	struct transfer_vec<DynamicDim, SVec, DVec>
 	{
-		return detail::vec_accum_helper<Scheme>::run(reduc, in);
-	}
+		BCS_ENSURE_INLINE
+		static void run(const index_t len, const SVec& in, DVec& out)
+		{
+			for (index_t i = 0; i < len; ++i)
+			{
+				out.set(i, in.get(i));
+			}
+		}
+	};
 
-	template<class Scheme, class Reductor, typename T, class LMat, class RMat>
-	BCS_ENSURE_INLINE
-	inline typename Reductor::accum_type accum_vec(const Scheme& sch,
-			Reductor reduc, const IVecReader<LMat, T>& left_in, const IVecReader<RMat, T>& right_in)
+
+	template<class SVec, class DVec>
+	struct transfer_vec<1, SVec, DVec>
 	{
-		return detail::vec_accum_helper<Scheme>::run(reduc, left_in, right_in);
-	}
+		BCS_ENSURE_INLINE
+		static void run(const index_t, const SVec& in, DVec& out)
+		{
+			out.set(0, in.get(0));
+		}
+	};
 
 
 }

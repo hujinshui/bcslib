@@ -46,8 +46,8 @@ namespace bcs
 	template<class Mat1, class Mat2>
 	struct binary_ct_rows
 	{
-		static const int v1 = matrix_traits<Mat1>::compile_time_num_rows;
-		static const int v2 = matrix_traits<Mat2>::compile_time_num_rows;
+		static const int v1 = ct_rows<Mat1>::value;
+		static const int v2 = ct_rows<Mat2>::value;
 		static const int value = v1 > v2 ? v1 : v2;
 
 #ifdef BCS_USE_STATIC_ASSERT
@@ -58,8 +58,8 @@ namespace bcs
 	template<class Mat1, class Mat2>
 	struct binary_ct_cols
 	{
-		static const int v1 = matrix_traits<Mat1>::compile_time_num_cols;
-		static const int v2 = matrix_traits<Mat2>::compile_time_num_cols;
+		static const int v1 = ct_cols<Mat1>::value;
+		static const int v2 = ct_cols<Mat2>::value;
 		static const int value = v1 > v2 ? v1 : v2;
 
 #ifdef BCS_USE_STATIC_ASSERT
@@ -89,7 +89,7 @@ namespace bcs
 	template<class Mat>
 	struct ct_is_vector
 	{
-		static const bool value = ct_is_row<Mat>::value && ct_is_col<Mat>::value;
+		static const bool value = ct_is_row<Mat>::value || ct_is_col<Mat>::value;
 	};
 
 	template<class Mat>

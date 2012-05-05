@@ -21,7 +21,8 @@ namespace bcs
 	// printf_mat
 
 	template<typename T, class Mat>
-	void printf_mat(const char *fmt, const IMatrixView<Mat, T>& X, const char *pre_line, const char *delim)
+	void printf_mat(const char *fmt, const IMatrixView<Mat, T>& X,
+			const char *pre_line=BCS_NULL, const char *delim="\n")
 	{
 		index_t m = X.nrows();
 		index_t n = X.ncolumns();

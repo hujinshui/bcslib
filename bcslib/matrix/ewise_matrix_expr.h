@@ -30,8 +30,8 @@ namespace bcs
 	 *
 	 ********************************************/
 
-	template<typename T, class Arg>
-	struct matrix_traits<unary_ewise_expr<T, Arg> >
+	template<typename Fun, class Arg>
+	struct matrix_traits<unary_ewise_expr<Fun, Arg> >
 	{
 		static const int num_dimensions = 2;
 		static const int compile_time_num_rows = ct_rows<Arg>::value;
@@ -40,7 +40,7 @@ namespace bcs
 		static const bool is_readonly = true;
 		static const bool is_resizable = false;
 
-		typedef T value_type;
+		typedef typename Fun::result_type value_type;
 		typedef index_t index_type;
 	};
 
@@ -50,7 +50,7 @@ namespace bcs
 	: public IMatrixXpr<unary_ewise_expr<Fun, Arg>, typename Fun::result_type>
 	{
 #ifdef BCS_USE_STATIC_ASSERT
-		static_assert(is_unary_ewise_functor<Fun>::value, "Fun must be a unary ewise-functor.");
+		static_assert(is_ewise_functor<Fun, 1>::value, "Fun must be a unary ewise-functor.");
 		static_assert(is_mat_xpr<Arg>::value, "Arg must be an matrix expression.");
 #endif
 
@@ -90,8 +90,8 @@ namespace bcs
 	};
 
 
-	template<typename T, class LArg, class RArg>
-	struct matrix_traits<binary_ewise_expr<T, LArg, RArg> >
+	template<typename Fun, class LArg, class RArg>
+	struct matrix_traits<binary_ewise_expr<Fun, LArg, RArg> >
 	{
 		static const int num_dimensions = 2;
 		static const int compile_time_num_rows = binary_ct_rows<LArg, RArg>::value;
@@ -100,7 +100,7 @@ namespace bcs
 		static const bool is_readonly = true;
 		static const bool is_resizable = false;
 
-		typedef T value_type;
+		typedef typename Fun::result_type value_type;
 		typedef index_t index_type;
 	};
 
@@ -110,7 +110,7 @@ namespace bcs
 	: public IMatrixXpr<binary_ewise_expr<Fun, LArg, RArg>, typename Fun::result_type>
 	{
 #ifdef BCS_USE_STATIC_ASSERT
-		static_assert(is_binary_ewise_functor<Fun>::value, "Fun must be a binary ewise-functor.");
+		static_assert(is_ewise_functor<Fun, 2>::value, "Fun must be a binary ewise-functor.");
 		static_assert(is_mat_xpr<LArg>::value, "LArg must be an matrix expression.");
 		static_assert(is_mat_xpr<RArg>::value, "RArg must be an matrix expression.");
 #endif
@@ -129,7 +129,7 @@ namespace bcs
 		binary_ewise_expr(Fun f, const LArg& a1, const RArg& a2)
 		: fun(f), left_arg(a1), right_arg(a2)
 		{
-			check_arg( is_same_size(a1, a2),
+			check_arg( has_same_size(a1, a2),
 					"The size of two operand matrices are inconsistent." );
 		}
 

@@ -13,7 +13,7 @@
 #ifndef BCSLIB_REPEAT_VECTORS_INTERNAL_H_
 #define BCSLIB_REPEAT_VECTORS_INTERNAL_H_
 
-#include <bcslib/matrix/vector_accessors.h>
+#include <bcslib/matrix/vector_operations.h>
 
 namespace bcs { namespace detail {
 
@@ -60,13 +60,13 @@ namespace bcs { namespace detail {
 	struct repeat_rows_evaluator
 	{
 		typedef typename matrix_traits<Arg>::value_type value_type;
-		typedef matrix_capture<Arg, is_dense_mat<Arg>::value> capture_t;
+		typedef matrix_capture<Arg, is_linear_accessible<Arg>::value> capture_t;
 
 		static void evaluate(const Arg& row, const index_t m, DMat& dst)
 		{
 			capture_t cap(row);
-			const value_type *src = cap.get().ptr_data();
-			const index_t n = row.ncols();
+			const typename capture_t::captured_type& src = cap.get();
+			const index_t n = row.ncolumns();
 
 			for (index_t j = 0; j < n; ++j)
 			{
@@ -80,13 +80,13 @@ namespace bcs { namespace detail {
 	struct repeat_rows_evaluator<Arg, DMat, DynamicDim>
 	{
 		typedef typename matrix_traits<Arg>::value_type value_type;
-		typedef matrix_capture<Arg, is_dense_mat<Arg>::value> capture_t;
+		typedef matrix_capture<Arg, is_linear_accessible<Arg>::value> capture_t;
 
 		static void evaluate(const Arg& row, const index_t m, DMat& dst)
 		{
 			capture_t cap(row);
-			const value_type *src = cap.get().ptr_data();
-			const index_t n = row.ncols();
+			const typename capture_t::captured_type& src = cap.get();
+			const index_t n = row.ncolumns();
 
 			for (index_t j = 0; j < n; ++j)
 			{

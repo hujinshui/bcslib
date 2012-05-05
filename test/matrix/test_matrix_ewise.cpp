@@ -101,7 +101,7 @@ namespace bcs
 	{
 		template<class DMap>
 		BCS_ENSURE_INLINE
-		static void evaluate(const MyConstMat& e, IRegularMatrix<DMap, double>& dst)
+		static void evaluate(const MyConstMat& e, IDenseMatrix<DMap, double>& dst)
 		{
 			fill(dst, e.scalar());
 		}

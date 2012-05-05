@@ -14,7 +14,8 @@
 #ifndef BCSLIB_ELEMENTARY_FUNCTORS_H_
 #define BCSLIB_ELEMENTARY_FUNCTORS_H_
 
-#include <bcslib/core/functor_base.h>
+#include <bcslib/core/functional.h>
+#include <bcslib/math/scalar_math.h>
 
 namespace bcs
 {
@@ -223,26 +224,26 @@ namespace bcs
 	};
 
 
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_sqrt )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_pow )
+	DECLARE_EWISE_FUNCTOR( unary_sqrt, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_pow, 1 )
 
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_exp )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_log )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_log10 )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_floor )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_ceil )
+	DECLARE_EWISE_FUNCTOR( unary_exp, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_log, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_log10, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_floor, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_ceil, 1 )
 
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_sin )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_cos )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_tan )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_asin )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_acos )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_atan )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_sinh )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_cosh )
-	DECLARE_UNARY_EWISE_FUNCTOR( unary_tanh )
+	DECLARE_EWISE_FUNCTOR( unary_sin, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_cos, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_tan, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_asin, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_acos, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_atan, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_sinh, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_cosh, 1 )
+	DECLARE_EWISE_FUNCTOR( unary_tanh, 1 )
 
-	DECLARE_BINARY_EWISE_FUNCTOR( binary_atan2 )
+	DECLARE_EWISE_FUNCTOR( binary_atan2, 2 )
 }
 
 #endif
