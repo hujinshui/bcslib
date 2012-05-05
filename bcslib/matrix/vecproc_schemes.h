@@ -35,11 +35,53 @@ namespace bcs
 	};
 
 
+	/********************************************
+	 *
+	 * 	vecscheme resolution
+	 *
+	 ********************************************/
 
-	// vec-scheme resolve
+	template<class LArg, class RArg>
+	struct binary_nil_expr;
+
+	template<class LArg, class RArg>
+	struct matrix_traits<binary_nil_expr<LArg, RArg> >
+	{
+		static const int num_dimensions = 2;
+		static const int compile_time_num_rows = binary_ct_rows<LArg, RArg>::value;
+		static const int compile_time_num_cols = binary_ct_cols<LArg, RArg>::value;
+
+		static const bool is_readonly = true;
+		static const bool is_resizable = false;
+
+		typedef typename matrix_traits<LArg>::value_type value_type;
+		typedef index_t index_type;
+	};
+
+
+	template<class LArg, class RArg>
+	struct binary_nil_expr
+	: public IMatrixXpr<binary_nil_expr<LArg, RArg>, typename matrix_traits<LArg>::value_type>
+	{
+		BCS_MAT_TRAITS_CDEFS(typename matrix_traits<LArg>::value_type)
+
+		const LArg& left_arg;
+		const RArg& right_arg;
+
+		binary_nil_expr(const LArg& a1, const RArg& a2)
+		: left_arg(a1), right_arg(a2)
+		{ }
+
+		BCS_ENSURE_INLINE index_type nelems() const { return left_arg.nelems(); }
+		BCS_ENSURE_INLINE size_type size() const { return left_arg.size(); }
+		BCS_ENSURE_INLINE index_type nrows() const { return left_arg.nrows(); }
+		BCS_ENSURE_INLINE index_type ncolumns() const { return left_arg.ncolumns(); }
+	};
+
+
 
 	template<class Expr>
-	class vecscheme_as_single_vec
+	class single_vecscheme
 	{
 	private:
 		struct dyn_vecscheme
@@ -47,10 +89,7 @@ namespace bcs
 			typedef vecscheme_by_scalars type;
 
 			BCS_ENSURE_INLINE
-			static type get(const Expr& expr)
-			{
-				return type(expr.nelems());
-			}
+			static type get(const Expr& expr) { return type(expr.nelems()); }
 		};
 
 		template<int N>
@@ -58,13 +97,10 @@ namespace bcs
 		{
 			typedef vecscheme_by_fixed_num_scalars<N> type;
 			BCS_ENSURE_INLINE
-			static type get(const Expr& expr)
-			{
-				return type();
-			}
+			static type get(const Expr& expr) { return type(); }
 		};
 
-		typedef typename select_type<has_dynamic_nrows,
+		typedef typename select_type<has_dynamic_nrows<Expr>::value,
 					dyn_vecscheme,
 					sta_vecscheme<ct_size<Expr>::value>
 				>::type internal_t;
@@ -73,14 +109,11 @@ namespace bcs
 		typedef typename internal_t::type type;
 
 		BCS_ENSURE_INLINE
-		static type get(const Expr& expr)
-		{
-			return internal_t::get(expr);
-		}
+		static type get(const Expr& expr) { return internal_t::get(expr); }
 	};
 
 	template<class Expr>
-	class vecscheme_by_columns
+	class colwise_vecscheme
 	{
 	private:
 		struct dyn_vecscheme
@@ -88,10 +121,7 @@ namespace bcs
 			typedef vecscheme_by_scalars type;
 
 			BCS_ENSURE_INLINE
-			static type get(const Expr& expr)
-			{
-				return type(expr.ncolumns());
-			}
+			static type get(const Expr& expr) { return type(expr.ncolumns()); }
 		};
 
 		template<int N>
@@ -99,13 +129,10 @@ namespace bcs
 		{
 			typedef vecscheme_by_fixed_num_scalars<N> type;
 			BCS_ENSURE_INLINE
-			static type get(const Expr& expr)
-			{
-				return type();
-			}
+			static type get(const Expr& expr) { return type(); }
 		};
 
-		typedef typename select_type<has_dynamic_nrows,
+		typedef typename select_type<has_dynamic_nrows<Expr>::value,
 					dyn_vecscheme,
 					sta_vecscheme<ct_rows<Expr>::value>
 				>::type internal_t;
@@ -114,10 +141,7 @@ namespace bcs
 		typedef typename internal_t::type type;
 
 		BCS_ENSURE_INLINE
-		static type get(const Expr& expr)
-		{
-			return internal_t::get(expr);
-		}
+		static type get(const Expr& expr) { return internal_t::get(expr); }
 	};
 
 

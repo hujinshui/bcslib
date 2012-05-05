@@ -46,14 +46,14 @@ namespace bcs
 
 	template<typename T, class LArg, class RArg>
 	BCS_ENSURE_INLINE
-	inline LArg& operator += (IRegularMatrix<LArg, T>& A, const IMatrixXpr<RArg, T>& B)
+	inline LArg& operator += (IDenseMatrix<LArg, T>& A, const IMatrixXpr<RArg, T>& B)
 	{
 		return A.derived() = A.derived() + B.derived();
 	}
 
 	template<typename T, class LArg>
 	BCS_ENSURE_INLINE
-	inline LArg& operator += (IRegularMatrix<LArg, T>& A, const T& b)
+	inline LArg& operator += (IDenseMatrix<LArg, T>& A, const T& b)
 	{
 		return A.derived() = A.derived() + b;
 	}
@@ -86,14 +86,14 @@ namespace bcs
 
 	template<typename T, class LArg, class RArg>
 	BCS_ENSURE_INLINE
-	inline LArg& operator -= (IRegularMatrix<LArg, T>& A, const IMatrixXpr<RArg, T>& B)
+	inline LArg& operator -= (IDenseMatrix<LArg, T>& A, const IMatrixXpr<RArg, T>& B)
 	{
 		return A.derived() = A.derived() - B.derived();
 	}
 
 	template<typename T, class LArg>
 	BCS_ENSURE_INLINE
-	inline LArg& operator -= (IRegularMatrix<LArg, T>& A, const T& b)
+	inline LArg& operator -= (IDenseMatrix<LArg, T>& A, const T& b)
 	{
 		return A.derived() = A.derived() - b;
 	}
@@ -126,14 +126,14 @@ namespace bcs
 
 	template<typename T, class LArg, class RArg>
 	BCS_ENSURE_INLINE
-	inline LArg& operator *= (IRegularMatrix<LArg, T>& A, const IMatrixXpr<RArg, T>& B)
+	inline LArg& operator *= (IDenseMatrix<LArg, T>& A, const IMatrixXpr<RArg, T>& B)
 	{
 		return A.derived() = A.derived() * B.derived();
 	}
 
 	template<typename T, class LArg>
 	BCS_ENSURE_INLINE
-	inline LArg& operator *= (IRegularMatrix<LArg, T>& A, const T& b)
+	inline LArg& operator *= (IDenseMatrix<LArg, T>& A, const T& b)
 	{
 		return A.derived() = A.derived() * b;
 	}
@@ -167,14 +167,14 @@ namespace bcs
 
 	template<typename T, class LArg, class RArg>
 	BCS_ENSURE_INLINE
-	inline LArg& operator /= (IRegularMatrix<LArg, T>& A, const IMatrixXpr<RArg, T>& B)
+	inline LArg& operator /= (IDenseMatrix<LArg, T>& A, const IMatrixXpr<RArg, T>& B)
 	{
 		return A.derived() = A.derived() / B.derived();
 	}
 
 	template<typename T, class LArg>
 	BCS_ENSURE_INLINE
-	inline LArg& operator /= (IRegularMatrix<LArg, T>& A, const T& b)
+	inline LArg& operator /= (IDenseMatrix<LArg, T>& A, const T& b)
 	{
 		return A.derived() = A.derived() / b;
 	}

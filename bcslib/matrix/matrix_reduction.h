@@ -36,8 +36,7 @@ namespace bcs
 				"Reductor must be a unary reduction functor");
 #endif
 
-		return detail::unary_reduction_eval_helper<
-				Reductor, Mat, is_accessible_as_vector<Mat>::value>::run(reduc, A.derived());
+		return detail::unary_reduction_eval_helper<Reductor, Mat>::run(reduc, A.derived());
 	}
 
 	template<typename Reductor, class LMat, class RMat>
@@ -52,12 +51,10 @@ namespace bcs
 				"Reductor must be a binary reduction functor");
 #endif
 
-		check_arg( is_same_size(A, B), "The sizes of two operands are inconsistent.");
+		check_arg( has_same_size(A, B),
+				"The sizes of two operands for binary reduction are inconsistent.");
 
-		return detail::binary_reduction_eval_helper<
-				Reductor, LMat, RMat,
-				is_accessible_as_vector<LMat>::value && is_accessible_as_vector<RMat>::value
-				>::run(reduc, A.derived(), B.derived());
+		return detail::binary_reduction_eval_helper<Reductor, LMat, RMat>::run(reduc, A.derived(), B.derived());
 	}
 
 

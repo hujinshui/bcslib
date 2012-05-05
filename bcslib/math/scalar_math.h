@@ -34,8 +34,6 @@ namespace bcs
 		using std::exp;
 		using std::log;
 		using std::log10;
-		using std::frexp;
-		using std::ldexp;
 
 		using std::floor;
 		using std::ceil;
@@ -56,6 +54,18 @@ namespace bcs
 		// BCSLib's extras (for convenience)
 
 		template<typename T>
+		inline BCS_ENSURE_INLINE T abs(T x)
+		{
+			return x > 0 ? x : -x;
+		}
+
+		template<typename T>
+		inline BCS_ENSURE_INLINE T abs_diff(T x, T y)
+		{
+			return x > y ? x - y : y - x;
+		}
+
+		template<typename T>
 		inline BCS_ENSURE_INLINE T sqr(T x)
 		{
 			return x * x;
@@ -70,48 +80,20 @@ namespace bcs
 		template<typename T>
 		inline BCS_ENSURE_INLINE T rcp(T x)
 		{
-			return T(1) / x;
+			return 1 / x;
 		}
 
 		template<typename T>
 		inline BCS_ENSURE_INLINE T rsqrt(T x)
 		{
-			return T(1) / sqrt(x);
+			return 1 / sqrt(x);
 		}
-	}
 
-	// Comparison
-
-	template<typename T>
-	inline BCS_ENSURE_INLINE T clamp(T x, T lb, T ub)
-	{
-		return x < lb ? lb : (x > ub ? ub : x);
-	}
-
-	template<typename T>
-	inline BCS_ENSURE_INLINE const T& min(const T& a, const T& b)
-	{
-		return a < b ? a : b;
-	}
-
-	template<typename T>
-	inline BCS_ENSURE_INLINE const T& max(const T& a, const T& b)
-	{
-		return a > b ? a : b;
-	}
-
-	template<typename T>
-	inline BCS_ENSURE_INLINE T& lbound(T &x, const T &lb)
-	{
-		if (x < lb) x = lb;
-		return x;
-	}
-
-	template<typename T>
-	inline BCS_ENSURE_INLINE T& ubound(T &x, const T &ub)
-	{
-		if (x > ub) x = ub;
-		return x;
+		template<typename T>
+		inline BCS_ENSURE_INLINE T clamp(T x, T lb, T ub)
+		{
+			return x < lb ? lb : (x > ub ? ub : x);
+		}
 	}
 
 }

@@ -13,141 +13,88 @@
 #ifndef BCSLIB_REPEAT_VECTORS_INTERNAL_H_
 #define BCSLIB_REPEAT_VECTORS_INTERNAL_H_
 
-#include <bcslib/matrix/vector_proxy.h>
-#include <bcslib/matrix/matrix_capture.h>
+#include <bcslib/matrix/vector_accessors.h>
 
 namespace bcs { namespace detail {
 
-	template<class Arg, int CTCols>
-	struct repeat_cols_vecwise
-	{
-	public:
-		typedef typename matrix_traits<Arg>::value_type value_type;
 
-		BCS_ENSURE_INLINE
-		explicit repeat_cols_vecwise(const Arg& col)
-		: m_cap(col), m_reader(m_cap.get())
-		{
-		}
-
-		BCS_ENSURE_INLINE value_type load_scalar(index_t i) const
-		{
-			return m_reader.load_scalar(i);
-		}
-
-	private:
-		static const bool CanDirectRef = bcs::has_matrix_interface<Arg, IDenseMatrix>::value;
-		typedef matrix_capture<Arg, CanDirectRef> capture_t;
-
-		capture_t m_cap;
-		vec_reader<typename capture_t::captured_type> m_reader;
-	};
-
-
-	template<class Arg, int CTRows>
-	struct repeat_rows_vecwise
-	{
-	public:
-		typedef typename matrix_traits<Arg>::value_type value_type;
-
-		BCS_ENSURE_INLINE
-		explicit repeat_rows_vecwise(const Arg& row)
-		: m_cap(row), m_icol(0)
-		{
-		}
-
-		BCS_ENSURE_INLINE value_type load_scalar(index_t i) const
-		{
-			return m_cap.get()[m_icol];
-		}
-
-		BCS_ENSURE_INLINE void operator ++ ()
-		{
-			++m_icol;
-		}
-
-		BCS_ENSURE_INLINE void operator -- ()
-		{
-			--m_icol;
-		}
-
-		BCS_ENSURE_INLINE void operator += (index_t n)
-		{
-			m_icol += n;
-		}
-
-		BCS_ENSURE_INLINE void operator -= (index_t n)
-		{
-			m_icol -= n;
-		}
-
-	private:
-		static const bool CanDirectRef =
-				bcs::has_matrix_interface<Arg, IDenseMatrix>::value &&
-				bcs::matrix_traits<Arg>::is_linear_indexable;
-
-		typedef matrix_capture<Arg, CanDirectRef> capture_t;
-
-		capture_t m_cap;
-		index_t m_icol;
-	};
-
-
-
-	template<class Arg, int CTCols, class DMat>
+	template<class Arg, class DMat, int CTRows>
 	struct repeat_cols_evaluator
 	{
 		typedef typename matrix_traits<Arg>::value_type value_type;
+		typedef matrix_capture<Arg, is_dense_mat<Arg>::value> capture_t;
 
-		static const bool CanDirectRef = bcs::has_matrix_interface<Arg, IDenseMatrix>::value;
-		typedef matrix_capture<Arg, CanDirectRef> capture_t;
-
-		static void evaluate(const Arg& col, DMat& dst)
+		static void evaluate(const Arg& col, const index_t n, DMat& dst)
 		{
 			capture_t cap(col);
+			const value_type *src = cap.get().ptr_data();
 
-			vec_reader<typename capture_t::captured_type> rdr(cap.get());
-			vecwise_writer<DMat> wrt(dst);
-
-			index_t m = dst.nrows();
-			index_t n = dst.ncolumns();
-
-			if (n == 1)
+			for (index_t j = 0; j < n; ++j)
 			{
-				copy_vec(m, rdr, wrt);
+				mem<value_type, CTRows>::copy(src, col_ptr(dst, j));
 			}
-			else
-			{
-				for (index_t j = 0; j < n; ++j, ++wrt) copy_vec(m, rdr, wrt);
-			}
+		}
+	};
 
+	template<class Arg, class DMat>
+	struct repeat_cols_evaluator<Arg, DMat, DynamicDim>
+	{
+		typedef typename matrix_traits<Arg>::value_type value_type;
+		typedef matrix_capture<Arg, is_dense_mat<Arg>::value> capture_t;
+
+		static void evaluate(const Arg& col, const index_t n, DMat& dst)
+		{
+			capture_t cap(col);
+			const value_type *src = cap.get().ptr_data();
+			const index_t m = col.nrows();
+
+			for (index_t j = 0; j < n; ++j)
+			{
+				copy_elems(m, src, col_ptr(dst, j));
+			}
 		}
 	};
 
 
-	template<class Arg, int CTRows, class DMat>
+	template<class Arg, class DMat, int CTRows>
 	struct repeat_rows_evaluator
 	{
 		typedef typename matrix_traits<Arg>::value_type value_type;
+		typedef matrix_capture<Arg, is_dense_mat<Arg>::value> capture_t;
 
-		static const bool CanDirectRef = matrix_traits<DMat>::is_linear_indexable;
-
-		static void evaluate(const Arg& row, DMat& dst)
+		static void evaluate(const Arg& row, const index_t m, DMat& dst)
 		{
-			matrix_capture<Arg, CanDirectRef> cap(row);
-			typename matrix_capture<Arg, CanDirectRef>::captured_type src = cap.get();
+			capture_t cap(row);
+			const value_type *src = cap.get().ptr_data();
+			const index_t n = row.ncols();
 
-			index_t m = dst.nrows();
-			index_t n = dst.ncolumns();
-
-			vecwise_writer<DMat> wrt(dst);
-
-			for (index_t j = 0; j < n; ++j, ++wrt)
+			for (index_t j = 0; j < n; ++j)
 			{
-				fill_vec(m, wrt, src[j]);
+				mem<value_type, CTRows>::fill(col_ptr(dst, j), src[j]);
 			}
 		}
 	};
+
+
+	template<class Arg, class DMat>
+	struct repeat_rows_evaluator<Arg, DMat, DynamicDim>
+	{
+		typedef typename matrix_traits<Arg>::value_type value_type;
+		typedef matrix_capture<Arg, is_dense_mat<Arg>::value> capture_t;
+
+		static void evaluate(const Arg& row, const index_t m, DMat& dst)
+		{
+			capture_t cap(row);
+			const value_type *src = cap.get().ptr_data();
+			const index_t n = row.ncols();
+
+			for (index_t j = 0; j < n; ++j)
+			{
+				fill_elems(m, col_ptr(dst, j), src[j]);
+			}
+		}
+	};
+
 
 
 

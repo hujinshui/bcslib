@@ -9,6 +9,8 @@
 #include <gtest/gtest.h>
 #include <bcslib/matrix.h>
 
+#include <algorithm>
+
 using namespace bcs;
 
 template<class Mat>
@@ -162,8 +164,8 @@ void test_matrix_multi_slices(IDenseMatrix<Mat, double>& mat)
 	index_t m = mat.nrows();
 	index_t n = mat.ncolumns();
 
-	index_t sm = bcs::max(m/2, index_t(1));
-	index_t sn = bcs::max(n/2, index_t(1));
+	index_t sm = std::max(m/2, index_t(1));
+	index_t sn = std::max(n/2, index_t(1));
 
 	const IDenseMatrix<Mat, double>& cmat = mat;
 

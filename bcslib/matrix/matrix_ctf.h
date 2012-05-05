@@ -224,36 +224,6 @@ namespace bcs
 	template<class Mat>
 	struct is_linear_accessible { static const bool value = false; };
 
-	template<class Mat>
-	struct is_readable_as_single_vector
-	{
-		static const bool value = is_linear_accessible<Mat>::value;
-	};
-
-	template<class Mat>
-	struct is_readable_colwise
-	{
-		static const bool value = is_dense_mat<Mat>::value;
-	};
-
-
-	template<class Mat>
-	struct is_accessible_as_single_vector
-	{
-		static const bool value =
-				is_linear_accessible<Mat>::value &&
-				!is_readonly_mat<Mat>::value;
-	};
-
-
-	template<class Mat>
-	struct is_accessible_colwise
-	{
-		static const bool value =
-				is_readable_colwise<Mat>::value &&
-				!is_readonly_mat<Mat>::value;
-	};
-
 
 	/********************************************
 	 *

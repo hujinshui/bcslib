@@ -16,7 +16,6 @@
 #include <bcslib/matrix/matrix_xpr.h>
 #include <bcslib/matrix/bits/repeat_vectors_internal.h>
 
-
 namespace bcs
 {
 
@@ -38,10 +37,8 @@ namespace bcs
 		static const int compile_time_num_rows = ct_rows<Arg>::value;
 		static const int compile_time_num_cols = CTCols;
 
-		static const bool is_linear_indexable = false;
-		static const bool is_continuous = false;
-		static const bool is_sparse = false;
 		static const bool is_readonly = true;
+		static const bool is_resizable = false;
 
 		typedef typename matrix_traits<Arg>::value_type value_type;
 		typedef index_t index_type;
@@ -104,19 +101,17 @@ namespace bcs
 		static const int compile_time_num_rows = CTRows;
 		static const int compile_time_num_cols = ct_cols<Arg>::value;
 
-		static const bool is_linear_indexable = false;
-		static const bool is_continuous = false;
-		static const bool is_sparse = false;
 		static const bool is_readonly = true;
+		static const bool is_resizable = false;
 
 		typedef typename matrix_traits<Arg>::value_type value_type;
 		typedef index_t index_type;
 	};
 
 
-	template<class Arg, int CTCols>
+	template<class Arg, int CTRows>
 	class repeat_rows_expr
-	: public IMatrixXpr<repeat_rows_expr<Arg, CTCols>, typename matrix_traits<Arg>::value_type>
+	: public IMatrixXpr<repeat_rows_expr<Arg, CTRows>, typename matrix_traits<Arg>::value_type>
 	{
 #ifdef BCS_USE_STATIC_ASSERT
 		static_assert(has_matrix_interface<Arg, IMatrixXpr>::value, "Arg must be an matrix expression.");
@@ -179,89 +174,144 @@ namespace bcs
 	}
 
 
+	template<int CTCols>
+	struct repcols
+	{
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(CTCols > 0, "CTCols must be a positive integer");
+#endif
+
+		template<class Arg>
+		BCS_ENSURE_INLINE
+		repeat_cols_expr<Arg, CTCols> of(
+				const IMatrixXpr<Arg, typename matrix_traits<Arg>::value_type>& arg)
+		{
+			return repeat_cols_expr<Arg, CTCols>(arg, CTCols);
+		}
+	};
+
+
+	template<int CTRows>
+	struct reprows
+	{
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(CTRows > 0, "CTCols must be a positive integer");
+#endif
+
+		template<class Arg>
+		BCS_ENSURE_INLINE
+		repeat_rows_expr<Arg, CTRows> of(
+				const IMatrixXpr<Arg, typename matrix_traits<Arg>::value_type>& arg)
+		{
+			return repeat_rows_expr<Arg, CTRows>(arg, CTRows);
+		}
+	};
+
+
 
 	/********************************************
 	 *
-	 *  vec-wise proxies
+	 *  vector-wise readers
 	 *
 	 ********************************************/
 
 	template<class Arg, int CTCols>
-	class vecwise_reader<repeat_cols_expr<Arg, CTCols> >
-	: public IVecReader<vecwise_reader<repeat_cols_expr<Arg, CTCols> >, typename matrix_traits<Arg>::value_type>
+	class repcols_colwise_reader_set
+	: public IVecReaderSet<repcols_colwise_reader_set<Arg, CTCols>,
+	  	  typename matrix_traits<Arg>::value_type>
+	, private noncopyable
 	{
+		typedef typename matrix_traits<Arg>::value_type T;
+
 	public:
-		typedef repeat_cols_expr<Arg, CTCols> expr_type;
-		typedef typename matrix_traits<Arg>::value_type value_type;
-
 		BCS_ENSURE_INLINE
-		explicit vecwise_reader(const expr_type& expr)
-		: m_internal(expr.column())
+		repcols_colwise_reader_set(const Arg& arg)
+		: m_in(arg)
 		{
 		}
 
-		BCS_ENSURE_INLINE value_type load_scalar(index_t i) const
+	public:
+		struct reader_type
+		: public IVecReader<reader_type, T>, private noncopyable
 		{
-			return m_internal.load_scalar(i);
-		}
+			BCS_ENSURE_INLINE
+			reader_type(const repcols_colwise_reader_set& host, const index_t)
+			: m_in(host.m_in)
+			{
+			}
 
-		BCS_ENSURE_INLINE void operator ++ () { }
+			BCS_ENSURE_INLINE T load_scalar(const index_t i) const
+			{
+				return m_in.load_scalar(i);
+			}
 
-		BCS_ENSURE_INLINE void operator -- () { }
-
-		BCS_ENSURE_INLINE void operator += (index_t n) { }
-
-		BCS_ENSURE_INLINE void operator -= (index_t n) { }
+		private:
+			const typename vec_reader<Arg>::type& m_in;
+		};
 
 	private:
-		detail::repeat_cols_vecwise<Arg, CTCols> m_internal;
-
+		const typename vec_reader<Arg>::type m_in;
 	};
 
 
 	template<class Arg, int CTRows>
-	class vecwise_reader<repeat_rows_expr<Arg, CTRows> >
-	: public IVecReader<vecwise_reader<repeat_rows_expr<Arg, CTRows> >, typename matrix_traits<Arg>::value_type>
+	class reprows_colwise_reader_set
+	: public IVecReaderSet<reprows_colwise_reader_set<Arg, CTRows>,
+	  	  typename matrix_traits<Arg>::value_type>
+	, private noncopyable
 	{
+		typedef typename matrix_traits<Arg>::value_type T;
+
 	public:
-		typedef repeat_rows_expr<Arg, CTRows> expr_type;
-		typedef typename matrix_traits<Arg>::value_type value_type;
-
 		BCS_ENSURE_INLINE
-		explicit vecwise_reader(const expr_type& expr)
-		: m_internal(expr.row())
+		reprows_colwise_reader_set(const Arg& arg)
+		: m_in(arg)
 		{
 		}
 
-		BCS_ENSURE_INLINE value_type load_scalar(index_t i) const
+	public:
+		struct reader_type
+		: public IVecReader<reader_type, T>, private noncopyable
 		{
-			return m_internal.load_scalar(i);
-		}
+			BCS_ENSURE_INLINE
+			reader_type(const reprows_colwise_reader_set& host, const index_t)
+			: m_val(m_in.load_scalar(i))
+			{
+			}
 
-		BCS_ENSURE_INLINE void operator ++ ()
-		{
-			++ m_internal;
-		}
+			BCS_ENSURE_INLINE T load_scalar(const index_t i) const
+			{
+				return m_val;
+			}
 
-		BCS_ENSURE_INLINE void operator -- ()
-		{
-			-- m_internal;
-		}
-
-		BCS_ENSURE_INLINE void operator += (index_t n)
-		{
-			m_internal += n;
-		}
-
-		BCS_ENSURE_INLINE void operator -= (index_t n)
-		{
-			m_internal -= n;
-		}
+		private:
+			T m_val;
+		};
 
 	private:
-		detail::repeat_rows_vecwise<Arg, CTRows> m_internal;
-
+		const typename vec_reader<Arg>::type m_in;
 	};
+
+
+	template<class Arg, int CTCols>
+	struct colwise_reader_set<repeat_cols_expr<Arg, CTCols> >
+	{
+		typedef repcols_colwise_reader_set<Arg, CTCols> type;
+	};
+
+	template<class Arg, int CTRows>
+	struct colwise_reader_set<repeat_cols_expr<Arg, CTRows> >
+	{
+		typedef repcols_colwise_reader_set<Arg, CTRows> type;
+	};
+
+
+	template<class Arg, int CTCols, typename Tag>
+	struct vecacc_cost<repeat_cols_expr<Fun, Arg>, Tag>
+	{
+		static const int value = vecacc_cost<Arg, Tag>::value;
+	};
+
 
 
 	/********************************************
@@ -274,14 +324,15 @@ namespace bcs
 	struct expr_evaluator<repeat_cols_expr<Arg, CTCols> >
 	{
 		typedef repeat_cols_expr<Arg, CTCols> expr_type;
-		typedef typename matrix_traits<Arg>::value_type value_type;
+		typedef typename expr_type::value_type value_type;
 
 		template<class DMat>
 		BCS_ENSURE_INLINE
-		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, value_type>& dst)
+		void evaluate(const expr_type& expr, IDenseMatrix<DMat, value_type>& dst)
 		{
-			detail::repeat_cols_evaluator<Arg, binary_ct_cols<expr_type, DMat>::value, DMat>::evaluate(
-					expr.column(), dst.derived());
+			detail::repeat_cols_evaluator<Arg, DMat,
+				binary_ct_rows<expr_type, DMat>::value>::evaluate(
+						expr.column(), expr.ncolumns(), dst.derived());
 		}
 	};
 
@@ -289,16 +340,19 @@ namespace bcs
 	struct expr_evaluator<repeat_rows_expr<Arg, CTRows> >
 	{
 		typedef repeat_rows_expr<Arg, CTRows> expr_type;
-		typedef typename matrix_traits<Arg>::value_type value_type;
+		typedef typename expr_type::value_type value_type;
 
 		template<class DMat>
 		BCS_ENSURE_INLINE
-		static void evaluate(const expr_type& expr, IRegularMatrix<DMat, value_type>& dst)
+		void evaluate(const expr_type& expr, IDenseMatrix<DMat, value_type>& dst)
 		{
-			detail::repeat_rows_evaluator<Arg, binary_ct_rows<expr_type, DMat>::value, DMat>::evaluate(
-					expr.row(), dst.derived());
+			detail::repeat_rows_evaluator<Arg, DMat,
+				binary_ct_rows<expr_type, DMat>::value>::evaluate(
+						expr.row(), expr.nrows(), dst.derived());
 		}
 	};
+
+
 
 }
 
