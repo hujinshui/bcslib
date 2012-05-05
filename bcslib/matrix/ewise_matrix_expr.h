@@ -30,19 +30,17 @@ namespace bcs
 	 *
 	 ********************************************/
 
-	template<typename Fun, class Arg>
-	struct matrix_traits<unary_ewise_expr<Fun, Arg> >
+	template<typename T, class Arg>
+	struct matrix_traits<unary_ewise_expr<T, Arg> >
 	{
 		static const int num_dimensions = 2;
 		static const int compile_time_num_rows = ct_rows<Arg>::value;
 		static const int compile_time_num_cols = ct_cols<Arg>::value;
 
-		static const bool is_linear_indexable = false;
-		static const bool is_continuous = false;
-		static const bool is_sparse = false;
 		static const bool is_readonly = true;
+		static const bool is_resizable = false;
 
-		typedef typename Fun::result_type value_type;
+		typedef T value_type;
 		typedef index_t index_type;
 	};
 
@@ -92,19 +90,17 @@ namespace bcs
 	};
 
 
-	template<typename Fun, class LArg, class RArg>
-	struct matrix_traits<binary_ewise_expr<Fun, LArg, RArg> >
+	template<typename T, class LArg, class RArg>
+	struct matrix_traits<binary_ewise_expr<T, LArg, RArg> >
 	{
 		static const int num_dimensions = 2;
 		static const int compile_time_num_rows = binary_ct_rows<LArg, RArg>::value;
 		static const int compile_time_num_cols = binary_ct_cols<LArg, RArg>::value;
 
-		static const bool is_linear_indexable = false;
-		static const bool is_continuous = false;
-		static const bool is_sparse = false;
 		static const bool is_readonly = true;
+		static const bool is_resizable = false;
 
-		typedef typename Fun::result_type value_type;
+		typedef T value_type;
 		typedef index_t index_type;
 	};
 

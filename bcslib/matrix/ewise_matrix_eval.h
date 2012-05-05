@@ -14,6 +14,7 @@
 #define BCSLIB_EWISE_MATRIX_EVAL_H_
 
 #include <bcslib/matrix/bits/ewise_matrix_eval_internal.h>
+#include <bcslib/matrix/vector_accessors.h>
 
 namespace bcs
 {
@@ -26,6 +27,7 @@ namespace bcs
 	template<typename Fun, class Arg>
 	class unary_ewise_linear_reader
 	: public IVecReader<unary_ewise_linear_reader<Fun, Arg>, typename Fun::result_type>
+	, private noncopyable
 	{
 	public:
 		typedef unary_ewise_expr<Fun, Arg> expr_type;
@@ -52,6 +54,7 @@ namespace bcs
 	template<typename Fun, class LArg, class RArg>
 	class binary_ewise_linear_reader
 	: public IVecReader<binary_ewise_linear_reader<Fun, LArg, RArg>, typename Fun::result_type>
+	, private noncopyable
 	{
 	public:
 		typedef binary_ewise_expr<Fun, LArg, RArg> expr_type;
@@ -81,6 +84,7 @@ namespace bcs
 	template<typename Fun, class Arg>
 	class unary_ewise_colwise_reader_set
 	: public IVecReaderSet<unary_ewise_colwise_reader_set<Fun, Arg>, typename Fun::result_type>
+	, private noncopyable
 	{
 	public:
 		typedef unary_ewise_expr<Fun, Arg> expr_type;
@@ -123,6 +127,7 @@ namespace bcs
 	template<typename Fun, class LArg, class RArg>
 	class binary_ewise_colwise_reader_set
 	: public IVecReaderSet<binary_ewise_colwise_reader_set<Fun, LArg, RArg>, typename Fun::result_type>
+	, private noncopyable
 	{
 	public:
 		typedef binary_ewise_expr<Fun, LArg, RArg> expr_type;
@@ -167,6 +172,53 @@ namespace bcs
 		left_arg_reader_set_type m_left_arg_rset;
 		right_arg_reader_set_type m_right_arg_rset;
 	};
+
+
+	/********************************************
+	 *
+	 *  vector reader dispatch
+	 *
+	 ********************************************/
+
+	template<class Fun, class Arg, typename Tag>
+	struct vecacc_cost<unary_ewise_expr<Fun, Arg>, Tag>
+	{
+		static const int value = vecacc_cost<Arg, Tag>::value;
+	};
+
+	template<class Fun, class LArg, class RArg, typename Tag>
+	struct vecacc_cost<binary_ewise_expr<Fun, LArg, RArg>, Tag>
+	{
+		static const int value =
+				vecacc_cost<LArg, Tag>::value +
+				vecacc_cost<RArg, Tag>::value;
+	};
+
+
+	template<typename Fun, class Arg>
+	struct vec_reader<unary_ewise_expr<Fun, Arg> >
+	{
+		typedef unary_ewise_linear_reader<Fun, Arg> type;
+	};
+
+	template<typename Fun, class LArg, class RArg>
+	struct vec_reader<binary_ewise_expr<Fun, LArg, RArg> >
+	{
+		typedef binary_ewise_linear_reader<Fun, LArg, RArg> type;
+	};
+
+	template<typename Fun, class Arg>
+	struct colwise_reader_set<unary_ewise_expr<Fun, Arg> >
+	{
+		typedef unary_ewise_colwise_reader_set<Fun, Arg> type;
+	};
+
+	template<typename Fun, class LArg, class RArg>
+	struct colwise_reader_set<binary_ewise_expr<Fun, LArg, RArg> >
+	{
+		typedef binary_ewise_colwise_reader_set<Fun, LArg, RArg> type;
+	};
+
 
 
 	/********************************************

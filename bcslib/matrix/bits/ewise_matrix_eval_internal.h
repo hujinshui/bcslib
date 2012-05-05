@@ -32,10 +32,7 @@ namespace bcs { namespace detail {
 		typename vec_reader<Expr>::type in;
 		typename vec_accessor<DMat>::type out;
 
-		typename vecscheme_as_single_vec<Expr>::type sch =
-				vecscheme_as_single_vec<Expr>::get(src);
-
-		copy_vec(sch, in, out);
+		copy_vec(single_vecscheme<Expr>::get(src), in, out);
 	}
 
 	template<class Expr, class DMat>
@@ -45,10 +42,7 @@ namespace bcs { namespace detail {
 		typename colwise_reader_set<Expr>::type in_set(src);
 		typename colwise_accessor_set<DMat>::type out_set(dst);
 
-		typename vecscheme_by_columns<Expr>::type sch =
-				vecscheme_by_columns<Expr>::get(src);
-
-		copy_vecs(sch, src.ncolumns(), in_set, out_set);
+		copy_vecs(colwise_vecscheme<Expr>::get(src), src.ncolumns(), in_set, out_set);
 	}
 
 

@@ -13,197 +13,134 @@
 #ifndef MATRIX_REDUCTION_INTERNAL_H_
 #define MATRIX_REDUCTION_INTERNAL_H_
 
-#include <bcslib/matrix/dense_matrix.h>
-#include <bcslib/matrix/vector_proxy.h>
+#include <bcslib/matrix/vector_operations.h>
+#include <bcslib/matrix/ewise_matrix_expr.h>
 
 namespace bcs { namespace detail {
 
 	// generic reduction
 
-	template<typename Reductor, class Mat, bool DoLinear>
-	struct unary_reduction_eval_helper;
-
-
-	template<typename Reductor, class Mat>
-	struct unary_reduction_eval_helper<Reductor, Mat, true>
+	template<class Reductor, class Expr>
+	BCS_ENSURE_INLINE
+	inline typename Reductor::result_type
+	full_reduce_as_single_vector(Reductor reduc, const Expr& a)
 	{
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(bcs::is_unary_reduction_functor<Reductor>::value,
-				"Reductor must be a unary reduction functor");
+		typename vec_reader<Expr>::type in;
 
-		static_assert(bcs::is_accessible_as_vector<Mat>::value,
-				"Mat must be accessible-as-vector.");
-#endif
+		typedef typename Reductor::accum_type accum_t;
+		accum_t s = accum_vec(single_vecscheme<Expr>::get(a), reduc, in);
+		return reduc.get(s, a.nelems());
+	}
 
-		static inline typename Reductor::result_type
-		run(Reductor reduc, const Mat& A)
+
+	template<class Reductor, class LExpr, class RExpr>
+	BCS_ENSURE_INLINE
+	inline typename Reductor::result_type
+	full_reduce_as_single_vector(Reductor reduc, const LExpr& a, const RExpr& b)
+	{
+		typename vec_reader<LExpr>::type in_a;
+		typename vec_reader<RExpr>::type in_b;
+
+		typedef typename Reductor::accum_type accum_t;
+		typedef typename binary_nil_expr<LExpr, RExpr> dummy_t;
+
+		accum_t s = accum_vec(single_vecscheme<dummy_t>::get(dummy_t(a, b)), reduc, in_a, in_b);
+		return reduc.get(s, a.nelems());
+	}
+
+	template<class Reductor, class Expr>
+	inline typename Reductor::result_type
+	full_reduce_by_columns(Reductor reduc, const Expr& a)
+	{
+		typedef typename colwise_reader_set<Expr>::type reader_set_t;
+		typedef typename reader_set_t::reader_type reader_t;
+		typedef typename Reductor::accum_type accum_t;
+
+		typename colwise_vecscheme<Expr>::type sch = colwise_vecscheme<Expr>::get(a);
+
+		reader_set_t in_set(a);
+
+		reader_t in0(in_set, 0);
+		accum_t s = accum_vec(sch, reduc, in0);
+
+		const index_t n = a.ncolumns();
+		for (index_t j = 1; j < n; ++j)
 		{
-			typedef typename Reductor::accum_type accum_t;
-
-			if (!is_empty(A))
-			{
-				vec_reader<Mat> vec_a(A);
-				accum_t s = accum_vec(reduc, A.nelems(), vec_a);
-				return reduc.get(s, A.nelems());
-			}
-			else
-			{
-				return reduc();
-			}
+			reader_t in(in_set, j);
+			s = reduc.combine(s, accum_vec(sch, reduc, in));
 		}
-	};
+
+		return reduc.get(s, a.nelems());
+	}
 
 
-	template<typename Reductor, class Mat>
-	struct unary_reduction_eval_helper<Reductor, Mat, false>
+	template<class Reductor, class LExpr, class RExpr>
+	inline typename Reductor::result_type
+	full_reduce_by_columns(Reductor reduc, const LExpr& a, const RExpr& b)
 	{
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(bcs::is_unary_reduction_functor<Reductor>::value,
-				"Reductor must be a unary reduction functor");
-#endif
+		typedef typename colwise_reader_set<LExpr>::type left_reader_set_t;
+		typedef typename colwise_reader_set<RExpr>::type right_reader_set_t;
+		typedef typename left_reader_set_t::reader_type left_reader_t;
+		typedef typename right_reader_set_t::reader_type right_reader_t;
 
-		static inline typename Reductor::result_type
-		run(Reductor reduc, const Mat& A)
+		typedef typename Reductor::accum_type accum_t;
+		typedef typename binary_nil_expr<LExpr, RExpr> dummy_t;
+
+		typename colwise_vecscheme<dummy_t>::type sch = colwise_vecscheme<dummy_t>::get(dummy_t(a, b));
+
+		left_reader_set_t  a_in_set(a);
+		right_reader_set_t b_in_set(b);
+
+		left_reader_t a_in0(a_in_set, 0);
+		right_reader_t b_in0(b_in_set, 0);
+		accum_t s = accum_vec(sch, reduc, a_in0, b_in0);
+
+		const index_t n = a.ncolumns();
+		for (index_t j = 1; j < n; ++j)
 		{
-			typedef typename Reductor::accum_type accum_t;
-
-			if (!is_empty(A))
-			{
-				index_t m = A.nrows();
-				index_t n = A.ncolumns();
-
-				vecwise_reader<Mat> vec_a(A);
-
-				if (m > 1)
-				{
-					accum_t s = accum_vec(reduc, m, vec_a);
-
-					if (n > 1)
-					{
-						++ vec_a;
-						for (index_t j = 1; j < n; ++j, ++vec_a)
-						{
-							accum_t sj = accum_vec(reduc, m, vec_a);
-							s = reduc.combine(s, sj);
-						}
-					}
-
-					return reduc.get(s, m * n);
-				}
-				else // m == 1
-				{
-					accum_t s = reduc(vec_a.load_scalar(0));
-
-					if (n > 1)
-					{
-						++ vec_a;
-						for (index_t j = 1; j < n; ++j, ++vec_a)
-							s = reduc(s, vec_a.load_scalar(0));
-					}
-
-					return reduc.get(s, n);
-				}
-			}
-			else
-			{
-				return reduc();
-			}
+			left_reader_t a_in(a_in_set, j);
+			right_reader_t b_in(b_in_set, j);
+			s = reduc.combine(s, accum_vec(sch, reduc, a_in, b_in));
 		}
-	};
+
+		return reduc.get(s, a.nelems());
+	}
 
 
+	// Unary
 
-	template<typename Reductor, class LMat, class RMat, bool DoLinear>
-	struct binary_reduction_eval_helper;
-
-	template<typename Reductor, class LMat, class RMat>
-	struct binary_reduction_eval_helper<Reductor, LMat, RMat, true>
+	template<typename Reductor, class Expr>
+	struct unary_reduction_eval_helper
 	{
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(bcs::is_binary_reduction_functor<Reductor>::value,
-				"Reductor must be a unary reduction functor");
+		// (compile-time) calculation to select the better way to perform calculation
 
-		static_assert(bcs::is_accessible_as_vector<LMat>::value,
-				"Mat must be accessible-as-vector.");
+		static const bool has_short_columns = (ct_rows<Expr>::value <= ShortColumnBound);
 
-		static_assert(bcs::is_accessible_as_vector<RMat>::value,
-				"Mat must be accessible-as-vector.");
-#endif
+		static const bool prefer_by_columns_way =
+				(has_short_columns ?
+						(vecacc_cost<Expr, by_short_columns_tag>::value <
+						 vecacc_cost<Expr, as_single_vector_tag>::value)
+						:
+						(vecacc_cost<Expr, by_columns_tag>::value <
+						 vecacc_cost<Expr, as_single_vector_tag>::value)
+				);
 
-		static inline typename Reductor::result_type
-		run(Reductor reduc, const LMat& A, const RMat& B)
+
+		BCS_ENSURE_INLINE
+		static typename Reductor::result_type
+		run(Reductor reduc, const Expr& A)
 		{
 			typedef typename Reductor::accum_type accum_t;
 
 			if (!is_empty(A))
 			{
-				vec_reader<LMat> vec_a(A);
-				vec_reader<RMat> vec_b(B);
-
-				accum_t s = accum_vec(reduc, A.nelems(), vec_a, vec_b);
-				return reduc.get(s, A.nelems());
-			}
-			else
-			{
-				return reduc();
-			}
-		}
-	};
-
-
-	template<typename Reductor, class LMat, class RMat>
-	struct binary_reduction_eval_helper<Reductor, LMat, RMat, false>
-	{
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(bcs::is_binary_reduction_functor<Reductor>::value,
-				"Reductor must be a binary reduction functor");
-#endif
-
-		static inline typename Reductor::result_type
-		run(Reductor reduc, const LMat& A, const RMat& B)
-		{
-			typedef typename Reductor::accum_type accum_t;
-
-			if (!is_empty(A))
-			{
-				index_t m = A.nrows();
-				index_t n = A.ncolumns();
-
-				vecwise_reader<LMat> vec_a(A);
-				vecwise_reader<RMat> vec_b(B);
-
-				if (m > 1)
+				if (prefer_by_columns_way)
 				{
-					accum_t s = accum_vec(reduc, m, vec_a, vec_b);
-
-					if (n > 1)
-					{
-						++ vec_a;
-						++ vec_b;
-
-						for (index_t j = 1; j < n; ++j, ++vec_a, ++vec_b)
-						{
-							accum_t sj = accum_vec(reduc, m, vec_a, vec_b);
-							s = reduc.combine(s, sj);
-						}
-					}
-
-					return reduc.get(s, m * n);
+					return full_reduce_by_columns(reduc, A);
 				}
-				else // m == 1
+				else
 				{
-					accum_t s = reduc(vec_a.load_scalar(0), vec_b.load_scalar(0));
-
-					if (n > 1)
-					{
-						++ vec_a;
-						++ vec_b;
-
-						for (index_t j = 1; j < n; ++j, ++vec_a, ++vec_b)
-							s = reduc(s, vec_a.load_scalar(0), vec_b.load_scalar(0));
-					}
-
-					return reduc.get(s, n);
+					return full_reduce_as_single_vector(reduc, A);
 				}
 			}
 			else
@@ -213,6 +150,49 @@ namespace bcs { namespace detail {
 		}
 	};
 
+
+	// Binary
+
+	template<typename Reductor, class LExpr, class RExpr>
+	struct binary_reduction_eval_helper
+	{
+		// (compile-time) calculation to select the better way to perform calculation
+
+		static const bool has_short_columns = (binary_ct_rows<LExpr, RExpr>::value <= ShortColumnBound);
+
+		static const bool prefer_by_columns_way =
+				(has_short_columns ?
+						(vecacc2_cost<LExpr, RExpr, by_short_columns_tag>::value <
+						 vecacc2_cost<LExpr, RExpr, as_single_vector_tag>::value)
+						:
+						(vecacc2_cost<LExpr, RExpr, by_columns_tag>::value <
+						 vecacc2_cost<LExpr, RExpr, as_single_vector_tag>::value)
+				);
+
+
+		BCS_ENSURE_INLINE
+		static typename Reductor::result_type
+		run(Reductor reduc, const LExpr& A, const RExpr& B)
+		{
+			typedef typename Reductor::accum_type accum_t;
+
+			if (!is_empty(A))
+			{
+				if (prefer_by_columns_way)
+				{
+					return full_reduce_by_columns(reduc, A, B);
+				}
+				else
+				{
+					return full_reduce_as_single_vector(reduc, A, B);
+				}
+			}
+			else
+			{
+				return reduc();
+			}
+		}
+	};
 
 
 } }

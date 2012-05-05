@@ -472,6 +472,7 @@ namespace bcs
 
 	template<class Expr, typename Tag> struct vecacc_cost;
 
+
 	// default costs
 
 	const int NoOverheadAccessCost = 0;

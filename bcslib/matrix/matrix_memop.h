@@ -60,7 +60,12 @@ namespace bcs
 
 			for (index_t j = 0; j < n; ++j)
 				for (index_t i = 0; i < m; ++i)
-					if (bcs::math::fabs(A.elem(i, j) - B.elem(i, j)) > tol) return false;
+				{
+					T a = A.elem(i, j);
+					T b = B.elem(i, j);
+
+					if (a > b + tol || b > a + tol) return false;
+				}
 
 			return true;
 		}

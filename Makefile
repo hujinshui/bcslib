@@ -72,8 +72,7 @@ CORE_H = \
 	$(INC)/config/config.h \
 	$(INC)/core/basic_types.h \
 	$(INC)/core/syntax.h \
-	$(INC)/core/functor_base.h \
-	$(INC)/core/scalar_math.h \
+	$(INC)/core/functional.h \
 	$(INC)/core/range.h \
 	$(INC)/core/basic_defs.h \
 	$(INC)/core/type_traits.h \
@@ -83,6 +82,13 @@ CORE_H = \
 	$(INC)/core/bits/mem_op_impl_static.h \
 	$(INC)/core/block.h \
 	$(INC)/core.h
+	
+MATH_H = \
+	$(INC)/math/scalar_math.h \
+	$(INC)/math/arithmetic_functors.h \
+	$(INC)/math/elementary_functors.h \
+	$(INC)/math/basic_reductors.h
+	
 	
 MATRIX_BASE_H = $(CORE_H) \
 	$(INC)/matrix/matrix_fwd.h \
