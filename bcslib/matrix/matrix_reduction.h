@@ -14,7 +14,7 @@
 #define BCSLIB_MATRIX_REDUCTION_H_
 
 #include <bcslib/matrix/bits/matrix_reduction_internal.h>
-#include <bcslib/engine/reduction_functors.h>
+#include <bcslib/math/basic_reductors.h>
 
 namespace bcs
 {
@@ -32,8 +32,7 @@ namespace bcs
 			const IMatrixXpr<Mat, typename Reductor::argument_type>& A)
 	{
 #ifdef BCS_USE_STATIC_ASSERT
-		static_assert(bcs::is_unary_reduction_functor<Reductor>::value,
-				"Reductor must be a unary reduction functor");
+		static_assert(bcs::is_reductor<Reductor, 1>::value, "Reductor must be a unary reductor");
 #endif
 
 		return detail::unary_reduction_eval_helper<Reductor, Mat>::run(reduc, A.derived());
@@ -47,8 +46,7 @@ namespace bcs
 			const IMatrixXpr<RMat, typename Reductor::argument_type>& B)
 	{
 #ifdef BCS_USE_STATIC_ASSERT
-		static_assert(bcs::is_binary_reduction_functor<Reductor>::value,
-				"Reductor must be a binary reduction functor");
+		static_assert(bcs::is_reductor<Reductor, 2>::value, "Reductor must be a binary reductor");
 #endif
 
 		check_arg( has_same_size(A, B),

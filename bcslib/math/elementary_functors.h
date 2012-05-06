@@ -224,26 +224,26 @@ namespace bcs
 	};
 
 
-	DECLARE_EWISE_FUNCTOR( unary_sqrt, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_pow, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_sqrt, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_pow, 1 )
 
-	DECLARE_EWISE_FUNCTOR( unary_exp, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_log, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_log10, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_floor, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_ceil, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_exp, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_log, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_log10, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_floor, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_ceil, 1 )
 
-	DECLARE_EWISE_FUNCTOR( unary_sin, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_cos, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_tan, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_asin, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_acos, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_atan, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_sinh, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_cosh, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_tanh, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_sin, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_cos, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_tan, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_asin, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_acos, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_atan, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_sinh, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_cosh, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_tanh, 1 )
 
-	DECLARE_EWISE_FUNCTOR( binary_atan2, 2 )
+	BCS_DECLARE_EWISE_FUNCTOR( binary_atan2, 2 )
 }
 
 #endif
