@@ -23,7 +23,7 @@
 #include <bcslib/matrix/repeat_vectors.h>
 #include <bcslib/matrix/matrix_broadcast.h>
 
-// #include <bcslib/matrix/matrix_reduction.h>
-
+#include <bcslib/matrix/matrix_reduction.h>
+#include <bcslib/matrix/matrix_par_reduc.h>
 
 #endif /* MATRIX_H_ */

@@ -263,28 +263,28 @@ namespace bcs
 	};
 
 
-	DECLARE_EWISE_FUNCTOR( binary_plus, 2 )
-	DECLARE_EWISE_FUNCTOR( binary_minus, 2 )
-	DECLARE_EWISE_FUNCTOR( binary_times, 2 )
-	DECLARE_EWISE_FUNCTOR( binary_divides, 2 )
+	BCS_DECLARE_EWISE_FUNCTOR( binary_plus, 2 )
+	BCS_DECLARE_EWISE_FUNCTOR( binary_minus, 2 )
+	BCS_DECLARE_EWISE_FUNCTOR( binary_times, 2 )
+	BCS_DECLARE_EWISE_FUNCTOR( binary_divides, 2 )
 
-	DECLARE_EWISE_FUNCTOR( plus_scalar, 1 )
-	DECLARE_EWISE_FUNCTOR( minus_scalar, 1 )
-	DECLARE_EWISE_FUNCTOR( rminus_scalar, 1 )
-	DECLARE_EWISE_FUNCTOR( times_scalar, 1 )
-	DECLARE_EWISE_FUNCTOR( divides_scalar, 1 )
-	DECLARE_EWISE_FUNCTOR( rdivides_scalar, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( plus_scalar, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( minus_scalar, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( rminus_scalar, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( times_scalar, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( divides_scalar, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( rdivides_scalar, 1 )
 
-	DECLARE_EWISE_FUNCTOR( unary_negate, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_rcp, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_abs, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_sqr, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_cube, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_negate, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_rcp, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_abs, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_sqr, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_cube, 1 )
 
-	DECLARE_EWISE_FUNCTOR( binary_min, 2 )
-	DECLARE_EWISE_FUNCTOR( binary_max, 2 )
-	DECLARE_EWISE_FUNCTOR( unary_min, 1 )
-	DECLARE_EWISE_FUNCTOR( unary_max, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( binary_min, 2 )
+	BCS_DECLARE_EWISE_FUNCTOR( binary_max, 2 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_min, 1 )
+	BCS_DECLARE_EWISE_FUNCTOR( unary_max, 1 )
 
 }
 

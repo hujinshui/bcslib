@@ -14,7 +14,6 @@
 #define MATRIX_REDUCTION_INTERNAL_H_
 
 #include <bcslib/matrix/vector_operations.h>
-#include <bcslib/matrix/ewise_matrix_expr.h>
 
 namespace bcs { namespace detail {
 
@@ -23,13 +22,17 @@ namespace bcs { namespace detail {
 	template<class Reductor, class Expr>
 	BCS_ENSURE_INLINE
 	inline typename Reductor::result_type
-	full_reduce_as_single_vector(Reductor reduc, const Expr& a)
+	full_reduce_as_single_vector(const Reductor& reduc, const Expr& a)
 	{
-		typename vec_reader<Expr>::type in;
-
 		typedef typename Reductor::accum_type accum_t;
-		accum_t s = accum_vec(single_vecscheme<Expr>::get(a), reduc, in);
-		return reduc.get(s, a.nelems());
+		typedef typename vec_reader<Expr>::type in_t;
+
+		const index_t n = a.nelems();
+		in_t in(a);
+
+		accum_t s = accum_vec<Reductor, ct_size<Expr>::value, in_t>::run(reduc, n, in);
+
+		return reduc.get(s, n);
 	}
 
 
@@ -38,36 +41,42 @@ namespace bcs { namespace detail {
 	inline typename Reductor::result_type
 	full_reduce_as_single_vector(Reductor reduc, const LExpr& a, const RExpr& b)
 	{
-		typename vec_reader<LExpr>::type in_a;
-		typename vec_reader<RExpr>::type in_b;
-
 		typedef typename Reductor::accum_type accum_t;
-		typedef typename binary_nil_expr<LExpr, RExpr> dummy_t;
+		typedef typename vec_reader<LExpr>::type left_in_t;
+		typedef typename vec_reader<RExpr>::type right_in_t;
 
-		accum_t s = accum_vec(single_vecscheme<dummy_t>::get(dummy_t(a, b)), reduc, in_a, in_b);
-		return reduc.get(s, a.nelems());
+		const index_t n = a.nelems();
+		left_in_t in1(a);
+		right_in_t in2(b);
+
+		accum_t s = accum_vec2<Reductor,
+				binary_ct_size<LExpr, RExpr>::value, left_in_t, right_in_t>::run(reduc, n, in1, in2);
+		return reduc.get(s, n);
 	}
 
 	template<class Reductor, class Expr>
 	inline typename Reductor::result_type
 	full_reduce_by_columns(Reductor reduc, const Expr& a)
 	{
-		typedef typename colwise_reader_set<Expr>::type reader_set_t;
-		typedef typename reader_set_t::reader_type reader_t;
 		typedef typename Reductor::accum_type accum_t;
+		typedef typename colwise_reader_bank<Expr>::type bank_t;
+		typedef typename bank_t::reader_type in_t;
 
-		typename colwise_vecscheme<Expr>::type sch = colwise_vecscheme<Expr>::get(a);
-
-		reader_set_t in_set(a);
-
-		reader_t in0(in_set, 0);
-		accum_t s = accum_vec(sch, reduc, in0);
-
+		const index_t m = a.nrows();
 		const index_t n = a.ncolumns();
+
+		bank_t bank(a);
+
+		in_t in0(bank, 0);
+		accum_t s = accum_vec<Reductor, ct_rows<Expr>::value, in_t>::run(reduc, m, in0);
+
 		for (index_t j = 1; j < n; ++j)
 		{
-			reader_t in(in_set, j);
-			s = reduc.combine(s, accum_vec(sch, reduc, in));
+			in_t in(bank, j);
+
+			accum_t sj = accum_vec<Reductor, ct_rows<Expr>::value, in_t>::run(reduc, m, in);
+
+			s = reduc.combine(s, sj);
 		}
 
 		return reduc.get(s, a.nelems());
@@ -78,29 +87,32 @@ namespace bcs { namespace detail {
 	inline typename Reductor::result_type
 	full_reduce_by_columns(Reductor reduc, const LExpr& a, const RExpr& b)
 	{
-		typedef typename colwise_reader_set<LExpr>::type left_reader_set_t;
-		typedef typename colwise_reader_set<RExpr>::type right_reader_set_t;
-		typedef typename left_reader_set_t::reader_type left_reader_t;
-		typedef typename right_reader_set_t::reader_type right_reader_t;
-
 		typedef typename Reductor::accum_type accum_t;
-		typedef typename binary_nil_expr<LExpr, RExpr> dummy_t;
+		typedef typename colwise_reader_bank<LExpr>::type left_bank_t;
+		typedef typename colwise_reader_bank<RExpr>::type right_bank_t;
+		typedef typename left_bank_t::reader_type left_in_t;
+		typedef typename right_bank_t::reader_type right_in_t;
 
-		typename colwise_vecscheme<dummy_t>::type sch = colwise_vecscheme<dummy_t>::get(dummy_t(a, b));
-
-		left_reader_set_t  a_in_set(a);
-		right_reader_set_t b_in_set(b);
-
-		left_reader_t a_in0(a_in_set, 0);
-		right_reader_t b_in0(b_in_set, 0);
-		accum_t s = accum_vec(sch, reduc, a_in0, b_in0);
-
+		const index_t m = a.nrows();
 		const index_t n = a.ncolumns();
+
+		left_bank_t bank_a(a);
+		right_bank_t bank_b(b);
+
+		left_in_t in_a0(bank_a, 0);
+		right_in_t in_b0(bank_b, 0);
+		accum_t s = accum_vec2<Reductor,
+				binary_ct_rows<LExpr, RExpr>::value, left_in_t, right_in_t>::run(reduc, m, in_a0, in_b0);
+
 		for (index_t j = 1; j < n; ++j)
 		{
-			left_reader_t a_in(a_in_set, j);
-			right_reader_t b_in(b_in_set, j);
-			s = reduc.combine(s, accum_vec(sch, reduc, a_in, b_in));
+			left_in_t in_a(bank_a, j);
+			right_in_t in_b(bank_b, j);
+
+			accum_t sj = accum_vec2<Reductor,
+					binary_ct_rows<LExpr, RExpr>::value, left_in_t, right_in_t>::run(reduc, m, in_a, in_b);
+
+			s = reduc.combine(s, sj);
 		}
 
 		return reduc.get(s, a.nelems());
@@ -145,7 +157,7 @@ namespace bcs { namespace detail {
 			}
 			else
 			{
-				return reduc();
+				return reduc.empty_result();
 			}
 		}
 	};
@@ -189,7 +201,7 @@ namespace bcs { namespace detail {
 			}
 			else
 			{
-				return reduc();
+				return reduc.empty_result();
 			}
 		}
 	};

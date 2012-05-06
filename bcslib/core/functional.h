@@ -18,12 +18,12 @@
 
 #define BCS_MAXIMUM_EWISE_ARGUMENTS 4
 
-#define DECLARE_EWISE_FUNCTOR(Name, N) \
+#define BCS_DECLARE_EWISE_FUNCTOR(Name, N) \
 	template<typename T> struct is_ewise_functor<Name<T>, N> { static const bool value = true; }; \
 	template<typename T> struct num_arguments<Name<T> > { static const bool value = N; };
 
-#define DECLARE_REDUCTOR(Name, N) \
-	template<typename T> struct is_reduction_functor<Name<T>, N> { static const bool value = true; }; \
+#define BCS_DECLARE_REDUCTOR(Name, N) \
+	template<typename T> struct is_reductor<Name<T>, N> { static const bool value = true; }; \
 	template<typename T> struct num_arguments<Name<T> > { static const bool value = N; };
 
 

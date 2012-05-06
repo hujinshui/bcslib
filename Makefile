@@ -157,7 +157,8 @@ test_core: $(BIN)/test_memory
 test_matrix: \
 	$(BIN)/test_matrix_basics \
 	$(BIN)/test_matrix_subviews \
-	$(BIN)/test_matrix_eval
+	$(BIN)/test_matrix_eval \
+	$(BIN)/test_matrix_reduc
 
 
 #_________________________________________________________________________
@@ -214,11 +215,12 @@ $(BIN)/test_matrix_eval: $(MATRIX_EVAL_H) $(TEST_MATRIX_EVAL_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_EVAL_SOURCES) $(MAIN_TEST_POST) -o $@
 	
 TEST_MATRIX_REDUC_SOURCES = \
-	test/matrix/test_matrix_reduction.cpp \
+	test/matrix/test_matrix_unary_reduction.cpp \
+	test/matrix/test_matrix_binary_reduction.cpp \
 	test/matrix/test_matrix_unary_par_reduc.cpp \
-	test/matrix/test_matrix_binary_par_reduc.cpp
+	test/matrix/test_matrix_binary_par_reduc.cpp 
 	
-$(BIN)/test_matrix_reduc: $(MATRIX_H) $(TEST_MATRIX_REDUC_SOURCES)
+$(BIN)/test_matrix_reduc: $(MATRIX_EVAL_H) $(TEST_MATRIX_REDUC_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_REDUC_SOURCES) $(MAIN_TEST_POST) -o $@
 	
 	
