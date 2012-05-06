@@ -73,7 +73,9 @@ namespace bcs
 
 	// important structures for manipulation
 
-	template<class Mat> struct subviews;
+	template<class Mat, typename RowRange> struct colviews;
+	template<class Mat, typename ColRange> struct rowviews;
+	template<class Mat, typename RowRange, typename ColRange> struct subviews;
 
 	template<class Mat> struct transposed;
 	template<class Mat> struct transpose_expr;

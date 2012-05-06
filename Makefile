@@ -113,8 +113,7 @@ MATRIX_BASE_H = $(CORE_H) \
 	$(INC)/matrix/matrix_base.h
 	
 MATRIX_EXT_H = $(MATRIX_BASE_H) \
-	$(INC)/matrix/matrix_subviews.h \
-	$(INC)/matrix/bits/matrix_subviews_internal.h
+	$(INC)/matrix/matrix_subviews.h
 	
 	
 MATRIX_EVAL_H = $(MATRIX_EXT_H) $(MATH_H) \
@@ -202,7 +201,8 @@ $(BIN)/test_matrix_basics: $(MATRIX_BASE_H) $(TEST_MATRIX_BASICS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_BASICS_SOURCES) $(MAIN_TEST_POST) -o $@
 	
 TEST_MATRIX_SUBVIEWS_SOURCES = \
-	test/matrix/test_matrix_slices.cpp
+	test/matrix/test_matrix_slices.cpp \
+	test/matrix/test_matrix_blocks.cpp
 
 $(BIN)/test_matrix_subviews: $(MATRIX_EXT_H) $(TEST_MATRIX_SUBVIEWS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_SUBVIEWS_SOURCES) $(MAIN_TEST_POST) -o $@

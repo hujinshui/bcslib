@@ -17,6 +17,7 @@
 
 namespace bcs
 {
+	struct whole { };
 
 	class range
 	{

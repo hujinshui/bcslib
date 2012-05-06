@@ -221,64 +221,125 @@ namespace bcs
 
 
 	public:
-		BCS_ENSURE_INLINE
-		typename subviews<Derived>::const_row_type
-		row(index_type i) const
-		{
-			return subviews<Derived>::get_row(derived(), i);
-		}
+
+		// column views
 
 		BCS_ENSURE_INLINE
-		typename subviews<Derived>::row_type
-		row(index_type i)
-		{
-			return subviews<Derived>::get_row(derived(), i);
-		}
-
-		BCS_ENSURE_INLINE
-		typename subviews<Derived>::const_column_type
+		typename colviews<Derived, whole>::const_type
 		column(index_type j) const
 		{
-			return subviews<Derived>::get_column(derived(), j);
+			return colviews<Derived, whole>::get(derived(), j, whole());
 		}
 
 		BCS_ENSURE_INLINE
-		typename subviews<Derived>::column_type
+		typename colviews<Derived, whole>::type
 		column(index_type j)
 		{
-			return subviews<Derived>::get_column(derived(), j);
+			return colviews<Derived, whole>::get(derived(), j, whole());
 		}
 
 		BCS_ENSURE_INLINE
-		typename subviews<Derived>::const_multirow_type
-		rows(const range& rgn) const
+		typename colviews<Derived, range>::const_type
+		V(const range& rgn, const index_t j) const
 		{
-			return subviews<Derived>::get_multirow(derived(),
-					rgn.begin_index(), rgn.num());
+			return colviews<Derived, range>::get(derived(), j, rgn);
 		}
 
 		BCS_ENSURE_INLINE
-		typename subviews<Derived>::multirow_type
-		rows(const range& rgn)
+		typename colviews<Derived, range>::type
+		V(const range& rgn, const index_t j)
 		{
-			return subviews<Derived>::get_multirow(derived(),
-					rgn.begin_index(), rgn.num());
+			return colviews<Derived, range>::get(derived(), j, rgn);
+		}
+
+
+		// row views
+
+		BCS_ENSURE_INLINE
+		typename rowviews<Derived, whole>::const_type
+		row(index_type i) const
+		{
+			return rowviews<Derived, whole>::get(derived(), i, whole());
 		}
 
 		BCS_ENSURE_INLINE
-		typename subviews<Derived>::const_multicolumn_type
-		columns(const range& rgn) const
+		typename rowviews<Derived, whole>::type
+		row(index_type i)
 		{
-			return subviews<Derived>::get_multicolumn(derived(),
-					rgn.begin_index(), rgn.num());
+			return rowviews<Derived, whole>::get(derived(), i, whole());
 		}
 
 		BCS_ENSURE_INLINE
-		typename subviews<Derived>::multicolumn_type
-		columns(const range& rgn)
+		typename rowviews<Derived, range>::const_type
+		V(const index_t i, const range& rgn) const
 		{
-			return subviews<Derived>::get_multicolumn(derived(),
-					rgn.begin_index(), rgn.num());
+			return rowviews<Derived, range>::get(derived(), i, rgn);
+		}
+
+		BCS_ENSURE_INLINE
+		typename rowviews<Derived, range>::type
+		V(const index_t i, const range& rgn)
+		{
+			return rowviews<Derived, range>::get(derived(), i, rgn);
+		}
+
+
+		// sub-views
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived, whole, whole>::const_type
+		V(whole, whole) const
+		{
+			return subviews<Derived, whole, whole>::get(derived(), whole(), whole());
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived, whole, whole>::type
+		V(whole, whole)
+		{
+			return subviews<Derived, whole, whole>::get(derived(), whole(), whole());
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived, whole, range>::const_type
+		V(whole, const range& col_rgn) const
+		{
+			return subviews<Derived, whole, range>::get(derived(), whole(), col_rgn);
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived, whole, range>::type
+		V(whole, const range& col_rgn)
+		{
+			return subviews<Derived, whole, range>::get(derived(), whole(), col_rgn);
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived, range, whole>::const_type
+		V(const range& row_rgn, whole) const
+		{
+			return subviews<Derived, range, whole>::get(derived(), row_rgn, whole());
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived, range, whole>::type
+		V(const range& row_rgn, whole)
+		{
+			return subviews<Derived, range, whole>::get(derived(), row_rgn, whole());
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived, range, range>::const_type
+		V(const range& row_rgn, const range& col_rgn) const
+		{
+			return subviews<Derived, range, range>::get(derived(), row_rgn, col_rgn);
+		}
+
+		BCS_ENSURE_INLINE
+		typename subviews<Derived, range, range>::type
+		V(const range& row_rgn, const range& col_rgn)
+		{
+			return subviews<Derived, range, range>::get(derived(), row_rgn, col_rgn);
 		}
 
 
