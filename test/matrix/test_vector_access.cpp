@@ -144,6 +144,67 @@ TEST( LinearReader, RefEx11 )
 }
 
 
+template<int CTRows, int CTCols>
+void test_linear_reader_on_grid2d(const index_t m, const index_t n)
+{
+	const index_t step = 2;
+	const index_t ldim = m * step + 3;
+
+	dense_matrix<double> A0(ldim, n);
+	for (index_t i = 0; i < ldim * n; ++i) A0[i] = double(i+2);
+
+	ref_grid2d<double, CTRows, CTCols> A(A0.ptr_data(), m, n, step, ldim);
+	ASSERT_TRUE( verify_linear_reader(A) );
+}
+
+
+TEST( LinearReader, Grid2dDD )
+{
+	test_linear_reader_on_grid2d<DynamicDim, DynamicDim>(5, 6);
+}
+
+TEST( LinearReader, Grid2dDS )
+{
+	test_linear_reader_on_grid2d<DynamicDim, 6>(5, 6);
+}
+
+TEST( LinearReader, Grid2dD1 )
+{
+	test_linear_reader_on_grid2d<DynamicDim, 1>(5, 1);
+}
+
+TEST( LinearReader, Grid2dSD )
+{
+	test_linear_reader_on_grid2d<5, DynamicDim>(5, 6);
+}
+
+TEST( LinearReader, Grid2dSS )
+{
+	test_linear_reader_on_grid2d<5, 6>(5, 6);
+}
+
+TEST( LinearReader, Grid2dS1 )
+{
+	test_linear_reader_on_grid2d<5, 1>(5, 1);
+}
+
+TEST( LinearReader, Grid2d1D )
+{
+	test_linear_reader_on_grid2d<1, DynamicDim>(1, 6);
+}
+
+TEST( LinearReader, Grid2d1S )
+{
+	test_linear_reader_on_grid2d<1, 6>(1, 6);
+}
+
+TEST( LinearReader, Grid2d11 )
+{
+	test_linear_reader_on_grid2d<1, 1>(1, 1);
+}
+
+
+
 
 template<class Mat>
 bool verify_colwise_reader(const Mat& A)
@@ -282,6 +343,68 @@ TEST( ColwiseReader, RefEx11 )
 {
 	test_colwise_reader_on_refex<1, 1>(1, 1);
 }
+
+template<int CTRows, int CTCols>
+void test_colwise_reader_on_grid2d(const index_t m, const index_t n)
+{
+	const index_t step = 2;
+	const index_t ldim = m * step + 3;
+
+	dense_matrix<double> A0(ldim, n);
+	for (index_t i = 0; i < ldim * n; ++i) A0[i] = double(i+2);
+
+	ref_grid2d<double, CTRows, CTCols> A(A0.ptr_data(), m, n, step, ldim);
+	ASSERT_TRUE( verify_colwise_reader(A) );
+}
+
+
+TEST( ColwiseReader, Grid2dDD )
+{
+	test_colwise_reader_on_grid2d<DynamicDim, DynamicDim>(5, 6);
+}
+
+TEST( ColwiseReader, Grid2dDS )
+{
+	test_colwise_reader_on_grid2d<DynamicDim, 6>(5, 6);
+}
+
+TEST( ColwiseReader, Grid2dD1 )
+{
+	test_colwise_reader_on_grid2d<DynamicDim, 1>(5, 1);
+}
+
+TEST( ColwiseReader, Grid2dSD )
+{
+	test_colwise_reader_on_grid2d<5, DynamicDim>(5, 6);
+}
+
+TEST( ColwiseReader, Grid2dSS )
+{
+	test_colwise_reader_on_grid2d<5, 6>(5, 6);
+}
+
+TEST( ColwiseReader, Grid2dS1 )
+{
+	test_colwise_reader_on_grid2d<5, 1>(5, 1);
+}
+
+TEST( ColwiseReader, Grid2d1D )
+{
+	test_colwise_reader_on_grid2d<1, DynamicDim>(1, 6);
+}
+
+TEST( ColwiseReader, Grid2d1S )
+{
+	test_colwise_reader_on_grid2d<1, 6>(1, 6);
+}
+
+TEST( ColwiseReader, Grid2d11 )
+{
+	test_colwise_reader_on_grid2d<1, 1>(1, 1);
+}
+
+
+
 
 
 

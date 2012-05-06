@@ -13,6 +13,10 @@ using namespace bcs;
 
 // explicit template for syntax check
 
+template class bcs::cref_matrix<double, DynamicDim, DynamicDim>;
+template class bcs::cref_matrix<double, DynamicDim, 1>;
+template class bcs::cref_matrix<double, 1, DynamicDim>;
+template class bcs::cref_matrix<double, 2, 2>;
 
 template class bcs::ref_matrix<double, DynamicDim, DynamicDim>;
 template class bcs::ref_matrix<double, DynamicDim, 1>;
@@ -20,6 +24,18 @@ template class bcs::ref_matrix<double, 1, DynamicDim>;
 template class bcs::ref_matrix<double, 2, 2>;
 
 #ifdef BCS_USE_STATIC_ASSERT
+static_assert(bcs::is_base_of<
+		bcs::IMatrixXpr<bcs::cref_matrix<double>, double>,
+		bcs::cref_matrix<double> >::value, "Base verification failed.");
+
+static_assert(bcs::is_base_of<
+		bcs::IMatrixView<bcs::cref_matrix<double>, double>,
+		bcs::cref_matrix<double> >::value, "Base verification failed.");
+
+static_assert(bcs::is_base_of<
+		bcs::IDenseMatrix<bcs::cref_matrix<double>, double>,
+		bcs::cref_matrix<double> >::value, "Base verification failed.");
+
 static_assert(bcs::is_base_of<
 		bcs::IMatrixXpr<bcs::ref_matrix<double>, double>,
 		bcs::ref_matrix<double> >::value, "Base verification failed.");
@@ -49,6 +65,7 @@ void do_test_ref_matrix(Mat& a1, index_t m, index_t n, const T *origin)
 	ASSERT_EQ(a1.ncolumns() == 1, is_column(a1));
 	ASSERT_EQ(a1.nelems() == 1, is_scalar(a1));
 	ASSERT_EQ(a1.nrows() == 1 || a1.ncolumns() == 1, is_vector(a1));
+	ASSERT_EQ(a1.nrows() == 1 && a1.ncolumns() == 1, is_scalar(a1));
 
 	// test element access
 
@@ -152,6 +169,7 @@ static void test_ref_matrix_ex(index_t m, index_t n, index_t ldim)
 	ASSERT_EQ(a1.ncolumns() == 1, is_column(a1));
 	ASSERT_EQ(a1.nelems() == 1, is_scalar(a1));
 	ASSERT_EQ(a1.nrows() == 1 || a1.ncolumns() == 1, is_vector(a1));
+	ASSERT_EQ(a1.nrows() == 1 && a1.ncolumns() == 1, is_scalar(a1));
 
 	// test element access
 
@@ -221,45 +239,99 @@ static void test_ref_matrix_ex(index_t m, index_t n, index_t ldim)
 
 
 
-TEST( RefMatrix, ConstDRowDCol )
+TEST( RefMatrix, CDD )
 {
 	test_ref_matrix<cref_matrix<double, DynamicDim, DynamicDim> >(3, 4);
 }
 
-TEST( RefMatrix, DRowDCol )
+TEST( RefMatrix, WDD )
 {
 	test_ref_matrix<ref_matrix<double, DynamicDim, DynamicDim> >(3, 4);
 }
 
-TEST( RefMatrix, ConstDRowSCol )
+TEST( RefMatrix, CDS )
 {
 	test_ref_matrix<cref_matrix<double, DynamicDim, 4> >(3, 4);
 }
 
-TEST( RefMatrix, DRowSCol )
+TEST( RefMatrix, WDS )
 {
 	test_ref_matrix<ref_matrix<double, DynamicDim, 4> >(3, 4);
 }
 
-TEST( RefMatrix, ConstSRowDCol )
+TEST( RefMatrix, CD1 )
+{
+	test_ref_matrix<cref_matrix<double, DynamicDim, 1> >(3, 1);
+}
+
+TEST( RefMatrix, WD1 )
+{
+	test_ref_matrix<ref_matrix<double, DynamicDim, 1> >(3, 1);
+}
+
+
+TEST( RefMatrix, CSD )
 {
 	test_ref_matrix<cref_matrix<double, 3, DynamicDim> >(3, 4);
 }
 
-TEST( RefMatrix, SRowDCol )
+TEST( RefMatrix, WSD )
 {
 	test_ref_matrix<ref_matrix<double, 3, DynamicDim> >(3, 4);
 }
 
-TEST( RefMatrix, ConstSRowSCol )
+TEST( RefMatrix, CSS )
 {
 	test_ref_matrix<cref_matrix<double, 3, 4> >(3, 4);
 }
 
-TEST( RefMatrix, SRowSCol )
+TEST( RefMatrix, WSS )
 {
 	test_ref_matrix<ref_matrix<double, 3, 4> >(3, 4);
 }
+
+TEST( RefMatrix, CS1 )
+{
+	test_ref_matrix<cref_matrix<double, 3, 1> >(3, 1);
+}
+
+TEST( RefMatrix, WS1 )
+{
+	test_ref_matrix<ref_matrix<double, 3, 1> >(3, 1);
+}
+
+TEST( RefMatrix, C1D )
+{
+	test_ref_matrix<cref_matrix<double, 1, DynamicDim> >(1, 4);
+}
+
+TEST( RefMatrix, W1D )
+{
+	test_ref_matrix<ref_matrix<double, 1, DynamicDim> >(1, 4);
+}
+
+TEST( RefMatrix, C1S )
+{
+	test_ref_matrix<cref_matrix<double, 1, 4> >(1, 4);
+}
+
+TEST( RefMatrix, W1S )
+{
+	test_ref_matrix<ref_matrix<double, 1, 4> >(1, 4);
+}
+
+TEST( RefMatrix, C11 )
+{
+	test_ref_matrix<cref_matrix<double, 1, 1> >(1, 1);
+}
+
+TEST( RefMatrix, W11 )
+{
+	test_ref_matrix<ref_matrix<double, 1, 1> >(1, 1);
+}
+
+
+
 
 
 TEST( RefVector, ConstColDyn )
@@ -305,76 +377,95 @@ TEST( RefVector, RowSta )
 
 
 
-TEST( RefMatrixEx, ConstDRowDCol )
+TEST( RefMatrixEx, CDD )
 {
 	test_ref_matrix_ex<cref_matrix_ex<double, DynamicDim, DynamicDim> >(3, 4, 7);
 }
 
-TEST( RefMatrixEx, DRowDCol )
+TEST( RefMatrixEx, WDD )
 {
 	test_ref_matrix_ex<ref_matrix_ex<double, DynamicDim, DynamicDim> >(3, 4, 7);
 }
 
-TEST( RefMatrixEx, ConstDRowSCol )
+TEST( RefMatrixEx, CDS )
 {
 	test_ref_matrix_ex<cref_matrix_ex<double, DynamicDim, 4> >(3, 4, 7);
 }
 
-TEST( RefMatrixEx, ConstDRowSCol1 )
-{
-	test_ref_matrix_ex<cref_matrix_ex<double, DynamicDim, 1> >(3, 1, 7);
-}
-
-TEST( RefMatrixEx, DRowSCol )
+TEST( RefMatrixEx, WDS )
 {
 	test_ref_matrix_ex<ref_matrix_ex<double, DynamicDim, 4> >(3, 4, 7);
 }
 
-TEST( RefMatrixEx, DRowSCol1 )
+TEST( RefMatrixEx, CD1 )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, DynamicDim, 1> >(3, 1, 7);
+}
+
+TEST( RefMatrixEx, WD1 )
 {
 	test_ref_matrix_ex<ref_matrix_ex<double, DynamicDim, 1> >(3, 1, 7);
 }
 
-TEST( RefMatrixEx, ConstSRowDCol )
+TEST( RefMatrixEx, CSD )
 {
 	test_ref_matrix_ex<cref_matrix_ex<double, 3, DynamicDim> >(3, 4, 7);
 }
 
-TEST( RefMatrixEx, ConstSRowDCol1 )
-{
-	test_ref_matrix_ex<cref_matrix_ex<double, 1, DynamicDim> >(1, 4, 7);
-}
-
-TEST( RefMatrixEx, SRowDCol )
+TEST( RefMatrixEx, WSD )
 {
 	test_ref_matrix_ex<ref_matrix_ex<double, 3, DynamicDim> >(3, 4, 7);
 }
 
-TEST( RefMatrixEx, SRowDCol1 )
-{
-	test_ref_matrix_ex<ref_matrix_ex<double, 1, DynamicDim> >(1, 4, 7);
-}
-
-TEST( RefMatrixEx, ConstSRowSCol )
+TEST( RefMatrixEx, CSS )
 {
 	test_ref_matrix_ex<cref_matrix_ex<double, 3, 4> >(3, 4, 7);
 }
 
-TEST( RefMatrixEx, ConstSRowSCol1 )
-{
-	test_ref_matrix_ex<cref_matrix_ex<double, 1, 1> >(1, 1, 7);
-}
-
-TEST( RefMatrixEx, SRowSCol )
+TEST( RefMatrixEx, WSS )
 {
 	test_ref_matrix_ex<ref_matrix_ex<double, 3, 4> >(3, 4, 7);
 }
 
-TEST( RefMatrixEx, SRowSCol1 )
+TEST( RefMatrixEx, CS1 )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, 3, 1> >(3, 1, 7);
+}
+
+TEST( RefMatrixEx, WS1 )
+{
+	test_ref_matrix_ex<ref_matrix_ex<double, 3, 1> >(3, 1, 7);
+}
+
+TEST( RefMatrixEx, C1D )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, 1, DynamicDim> >(1, 4, 7);
+}
+
+TEST( RefMatrixEx, W1D )
+{
+	test_ref_matrix_ex<ref_matrix_ex<double, 1, DynamicDim> >(1, 4, 7);
+}
+
+TEST( RefMatrixEx, C1S )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, 1, 4> >(1, 4, 7);
+}
+
+TEST( RefMatrixEx, W1S )
+{
+	test_ref_matrix_ex<ref_matrix_ex<double, 1, 4> >(1, 4, 7);
+}
+
+TEST( RefMatrixEx, C11 )
+{
+	test_ref_matrix_ex<cref_matrix_ex<double, 1, 1> >(1, 1, 7);
+}
+
+TEST( RefMatrixEx, W11 )
 {
 	test_ref_matrix_ex<ref_matrix_ex<double, 1, 1> >(1, 1, 7);
 }
-
 
 
 

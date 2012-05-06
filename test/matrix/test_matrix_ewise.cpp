@@ -712,6 +712,26 @@ static void test_binary_ewise_plus_on_refex(index_t m, index_t n)
 }
 
 
+template<int CTRows, int CTCols>
+static void test_binary_ewise_plus_between_dense_and_grid(index_t m, index_t n)
+{
+	dense_matrix<double, CTRows, CTCols> Amat(m, n);
+	for (index_t i = 0; i < m * n; ++i) Amat[i] = double(i+1);
+
+	const index_t step = 2;
+	const index_t ldim = m * step + 3;
+	scoped_block<double> Bblk(ldim * n);
+
+	for (index_t i = 0; i < ldim * n; ++i) Bblk[i] = (i+1);
+	cref_grid2d<double, CTRows, CTCols> Bmat(Bblk.ptr_begin(), m, n, step, ldim);
+
+	test_binary_ewise_plus(Amat, Bmat);
+}
+
+
+
+
+
 TEST( MatrixEWise2,  BinaryContinuDD )
 {
 	test_binary_ewise_plus_on_dense<DynamicDim, DynamicDim>(5, 6);
@@ -805,7 +825,50 @@ TEST( MatrixEWise2,  BinaryRefEx11 )
 }
 
 
+TEST( MatrixEWise2,  BinaryDenseAndGridDD )
+{
+	test_binary_ewise_plus_between_dense_and_grid<DynamicDim, DynamicDim>(5, 6);
+}
 
+TEST( MatrixEWise2,  BinaryDenseAndGridDS )
+{
+	test_binary_ewise_plus_between_dense_and_grid<DynamicDim, 6>(5, 6);
+}
+
+TEST( MatrixEWise2,  BinaryDenseAndGridD1 )
+{
+	test_binary_ewise_plus_between_dense_and_grid<DynamicDim, 1>(5, 1);
+}
+
+TEST( MatrixEWise2,  BinaryDenseAndGridSD )
+{
+	test_binary_ewise_plus_between_dense_and_grid<5, DynamicDim>(5, 6);
+}
+
+TEST( MatrixEWise2,  BinaryDenseAndGridSS )
+{
+	test_binary_ewise_plus_between_dense_and_grid<5, 6>(5, 6);
+}
+
+TEST( MatrixEWise2,  BinaryDenseAndGridS1 )
+{
+	test_binary_ewise_plus_between_dense_and_grid<5, 1>(5, 1);
+}
+
+TEST( MatrixEWise2,  BinaryDenseAndGrid1D )
+{
+	test_binary_ewise_plus_between_dense_and_grid<1, DynamicDim>(1, 6);
+}
+
+TEST( MatrixEWise2,  BinaryDenseAndGrid1S )
+{
+	test_binary_ewise_plus_between_dense_and_grid<1, 6>(1, 6);
+}
+
+TEST( MatrixEWise2,  BinaryDenseAndGrid11 )
+{
+	test_binary_ewise_plus_between_dense_and_grid<1, 1>(1, 1);
+}
 
 
 

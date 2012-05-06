@@ -24,6 +24,7 @@
 
 #include <bcslib/matrix/ref_matrix.h>
 #include <bcslib/matrix/dense_matrix.h>
+#include <bcslib/matrix/ref_grid2d.h>
 #include <bcslib/matrix/matrix_capture.h>
 
 #endif

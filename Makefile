@@ -101,10 +101,14 @@ MATRIX_BASE_H = $(CORE_H) \
 	$(INC)/matrix/matrix_io.h \
 	$(INC)/matrix/ref_matrix.h \
 	$(INC)/matrix/dense_matrix.h \
+	$(INC)/matrix/vector_accessors.h \
+	$(INC)/matrix/vector_operations.h \
+	$(INC)/matrix/ref_grid2d.h \
 	$(INC)/matrix/matrix_capture.h \
 	$(INC)/matrix/bits/matrix_memop_internal.h \
 	$(INC)/matrix/bits/offset_helper.h \
 	$(INC)/matrix/bits/ref_matrix_internal.h \
+	$(INC)/matrix/bits/ref_grid2d_internal.h \
 	$(INC)/matrix/bits/dense_matrix_internal.h \
 	$(INC)/matrix/matrix_base.h
 	
@@ -114,8 +118,6 @@ MATRIX_EXT_H = $(MATRIX_BASE_H) \
 	
 	
 MATRIX_EVAL_H = $(MATRIX_EXT_H) $(MATH_H) \
-	$(INC)/matrix/vector_accessors.h \
-	$(INC)/matrix/vector_operations.h \
 	$(INC)/matrix/ewise_matrix_expr.h \
 	$(INC)/matrix/ewise_matrix_eval.h \
 	$(INC)/matrix/matrix_arithmetic.h \
@@ -189,8 +191,10 @@ $(BIN)/test_memory: $(CORE_H) $(TEST_MEMORY_SOURCES)
 #----------------------------------------------------------
 
 TEST_MATRIX_BASICS_SOURCES = \
-	test/matrix/test_ref_matrix.cpp \
 	test/matrix/test_dense_matrix.cpp \
+	test/matrix/test_ref_matrix.cpp \
+	test/matrix/test_ref_grid2d.cpp \
+	test/matrix/test_vector_access.cpp \
 	test/matrix/test_matrix_memop.cpp \
 	test/matrix/test_matrix_assign.cpp
 	
@@ -204,7 +208,6 @@ $(BIN)/test_matrix_subviews: $(MATRIX_EXT_H) $(TEST_MATRIX_SUBVIEWS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_SUBVIEWS_SOURCES) $(MAIN_TEST_POST) -o $@
 
 TEST_MATRIX_EVAL_SOURCES = \
-	test/matrix/test_vector_access.cpp \
 	test/matrix/test_matrix_ewise.cpp \
 	test/matrix/test_matrix_arithmetic.cpp \
 	test/matrix/test_matrix_elfuns.cpp \

@@ -177,6 +177,7 @@ namespace bcs
 		BCS_MAT_TRAITS_DEFS(T)
 
 	public:
+		BCS_ENSURE_INLINE
 		ref_matrix(T* pdata, index_type m, index_type n)
 		: m_internal(pdata, m, n)
 		{
@@ -420,9 +421,6 @@ namespace bcs
 	public:
 		BCS_MAT_TRAITS_CDEFS(T)
 
-	private:
-		static const bool IsCTVector = (CTRows == 1 || CTCols == 1);
-
 	public:
 
 		BCS_ENSURE_INLINE
@@ -533,10 +531,8 @@ namespace bcs
 	public:
 		BCS_MAT_TRAITS_DEFS(T)
 
-	private:
-			static const bool IsCTVector = (CTRows == 1 || CTCols == 1);
-
 	public:
+		BCS_ENSURE_INLINE
 		ref_matrix_ex(T* pdata, index_type m, index_type n, index_type ldim)
 		: m_internal(pdata, m, n, ldim)
 		{

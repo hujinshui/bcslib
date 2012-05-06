@@ -67,6 +67,7 @@ static void test_dense_matrix(index_t m, index_t n)
 	ASSERT_EQ(a0.ncolumns() == 1, is_column(a0));
 	ASSERT_EQ(a0.nelems() == 1, is_scalar(a0));
 	ASSERT_EQ(a0.nrows() == 1 || a0.ncolumns() == 1, is_vector(a0));
+	ASSERT_EQ(a0.nrows() == 1 && a0.ncolumns() == 1, is_scalar(a0));
 
 	if (IsStatic)
 	{
@@ -367,52 +368,84 @@ void test_dense_row(index_t len)
 
 
 
-TEST( DenseMatrix, DRowDCol )
+TEST( DenseMatrix, MatDD )
 {
 	test_dense_matrix<DynamicDim, DynamicDim>(3, 4);
 	test_dense_matrix_swap_and_resize<DynamicDim, DynamicDim>(3, 4, 5, 6);
 }
 
-TEST( DenseMatrix, DRowSCol )
+TEST( DenseMatrix, MatDS )
 {
 	test_dense_matrix<DynamicDim, 4>(3, 4);
 	test_dense_matrix_swap_and_resize<DynamicDim, 4>(3, 4, 5, 4);
 }
 
-TEST( DenseMatrix, SRowDCol )
+TEST( DenseMatrix, MatD1 )
+{
+	test_dense_matrix<DynamicDim, 1>(3, 1);
+	test_dense_matrix_swap_and_resize<DynamicDim, 1>(3, 1, 5, 1);
+}
+
+TEST( DenseMatrix, MatSD )
 {
 	test_dense_matrix<3, DynamicDim>(3, 4);
 	test_dense_matrix_swap_and_resize<3, DynamicDim>(3, 4, 3, 6);
 }
 
-TEST( DenseMatrix, SRowSCol )
+TEST( DenseMatrix, MatSS )
 {
 	test_dense_matrix<3, 4>(3, 4);
 	test_dense_matrix_swap_and_resize<3, 4>(3, 4, 3, 4);
 }
 
-TEST( DenseMatrix, DColVec )
+TEST( DenseMatrix, MatS1 )
+{
+	test_dense_matrix<3, 1>(3, 1);
+	test_dense_matrix_swap_and_resize<3, 1>(3, 1, 3, 1);
+}
+
+TEST( DenseMatrix, Mat1D )
+{
+	test_dense_matrix<1, DynamicDim>(1, 4);
+	test_dense_matrix_swap_and_resize<1, DynamicDim>(1, 4, 1, 6);
+}
+
+TEST( DenseMatrix, Mat1S )
+{
+	test_dense_matrix<1, 4>(1, 4);
+	test_dense_matrix_swap_and_resize<1, 4>(1, 4, 1, 4);
+}
+
+TEST( DenseMatrix, Mat11 )
+{
+	test_dense_matrix<1, 1>(1, 1);
+	test_dense_matrix_swap_and_resize<1, 1>(1, 1, 1, 1);
+}
+
+
+
+TEST( DenseVector, DColVec )
 {
 	test_dense_matrix<DynamicDim, 1>(5, 1);
 	test_dense_col<DynamicDim>(5);
 	test_dense_matrix_swap_and_resize<DynamicDim, 1>(5, 1, 6, 1);
 }
 
-TEST( DenseMatrix, SColVec )
+TEST( DenseVector, SColVec )
 {
 	test_dense_matrix<5, 1>(5, 1);
 	test_dense_col<5>(5);
 	test_dense_matrix_swap_and_resize<5, 1>(5, 1, 5, 1);
 }
 
-TEST( DenseMatrix, DRowVec )
+TEST( DenseVector, DRowVec )
 {
 	test_dense_matrix<1, DynamicDim>(1, 5);
 	test_dense_row<DynamicDim>(5);
 	test_dense_matrix_swap_and_resize<1, DynamicDim>(1, 5, 1, 6);
 }
 
-TEST( DenseMatrix, SRowVec )
+TEST( DenseVector, SRowVec )
 {
 	test_dense_matrix<1, 5>(1, 5);
 	test_dense_row<5>(5);
