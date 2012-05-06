@@ -13,92 +13,290 @@
 #ifndef BCSLIB_MATRIX_SUBVIEWS_H_
 #define BCSLIB_MATRIX_SUBVIEWS_H_
 
-#include <bcslib/matrix/bits/matrix_subviews_internal.h>
+#include <bcslib/matrix/matrix_ctf.h>
 
 namespace bcs
 {
 
+	/********************************************
+	 *
+	 *  column views
+	 *
+	 ********************************************/
+
 	template<class Mat>
-	struct subviews
+	struct colviews<Mat, whole>
 	{
-		static const bool is_readonly = matrix_traits<Mat>::is_readonly;
-		static const bool is_continuous = has_continuous_layout<Mat>::value;
-		static const int comptime_rows = matrix_traits<Mat>::compile_time_num_rows;
-		static const int comptime_cols = matrix_traits<Mat>::compile_time_num_cols;
-
 		typedef typename matrix_traits<Mat>::value_type value_type;
+		static const bool is_readonly = matrix_traits<Mat>::is_readonly;
 
+		static const int ctrows = ct_rows<Mat>::value;
 
-		// slices
+		typedef cref_matrix<value_type, ctrows, 1> const_type;
+		typedef  ref_matrix<value_type, ctrows, 1> non_const_type;
 
-		typedef detail::slice_helper<Mat> slice_ht;
-
-		typedef typename slice_ht::const_row_type 		const_row_type;
-		typedef typename slice_ht::row_type 			row_type;
-		typedef typename slice_ht::const_column_type	const_column_type;
-		typedef typename slice_ht::column_type 			column_type;
+		typedef typename select_type<is_readonly, const_type, non_const_type>::type type;
 
 		BCS_ENSURE_INLINE
-		static const_row_type get_row(const Mat& mat, const index_t i)
+		static const_type get(const Mat& mat, const index_t j, whole)
 		{
-			return slice_ht::get_row(mat, i);
+			return const_type(col_ptr(mat, j), mat.nrows(), 1);
 		}
 
 		BCS_ENSURE_INLINE
-		static row_type get_row(Mat& mat, const index_t i)
+		static type get(Mat& mat, const index_t j, whole)
 		{
-			return slice_ht::get_row(mat, i);
+			return type(col_ptr(mat, j), mat.nrows(), 1);
+		}
+	};
+
+
+	template<class Mat>
+	struct colviews<Mat, range>
+	{
+		typedef typename matrix_traits<Mat>::value_type value_type;
+		static const bool is_readonly = matrix_traits<Mat>::is_readonly;
+
+		typedef cref_matrix<value_type, DynamicDim, 1> const_type;
+		typedef  ref_matrix<value_type, DynamicDim, 1> non_const_type;
+
+		typedef typename select_type<is_readonly, const_type, non_const_type>::type type;
+
+		BCS_ENSURE_INLINE
+		static const_type get(const Mat& mat, const index_t j, const range &rg)
+		{
+			return const_type(ptr_elem(mat, rg.begin_index(), j), rg.num(), 1);
 		}
 
 		BCS_ENSURE_INLINE
-		static const_column_type get_column(const Mat& mat, const index_t j)
+		static type get(Mat& mat, const index_t j, const range& rg)
 		{
-			return slice_ht::get_column(mat, j);
+			return type(ptr_elem(mat, rg.begin_index(), j), rg.num(), 1);
+		}
+	};
+
+
+
+	/********************************************
+	 *
+	 *  row views
+	 *
+	 ********************************************/
+
+	template<class Mat>
+	struct rowviews<Mat, whole>
+	{
+		typedef typename matrix_traits<Mat>::value_type value_type;
+		static const bool is_readonly = matrix_traits<Mat>::is_readonly;
+
+		static const int ctcols = ct_cols<Mat>::value;
+
+		typedef cref_matrix_ex<value_type, 1, ctcols> const_type;
+		typedef  ref_matrix_ex<value_type, 1, ctcols> non_const_type;
+
+		typedef typename select_type<is_readonly, const_type, non_const_type>::type type;
+
+		BCS_ENSURE_INLINE
+		static const_type get(const Mat& mat, const index_t i, whole)
+		{
+			return const_type(row_ptr(mat, i), 1, mat.ncolumns(), mat.lead_dim());
 		}
 
 		BCS_ENSURE_INLINE
-		static column_type get_column(Mat& mat, const index_t j)
+		static type get(Mat& mat, const index_t i, whole)
 		{
-			return slice_ht::get_column(mat, j);
+			return type(row_ptr(mat, i), 1, mat.ncolumns(), mat.lead_dim());
 		}
-
-
-		// multi-slices
-
-		typedef detail::multislice_helper<Mat, is_continuous> multislice_ht;
-
-		typedef typename multislice_ht::const_multirow_type 	const_multirow_type;
-		typedef typename multislice_ht::multirow_type 			multirow_type;
-		typedef typename multislice_ht::const_multicolumn_type 	const_multicolumn_type;
-		typedef typename multislice_ht::multicolumn_type 		multicolumn_type;
-
-		BCS_ENSURE_INLINE
-		static const_multirow_type get_multirow(const Mat& mat, const index_t i, const index_t m)
-		{
-			return multislice_ht::get_multirow(mat, i, m);
-		}
-
-		BCS_ENSURE_INLINE
-		static multirow_type get_multirow(Mat& mat, const index_t i, const index_t m)
-		{
-			return multislice_ht::get_multirow(mat, i, m);
-		}
-
-		BCS_ENSURE_INLINE
-		static const_multicolumn_type get_multicolumn(const Mat& mat, const index_t j, const index_t n)
-		{
-			return multislice_ht::get_multicolumn(mat, j, n);
-		}
-
-		BCS_ENSURE_INLINE
-		static multicolumn_type get_multicolumn(Mat& mat, const index_t j, const index_t n)
-		{
-			return multislice_ht::get_multicolumn(mat, j, n);
-		}
-
 
 	};
 
+
+	template<class Mat>
+	struct rowviews<Mat, range>
+	{
+		typedef typename matrix_traits<Mat>::value_type value_type;
+		static const bool is_readonly = matrix_traits<Mat>::is_readonly;
+
+		typedef cref_matrix_ex<value_type, 1, DynamicDim> const_type;
+		typedef  ref_matrix_ex<value_type, 1, DynamicDim> non_const_type;
+
+		typedef typename select_type<is_readonly, const_type, non_const_type>::type type;
+
+		BCS_ENSURE_INLINE
+		static const_type get(const Mat& mat, const index_t i, const range& rg)
+		{
+			return const_type(ptr_elem(mat, i, rg.begin_index()), 1, rg.num(), mat.lead_dim());
+		}
+
+		BCS_ENSURE_INLINE
+		static type get(Mat& mat, const index_t i, const range& rg)
+		{
+			return type(ptr_elem(mat, i, rg.begin_index()), 1, rg.num(), mat.lead_dim());
+		}
+
+	};
+
+
+
+	/********************************************
+	 *
+	 *  subviews
+	 *
+	 ********************************************/
+
+	namespace detail
+	{
+		template<class Mat, int CTCols, bool IsCont> struct multicol_helper;
+
+		template<class Mat, int CTCols>
+		struct multicol_helper<Mat, CTCols, true>
+		{
+			typedef typename matrix_traits<Mat>::value_type value_type;
+			static const bool is_readonly = matrix_traits<Mat>::is_readonly;
+			static const int ctrows = ct_rows<Mat>::value;
+
+			typedef cref_matrix<value_type, ctrows, CTCols> const_type;
+			typedef  ref_matrix<value_type, ctrows, CTCols> non_const_type;
+			typedef typename select_type<is_readonly, const_type, non_const_type>::type type;
+
+			BCS_ENSURE_INLINE
+			static const_type get(const Mat& mat, const index_t j, const index_t n)
+			{
+				return const_type(col_ptr(mat, j), mat.nrows(), n);
+			}
+
+			BCS_ENSURE_INLINE
+			static type get(Mat& mat, const index_t j, const index_t n)
+			{
+				return type(col_ptr(mat, j), mat.nrows(), n);
+			}
+		};
+
+
+		template<class Mat, int CTCols>
+		struct multicol_helper<Mat, CTCols, false>
+		{
+			typedef typename matrix_traits<Mat>::value_type value_type;
+			static const bool is_readonly = matrix_traits<Mat>::is_readonly;
+			static const int ctrows = ct_rows<Mat>::value;
+
+			typedef cref_matrix_ex<value_type, ctrows, CTCols> const_type;
+			typedef  ref_matrix_ex<value_type, ctrows, CTCols> non_const_type;
+			typedef typename select_type<is_readonly, const_type, non_const_type>::type type;
+
+			BCS_ENSURE_INLINE
+			static const_type get(const Mat& mat, const index_t j, const index_t n)
+			{
+				return const_type(col_ptr(mat, j), mat.nrows(), n, mat.lead_dim());
+			}
+
+			BCS_ENSURE_INLINE
+			static type get(Mat& mat, const index_t j, const index_t n)
+			{
+				return type(col_ptr(mat, j), mat.nrows(), n, mat.lead_dim());
+			}
+		};
+	}
+
+	template<class Mat>
+	struct subviews<Mat, whole, whole>
+	{
+		static const bool is_continuous = has_continuous_layout<Mat>::value;
+		typedef detail::multicol_helper<Mat, ct_cols<Mat>::value, is_continuous> helper_t;
+
+		typedef typename helper_t::const_type const_type;
+		typedef typename helper_t::type type;
+
+		BCS_ENSURE_INLINE
+		static const_type get(const Mat& mat, whole, whole)
+		{
+			return helper_t::get(mat, 0, mat.ncolumns());
+		}
+
+		BCS_ENSURE_INLINE
+		static type get(Mat& mat, whole, whole)
+		{
+			return helper_t::get(mat, 0, mat.ncolumns());
+		}
+	};
+
+
+	template<class Mat>
+	struct subviews<Mat, whole, range>
+	{
+		static const bool is_continuous = has_continuous_layout<Mat>::value;
+		typedef detail::multicol_helper<Mat, DynamicDim, is_continuous> helper_t;
+
+		typedef typename helper_t::const_type const_type;
+		typedef typename helper_t::type type;
+
+		BCS_ENSURE_INLINE
+		static const_type get(const Mat& mat, whole, const range& rg)
+		{
+			return helper_t::get(mat, rg.begin_index(), rg.num());
+		}
+
+		BCS_ENSURE_INLINE
+		static type get(Mat& mat, whole, const range& rg)
+		{
+			return helper_t::get(mat, rg.begin_index(), rg.num());
+		}
+	};
+
+
+	template<class Mat>
+	struct subviews<Mat, range, whole>
+	{
+		typedef typename matrix_traits<Mat>::value_type value_type;
+		static const bool is_readonly = matrix_traits<Mat>::is_readonly;
+		static const int ctcols = ct_cols<Mat>::value;
+
+		typedef cref_matrix_ex<value_type, DynamicDim, ctcols> const_type;
+		typedef  ref_matrix_ex<value_type, DynamicDim, ctcols> non_const_type;
+		typedef typename select_type<is_readonly, const_type, non_const_type>::type type;
+
+		BCS_ENSURE_INLINE
+		static const_type get(const Mat& mat, const range& rg, whole)
+		{
+			return const_type(row_ptr(mat, rg.begin_index()), rg.num(),
+					mat.ncolumns(), mat.lead_dim());
+		}
+
+		BCS_ENSURE_INLINE
+		static type get(Mat& mat, const range& rg, whole)
+		{
+			return type(row_ptr(mat, rg.begin_index()), rg.num(),
+					mat.ncolumns(), mat.lead_dim());
+		}
+	};
+
+
+	template<class Mat>
+	struct subviews<Mat, range, range>
+	{
+		typedef typename matrix_traits<Mat>::value_type value_type;
+		static const bool is_readonly = matrix_traits<Mat>::is_readonly;
+
+		typedef cref_matrix_ex<value_type, DynamicDim, DynamicDim> const_type;
+		typedef  ref_matrix_ex<value_type, DynamicDim, DynamicDim> non_const_type;
+		typedef typename select_type<is_readonly, const_type, non_const_type>::type type;
+
+		BCS_ENSURE_INLINE
+		static const_type get(const Mat& mat, const range& rrg, const range& crg)
+		{
+			return const_type(
+					ptr_elem(mat, rrg.begin_index(), crg.begin_index()),
+					rrg.num(), crg.num(), mat.lead_dim());
+		}
+
+		BCS_ENSURE_INLINE
+		static type get(Mat& mat, const range& rrg, const range& crg)
+		{
+			return type(
+					ptr_elem(mat, rrg.begin_index(), crg.begin_index()),
+					rrg.num(), crg.num(), mat.lead_dim());
+		}
+	};
 
 }
 

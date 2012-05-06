@@ -113,6 +113,23 @@ namespace bcs
 		return X.ptr_data() + i;
 	}
 
+	template<class Mat, typename T>
+	BCS_ENSURE_INLINE
+	typename mat_access<Mat>::const_pointer
+	ptr_elem(const IDenseMatrix<Mat, T>& X, index_t i, index_t j)
+	{
+		return X.ptr_data() + X.lead_dim() * j + i;
+	}
+
+	template<class Mat, typename T>
+	BCS_ENSURE_INLINE
+	typename mat_access<Mat>::pointer
+	ptr_elem(IDenseMatrix<Mat, T>& X, index_t i, index_t j)
+	{
+		return X.ptr_data() + X.lead_dim() * j + i;
+	}
+
+
 
 	namespace detail
 	{
