@@ -75,6 +75,9 @@ namespace bcs
 
 	template<class Mat> struct subviews;
 
+	template<class Mat> struct transposed;
+	template<class Mat> struct transpose_expr;
+
 	// important structures for evaluation
 
 	template<class Expr> struct expr_optimizer;

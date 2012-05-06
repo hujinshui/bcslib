@@ -40,6 +40,20 @@ static void fill_matrix_values(IDenseMatrix<Mat, double>& A, double base_v)
 }
 
 
+template<int CTRows, int CTCols>
+static void fill_matrix_values(ref_grid2d<double, CTRows, CTCols>& A, double base_v)
+{
+	for (index_t j = 0; j < A.ncolumns(); ++j)
+	{
+		for (index_t i = 0; i < A.nrows(); ++i)
+		{
+			double expect_val = double(i + j * A.nrows() + 1) * base_v;
+			A.elem(i, j) = expect_val;
+		}
+	}
+}
+
+
 template<int SrcRows, int SrcCols, int DstRows, int DstCols>
 void test_densemat_to_densemat_assign(index_t m, index_t n, bool do_empty_assign)
 {
@@ -305,11 +319,6 @@ TEST( RefMatAssign, DMattoDRow )
 }
 
 
-
-
-
-
-
 template<int SrcRows, int SrcCols, int DstRows, int DstCols>
 void test_refmat_ex_to_refmat_ex_assign(index_t m, index_t n, index_t lda, index_t ldb)
 {
@@ -446,13 +455,100 @@ TEST( Ref2DenseAssign, SStoSD ) { test_refmat_to_densemat_assign<3, 4, 3, 0>(3, 
 TEST( Ref2DenseAssign, SStoSS ) { test_refmat_to_densemat_assign<3, 4, 3, 4>(3, 4); }
 
 
+template<int SrcRows, int SrcCols, int DstRows, int DstCols>
+void test_densemat_to_grid2d_assign(index_t m, index_t n)
+{
+	const index_t step = 2;
+	const index_t ldim = step * m + 3;
+
+	scoped_block<double> blk_b(ldim * n, 0.0);
+	double *pb = blk_b.ptr_begin();
+
+	dense_matrix<double, SrcRows, SrcCols> A(m, n);
+	fill_matrix_values(A, 2.0);
+	ASSERT_TRUE( verify_matrix_values(A, 2.0) );
+	const double *pa = A.ptr_data();
+
+	ref_grid2d<double, DstRows, DstCols> B(pb, m, n, step, ldim);
+
+	B = A;
+
+	ASSERT_TRUE( A.ptr_data() == pa );
+	ASSERT_TRUE( B.ptr_data() == pb );
+
+	ASSERT_EQ( m, B.nrows() );
+	ASSERT_EQ( n, B.ncolumns() );
+	ASSERT_TRUE( verify_matrix_values(B, 2.0) );
+}
 
 
+TEST( Dense2GridAssign, DDtoDD ) { test_densemat_to_grid2d_assign<0, 0, 0, 0>(3, 4); }
+TEST( Dense2GridAssign, DDtoDS ) { test_densemat_to_grid2d_assign<0, 0, 0, 4>(3, 4); }
+TEST( Dense2GridAssign, DDtoSD ) { test_densemat_to_grid2d_assign<0, 0, 3, 0>(3, 4); }
+TEST( Dense2GridAssign, DDtoSS ) { test_densemat_to_grid2d_assign<0, 0, 3, 4>(3, 4); }
+
+TEST( Dense2GridAssign, DStoDD ) { test_densemat_to_grid2d_assign<0, 4, 0, 0>(3, 4); }
+TEST( Dense2GridAssign, DStoDS ) { test_densemat_to_grid2d_assign<0, 4, 0, 4>(3, 4); }
+TEST( Dense2GridAssign, DStoSD ) { test_densemat_to_grid2d_assign<0, 4, 3, 0>(3, 4); }
+TEST( Dense2GridAssign, DStoSS ) { test_densemat_to_grid2d_assign<0, 4, 3, 4>(3, 4); }
+
+TEST( Dense2GridAssign, SDtoDD ) { test_densemat_to_grid2d_assign<3, 0, 0, 0>(3, 4); }
+TEST( Dense2GridAssign, SDtoDS ) { test_densemat_to_grid2d_assign<3, 0, 0, 4>(3, 4); }
+TEST( Dense2GridAssign, SDtoSD ) { test_densemat_to_grid2d_assign<3, 0, 3, 0>(3, 4); }
+TEST( Dense2GridAssign, SDtoSS ) { test_densemat_to_grid2d_assign<3, 0, 3, 4>(3, 4); }
+
+TEST( Dense2GridAssign, SStoDD ) { test_densemat_to_grid2d_assign<3, 4, 0, 0>(3, 4); }
+TEST( Dense2GridAssign, SStoDS ) { test_densemat_to_grid2d_assign<3, 4, 0, 4>(3, 4); }
+TEST( Dense2GridAssign, SStoSD ) { test_densemat_to_grid2d_assign<3, 4, 3, 0>(3, 4); }
+TEST( Dense2GridAssign, SStoSS ) { test_densemat_to_grid2d_assign<3, 4, 3, 4>(3, 4); }
 
 
+template<int SrcRows, int SrcCols, int DstRows, int DstCols>
+void test_grid2d_to_densemat_assign(index_t m, index_t n)
+{
+	const index_t step = 2;
+	const index_t ldim = step * m + 3;
+
+	scoped_block<double> blk_a(ldim * n);
+
+	double *pa = blk_a.ptr_begin();
+
+	ref_grid2d<double, SrcRows, SrcCols> A(pa, m, n, step, ldim);
+	fill_matrix_values(A, 2.0);
+	ASSERT_TRUE( verify_matrix_values(A, 2.0) );
+
+	dense_matrix<double, DstRows, DstCols> B;
+
+	B = A;
+
+	ASSERT_TRUE( A.ptr_data() == pa );
+	ASSERT_TRUE( B.ptr_data() != pa );
+
+	ASSERT_EQ( m, B.nrows() );
+	ASSERT_EQ( n, B.ncolumns() );
+	ASSERT_TRUE( verify_matrix_values(B, 2.0) );
+}
 
 
+TEST( Grid2DenseAssign, DDtoDD ) { test_grid2d_to_densemat_assign<0, 0, 0, 0>(3, 4); }
+TEST( Grid2DenseAssign, DDtoDS ) { test_grid2d_to_densemat_assign<0, 0, 0, 4>(3, 4); }
+TEST( Grid2DenseAssign, DDtoSD ) { test_grid2d_to_densemat_assign<0, 0, 3, 0>(3, 4); }
+TEST( Grid2DenseAssign, DDtoSS ) { test_grid2d_to_densemat_assign<0, 0, 3, 4>(3, 4); }
 
+TEST( Grid2DenseAssign, DStoDD ) { test_grid2d_to_densemat_assign<0, 4, 0, 0>(3, 4); }
+TEST( Grid2DenseAssign, DStoDS ) { test_grid2d_to_densemat_assign<0, 4, 0, 4>(3, 4); }
+TEST( Grid2DenseAssign, DStoSD ) { test_grid2d_to_densemat_assign<0, 4, 3, 0>(3, 4); }
+TEST( Grid2DenseAssign, DStoSS ) { test_grid2d_to_densemat_assign<0, 4, 3, 4>(3, 4); }
+
+TEST( Grid2DenseAssign, SDtoDD ) { test_grid2d_to_densemat_assign<3, 0, 0, 0>(3, 4); }
+TEST( Grid2DenseAssign, SDtoDS ) { test_grid2d_to_densemat_assign<3, 0, 0, 4>(3, 4); }
+TEST( Grid2DenseAssign, SDtoSD ) { test_grid2d_to_densemat_assign<3, 0, 3, 0>(3, 4); }
+TEST( Grid2DenseAssign, SDtoSS ) { test_grid2d_to_densemat_assign<3, 0, 3, 4>(3, 4); }
+
+TEST( Grid2DenseAssign, SStoDD ) { test_grid2d_to_densemat_assign<3, 4, 0, 0>(3, 4); }
+TEST( Grid2DenseAssign, SStoDS ) { test_grid2d_to_densemat_assign<3, 4, 0, 4>(3, 4); }
+TEST( Grid2DenseAssign, SStoSD ) { test_grid2d_to_densemat_assign<3, 4, 3, 0>(3, 4); }
+TEST( Grid2DenseAssign, SStoSS ) { test_grid2d_to_densemat_assign<3, 4, 3, 4>(3, 4); }
 
 
 
