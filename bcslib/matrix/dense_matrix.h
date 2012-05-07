@@ -324,6 +324,15 @@ namespace bcs
 	};
 
 
+	template<typename T, class Expr>
+	BCS_ENSURE_INLINE
+	dense_matrix<T, ct_rows<Expr>::value, ct_cols<Expr>::value>
+	eval(const IMatrixXpr<Expr, T>& expr)
+	{
+		return dense_matrix<T, ct_rows<Expr>::value, ct_cols<Expr>::value>(expr);
+	}
+
+
 	/********************************************
 	 *
 	 *  Typedefs
