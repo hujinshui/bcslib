@@ -221,6 +221,12 @@ namespace bcs
 
 
 	public:
+		typename transposed<Derived>::type trans() const
+		{
+			return transposed<Derived>::get(derived());
+		}
+
+	public:
 
 		// column views
 

@@ -16,6 +16,7 @@
 #include <bcslib/matrix/matrix_base.h>
 
 #include <bcslib/matrix/matrix_subviews.h>
+#include <bcslib/matrix/matrix_transpose.h>
 
 #include <bcslib/matrix/ewise_matrix_eval.h>
 #include <bcslib/matrix/matrix_arithmetic.h>

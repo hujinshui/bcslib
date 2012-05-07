@@ -78,7 +78,7 @@ namespace bcs
 	template<class Mat, typename RowRange, typename ColRange> struct subviews;
 
 	template<class Mat> struct transposed;
-	template<class Mat> struct transpose_expr;
+	template<class Mat> class transpose_expr;
 
 	// important structures for evaluation
 
