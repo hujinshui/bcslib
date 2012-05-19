@@ -14,8 +14,7 @@
 #ifndef BCSLIB_TIMER_H
 #define BCSLIB_TIMER_H
 
-#include <bcslib/base/config.h>
-#include <bcslib/base/basic_defs.h>
+#include <bcslib/core/basic_defs.h>
 
 #if BCS_PLATFORM_INTERFACE == BCS_POSIX_INTERFACE
 #include <sys/time.h>
@@ -23,13 +22,6 @@
 
 namespace bcs
 {
-	enum time_units
-	{
-		SECONDS,
-		MILLI_SECONDS,
-		MICRO_SECONDS
-	};
-
 
 #if BCS_PLATFORM_INTERFACE == BCS_WINDOWS_INTERFACE
 
@@ -81,22 +73,20 @@ namespace bcs
 			m_is_on = false;
 		}
 
-		double elapsed( time_units unit = SECONDS ) const
+		double elapsed_usecs() const
 		{
 			double e = static_cast<double>(m_is_on ? last_elapsed() + m_elapsed_usecs : m_elapsed_usecs);
+			return e;
+		}
 
-			if (unit == SECONDS)
-			{
-				return e * 1.0e-6;
-			}
-			else if (unit == MILLI_SECONDS)
-			{
-				return e * 1.0e-3;
-			}
-			else
-			{
-				return e;
-			}
+		double elapsed_msecs() const
+		{
+			return elapsed_usecs() * 1.0e-3;
+		}
+
+		double elapsed_secs() const
+		{
+			return elapsed_usecs() * 1.0e-6;
 		}
 
 	private:

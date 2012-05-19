@@ -26,7 +26,7 @@ ifeq ($(UNAME), Darwin)
 	CXXFLAGS = -std=c++0x -stdlib=libc++ -pedantic $(WARNING_FLAGS) $(CPPFLAGS)
 endif
 
-OFLAGS=-O3 -ffast-math
+OFLAGS=-O3 -ffast-math -DBCSLIB_NO_DEBUG
 
 
 # Intel MKL configuration
@@ -137,10 +137,13 @@ MATRIX_EVAL_H = $(MATRIX_EXT_H) $(MATH_H) \
 #---------- Target groups -------------------
 
 .PHONY: all
-all: test
+all: test bench
 
 .PHONY: test
 test: test_core test_matrix
+
+.PHONY: bench
+bench: bench_matrix
 
 .PHONY: clean
 
@@ -162,6 +165,10 @@ test_matrix: \
 	$(BIN)/test_matrix_ext \
 	$(BIN)/test_matrix_eval \
 	$(BIN)/test_matrix_reduc
+
+
+bench_matrix: \
+	$(BIN)/bench_matrix_access
 
 
 #_________________________________________________________________________
@@ -230,7 +237,8 @@ $(BIN)/test_matrix_reduc: $(MATRIX_EVAL_H) $(TEST_MATRIX_REDUC_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_MATRIX_REDUC_SOURCES) $(MAIN_TEST_POST) -o $@
 	
 	
-	
+$(BIN)/bench_matrix_access: $(MATRIX_BASE_H) bench/bench_matrix_access.cpp
+	$(CXX) $(CXXFLAGS) $(OFLAGS) bench/bench_matrix_access.cpp -o $@
 	
 
 
