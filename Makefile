@@ -27,7 +27,7 @@ ifeq ($(UNAME), Darwin)
 endif
 
 CXX_FAST=icpc
-CXXFLAGS_FAST= -pedantic -O3 -DBCSLIB_NO_DEBUG $(WARNING_FLAGS) $(CPPFLAGS)
+CXXFLAGS_FAST= -march=native -pedantic -O3 -DBCSLIB_NO_DEBUG $(WARNING_FLAGS) $(CPPFLAGS)
 VECT_REPORT=-vec-report2
 
 # Intel MKL configuration
@@ -138,7 +138,7 @@ MATRIX_EVAL_H = $(MATRIX_EXT_H) $(MATH_H) \
 #---------- Target groups -------------------
 
 .PHONY: all
-all: test bench
+all: test
 
 .PHONY: test
 test: test_core test_matrix
@@ -170,7 +170,8 @@ test_matrix: \
 
 bench_matrix: \
 	$(BIN)/bench_matrix_access \
-	$(BIN)/bench_ewise_calc
+	$(BIN)/bench_ewise_calc \
+	$(BIN)/bench_matrix_reduction 
 
 
 #_________________________________________________________________________
@@ -243,9 +244,10 @@ $(BIN)/bench_matrix_access: $(MATRIX_BASE_H) bench/bench_matrix_access.cpp
 	$(CXX_FAST) $(CXXFLAGS_FAST) bench/bench_matrix_access.cpp -o $@
 	
 $(BIN)/bench_ewise_calc: $(MATRIX_BASE_H) bench/bench_ewise_calc.cpp
-	$(CXX_FAST) $(CXXFLAGS_FAST) $(VECT_REPORT) bench/bench_ewise_calc.cpp -o $@
+	$(CXX_FAST) $(CXXFLAGS_FAST) bench/bench_ewise_calc.cpp -o $@
 	
-	
+$(BIN)/bench_matrix_reduction: $(MATRIX_BASE_H) bench/bench_matrix_reduction.cpp
+	$(CXX_FAST) $(CXXFLAGS_FAST) bench/bench_matrix_reduction.cpp -o $@
 	
 	
 	
