@@ -28,7 +28,7 @@ endif
 
 CXX_FAST=icpc
 CXXFLAGS_FAST= -pedantic -O3 -DBCSLIB_NO_DEBUG $(WARNING_FLAGS) $(CPPFLAGS)
-
+VECT_REPORT=-vec-report2
 
 # Intel MKL configuration
 
@@ -243,7 +243,7 @@ $(BIN)/bench_matrix_access: $(MATRIX_BASE_H) bench/bench_matrix_access.cpp
 	$(CXX_FAST) $(CXXFLAGS_FAST) bench/bench_matrix_access.cpp -o $@
 	
 $(BIN)/bench_ewise_calc: $(MATRIX_BASE_H) bench/bench_ewise_calc.cpp
-	$(CXX_FAST) $(CXXFLAGS_FAST) -vec-report2 bench/bench_ewise_calc.cpp -o $@
+	$(CXX_FAST) $(CXXFLAGS_FAST) $(VECT_REPORT) bench/bench_ewise_calc.cpp -o $@
 	
 	
 	
