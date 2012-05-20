@@ -88,13 +88,79 @@ struct PerColCalc : public ECalcTaskBase
 };
 
 
+struct BsxCalcTaskBase
+{
+	dense_col<double> x;
+	dense_row<double> y;
+	dense_matrix<double> z;
+
+	dense_matrix<double> res;
+
+	BsxCalcTaskBase(index_t m, index_t n)
+	: x(m), y(n), z(m, n)
+	, res(m, n)
+	{
+		index_t len = m * n;
+		for (index_t i = 0; i < m; ++i) x[i] = double(std::rand()) / RAND_MAX;
+		for (index_t i = 0; i < n; ++i) y[i] = double(std::rand()) / RAND_MAX;
+		for (index_t i = 0; i < len; ++i) z[i] = double(std::rand()) / RAND_MAX;
+	}
+
+	index_t size() const { return z.nelems(); }
+};
+
+
+struct DirectBsxCalc : public BsxCalcTaskBase
+{
+	DirectBsxCalc(index_t m, index_t n) : BsxCalcTaskBase(m, n) { }
+
+	void run()
+	{
+		const index_t m = z.nrows();
+		const index_t n = z.ncolumns();
+
+		for (index_t j = 0; j < n; ++j)
+		{
+			double yj = y[j];
+			const double* cz = col_ptr(z, j);
+			double *r = col_ptr(res, j);
+
+#ifdef __INTEL_COMPILER
+			#pragma simd
+#endif
+			for (index_t i = 0; i < m; ++i)
+			{
+				r[i] = (x[i] + yj) * std::exp(cz[i]);
+			}
+		}
+	}
+};
+
+
+struct MatrixBsxCalc : public BsxCalcTaskBase
+{
+	MatrixBsxCalc(index_t m, index_t n) : BsxCalcTaskBase(m, n) { }
+
+	void run()
+	{
+		const index_t m = z.nrows();
+		const index_t n = z.ncolumns();
+
+#ifdef __INTEL_COMPILER
+		#pragma ivdep
+#endif
+		res = (repeat_cols(x, n) + repeat_rows(y, m)) * exp(z);
+	}
+};
+
+
 
 
 template<class Task>
 void run(Task& tsk, const char *name, int ntimes)
 {
 	bench_stats bst = run_benchmark(tsk, 1, ntimes);
-	std::printf("%16s:  %.2f M /sec\n", name, bst.MPS());
+	std::printf("  %-16s:  %.2f M /sec\n", name, bst.MPS());
 }
 
 
@@ -111,6 +177,15 @@ int main(int argc, char *argv[])
 
 	PerColCalc percol_calc(1000, 1000);
 	run(percol_calc, "percol-calc", 100);
+
+	std::printf("broadcast evaluation benchmark\n");
+	std::printf("======================================\n");
+
+	DirectBsxCalc direct_bsx_calc(1000, 1000);
+	run(direct_bsx_calc, "direct-bsx-calc", 200);
+
+	MatrixBsxCalc matrix_bsx_calc(1000, 1000);
+	run(matrix_bsx_calc, "matrix-bsx-calc", 200);
 
 	std::printf("\n");
 }
