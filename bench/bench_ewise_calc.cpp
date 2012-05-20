@@ -43,9 +43,11 @@ struct DirectCalc : public ECalcTaskBase
 
 	void run()
 	{
-		index_t len = x.nelems();
+		const index_t len = x.nelems();
 
+#ifdef __INTEL_COMPILER
 		#pragma simd
+#endif
 		for (index_t i = 0; i < len; ++i)
 		{
 			res[i] = std::log(std::exp(x[i] - y[i]) + z[i]);
@@ -60,9 +62,32 @@ struct MatrixCalc : public ECalcTaskBase
 
 	void run()
 	{
-		res = log(exp(x + y) + z);
+#ifdef __INTEL_COMPILER
+		#pragma ivdep
+#endif
+		res = log(exp(x - y) + z);
 	}
 };
+
+struct PerColCalc : public ECalcTaskBase
+{
+	PerColCalc(index_t m, index_t n) : ECalcTaskBase(m, n) { }
+
+	void run()
+	{
+		const index_t n = x.ncolumns();
+
+#ifdef __INTEL_COMPILER
+		#pragma ivdep
+#endif
+		for (index_t j = 0; j < n; ++j)
+		{
+			res.column(j) = log(exp(x.column(j) - y.column(j)) + z.column(j));
+		}
+	}
+};
+
+
 
 
 template<class Task>
@@ -81,8 +106,11 @@ int main(int argc, char *argv[])
 	DirectCalc direct_calc(1000, 1000);
 	run(direct_calc, "direct-calc", 100);
 
-	DirectCalc matrix_calc(1000, 1000);
+	MatrixCalc matrix_calc(1000, 1000);
 	run(matrix_calc, "matrix-calc", 100);
+
+	PerColCalc percol_calc(1000, 1000);
+	run(percol_calc, "percol-calc", 100);
 
 	std::printf("\n");
 }
