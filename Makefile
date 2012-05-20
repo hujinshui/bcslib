@@ -15,18 +15,19 @@ endif
 #-------------------------
 
 WARNING_FLAGS = -Wall -Wextra -Wconversion -Wformat -Wno-unused-parameter
-CPPFLAGS = -I. -isystem $(ARMA_HOME)/include
+CPPFLAGS = -I. 
 
 ifeq ($(UNAME), Linux)
 	CXX=g++
-	CXXFLAGS = -std=c++0x -pedantic $(WARNING_FLAGS) $(CPPFLAGS)
+	CXXFLAGS = -std=c++0x -pedantic $(WARNING_FLAGS) $(CPPFLAGS) 
 endif
 ifeq ($(UNAME), Darwin)
 	CXX=clang++
 	CXXFLAGS = -std=c++0x -stdlib=libc++ -pedantic $(WARNING_FLAGS) $(CPPFLAGS)
 endif
 
-OFLAGS=-O3 -ffast-math -DBCSLIB_NO_DEBUG
+CXX_FAST=icpc
+CXXFLAGS_FAST= -pedantic -O3 -DBCSLIB_NO_DEBUG $(WARNING_FLAGS) $(CPPFLAGS)
 
 
 # Intel MKL configuration
@@ -168,7 +169,8 @@ test_matrix: \
 
 
 bench_matrix: \
-	$(BIN)/bench_matrix_access
+	$(BIN)/bench_matrix_access \
+	$(BIN)/bench_ewise_calc
 
 
 #_________________________________________________________________________
@@ -238,7 +240,15 @@ $(BIN)/test_matrix_reduc: $(MATRIX_EVAL_H) $(TEST_MATRIX_REDUC_SOURCES)
 	
 	
 $(BIN)/bench_matrix_access: $(MATRIX_BASE_H) bench/bench_matrix_access.cpp
-	$(CXX) $(CXXFLAGS) $(OFLAGS) bench/bench_matrix_access.cpp -o $@
+	$(CXX_FAST) $(CXXFLAGS_FAST) bench/bench_matrix_access.cpp -o $@
 	
+$(BIN)/bench_ewise_calc: $(MATRIX_BASE_H) bench/bench_ewise_calc.cpp
+	$(CXX_FAST) $(CXXFLAGS_FAST) -vec-report2 bench/bench_ewise_calc.cpp -o $@
+	
+	
+	
+	
+	
+
 
 
