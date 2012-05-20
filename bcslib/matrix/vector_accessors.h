@@ -74,7 +74,9 @@ namespace bcs
 	: public IVecReader<continuous_vector_reader<Mat>, typename matrix_traits<Mat>::value_type>
 	, private noncopyable
 	{
+#ifdef BCS_USE_STATIC_ASSERT
 		static_assert(has_continuous_layout<Mat>::value, "Mat should have a continuous layout.");
+#endif
 
 	public:
 		typedef typename matrix_traits<Mat>::value_type value_type;
@@ -98,8 +100,10 @@ namespace bcs
 	: public IVecAccessor<continuous_vector_accessor<Mat>, typename matrix_traits<Mat>::value_type>
 	, private noncopyable
 	{
+#ifdef BCS_USE_STATIC_ASSERT
 		static_assert(has_continuous_layout<Mat>::value && !is_readonly_mat<Mat>::value,
 				"Mat should have a continuous layout and be NOT readonly.");
+#endif
 
 	public:
 		typedef typename matrix_traits<Mat>::value_type value_type;
@@ -129,7 +133,9 @@ namespace bcs
 	: public IVecReader<linear_vector_reader<Mat>, typename matrix_traits<Mat>::value_type>
 	, private noncopyable
 	{
+#ifdef BCS_USE_STATIC_ASSERT
 		static_assert(is_linear_accessible<Mat>::value, "Mat should be linear-accessible.");
+#endif
 
 	public:
 		typedef typename matrix_traits<Mat>::value_type value_type;
@@ -152,8 +158,10 @@ namespace bcs
 	: public IVecAccessor<linear_vector_accessor<Mat>, typename matrix_traits<Mat>::value_type>
 	, private noncopyable
 	{
+#ifdef BCS_USE_STATIC_ASSERT
 		static_assert(is_linear_accessible<Mat>::value && !is_readonly_mat<Mat>::value,
 				"Mat should be linear-accessible and NOT readonly.");
+#endif
 
 	public:
 		typedef typename matrix_traits<Mat>::value_type value_type;
