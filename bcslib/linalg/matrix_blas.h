@@ -36,7 +36,7 @@ namespace bcs { namespace blas {
 	{
 		return engine::asum<T, ct_size<Mat>::value>::eval(
 				(int)x.nelems(), x.ptr_data());
-	};
+	}
 
 	// axpy
 
@@ -79,7 +79,7 @@ namespace bcs { namespace blas {
 	{
 		return engine::nrm2<T, ct_size<Mat>::value>::eval(
 				(int)x.nelems(), x.ptr_data());
-	};
+	}
 
 	// rot
 
