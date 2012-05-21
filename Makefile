@@ -269,7 +269,8 @@ $(BIN)/bench_matrix_reduction: $(MATRIX_BASE_H) bench/bench_matrix_reduction.cpp
 #----------------------------------------------------------	
 
 TEST_MATRIX_BLAS_SOURCES = \
-	test/linalg/test_matrix_blas1.cpp
+	test/linalg/test_matrix_blas1.cpp \
+	test/linalg/test_matrix_blas2.cpp
 	
 $(BIN)/test_matrix_blas: $(LINALG_H) $(TEST_MATRIX_BLAS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(BLAS_PATHS) $(MAIN_TEST_PRE) $(TEST_MATRIX_BLAS_SOURCES) $(BLAS_LNKS) $(MAIN_TEST_POST) -o $@
