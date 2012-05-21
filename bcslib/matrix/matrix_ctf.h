@@ -43,28 +43,27 @@ namespace bcs
 		static const int value = ct_rows<Mat>::value * ct_cols<Mat>::value;
 	};
 
+
+	template<int N1, int N2>
+	struct binary_ctdim
+	{
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(!(N1 > 0 && N2 > 0 && N1 != N2), "Incompatible compile-time dimensions.");
+#endif
+		static const int value = N1 > N2 ? N1 : N2;
+	};
+
+
 	template<class Mat1, class Mat2>
 	struct binary_ct_rows
 	{
-		static const int v1 = ct_rows<Mat1>::value;
-		static const int v2 = ct_rows<Mat2>::value;
-		static const int value = v1 > v2 ? v1 : v2;
-
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(!(v1 > 0 && v2 > 0 && v1 != v2), "Incompatible compile-time dimensions.");
-#endif
+		static const int value = binary_ctdim<ct_rows<Mat1>::value, ct_rows<Mat2>::value>::value;
 	};
 
 	template<class Mat1, class Mat2>
 	struct binary_ct_cols
 	{
-		static const int v1 = ct_cols<Mat1>::value;
-		static const int v2 = ct_cols<Mat2>::value;
-		static const int value = v1 > v2 ? v1 : v2;
-
-#ifdef BCS_USE_STATIC_ASSERT
-		static_assert(!(v1 > 0 && v2 > 0 && v1 != v2), "Incompatible compile-time dimensions.");
-#endif
+		static const int value = binary_ctdim<ct_cols<Mat1>::value, ct_cols<Mat2>::value>::value;
 	};
 
 	template<class Mat1, class Mat2>

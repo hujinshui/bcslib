@@ -134,6 +134,11 @@ MATRIX_EVAL_H = $(MATRIX_EXT_H) $(MATH_H) \
 	$(INC)/matrix/bits/matrix_reduction_internal.h \
 	$(INC)/matrix/bits/matrix_par_reduc_internal.h
 	
+LINALG_H = $(MATRIX_EXT_H) \
+	$(INC)/engine/blas_extern.h \
+	$(INC)/engine/blas.h \
+	$(INC)/linalg/matrix_blas.h	
+	
 
 #---------- Target groups -------------------
 
@@ -141,7 +146,7 @@ MATRIX_EVAL_H = $(MATRIX_EXT_H) $(MATH_H) \
 all: test
 
 .PHONY: test
-test: test_core test_matrix
+test: test_core test_matrix test_linalg
 
 .PHONY: bench
 bench: bench_matrix
@@ -172,6 +177,13 @@ bench_matrix: \
 	$(BIN)/bench_matrix_access \
 	$(BIN)/bench_ewise_calc \
 	$(BIN)/bench_matrix_reduction 
+	
+	
+#------ Linear Algebra tests --------
+
+.PHONY: test_linalg
+test_linalg: \
+	$(BIN)/test_matrix_blas
 
 
 #_________________________________________________________________________
@@ -248,8 +260,19 @@ $(BIN)/bench_ewise_calc: $(MATRIX_BASE_H) bench/bench_ewise_calc.cpp
 	
 $(BIN)/bench_matrix_reduction: $(MATRIX_BASE_H) bench/bench_matrix_reduction.cpp
 	$(CXX_FAST) $(CXXFLAGS_FAST) bench/bench_matrix_reduction.cpp -o $@
+
 	
+#----------------------------------------------------------
+#
+#   Linear algebra test (details)
+#
+#----------------------------------------------------------	
+
+TEST_MATRIX_BLAS_SOURCES = \
+	test/linalg/test_matrix_blas1.cpp
 	
+$(BIN)/test_matrix_blas: $(LINALG_H) $(TEST_MATRIX_BLAS_SOURCES)
+	$(CXX) $(CXXFLAGS) $(BLAS_PATHS) $(BLAS_LNKS) $(MAIN_TEST_PRE) $(TEST_MATRIX_BLAS_SOURCES) $(MAIN_TEST_POST) -o $@
 	
 
 
