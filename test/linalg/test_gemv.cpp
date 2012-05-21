@@ -1,7 +1,7 @@
 /*
- * @file test_matrix_blas2.cpp
+ * @file test_gemv.cpp
  *
- * Unit testing for BLAS Level 2
+ * Unit testing for GEMV
  *
  * @author Dahua Lin
  */
@@ -38,8 +38,8 @@ void my_mv(const T alpha, const IDenseMatrix<MatA, T>& a, IDenseMatrix<MatB, T>&
 template<typename T>
 void test_gemv_n()
 {
-	const index_t m = 4;
-	const index_t n = 5;
+	const index_t m = 5;
+	const index_t n = 6;
 
 	T alpha = T(1.5);
 	T beta = T(0.5);
@@ -62,12 +62,12 @@ void test_gemv_n()
 	ASSERT_TRUE( is_equal(y, y0) );
 }
 
-TEST( MatrixBlasL2, GemvNDDdouble )
+TEST( MatrixBlasL2, GemvN_DDd )
 {
 	test_gemv_n<double>();
 }
 
-TEST( MatrixBlasL2, GemvNDDsingle )
+TEST( MatrixBlasL2, GemvN_DDs )
 {
 	test_gemv_n<float>();
 }
@@ -75,8 +75,8 @@ TEST( MatrixBlasL2, GemvNDDsingle )
 template<typename T>
 void test_gemv_t()
 {
-	const index_t m = 4;
-	const index_t n = 5;
+	const index_t m = 5;
+	const index_t n = 6;
 
 	T alpha = T(1.5);
 	T beta = T(0.5);
@@ -100,12 +100,12 @@ void test_gemv_t()
 	ASSERT_TRUE( is_equal(y, y0) );
 }
 
-TEST( MatrixBlasL2, GemvTDDdouble )
+TEST( MatrixBlasL2, GemvT_DDd )
 {
 	test_gemv_t<double>();
 }
 
-TEST( MatrixBlasL2, GemvTDDsingle )
+TEST( MatrixBlasL2, GemvT_DDs )
 {
 	test_gemv_t<float>();
 }

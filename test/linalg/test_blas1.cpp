@@ -1,5 +1,5 @@
 /**
- * @file test_matrix_blas1.cpp
+ * @file test_blas1.cpp
  *
  * Unit testing of BLAS level 1 functions on matrix
  *
