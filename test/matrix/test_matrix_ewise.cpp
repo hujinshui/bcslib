@@ -722,7 +722,7 @@ static void test_binary_ewise_plus_between_dense_and_grid(index_t m, index_t n)
 	const index_t ldim = m * step + 3;
 	scoped_block<double> Bblk(ldim * n);
 
-	for (index_t i = 0; i < ldim * n; ++i) Bblk[i] = (i+1);
+	for (index_t i = 0; i < ldim * n; ++i) Bblk[i] = double(i+1);
 	cref_grid2d<double, CTRows, CTCols> Bmat(Bblk.ptr_begin(), m, n, step, ldim);
 
 	test_binary_ewise_plus(Amat, Bmat);
