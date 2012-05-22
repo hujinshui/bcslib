@@ -96,6 +96,87 @@ TEST( GeneralMatrixProd, TMatCol_DDs )
 
 
 template<typename T>
+void test_ge_row_mat(const index_t m, const index_t n)
+{
+	dense_matrix<T> a(m, n);
+	for (index_t i = 0; i < a.nelems(); ++i) a[i] = T(i+1);
+
+	dense_row<T> x(m);
+	for (index_t i = 0; i < x.nelems(); ++i) x[i] = T(2 * i - n);
+
+	dense_row<T> y0(n, T(0));
+	my_vm(T(1), x, a, T(0), y0);
+
+	dense_matrix<T> y = mm(x, a);
+
+	ASSERT_EQ(1, y.nrows());
+	ASSERT_EQ(n, y.ncolumns());
+
+	ASSERT_TRUE( is_equal(y, y0) );
+
+	for (index_t i = 0; i < y0.nelems(); ++i) y0[i] = T(i+1);
+	for (index_t i = 0; i < y.nelems(); ++i) y[i] = T(i+1);
+
+	my_vm(T(1), x, a, T(1), y0);
+	y += mm(x, a);
+
+	ASSERT_TRUE( is_equal(y, y0) );
+}
+
+TEST( GeneralMatrixProd, RowMat_DDd )
+{
+	test_ge_row_mat<double>(5, 6);
+}
+
+TEST( GeneralMatrixProd, RowMat_DDs )
+{
+	test_ge_row_mat<float>(5, 6);
+}
+
+template<typename T>
+void test_ge_row_tmat(const index_t m, const index_t n)
+{
+	dense_matrix<T> a(m, n);
+	for (index_t i = 0; i < a.nelems(); ++i) a[i] = T(i+1);
+
+	dense_row<T> x(n);
+	for (index_t i = 0; i < x.nelems(); ++i) x[i] = T(2 * i - n);
+
+	dense_row<T> y0(m, T(0));
+
+	dense_matrix<T> at = a.trans();
+	my_vm(T(1), x, at, T(0), y0);
+
+	dense_matrix<T> y = mm(x, a.trans());
+
+	ASSERT_EQ(1, y.nrows());
+	ASSERT_EQ(m, y.ncolumns());
+
+	ASSERT_TRUE( is_equal(y, y0) );
+
+	for (index_t i = 0; i < y0.nelems(); ++i) y0[i] = T(i+1);
+	for (index_t i = 0; i < y.nelems(); ++i) y[i] = T(i+1);
+
+	my_vm(T(1), x, at, T(1), y0);
+	y += mm(x, a.trans());
+
+	ASSERT_TRUE( is_equal(y, y0) );
+}
+
+TEST( GeneralMatrixProd, RowTMat_DDd )
+{
+	test_ge_row_tmat<double>(5, 6);
+}
+
+TEST( GeneralMatrixProd, RowTMat_DDs )
+{
+	test_ge_row_tmat<float>(5, 6);
+}
+
+
+
+
+template<typename T>
 void test_ge_mat_mat(const index_t m, const index_t n, const index_t k)
 {
 	dense_matrix<T> a(m, k);

@@ -76,6 +76,85 @@ void test_gemv_t()
 	ASSERT_TRUE( is_equal(y, y0) );
 }
 
+
+/************************************************
+ *
+ *  GEVM
+ *
+ ************************************************/
+
+
+template<typename T>
+void test_gevm_n()
+{
+	const index_t m = 5;
+	const index_t n = 6;
+	const index_t ld = 3;
+
+	T alpha = T(1.5);
+	T beta = T(0.5);
+
+	dense_matrix<T> a(m, n);
+	for (index_t i = 0; i < a.nelems(); ++i) a[i] = T(i+1);
+
+	dense_matrix<T> x_bk(ld, m);
+	for (index_t i = 0; i < x_bk.nelems(); ++i) x_bk[i] = T(2 * i - 5);
+
+	ref_matrix_ex<T, 1, DynamicDim> x( x_bk.row(0) );
+
+	dense_matrix<T> y0_bk(ld, n);
+	for (index_t i = 0; i < y0_bk.nelems(); ++i) y0_bk[i] = T(i+2);
+
+	dense_matrix<T> y_bk(y0_bk);
+
+	ref_matrix_ex<T, 1, DynamicDim> y0( y0_bk.row(0) );
+	ref_matrix_ex<T, 1, DynamicDim> y( y_bk.row(0) );
+
+	ASSERT_TRUE( y0.ptr_data() != y.ptr_data() );
+
+	my_vm(alpha, x, a, beta, y0);
+	blas::gevm_n(alpha, x, a, beta, y);
+
+	ASSERT_TRUE( is_equal(y, y0) );
+}
+
+template<typename T>
+void test_gevm_t()
+{
+	const index_t m = 5;
+	const index_t n = 6;
+	const index_t ld = 3;
+
+	T alpha = T(1.5);
+	T beta = T(0.5);
+
+	dense_matrix<T> a(m, n);
+	for (index_t i = 0; i < a.nelems(); ++i) a[i] = T(i+1);
+
+	dense_matrix<T> x_bk(ld, n);
+	for (index_t i = 0; i < x_bk.nelems(); ++i) x_bk[i] = T(2 * i - 5);
+
+	ref_matrix_ex<T, 1, DynamicDim> x( x_bk.row(0) );
+
+	dense_matrix<T> y0_bk(ld, m);
+	for (index_t i = 0; i < y0_bk.nelems(); ++i) y0_bk[i] = T(i+2);
+
+	dense_matrix<T> y_bk(y0_bk);
+
+	ref_matrix_ex<T, 1, DynamicDim> y0( y0_bk.row(0) );
+	ref_matrix_ex<T, 1, DynamicDim> y( y_bk.row(0) );
+
+	ASSERT_TRUE( y0.ptr_data() != y.ptr_data() );
+
+	dense_matrix<T> at = a.trans();
+
+	my_vm(alpha, x, at, beta, y0);
+	blas::gevm_t(alpha, x, a, beta, y);
+
+	ASSERT_TRUE( is_equal(y, y0) );
+}
+
+
 TEST( MatrixBlasL2, GemvN_DDd )
 {
 	test_gemv_n<double>();
@@ -94,6 +173,26 @@ TEST( MatrixBlasL2, GemvT_DDd )
 TEST( MatrixBlasL2, GemvT_DDs )
 {
 	test_gemv_t<float>();
+}
+
+TEST( MatrixBlasL2, GevmN_DDd )
+{
+	test_gevm_n<double>();
+}
+
+TEST( MatrixBlasL2, GevmN_DDs )
+{
+	test_gevm_n<float>();
+}
+
+TEST( MatrixBlasL2, GevmT_DDd )
+{
+	test_gevm_t<double>();
+}
+
+TEST( MatrixBlasL2, GevmT_DDs )
+{
+	test_gevm_t<float>();
 }
 
 
@@ -195,9 +294,55 @@ TEST( MatrixBlasL2, Symv_DDs )
 }
 
 
+/************************************************
+ *
+ *  SYVM
+ *
+ ************************************************/
 
+template<typename T>
+void test_syvm()
+{
+	const index_t n = 6;
+	const index_t ld = 3;
 
+	T alpha = T(1.5);
+	T beta = T(0.5);
 
+	dense_matrix<T> a(n, n);
+	for (index_t j = 0; j < n; ++j)
+		for (index_t i = 0; i < n; ++i) a(i, j) = T(i + j + 1);
+
+	dense_matrix<T> x_bk(ld, n);
+	for (index_t i = 0; i < x_bk.nelems(); ++i) x_bk[i] = T(2 * i - 5);
+
+	ref_matrix_ex<T, 1, DynamicDim> x( x_bk.row(0) );
+
+	dense_matrix<T> y0_bk(ld, n);
+	for (index_t i = 0; i < y0_bk.nelems(); ++i) y0_bk[i] = T(i+2);
+
+	dense_matrix<T> y_bk(y0_bk);
+
+	ref_matrix_ex<T, 1, DynamicDim> y0( y0_bk.row(0) );
+	ref_matrix_ex<T, 1, DynamicDim> y( y_bk.row(0) );
+
+	ASSERT_TRUE( y0.ptr_data() != y.ptr_data() );
+
+	my_vm(alpha, x, a, beta, y0);
+	blas::syvm(alpha, x, a, beta, y);
+
+	ASSERT_TRUE( is_equal(y, y0) );
+}
+
+TEST( MatrixBlasL2, Syvm_DDd )
+{
+	test_syvm<double>();
+}
+
+TEST( MatrixBlasL2, Syvm_DDs )
+{
+	test_syvm<float>();
+}
 
 
 

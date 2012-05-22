@@ -92,6 +92,11 @@ namespace bcs { namespace detail {
 	{
 		typedef typename matrix_traits<LArg>::value_type T;
 
+		BCS_ENSURE_INLINE static void check_args(const LArg& larg, const RArg& rarg)
+		{
+			check_arg(larg.ncolumns() == rarg.nrows(), "Inconsistent inner dimension for mm_expr");
+		}
+
 		BCS_ENSURE_INLINE static index_t get_nelems(const LArg& larg, const RArg& rarg)
 		{
 			return larg.nrows();
@@ -119,6 +124,11 @@ namespace bcs { namespace detail {
 	{
 		typedef typename matrix_traits<LArg>::value_type T;
 
+		BCS_ENSURE_INLINE static void check_args(const LArg& larg, const RArg& rarg)
+		{
+			check_arg(larg.nrows() == rarg.nrows(), "Inconsistent inner dimension for mm_expr");
+		}
+
 		BCS_ENSURE_INLINE static index_t get_nelems(const LArg& larg, const RArg& rarg)
 		{
 			return larg.ncolumns();
@@ -139,6 +149,69 @@ namespace bcs { namespace detail {
 		}
 	};
 
+	// row x mat
+
+	template<class LArg, class RArg>
+	struct mm_expr_intern<LArg, RArg, mm_row_tag, mm_mat_tag>
+	{
+		typedef typename matrix_traits<LArg>::value_type T;
+
+		BCS_ENSURE_INLINE static void check_args(const LArg& larg, const RArg& rarg)
+		{
+			check_arg(larg.ncolumns() == rarg.nrows(), "Inconsistent inner dimension for mm_expr");
+		}
+
+		BCS_ENSURE_INLINE static index_t get_nelems(const LArg& larg, const RArg& rarg)
+		{
+			return rarg.ncolumns();
+		}
+
+		BCS_ENSURE_INLINE static index_t get_nrows(const LArg& larg) { return 1; }
+
+		BCS_ENSURE_INLINE static index_t get_ncols(const RArg& rarg) { return rarg.ncolumns(); }
+
+		template<class DMat>
+		BCS_ENSURE_INLINE static void eval(
+				const T& alpha,
+				const typename mm_arg_capture<LArg>::type& lmat,
+				const typename mm_arg_capture<RArg>::type& rmat,
+				const T& beta, IDenseMatrix<DMat, T>& dst)
+		{
+			blas::gevm_n(alpha, lmat, rmat, beta, dst);
+		}
+	};
+
+	// row x tmat
+
+	template<class LArg, class RArg>
+	struct mm_expr_intern<LArg, RArg, mm_row_tag, mm_tmat_tag>
+	{
+		typedef typename matrix_traits<LArg>::value_type T;
+
+		BCS_ENSURE_INLINE static void check_args(const LArg& larg, const RArg& rarg)
+		{
+			check_arg(larg.ncolumns() == rarg.ncolumns(), "Inconsistent inner dimension for mm_expr");
+		}
+
+		BCS_ENSURE_INLINE static index_t get_nelems(const LArg& larg, const RArg& rarg)
+		{
+			return rarg.nrows();
+		}
+
+		BCS_ENSURE_INLINE static index_t get_nrows(const LArg& larg) { return 1; }
+
+		BCS_ENSURE_INLINE static index_t get_ncols(const RArg& rarg) { return rarg.nrows(); }
+
+		template<class DMat>
+		BCS_ENSURE_INLINE static void eval(
+				const T& alpha,
+				const typename mm_arg_capture<LArg>::type& lmat,
+				const typename mm_arg_capture<RArg>::type& rmat,
+				const T& beta, IDenseMatrix<DMat, T>& dst)
+		{
+			blas::gevm_t(alpha, lmat, rmat, beta, dst);
+		}
+	};
 
 
 	// mat x mat
@@ -147,6 +220,11 @@ namespace bcs { namespace detail {
 	struct mm_expr_intern<LArg, RArg, mm_mat_tag, mm_mat_tag>
 	{
 		typedef typename matrix_traits<LArg>::value_type T;
+
+		BCS_ENSURE_INLINE static void check_args(const LArg& larg, const RArg& rarg)
+		{
+			check_arg(larg.ncolumns() == rarg.nrows(), "Inconsistent inner dimension for mm_expr");
+		}
 
 		BCS_ENSURE_INLINE static index_t get_nelems(const LArg& larg, const RArg& rarg)
 		{
@@ -175,6 +253,11 @@ namespace bcs { namespace detail {
 	{
 		typedef typename matrix_traits<LArg>::value_type T;
 
+		BCS_ENSURE_INLINE static void check_args(const LArg& larg, const RArg& rarg)
+		{
+			check_arg(larg.ncolumns() == rarg.ncolumns(), "Inconsistent inner dimension for mm_expr");
+		}
+
 		BCS_ENSURE_INLINE static index_t get_nelems(const LArg& larg, const RArg& rarg)
 		{
 			return larg.nrows() * rarg.rows();
@@ -202,6 +285,11 @@ namespace bcs { namespace detail {
 	{
 		typedef typename matrix_traits<LArg>::value_type T;
 
+		BCS_ENSURE_INLINE static void check_args(const LArg& larg, const RArg& rarg)
+		{
+			check_arg(larg.nrows() == rarg.nrows(), "Inconsistent inner dimension for mm_expr");
+		}
+
 		BCS_ENSURE_INLINE static index_t get_nelems(const LArg& larg, const RArg& rarg)
 		{
 			return larg.ncolumns() * rarg.ncolumns();
@@ -228,6 +316,11 @@ namespace bcs { namespace detail {
 	struct mm_expr_intern<LArg, RArg, mm_tmat_tag, mm_tmat_tag>
 	{
 		typedef typename matrix_traits<LArg>::value_type T;
+
+		BCS_ENSURE_INLINE static void check_args(const LArg& larg, const RArg& rarg)
+		{
+			check_arg(larg.nrows() == rarg.ncolumns(), "Inconsistent inner dimension for mm_expr");
+		}
 
 		BCS_ENSURE_INLINE static index_t get_nelems(const LArg& larg, const RArg& rarg)
 		{
