@@ -16,7 +16,7 @@
 #include <bcslib/matrix.h>
 
 #include <bcslib/linalg/matrix_blas.h>
-#include <bcslib/linalg/gen_matrix_prod.h>
+#include <bcslib/linalg/matrix_prod.h>
 
 
 #endif /* LINALG_H_ */
