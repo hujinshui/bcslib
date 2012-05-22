@@ -58,6 +58,12 @@ namespace bcs
 		mm_expr(const LArg& larg, const RArg& rarg, const value_type alpha = value_type(1))
 		: base_t(larg, rarg, alpha)
 		{
+			intern_t::check_args(larg, rarg);
+		}
+
+		mm_expr(const mm_expr& e0, const value_type alpha)  // replace the alpha value
+		: base_t(e0.left_arg(), e0.right_arg(), alpha)
+		{
 		}
 
 		BCS_ENSURE_INLINE
@@ -146,7 +152,7 @@ namespace bcs
 	inline mm_expr<LArg, RArg, LTag, RTag> operator * (
 			const mm_expr<LArg, RArg, LTag, RTag>& expr, const typename matrix_traits<RArg>::value_type& c)
 	{
-		return mm_expr<LArg, RArg, LTag, RTag>(expr.left_arg(), expr.right_arg(), expr.alpha() * c);
+		return mm_expr<LArg, RArg, LTag, RTag>(expr, expr.alpha() * c);
 	}
 
 	template<class LArg, class RArg, typename LTag, typename RTag>
@@ -154,7 +160,7 @@ namespace bcs
 	inline mm_expr<LArg, RArg, LTag, RTag> operator * (
 			const typename matrix_traits<LArg>::value_type& c, const mm_expr<LArg, RArg, LTag, RTag>& expr)
 	{
-		return mm_expr<LArg, RArg, LTag, RTag>(expr.left_arg(), expr.right_arg(), c * expr.alpha());
+		return mm_expr<LArg, RArg, LTag, RTag>(expr, c * expr.alpha());
 	}
 
 	template<class DMat, class LArg, class RArg, typename LTag, typename RTag>

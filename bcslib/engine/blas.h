@@ -176,6 +176,7 @@ namespace bcs { namespace engine {
 	// gemv
 
 	template<typename T, int M, int N> struct gemv;
+	template<typename T, int M, int N> struct gemv_ex;
 
 	template<int M, int N>
 	struct gemv<double, M, N>
@@ -206,6 +207,31 @@ namespace bcs { namespace engine {
 			BCS_SGEMV(&trans, &m, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
 		}
 	};
+
+	template<int M, int N>
+	struct gemv_ex<double, M, N>
+	{
+		BCS_ENSURE_INLINE
+		static void eval(char trans, const int m, const int n,
+				const double alpha, const double *a, const int lda, const double *x, const int incx,
+				const double beta, double *y, const int incy)
+		{
+			BCS_DGEMV(&trans, &m, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
+		}
+	};
+
+	template<int M, int N>
+	struct gemv_ex<float, M, N>
+	{
+		BCS_ENSURE_INLINE
+		static void eval(char trans, const int m, const int n,
+				const float alpha, const float *a, int lda, const float *x, const int incx,
+				const float beta, float *y, const int incy)
+		{
+			BCS_SGEMV(&trans, &m, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
+		}
+	};
+
 
 
 	// ger
@@ -278,6 +304,37 @@ namespace bcs { namespace engine {
 			BCS_SSYMV(&uplo, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
 		}
 	};
+
+
+	// symv_ex
+
+	template<typename T, int N> struct symv_ex;
+
+	template<int N>
+	struct symv_ex<double, N>
+	{
+		BCS_ENSURE_INLINE
+		static void eval(const char uplo, int n,
+				const double alpha, const double *a, const int lda, const double *x, const int incx,
+				const double beta, double *y, const int incy)
+		{
+			BCS_DSYMV(&uplo, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
+		}
+	};
+
+	template<int N>
+	struct symv_ex<float, N>
+	{
+		BCS_ENSURE_INLINE
+		static void eval(const char uplo, int n,
+				const float alpha, const float *a, const int lda, const float *x, const int incx,
+				const float beta, float *y, const int incy)
+		{
+			BCS_SSYMV(&uplo, &n, &alpha, a, &lda, x, &incx, &beta, y, &incy);
+		}
+	};
+
+
 
 	// trmv
 
