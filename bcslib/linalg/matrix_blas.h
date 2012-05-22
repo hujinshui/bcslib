@@ -127,16 +127,60 @@ namespace bcs { namespace blas {
 			const T beta, IDenseMatrix<MatY, T>& y)
 	{
 		check_arg(x.nrows() == a.nrows() && x.ncolumns() == 1,
-				"The size of x is invalid (for gemv_n)");
+				"The size of x is invalid (for gemv_t)");
 
 		check_arg(y.nrows() == a.ncolumns() && y.ncolumns() == 1,
-				"The size of y is invalid (for gemv_n)");
+				"The size of y is invalid (for gemv_t)");
 
 		typedef engine::gemv<T, ct_rows<MatA>::value, ct_cols<MatA>::value> impl_t;
 		impl_t::eval('T', (int)a.nrows(), (int)a.ncolumns(),
 				alpha, a.ptr_data(), (int)a.lead_dim(), x.ptr_data(),
 				beta, y.ptr_data());
 	}
+
+
+	// ger
+
+	template<typename T, class MatX, class MatY, class MatA>
+	inline typename enable_ty<is_floating_point<T>::value, void>::type
+	ger(const T alpha, const IDenseMatrix<MatX, T>& x, const IDenseMatrix<MatY, T>& y,
+			IDenseMatrix<MatA, T>& a)
+	{
+		check_arg(x.nrows() == a.nrows() && x.ncolumns() == 1,
+				"The size of x is invalid (for ger)");
+
+		check_arg(y.nrows() == a.ncolumns() && y.ncolumns() == 1,
+				"The size of y is invalid (for ger)");
+
+		typedef engine::ger<T,
+				binary_ctdim<ct_rows<MatA>::value, ct_rows<MatX>::value>::value,
+				binary_ctdim<ct_cols<MatA>::value, ct_rows<MatY>::value>::value> impl_t;
+
+		impl_t::eval((int)a.nrows(), (int)a.ncolumns(),
+				alpha, x.ptr_data(), y.ptr_data(), a.ptr_data(), (int)a.lead_dim());
+	}
+
+
+	// symv
+
+	template<typename T, class MatA, class MatX, class MatY>
+	inline typename enable_ty<is_floating_point<T>::value, void>::type
+	symv(const T alpha, const IDenseMatrix<MatA, T>& a, const IDenseMatrix<MatX, T>& x,
+			const T beta, IDenseMatrix<MatY, T>& y, const char uplo = 'L')
+	{
+		const index_t n = a.nrows();
+
+		check_arg(a.ncolumns() == n, "a should be a square matrix (for symv)");
+		check_arg(x.nrows() == n && x.ncolumns() == 1, "The size of x is invalid (for symv)");
+
+		typedef engine::symv<T,
+				binary_ctdim<ct_rows<MatA>::value, ct_cols<MatA>::value>::value> impl_t;
+
+		impl_t::eval(uplo, (int)n,
+				alpha, a.ptr_data(), (int)a.lead_dim(), x.ptr_data(),
+				beta, y.ptr_data());
+	}
+
 
 
 	/********************************************
@@ -208,6 +252,35 @@ namespace bcs { namespace blas {
 				beta, c.ptr_data(), (int)c.lead_dim());
 	}
 
+	// symm
+
+	template<typename T, class MatA, class MatB, class MatC>
+	inline typename enable_ty<is_floating_point<T>::value, void>::type
+	symm_l(const T alpha, const IDenseMatrix<MatA, T>& a, const IDenseMatrix<MatB, T>& b,
+			const T beta, IDenseMatrix<MatC, T>& c, const char uplo = 'L')
+	{
+		typedef engine::symm<T,
+				binary_ctdim<ct_rows<MatA>::value, ct_cols<MatA>::value>::value,
+				binary_ctdim<ct_cols<MatB>::value, ct_cols<MatC>::value>::value> impl_t;
+
+		impl_t::eval('L', uplo, (int)a.nrows(), (int)b.ncolumns(),
+				alpha, a.ptr_data(), (int)a.lead_dim(), b.ptr_data(), (int)b.lead_dim(),
+				beta, c.ptr_data(), (int)c.lead_dim());
+	}
+
+	template<typename T, class MatA, class MatB, class MatC>
+	inline typename enable_ty<is_floating_point<T>::value, void>::type
+	symm_r(const T alpha, const IDenseMatrix<MatA, T>& a, const IDenseMatrix<MatB, T>& b,
+			const T beta, IDenseMatrix<MatC, T>& c, const char uplo = 'L')
+	{
+		typedef engine::symm<T,
+				binary_ctdim<ct_rows<MatB>::value, ct_rows<MatC>::value>::value,
+				binary_ctdim<ct_rows<MatA>::value, ct_cols<MatA>::value>::value> impl_t;
+
+		impl_t::eval('R', uplo, (int)b.nrows(), (int)a.ncolumns(),
+				alpha, a.ptr_data(), (int)a.lead_dim(), b.ptr_data(), (int)b.lead_dim(),
+				beta, c.ptr_data(), (int)c.lead_dim());
+	}
 
 
 } }
