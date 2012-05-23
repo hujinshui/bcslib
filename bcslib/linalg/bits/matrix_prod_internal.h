@@ -13,7 +13,7 @@
 #ifndef BCSLIB_MATRIX_PROD_INTERNAL_H_
 #define BCSLIB_MATRIX_PROD_INTERNAL_H_
 
-#include <bcslib/linalg/matrix_prod_base.h>
+#include <bcslib/linalg/linalg_base.h>
 
 namespace bcs { namespace detail {
 
