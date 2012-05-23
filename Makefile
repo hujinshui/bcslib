@@ -137,8 +137,8 @@ MATRIX_EVAL_H = $(MATRIX_EXT_H) $(MATH_H) \
 LINALG_H = $(MATRIX_EXT_H) \
 	$(INC)/engine/blas_extern.h \
 	$(INC)/engine/blas.h \
+	$(INC)/linalg/linalg_base.h \
 	$(INC)/linalg/matrix_blas.h	\
-	$(INC)/linalg/matrix_prod_base.h \
 	$(INC)/linalg/matrix_prod.h \
 	$(INC)/linalg/bits/matrix_prod_internal.h \
 	$(INC)/linalg.h

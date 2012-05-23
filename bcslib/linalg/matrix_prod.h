@@ -45,31 +45,56 @@ namespace bcs
 	};
 
 	template<class LArg, class RArg, typename LTag, typename RTag>
-	class mm_expr : public matrix_prod_expr_base<LArg, RArg>
-	, public IMatrixXpr<mm_expr<LArg, RArg, LTag, RTag>, typename matrix_traits<LArg>::value_type>
+	class mm_expr : public IMatrixXpr<mm_expr<LArg, RArg, LTag, RTag>, typename matrix_traits<LArg>::value_type>
 	{
-		typedef matrix_prod_expr_base<LArg, RArg> base_t;
+#ifdef BCS_USE_STATIC_ASSERT
+		static_assert(is_mat_xpr<LArg>::value, "LArg must be a matrix expression");
+		static_assert(is_mat_xpr<RArg>::value, "LArg must be a matrix expression");
+		static_assert(bcs::is_same<
+				typename matrix_traits<LArg>::value_type,
+				typename matrix_traits<RArg>::value_type>::value, "LArg and RArg must have the same type.");
+#endif
 
 	public:
 		typedef detail::mm_expr_intern<LArg, RArg, LTag, RTag> intern_t;
-		BCS_MAT_TRAITS_CDEFS(typename base_t::value_type)
+		BCS_MAT_TRAITS_CDEFS(typename matrix_traits<LArg>::value_type)
 
 	public:
+		BCS_ENSURE_INLINE
 		mm_expr(const LArg& larg, const RArg& rarg, const value_type alpha = value_type(1))
-		: base_t(larg, rarg, alpha)
+		: m_left_arg(larg), m_right_arg(rarg), m_alpha(alpha)
 		{
 			intern_t::check_args(larg, rarg);
 		}
 
+		BCS_ENSURE_INLINE
 		mm_expr(const mm_expr& e0, const value_type alpha)  // replace the alpha value
-		: base_t(e0.left_arg(), e0.right_arg(), alpha)
+		: m_left_arg(e0.m_left_arg), m_right_arg(e0.m_right_arg), m_alpha(alpha)
 		{
+		}
+
+		BCS_ENSURE_INLINE
+		const LArg& left_arg() const
+		{
+			return m_left_arg;
+		}
+
+		BCS_ENSURE_INLINE
+		const RArg& right_arg() const
+		{
+			return m_right_arg;
+		}
+
+		BCS_ENSURE_INLINE
+		value_type alpha() const
+		{
+			return m_alpha;
 		}
 
 		BCS_ENSURE_INLINE
 		index_type nelems() const
 		{
-			return intern_t::get_nelems(this->left_arg(), this->right_arg());
+			return intern_t::get_nelems(m_left_arg, m_right_arg);
 		}
 
 		BCS_ENSURE_INLINE
@@ -81,14 +106,19 @@ namespace bcs
 		BCS_ENSURE_INLINE
 		index_type nrows() const
 		{
-			return intern_t::get_nrows(this->left_arg());
+			return intern_t::get_nrows(m_left_arg);
 		}
 
 		BCS_ENSURE_INLINE
 		index_type ncolumns() const
 		{
-			return intern_t::get_ncols(this->right_arg());
+			return intern_t::get_ncols(m_right_arg);
 		}
+
+	private:
+		const LArg& m_left_arg;
+		const RArg& m_right_arg;
+		const value_type m_alpha;
 	};
 
 
