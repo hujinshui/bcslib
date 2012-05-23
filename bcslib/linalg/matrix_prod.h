@@ -13,7 +13,7 @@
 #ifndef BCSLIB_MATRIX_PROD_H_
 #define BCSLIB_MATRIX_PROD_H_
 
-#include <bcslib/linalg/bits/matrix_prod_internal.h>
+#include <bcslib/linalg/mm_evaluators.h>
 
 namespace bcs
 {
@@ -24,18 +24,15 @@ namespace bcs
 	 *
 	 ********************************************/
 
-	template<class LArg, class RArg, typename LTag, typename RTag> class mm_expr;
+	template<class LArg, class RArg> class mm_expr;
 
-	template<class LArg, class RArg, typename LTag, typename RTag>
-	struct matrix_traits<mm_expr<LArg, RArg, LTag, RTag> >
+	template<class LArg, class RArg>
+	struct matrix_traits<mm_expr<LArg, RArg> >
 	{
 		static const int num_dimensions = 2;
 
-		static const int compile_time_num_rows =
-				bcs::is_same<LTag, mm_tmat_tag>::value ? ct_rows<LArg>::value : ct_cols<LArg>::value;
-
-		static const int compile_time_num_cols =
-				bcs::is_same<RTag, mm_tmat_tag>::value ? ct_cols<RArg>::value : ct_rows<RArg>::value;
+		static const int compile_time_num_rows = ct_rows<LArg>::value;
+		static const int compile_time_num_cols = ct_cols<RArg>::value;
 
 		static const bool is_readonly = true;
 		static const bool is_resizable = false;
@@ -44,8 +41,8 @@ namespace bcs
 		typedef index_t index_type;
 	};
 
-	template<class LArg, class RArg, typename LTag, typename RTag>
-	class mm_expr : public IMatrixXpr<mm_expr<LArg, RArg, LTag, RTag>, typename matrix_traits<LArg>::value_type>
+	template<class LArg, class RArg>
+	class mm_expr : public IMatrixXpr<mm_expr<LArg, RArg>, typename matrix_traits<LArg>::value_type>
 	{
 #ifdef BCS_USE_STATIC_ASSERT
 		static_assert(is_mat_xpr<LArg>::value, "LArg must be a matrix expression");
@@ -56,15 +53,14 @@ namespace bcs
 #endif
 
 	public:
-		typedef detail::mm_expr_intern<LArg, RArg, LTag, RTag> intern_t;
 		BCS_MAT_TRAITS_CDEFS(typename matrix_traits<LArg>::value_type)
 
-	public:
 		BCS_ENSURE_INLINE
 		mm_expr(const LArg& larg, const RArg& rarg, const value_type alpha = value_type(1))
 		: m_left_arg(larg), m_right_arg(rarg), m_alpha(alpha)
 		{
-			intern_t::check_args(larg, rarg);
+			check_arg(larg.ncolumns() == rarg.nrows(),
+					"Inner dimensions are inconsistent (for mm_expr)");
 		}
 
 		BCS_ENSURE_INLINE
@@ -94,7 +90,7 @@ namespace bcs
 		BCS_ENSURE_INLINE
 		index_type nelems() const
 		{
-			return intern_t::get_nelems(m_left_arg, m_right_arg);
+			return nrows() * ncolumns();
 		}
 
 		BCS_ENSURE_INLINE
@@ -106,13 +102,13 @@ namespace bcs
 		BCS_ENSURE_INLINE
 		index_type nrows() const
 		{
-			return intern_t::get_nrows(m_left_arg);
+			return m_left_arg.nrows();
 		}
 
 		BCS_ENSURE_INLINE
 		index_type ncolumns() const
 		{
-			return intern_t::get_ncols(m_right_arg);
+			return m_right_arg.ncolumns();
 		}
 
 	private:
@@ -128,22 +124,18 @@ namespace bcs
 	 *
 	 ********************************************/
 
-	template<class LArg, class RArg, typename LTag, typename RTag>
-	struct expr_evaluator<mm_expr<LArg, RArg, LTag, RTag> >
+	template<class LArg, class RArg>
+	struct expr_evaluator<mm_expr<LArg, RArg> >
 	{
-		typedef mm_expr<LArg, RArg, LTag, RTag> expr_type;
+		typedef mm_expr<LArg, RArg> expr_type;
 		typedef typename matrix_traits<expr_type>::value_type T;
-
-		typedef typename expr_type::intern_t intern_t;
 
 		template<class DMat>
 		BCS_ENSURE_INLINE
 		static void evaluate(const expr_type& expr, IDenseMatrix<DMat, T>& dst)
 		{
-			matrix_capture<LArg, is_dense_mat<LArg>::value > left(expr.left_arg());
-			matrix_capture<RArg, is_dense_mat<RArg>::value > right(expr.right_arg());
-
-			intern_t::eval(expr.alpha(), left.get(), right.get(), T(0), dst.derived());
+			mm_evaluator<LArg, RArg>::eval(
+					expr.alpha(), expr.left_arg(), expr.right_arg(), T(0), dst);
 		}
 	};
 
@@ -154,58 +146,40 @@ namespace bcs
 	 *
 	 ********************************************/
 
-	template<class LArg, class RArg>
-	struct mm_expr_t
-	{
-		typedef mm_expr<
-				typename detail::mm_left_arg<LArg>::type,
-				typename detail::mm_right_arg<RArg>::type,
-				typename detail::mm_left_arg<LArg>::tag,
-				typename detail::mm_right_arg<RArg>::tag> type;
-	};
-
-
 	template<typename T, class LArg, class RArg>
 	BCS_ENSURE_INLINE
-	inline typename mm_expr_t<LArg, RArg>::type
-	mm(const IMatrixXpr<LArg, T>& a, const IMatrixXpr<RArg, T>& b)
+	inline mm_expr<LArg, RArg> mm(const IMatrixXpr<LArg, T>& a, const IMatrixXpr<RArg, T>& b)
 	{
-		typedef typename mm_expr_t<LArg, RArg>::type result_expr_t;
-
-		return result_expr_t(
-				detail::mm_left_arg<LArg>::get(a.derived()),
-				detail::mm_right_arg<RArg>::get(b.derived()));
+		return mm_expr<LArg, RArg>(a.derived(), b.derived());
 	}
 
-	template<class LArg, class RArg, typename LTag, typename RTag>
+
+	template<class LArg, class RArg>
 	BCS_ENSURE_INLINE
-	inline mm_expr<LArg, RArg, LTag, RTag> operator * (
-			const mm_expr<LArg, RArg, LTag, RTag>& expr, const typename matrix_traits<RArg>::value_type& c)
+	inline mm_expr<LArg, RArg> operator * (
+			const mm_expr<LArg, RArg>& expr, const typename matrix_traits<RArg>::value_type& c)
 	{
-		return mm_expr<LArg, RArg, LTag, RTag>(expr, expr.alpha() * c);
+		return mm_expr<LArg, RArg>(expr, expr.alpha() * c);
 	}
 
-	template<class LArg, class RArg, typename LTag, typename RTag>
+	template<class LArg, class RArg>
 	BCS_ENSURE_INLINE
-	inline mm_expr<LArg, RArg, LTag, RTag> operator * (
-			const typename matrix_traits<LArg>::value_type& c, const mm_expr<LArg, RArg, LTag, RTag>& expr)
+	inline mm_expr<LArg, RArg> operator * (
+			const typename matrix_traits<LArg>::value_type& c, const mm_expr<LArg, RArg>& expr)
 	{
-		return mm_expr<LArg, RArg, LTag, RTag>(expr, c * expr.alpha());
+		return mm_expr<LArg, RArg>(expr, c * expr.alpha());
 	}
 
-	template<class DMat, class LArg, class RArg, typename LTag, typename RTag>
+	template<class DMat, class LArg, class RArg>
 	BCS_ENSURE_INLINE
 	inline void operator += (
 			IDenseMatrix<DMat, typename matrix_traits<LArg>::value_type>& lhs,
-			const mm_expr<LArg, RArg, LTag, RTag>& expr)
+			const mm_expr<LArg, RArg>& expr)
 	{
 		typedef typename matrix_traits<LArg>::value_type T;
-		typedef typename mm_expr<LArg, RArg, LTag, RTag>::intern_t intern_t;
 
-		matrix_capture<LArg, is_dense_mat<LArg>::value > left(expr.left_arg());
-		matrix_capture<RArg, is_dense_mat<RArg>::value > right(expr.right_arg());
-
-		intern_t::eval(expr.alpha(), left.get(), right.get(), T(1), lhs.derived());
+		mm_evaluator<LArg, RArg>::eval(
+				expr.alpha(), expr.left_arg(), expr.right_arg(), T(1), lhs);
 	}
 
 

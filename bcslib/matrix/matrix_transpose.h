@@ -67,6 +67,8 @@ namespace bcs
 	: public IMatrixXpr<transpose_expr<Mat>, typename matrix_traits<Mat>::value_type>
 	{
 	public:
+		typedef Mat arg_type;
+
 		BCS_MAT_TRAITS_DEFS(typename matrix_traits<Mat>::value_type)
 
 		BCS_ENSURE_INLINE
