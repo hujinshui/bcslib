@@ -286,3 +286,14 @@ $(BIN)/test_matrix_blas: $(LINALG_H) $(TEST_MATRIX_BLAS_SOURCES)
 
 
 
+#---------- Sand box stuff -------------------
+
+sbin/smallmat_mul: sandbox/smallmat_mul.cpp
+	$(CXX_FAST) $(CXXFLAGS_FAST) $(BLAS_PATHS) sandbox/smallmat_mul.cpp $(BLAS_LNKS) -o $@
+
+
+
+
+
+
+

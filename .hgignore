@@ -8,6 +8,7 @@ makefile
 Debug/*
 temp/*
 bin/*
+sbin/*
 
 *.swp
 *.suo
