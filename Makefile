@@ -27,7 +27,7 @@ ifeq ($(UNAME), Darwin)
 endif
 
 CXX_FAST=icpc
-CXXFLAGS_FAST= -march=native -pedantic -O3 -DBCSLIB_NO_DEBUG $(WARNING_FLAGS) $(CPPFLAGS)
+CXXFLAGS_FAST= -march=native -pedantic -O3 -DBCSLIB_NO_DEBUG $(WARNING_FLAGS) $(CPPFLAGS) -vec-threshold20
 VECT_REPORT=-vec-report2
 
 # Intel MKL configuration
