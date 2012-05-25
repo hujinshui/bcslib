@@ -134,6 +134,15 @@ MATRIX_EVAL_H = $(MATRIX_EXT_H) $(MATH_H) \
 	$(INC)/matrix/bits/matrix_reduction_internal.h \
 	$(INC)/matrix/bits/matrix_par_reduc_internal.h
 	
+BLAS_ENGINE_H = $(CORE_H) \
+	$(INC)/engine/blas_kernel.h \
+	$(INC)/engine/blas_refimpl.h \
+	$(INC)/engine/small_blasL1.h \
+	$(INC)/engine/small_blasL2.h \
+	$(INC)/engine/small_blasL3.h \
+	$(INC)/engine/blas_extern.h \
+	$(INC)/engine/blas.h
+		
 LINALG_H = $(MATRIX_EXT_H) \
 	$(INC)/engine/blas_extern.h \
 	$(INC)/engine/blas.h \
@@ -151,7 +160,7 @@ LINALG_H = $(MATRIX_EXT_H) \
 all: test
 
 .PHONY: test
-test: test_core test_matrix test_linalg
+test: test_core test_matrix test_engine test_linalg
 
 .PHONY: bench
 bench: bench_matrix
@@ -182,6 +191,12 @@ bench_matrix: \
 	$(BIN)/bench_matrix_access \
 	$(BIN)/bench_ewise_calc \
 	$(BIN)/bench_matrix_reduction 
+	
+#------ Engine tests --------	
+	
+.PHONY: test_engine
+test_engine: \
+	$(BIN)/test_small_blas	
 	
 	
 #------ Linear Algebra tests --------
@@ -265,6 +280,19 @@ $(BIN)/bench_ewise_calc: $(MATRIX_BASE_H) bench/bench_ewise_calc.cpp
 	
 $(BIN)/bench_matrix_reduction: $(MATRIX_BASE_H) bench/bench_matrix_reduction.cpp
 	$(CXX_FAST) $(CXXFLAGS_FAST) bench/bench_matrix_reduction.cpp -o $@
+
+
+#----------------------------------------------------------
+#
+#   Engine test (details)
+#
+#----------------------------------------------------------	
+
+TEST_SMALL_BLAS_SOURCES = \
+	test/engine/test_small_blasL1.cpp
+
+$(BIN)/test_small_blas: $(BLAS_ENGINE_H) $(TEST_SMALL_BLAS_SOURCES)
+	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_SMALL_BLAS_SOURCES) $(MAIN_TEST_POST) -o $@
 
 	
 #----------------------------------------------------------
