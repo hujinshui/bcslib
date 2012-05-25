@@ -81,7 +81,7 @@ void report_res(int m, int n, int k,
 template<index_t M, index_t N, index_t K>
 void test_main()
 {
-	typedef float real;
+	typedef double real;
 
 	dense_matrix<real> a(M, K);
 	dense_matrix<real> b(K, N);
