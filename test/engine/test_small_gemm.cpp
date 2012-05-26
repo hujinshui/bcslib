@@ -78,6 +78,105 @@ bool check_gemm_nn(const T alpha, const T beta, const MatA& a, const MatB& b,
 	return pass;
 }
 
+template<typename T, class MatA, class MatB, class MatC0, class MatC>
+bool check_gemm_nt(const T alpha, const T beta, const MatA& a, const MatB& b,
+		const MatC0& c0, const MatC& c)
+{
+	dense_matrix<T> bt = b.trans();
+	dense_matrix<T> r = naive_gemm(alpha, beta, a, bt, c0);
+
+	bool pass = is_equal(r, c);
+	if (!pass)
+	{
+		const index_t m = a.nrows();
+		const index_t n = b.nrows();
+		const index_t k = a.ncolumns();
+
+		std::printf("gemm_nt-dump [m = %ld, n = %ld, k = %ld]\n", m, n, k);
+		std::printf("  alpha = %g,  beta = %g, cont_a = %d, cont_b = %d, cont_c = %d\n",
+				alpha, beta,
+				int(a.lead_dim() == a.nrows()),
+				int(b.lead_dim() == b.nrows()),
+				int(c.lead_dim() == c.nrows()));
+
+		std::printf("a = \n"); printf_mat("%6g ", a);
+		std::printf("b = \n"); printf_mat("%6g ", b);
+		std::printf("c0 = \n"); printf_mat("%6g ", c0);
+		std::printf("r = \n"); printf_mat("%6g ", r);
+		std::printf("c = \n"); printf_mat("%6g ", c);
+		std::printf("\n");
+	}
+
+	return pass;
+}
+
+
+template<typename T, class MatA, class MatB, class MatC0, class MatC>
+bool check_gemm_tn(const T alpha, const T beta, const MatA& a, const MatB& b,
+		const MatC0& c0, const MatC& c)
+{
+	dense_matrix<T> at = a.trans();
+	dense_matrix<T> r = naive_gemm(alpha, beta, at, b, c0);
+
+	bool pass = is_equal(r, c);
+	if (!pass)
+	{
+		const index_t m = a.ncolumns();
+		const index_t n = b.ncolumns();
+		const index_t k = a.nrows();
+
+		std::printf("gemm_tn-dump [m = %ld, n = %ld, k = %ld]\n", m, n, k);
+		std::printf("  alpha = %g,  beta = %g, cont_a = %d, cont_b = %d, cont_c = %d\n",
+				alpha, beta,
+				int(a.lead_dim() == a.nrows()),
+				int(b.lead_dim() == b.nrows()),
+				int(c.lead_dim() == c.nrows()));
+
+		std::printf("a = \n"); printf_mat("%6g ", a);
+		std::printf("b = \n"); printf_mat("%6g ", b);
+		std::printf("c0 = \n"); printf_mat("%6g ", c0);
+		std::printf("r = \n"); printf_mat("%6g ", r);
+		std::printf("c = \n"); printf_mat("%6g ", c);
+		std::printf("\n");
+	}
+
+	return pass;
+}
+
+
+template<typename T, class MatA, class MatB, class MatC0, class MatC>
+bool check_gemm_tt(const T alpha, const T beta, const MatA& a, const MatB& b,
+		const MatC0& c0, const MatC& c)
+{
+	dense_matrix<T> at = a.trans();
+	dense_matrix<T> bt = b.trans();
+	dense_matrix<T> r = naive_gemm(alpha, beta, at, bt, c0);
+
+	bool pass = is_equal(r, c);
+	if (!pass)
+	{
+		const index_t m = a.ncolumns();
+		const index_t n = b.nrows();
+		const index_t k = a.nrows();
+
+		std::printf("gemm_tt-dump [m = %ld, n = %ld, k = %ld]\n", m, n, k);
+		std::printf("  alpha = %g,  beta = %g, cont_a = %d, cont_b = %d, cont_c = %d\n",
+				alpha, beta,
+				int(a.lead_dim() == a.nrows()),
+				int(b.lead_dim() == b.nrows()),
+				int(c.lead_dim() == c.nrows()));
+
+		std::printf("a = \n"); printf_mat("%6g ", a);
+		std::printf("b = \n"); printf_mat("%6g ", b);
+		std::printf("c0 = \n"); printf_mat("%6g ", c0);
+		std::printf("r = \n"); printf_mat("%6g ", r);
+		std::printf("c = \n"); printf_mat("%6g ", c);
+		std::printf("\n");
+	}
+
+	return pass;
+}
+
 
 template<typename T, int M, int N, int K>
 void gemm_test_nn()
@@ -134,7 +233,178 @@ void gemm_test_nn()
 		bool pass = check_gemm_nn(alpha, beta, a, b, c_bas, c);
 		ASSERT_TRUE( pass );
 	}
+}
 
+template<typename T, int M, int N, int K>
+void gemm_test_nt()
+{
+	const int ld_add = 2;
+
+	const int ma = M; const int na = K;
+	const int mb = N; const int nb = K;
+	const int mc = M; const int nc = N;
+
+	const int lda0 = ma + ld_add;
+	const int ldb0 = mb + ld_add;
+	const int ldc0 = mc + ld_add;
+
+	dense_matrix<T> a0(lda0, na);
+	dense_matrix<T> b0(ldb0, nb);
+	dense_matrix<T> c0(ldc0, nc);
+
+	L3_init_mat(a0, T(1));
+	L3_init_mat(b0, T(2));
+	L3_init_mat(c0, T(3));
+
+	const int lda_s[2] = {ma, lda0};
+	const int ldb_s[2] = {mb, ldb0};
+	const int ldc_s[2] = {mc, ldc0};
+
+	const T alpha_s[2] = {T(1), T(2)};
+	const T beta_s[3] = {T(0), T(1), T(2)};
+
+	for (int ia = 0; ia < 2; ++ia)
+	for (int ib = 0; ib < 2; ++ib)
+	for (int ic = 0; ic < 2; ++ic)
+	for (int ja = 0; ja < 2; ++ja)
+	for (int jb = 0; jb < 3; ++jb)
+	{
+		const int lda = lda_s[ia];
+		const int ldb = ldb_s[ib];
+		const int ldc = ldc_s[ic];
+
+		const T alpha = alpha_s[ja];
+		const T beta = beta_s[jb];
+
+		ref_matrix_ex<T> a(a0.ptr_data(), ma, na, lda);
+		ref_matrix_ex<T> b(b0.ptr_data(), mb, nb, ldb);
+		ref_matrix_ex<T> c_bas(c0.ptr_data(), mc, nc, ldc);
+
+		dense_matrix<T> c_cp(c0);
+		ref_matrix_ex<T> c(c_cp.ptr_data(), mc, nc, ldc);
+
+		engine::small_gemm<T, M, N, K>::eval_nt(
+				alpha, a.ptr_data(), lda, b.ptr_data(), ldb,
+				beta, c.ptr_data(), ldc);
+
+		bool pass = check_gemm_nt(alpha, beta, a, b, c_bas, c);
+		ASSERT_TRUE( pass );
+	}
+}
+
+
+template<typename T, int M, int N, int K>
+void gemm_test_tn()
+{
+	const int ld_add = 2;
+
+	const int ma = K; const int na = M;
+	const int mb = K; const int nb = N;
+	const int mc = M; const int nc = N;
+
+	const int lda0 = ma + ld_add;
+	const int ldb0 = mb + ld_add;
+	const int ldc0 = mc + ld_add;
+
+	dense_matrix<T> a0(lda0, na);
+	dense_matrix<T> b0(ldb0, nb);
+	dense_matrix<T> c0(ldc0, nc);
+
+	L3_init_mat(a0, T(1));
+	L3_init_mat(b0, T(2));
+	L3_init_mat(c0, T(3));
+
+	const int lda_s[2] = {ma, lda0};
+	const int ldb_s[2] = {mb, ldb0};
+	const int ldc_s[2] = {mc, ldc0};
+
+	const T alpha_s[2] = {T(1), T(2)};
+	const T beta_s[3] = {T(0), T(1), T(2)};
+
+	for (int ia = 0; ia < 2; ++ia)
+	for (int ib = 0; ib < 2; ++ib)
+	for (int ic = 0; ic < 2; ++ic)
+	for (int ja = 0; ja < 2; ++ja)
+	for (int jb = 0; jb < 3; ++jb)
+	{
+		const int lda = lda_s[ia];
+		const int ldb = ldb_s[ib];
+		const int ldc = ldc_s[ic];
+
+		const T alpha = alpha_s[ja];
+		const T beta = beta_s[jb];
+
+		ref_matrix_ex<T> a(a0.ptr_data(), ma, na, lda);
+		ref_matrix_ex<T> b(b0.ptr_data(), mb, nb, ldb);
+		ref_matrix_ex<T> c_bas(c0.ptr_data(), mc, nc, ldc);
+
+		dense_matrix<T> c_cp(c0);
+		ref_matrix_ex<T> c(c_cp.ptr_data(), mc, nc, ldc);
+
+		engine::small_gemm<T, M, N, K>::eval_tn(
+				alpha, a.ptr_data(), lda, b.ptr_data(), ldb,
+				beta, c.ptr_data(), ldc);
+
+		bool pass = check_gemm_tn(alpha, beta, a, b, c_bas, c);
+		ASSERT_TRUE( pass );
+	}
+}
+
+template<typename T, int M, int N, int K>
+void gemm_test_tt()
+{
+	const int ld_add = 2;
+
+	const int ma = K; const int na = M;
+	const int mb = N; const int nb = K;
+	const int mc = M; const int nc = N;
+
+	const int lda0 = ma + ld_add;
+	const int ldb0 = mb + ld_add;
+	const int ldc0 = mc + ld_add;
+
+	dense_matrix<T> a0(lda0, na);
+	dense_matrix<T> b0(ldb0, nb);
+	dense_matrix<T> c0(ldc0, nc);
+
+	L3_init_mat(a0, T(1));
+	L3_init_mat(b0, T(2));
+	L3_init_mat(c0, T(3));
+
+	const int lda_s[2] = {ma, lda0};
+	const int ldb_s[2] = {mb, ldb0};
+	const int ldc_s[2] = {mc, ldc0};
+
+	const T alpha_s[2] = {T(1), T(2)};
+	const T beta_s[3] = {T(0), T(1), T(2)};
+
+	for (int ia = 0; ia < 2; ++ia)
+	for (int ib = 0; ib < 2; ++ib)
+	for (int ic = 0; ic < 2; ++ic)
+	for (int ja = 0; ja < 2; ++ja)
+	for (int jb = 0; jb < 3; ++jb)
+	{
+		const int lda = lda_s[ia];
+		const int ldb = ldb_s[ib];
+		const int ldc = ldc_s[ic];
+
+		const T alpha = alpha_s[ja];
+		const T beta = beta_s[jb];
+
+		ref_matrix_ex<T> a(a0.ptr_data(), ma, na, lda);
+		ref_matrix_ex<T> b(b0.ptr_data(), mb, nb, ldb);
+		ref_matrix_ex<T> c_bas(c0.ptr_data(), mc, nc, ldc);
+
+		dense_matrix<T> c_cp(c0);
+		ref_matrix_ex<T> c(c_cp.ptr_data(), mc, nc, ldc);
+
+		engine::small_gemm<T, M, N, K>::eval_tt(
+				alpha, a.ptr_data(), lda, b.ptr_data(), ldb,
+				beta, c.ptr_data(), ldc);
+
+		bool pass = check_gemm_tt(alpha, beta, a, b, c_bas, c);
+		ASSERT_TRUE( pass );
+	}
 }
 
 
@@ -142,8 +412,10 @@ template<typename T, int M, int N, int K>
 void gemm_test()
 {
 	gemm_test_nn<T, M, N, K>();
+	gemm_test_nt<T, M, N, K>();
+	gemm_test_tn<T, M, N, K>();
+	gemm_test_tt<T, M, N, K>();
 }
-
 
 TEST( SmallBlasL3, Gemm_111d )
 {
