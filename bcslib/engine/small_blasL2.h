@@ -660,9 +660,9 @@ namespace bcs { namespace engine {
 				T *__restrict__ a, const int lda)
 		{
 			if (lda == 1)
-				addx_ker<T, N>::eval(x[0], y, a);
+				addx_ker<T, N>::eval(alpha * x[0], y, a);
 			else
-				addx_ker<T, N>::eval(x[0], y, a, lda);
+				addx_ker<T, N>::eval(alpha * x[0], y, a, lda);
 		}
 
 		BCS_ENSURE_INLINE
@@ -671,9 +671,9 @@ namespace bcs { namespace engine {
 				T *__restrict__ a, const int lda)
 		{
 			if (lda == 1)
-				addx_ker<T, N>::eval(x[0], y, a);
+				addx_ker<T, N>::eval(alpha * x[0], y, a);
 			else
-				addx_ker<T, N>::eval(x[0], y, a, lda);
+				addx_ker<T, N>::eval(alpha * x[0], y, a, lda);
 		}
 
 		BCS_ENSURE_INLINE
@@ -682,9 +682,9 @@ namespace bcs { namespace engine {
 				T *__restrict__ a, const int lda)
 		{
 			if (lda == 1)
-				addx_ker<T, N>::eval(x[0], y, incy, a);
+				addx_ker<T, N>::eval(alpha * x[0], y, incy, a);
 			else
-				addx_ker<T, N>::eval(x[0], y, incy, a, lda);
+				addx_ker<T, N>::eval(alpha * x[0], y, incy, a, lda);
 		}
 
 		BCS_ENSURE_INLINE
@@ -693,9 +693,9 @@ namespace bcs { namespace engine {
 				T *__restrict__ a, const int lda)
 		{
 			if (lda == 1)
-				addx_ker<T, N>::eval(x[0], y, incy, a);
+				addx_ker<T, N>::eval(alpha * x[0], y, incy, a);
 			else
-				addx_ker<T, N>::eval(x[0], y, incy, a, lda);
+				addx_ker<T, N>::eval(alpha * x[0], y, incy, a, lda);
 		}
 
 
@@ -705,9 +705,9 @@ namespace bcs { namespace engine {
 				T *__restrict__ a, const int lda)
 		{
 			if (lda == 1)
-				mul_ker<T, N>::eval(x[0], y, a);
+				mul_ker<T, N>::eval(alpha * x[0], y, a);
 			else
-				mul_ker<T, N>::eval(x[0], y, a, lda);
+				mul_ker<T, N>::eval(alpha * x[0], y, a, lda);
 		}
 
 		BCS_ENSURE_INLINE
@@ -716,9 +716,9 @@ namespace bcs { namespace engine {
 				T *__restrict__ a, const int lda)
 		{
 			if (lda == 1)
-				mul_ker<T, N>::eval(x[0], y, a);
+				mul_ker<T, N>::eval(alpha * x[0], y, a);
 			else
-				mul_ker<T, N>::eval(x[0], y, a, lda);
+				mul_ker<T, N>::eval(alpha * x[0], y, a, lda);
 		}
 
 		BCS_ENSURE_INLINE
@@ -727,9 +727,9 @@ namespace bcs { namespace engine {
 				T *__restrict__ a, const int lda)
 		{
 			if (lda == 1)
-				mul_ker<T, N>::eval(x[0], y, incy, a);
+				mul_ker<T, N>::eval(alpha * x[0], y, incy, a);
 			else
-				mul_ker<T, N>::eval(x[0], y, incy, a, lda);
+				mul_ker<T, N>::eval(alpha * x[0], y, incy, a, lda);
 		}
 
 		BCS_ENSURE_INLINE
@@ -738,9 +738,9 @@ namespace bcs { namespace engine {
 				T *__restrict__ a, const int lda)
 		{
 			if (lda == 1)
-				mul_ker<T, N>::eval(x[0], y, incy, a);
+				mul_ker<T, N>::eval(alpha * x[0], y, incy, a);
 			else
-				mul_ker<T, N>::eval(x[0], y, incy, a, lda);
+				mul_ker<T, N>::eval(alpha * x[0], y, incy, a, lda);
 		}
 	};
 
@@ -753,7 +753,7 @@ namespace bcs { namespace engine {
 				const T* __restrict__ x, const T* __restrict__ y,
 				T *__restrict__ a, const int lda)
 		{
-			addx_ker<T, M>::eval(y[0], x, a);
+			addx_ker<T, M>::eval(alpha * y[0], x, a);
 		}
 
 		BCS_ENSURE_INLINE
@@ -761,7 +761,7 @@ namespace bcs { namespace engine {
 				const T* __restrict__ x, const int incx, const T* __restrict__ y,
 				T *__restrict__ a, const int lda)
 		{
-			addx_ker<T, M>::eval(y[0], x, incx, a);
+			addx_ker<T, M>::eval(alpha * y[0], x, incx, a);
 		}
 
 		BCS_ENSURE_INLINE
@@ -769,7 +769,7 @@ namespace bcs { namespace engine {
 				const T* __restrict__ x, const T* __restrict__ y, const int,
 				T *__restrict__ a, const int lda)
 		{
-			addx_ker<T, M>::eval(y[0], x, a);
+			addx_ker<T, M>::eval(alpha * y[0], x, a);
 		}
 
 		BCS_ENSURE_INLINE
@@ -777,7 +777,7 @@ namespace bcs { namespace engine {
 				const T* __restrict__ x, const int incx, const T* __restrict__ y, const int,
 				T *__restrict__ a, const int lda)
 		{
-			addx_ker<T, M>::eval(y[0], x, incx, a);
+			addx_ker<T, M>::eval(alpha * y[0], x, incx, a);
 		}
 
 		BCS_ENSURE_INLINE
@@ -785,7 +785,7 @@ namespace bcs { namespace engine {
 				const T* __restrict__ x, const T* __restrict__ y,
 				T *__restrict__ a, const int lda)
 		{
-			mul_ker<T, M>::eval(y[0], x, a);
+			mul_ker<T, M>::eval(alpha * y[0], x, a);
 		}
 
 		BCS_ENSURE_INLINE
@@ -793,7 +793,7 @@ namespace bcs { namespace engine {
 				const T* __restrict__ x, const int incx, const T* __restrict__ y,
 				T *__restrict__ a, const int lda)
 		{
-			mul_ker<T, M>::eval(y[0], x, incx, a);
+			mul_ker<T, M>::eval(alpha * y[0], x, incx, a);
 		}
 
 		BCS_ENSURE_INLINE
@@ -801,7 +801,7 @@ namespace bcs { namespace engine {
 				const T* __restrict__ x, const T* __restrict__ y, const int,
 				T *__restrict__ a, const int lda)
 		{
-			mul_ker<T, M>::eval(y[0], x, a);
+			mul_ker<T, M>::eval(alpha * y[0], x, a);
 		}
 
 		BCS_ENSURE_INLINE
@@ -809,7 +809,7 @@ namespace bcs { namespace engine {
 				const T* __restrict__ x, const int incx, const T* __restrict__ y, const int,
 				T *__restrict__ a, const int lda)
 		{
-			mul_ker<T, M>::eval(y[0], x, incx, a);
+			mul_ker<T, M>::eval(alpha * y[0], x, incx, a);
 		}
 	};
 
@@ -825,12 +825,12 @@ namespace bcs { namespace engine {
 			if (alpha == 1)
 			{
 				for (int j = 0; j < N; ++j)
-					addx_ker<T, M>::eval(a + lda * j, x, y[j]);
+					addx_ker<T, M>::eval(y[j], x, a + lda * j);
 			}
 			else
 			{
 				for (int j = 0; j < N; ++j)
-					addx_ker<T, M>::eval(a + lda * j, x, alpha * y[j]);
+					addx_ker<T, M>::eval(alpha * y[j], x, a + lda * j);
 			}
 		}
 
@@ -852,12 +852,12 @@ namespace bcs { namespace engine {
 			if (alpha == 1)
 			{
 				for (int j = 0; j < N; ++j)
-					addx_ker<T, M>::eval(a + lda * j, x, y[j * incy]);
+					addx_ker<T, M>::eval(y[j * incy], x, a + lda * j);
 			}
 			else
 			{
 				for (int j = 0; j < N; ++j)
-					addx_ker<T, M>::eval(a + lda * j, x, alpha * y[j * incy]);
+					addx_ker<T, M>::eval(alpha * y[j * incy], x, a + lda * j);
 			}
 		}
 
@@ -867,7 +867,7 @@ namespace bcs { namespace engine {
 				T *__restrict__ a, const int lda)
 		{
 			small_cache<T, M> cache_x;
-			copy_ker<T, M>::copy(x, incx, cache_x.data);
+			copy_ker<T, M>::eval(x, incx, cache_x.data);
 			eval(alpha, cache_x.data, y, incy, a, lda);
 		}
 
@@ -879,12 +879,12 @@ namespace bcs { namespace engine {
 			if (alpha == 1)
 			{
 				for (int j = 0; j < N; ++j)
-					mul_ker<T, M>::eval(a + lda * j, x, y[j]);
+					mul_ker<T, M>::eval(y[j], x, a + lda * j);
 			}
 			else
 			{
 				for (int j = 0; j < N; ++j)
-					mul_ker<T, M>::eval(a + lda * j, x, alpha * y[j]);
+					mul_ker<T, M>::eval(alpha * y[j], x, a + lda * j);
 			}
 		}
 
@@ -906,12 +906,12 @@ namespace bcs { namespace engine {
 			if (alpha == 1)
 			{
 				for (int j = 0; j < N; ++j)
-					mul_ker<T, M>::eval(a + lda * j, x, y[j * incy]);
+					mul_ker<T, M>::eval(y[j * incy], x, a + lda * j);
 			}
 			else
 			{
 				for (int j = 0; j < N; ++j)
-					mul_ker<T, M>::eval(a + lda * j, x, alpha * y[j * incy]);
+					mul_ker<T, M>::eval(alpha * y[j * incy], x, a + lda * j);
 			}
 		}
 

@@ -483,4 +483,237 @@ TEST( SmallBlasL2, GemvT_66d )
 }
 
 
+/************************************************
+ *
+ *  ger
+ *
+ ************************************************/
+
+template<typename T>
+bool ger_check(const T alpha, const int m, const int n,
+		const T *x, int incx, const T *y, int incy,
+		const dense_matrix<T>& abase,
+		const dense_matrix<T>& a0,
+		const dense_matrix<T>& a1)
+{
+
+	dense_matrix<T> r0(m, n);
+	dense_matrix<T> r1(m, n);
+
+	for (int j = 0; j < n; ++j)
+	{
+		for (int i = 0; i < m; ++i)
+		{
+			r0(i, j) = alpha * x[i * incx] * y[j * incy];
+			r1(i, j) = r0(i, j) + abase(i, j);
+		}
+	}
+
+	bool pass0 = is_equal(r0, a0);
+
+	if (!pass0)
+	{
+		std::printf("ger-dump-0 [m = %d, n = %d, incx = %d, incy = %d, alpha = %g]:\n", m, n, incx, incy, alpha);
+
+		std::printf("  abase = \n"); printf_mat("%6g ", abase);
+		L2_prn_vec("  x ", (int)m, x, incx);
+		L2_prn_vec("  y ", (int)n, y, incy);
+		std::printf("  r0 = \n"); printf_mat("%6g ", r0);
+		std::printf("  a0 = \n"); printf_mat("%6g ", a0);
+
+		return false;
+	}
+
+	bool pass1 = is_equal(r1, a1);
+
+	if (!pass1)
+	{
+		std::printf("ger-dump-1 [m = %d, n = %d, incx = %d, incy = %d, alpha = %g]:\n", m, n, incx, incy, alpha);
+
+		std::printf("  abase = \n"); printf_mat("%6g ", abase);
+		L2_prn_vec("  x ", (int)m, x, incx);
+		L2_prn_vec("  y ", (int)n, y, incy);
+		std::printf("  r0 = \n"); printf_mat("%6g ", r1);
+		std::printf("  a0 = \n"); printf_mat("%6g ", a1);
+
+		return false;
+	}
+
+	return true;
+}
+
+
+template<typename T, int M, int N>
+void ger_test()
+{
+	dense_matrix<T> abase(M, N);
+	L2_init_vec(M * N, abase.ptr_data(), T(1));
+
+	T x[4 * M];
+	T y[4 * N];
+
+	L2_init_vec(4 * M, x, T(1));
+	L2_init_vec(4 * N, y, T(2));
+
+	int incxs[2] = {1, 2};
+	const int n_incxs = 2;
+
+	int incys[2] = {1, 3};
+	const int n_incys = 2;
+
+	T alphas[2] = {T(1), T(2)};
+	const int n_alphas = 2;
+
+	for (int u = 0; u < n_incxs; ++u)
+	for (int v = 0; v < n_incys; ++v)
+	for (int k = 0; k < n_alphas; ++k)
+	{
+		const int incx = incxs[u];
+		const int incy = incys[v];
+
+		const T alpha = alphas[k];
+
+		dense_matrix<T> a0(abase);
+		engine::small_ger<T, M, N>::eval0(alpha, x, incx, y, incy, a0.ptr_data(), (int)a0.lead_dim());
+
+		dense_matrix<T> a1(abase);
+		engine::small_ger<T, M, N>::eval(alpha, x, incx, y, incy, a1.ptr_data(), (int)a1.lead_dim());
+
+		bool pass = ger_check(alpha, M, N, x, incx, y, incy, abase, a0, a1);
+		ASSERT_TRUE(pass);
+	}
+
+}
+
+TEST( SmallBlasL2, Ger_11d )
+{
+	ger_test<double, 1, 1>();
+}
+
+TEST( SmallBlasL2, Ger_12d )
+{
+	ger_test<double, 1, 2>();
+}
+
+TEST( SmallBlasL2, Ger_13d )
+{
+	ger_test<double, 1, 3>();
+}
+
+TEST( SmallBlasL2, Ger_14d )
+{
+	ger_test<double, 1, 4>();
+}
+
+TEST( SmallBlasL2, Ger_16d )
+{
+	ger_test<double, 1, 6>();
+}
+
+
+TEST( SmallBlasL2, Ger_21d )
+{
+	ger_test<double, 2, 1>();
+}
+
+TEST( SmallBlasL2, Ger_22d )
+{
+	ger_test<double, 2, 2>();
+}
+
+TEST( SmallBlasL2, Ger_23d )
+{
+	ger_test<double, 2, 3>();
+}
+
+TEST( SmallBlasL2, Ger_24d )
+{
+	ger_test<double, 2, 4>();
+}
+
+TEST( SmallBlasL2, Ger_26d )
+{
+	ger_test<double, 2, 6>();
+}
+
+
+TEST( SmallBlasL2, Ger_31d )
+{
+	ger_test<double, 3, 1>();
+}
+
+TEST( SmallBlasL2, Ger_32d )
+{
+	ger_test<double, 3, 2>();
+}
+
+TEST( SmallBlasL2, Ger_33d )
+{
+	ger_test<double, 3, 3>();
+}
+
+TEST( SmallBlasL2, Ger_34d )
+{
+	ger_test<double, 3, 4>();
+}
+
+TEST( SmallBlasL2, Ger_36d )
+{
+	ger_test<double, 3, 6>();
+}
+
+
+TEST( SmallBlasL2, Ger_41d )
+{
+	ger_test<double, 4, 1>();
+}
+
+TEST( SmallBlasL2, Ger_42d )
+{
+	ger_test<double, 4, 2>();
+}
+
+TEST( SmallBlasL2, Ger_43d )
+{
+	ger_test<double, 4, 3>();
+}
+
+TEST( SmallBlasL2, Ger_44d )
+{
+	ger_test<double, 4, 4>();
+}
+
+TEST( SmallBlasL2, Ger_46d )
+{
+	ger_test<double, 4, 6>();
+}
+
+
+TEST( SmallBlasL2, Ger_61d )
+{
+	ger_test<double, 6, 1>();
+}
+
+TEST( SmallBlasL2, Ger_62d )
+{
+	ger_test<double, 6, 2>();
+}
+
+TEST( SmallBlasL2, Ger_63d )
+{
+	ger_test<double, 6, 3>();
+}
+
+TEST( SmallBlasL2, Ger_64d )
+{
+	ger_test<double, 6, 4>();
+}
+
+TEST( SmallBlasL2, Ger_66d )
+{
+	ger_test<double, 6, 6>();
+}
+
+
+
 
