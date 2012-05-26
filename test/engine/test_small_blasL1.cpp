@@ -1,7 +1,7 @@
 /*
  * @file test_small_blasL1.cpp
  *
- * Unit testing of small matrix BLAS
+ * Unit testing of small matrix BLAS (Level 1)
  *
  * @author Dahua Lin
  */

@@ -28,14 +28,14 @@ namespace bcs { namespace engine {
 	struct small_gemv_n_M1
 	{
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			mul_ker<T, M>::eval(alpha * x[0], a, y);
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			mul_ker<T, M>::eval(alpha * x[0], a, y, incy);
@@ -43,14 +43,14 @@ namespace bcs { namespace engine {
 
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			addx_ker<T, M>::eval(alpha * x[0], a, y);
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			addx_ker<T, M>::eval(alpha * x[0], a, y, incy);
@@ -62,28 +62,28 @@ namespace bcs { namespace engine {
 	struct small_gemv_t_M1
 	{
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			y[0] = alpha * dot_ker<T, M>::eval(a, x);
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			y[0] = alpha * dot_ker<T, M>::eval(a, x, incx);
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			y[0] += alpha * dot_ker<T, M>::eval(a, x);
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			y[0] += alpha * dot_ker<T, M>::eval(a, x, incx);
@@ -95,7 +95,7 @@ namespace bcs { namespace engine {
 	struct small_gemv_n_1N
 	{
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			if (lda == 1)
@@ -109,7 +109,7 @@ namespace bcs { namespace engine {
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			if (lda == 1)
@@ -124,7 +124,7 @@ namespace bcs { namespace engine {
 
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			if (lda == 1)
@@ -138,7 +138,7 @@ namespace bcs { namespace engine {
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			if (lda == 1)
@@ -157,58 +157,58 @@ namespace bcs { namespace engine {
 	struct small_gemv_t_1N
 	{
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			if (lda == 1)
 			{
-				mul_ker<T, N>::eval(x[0], a, y);
+				mul_ker<T, N>::eval(alpha * x[0], a, y);
 			}
 			else
 			{
-				mul_ker<T, N>::eval(x[0], a, lda, y);
+				mul_ker<T, N>::eval(alpha * x[0], a, lda, y);
 			}
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			if (lda == 1)
 			{
-				mul_ker<T, N>::eval(x[0], a, y, incy);
+				mul_ker<T, N>::eval(alpha * x[0], a, y, incy);
 			}
 			else
 			{
-				mul_ker<T, N>::eval(x[0], a, lda, y, incy);
+				mul_ker<T, N>::eval(alpha * x[0], a, lda, y, incy);
 			}
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			if (lda == 1)
 			{
-				addx_ker<T, N>::eval(x[0], a, y);
+				addx_ker<T, N>::eval(alpha * x[0], a, y);
 			}
 			else
 			{
-				addx_ker<T, N>::eval(x[0], a, lda, y);
+				addx_ker<T, N>::eval(alpha * x[0], a, lda, y);
 			}
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			if (lda == 1)
 			{
-				addx_ker<T, N>::eval(x[0], a, y, incy);
+				addx_ker<T, N>::eval(alpha * x[0], a, y, incy);
 			}
 			else
 			{
-				addx_ker<T, N>::eval(x[0], a, lda, y, incy);
+				addx_ker<T, N>::eval(alpha * x[0], a, lda, y, incy);
 			}
 		}
 	};
@@ -218,7 +218,7 @@ namespace bcs { namespace engine {
 	struct small_gemv_n_MN
 	{
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			if (alpha == 1)
@@ -239,7 +239,7 @@ namespace bcs { namespace engine {
 
 
 		BCS_ENSURE_INLINE
-		static void eval_b0_(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0_(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y)
 		{
 			if (alpha == 1)
@@ -260,7 +260,7 @@ namespace bcs { namespace engine {
 
 
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			if (incy == 1)
@@ -277,7 +277,7 @@ namespace bcs { namespace engine {
 
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			if (alpha == 1)
@@ -293,7 +293,7 @@ namespace bcs { namespace engine {
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1_(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1_(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y)
 		{
 			if (alpha == 1)
@@ -309,7 +309,7 @@ namespace bcs { namespace engine {
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			if (incy == 1)
@@ -330,7 +330,7 @@ namespace bcs { namespace engine {
 	struct small_gemv_t_MN
 	{
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			if (alpha == 1)
@@ -346,7 +346,7 @@ namespace bcs { namespace engine {
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b0_(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0_(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y, const int incy)
 		{
 			if (alpha == 1)
@@ -362,7 +362,7 @@ namespace bcs { namespace engine {
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			if (incx == 1)
@@ -380,7 +380,7 @@ namespace bcs { namespace engine {
 
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			if (alpha == 1)
@@ -396,7 +396,7 @@ namespace bcs { namespace engine {
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1_(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1_(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y, const int incy)
 		{
 			if (alpha == 1)
@@ -412,7 +412,7 @@ namespace bcs { namespace engine {
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			if (incx == 1)
@@ -422,7 +422,7 @@ namespace bcs { namespace engine {
 			else
 			{
 				small_cache<T, M> cache_x;
-				copy_ker<T, M>::copy(x, incx, cache_x.data);
+				copy_ker<T, M>::eval(x, incx, cache_x.data);
 				eval_b1_(alpha, a, lda, cache_x.data, y, incy);
 			}
 		}
@@ -433,7 +433,7 @@ namespace bcs { namespace engine {
 	struct small_gemv_n_ker
 	{
 		typedef typename select_type<N == 1,
-					small_gemv_n_M1<M, 1>,
+					small_gemv_n_M1<T, M>,
 					typename select_type<M == 1,
 						small_gemv_n_1N<T, N>,
 						small_gemv_n_MN<T, M, N>
@@ -441,14 +441,14 @@ namespace bcs { namespace engine {
 				>::type impl_t;
 
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			impl_t::eval_b0(alpha, a, lda, x, y);
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			impl_t::eval_b0(alpha, a, lda, x, incx, y, incy);
@@ -456,14 +456,14 @@ namespace bcs { namespace engine {
 
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			impl_t::eval_b1(alpha, a, lda, x, y);
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			impl_t::eval_b1(alpha, a, lda, x, incx, y, incy);
@@ -475,7 +475,7 @@ namespace bcs { namespace engine {
 	struct small_gemv_t_ker
 	{
 		typedef typename select_type<N == 1,
-					small_gemv_t_M1<M, 1>,
+					small_gemv_t_M1<T, M>,
 					typename select_type<M == 1,
 						small_gemv_t_1N<T, N>,
 						small_gemv_t_MN<T, M, N>
@@ -483,31 +483,31 @@ namespace bcs { namespace engine {
 				>::type impl_t;
 
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
 			impl_t::eval_b0(alpha, a, lda, x, y);
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b0(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b0(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
 			impl_t::eval_b0(alpha, a, lda, x, incx, y, incy);
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, T* __restrict__ y)
 		{
-			impl_t::eval_t_b1(alpha, a, lda, x, y);
+			impl_t::eval_b1(alpha, a, lda, x, y);
 		}
 
 		BCS_ENSURE_INLINE
-		static void eval_b1(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval_b1(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx, T* __restrict__ y, const int incy)
 		{
-			impl_t::eval_t_b1(alpha, a, lda, x, incx, y, incy);
+			impl_t::eval_b1(alpha, a, lda, x, incx, y, incy);
 		}
 	};
 
@@ -516,7 +516,7 @@ namespace bcs { namespace engine {
 	struct small_gemv_n
 	{
 		inline
-		static void eval(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx,
 				const T beta, T* __restrict__ y, const int incy)
 		{
@@ -547,7 +547,7 @@ namespace bcs { namespace engine {
 	struct small_gemv_t
 	{
 		inline
-		static void eval(const T alpha, const T* __restrict__ a, const index_t lda,
+		static void eval(const T alpha, const T* __restrict__ a, const int lda,
 				const T* __restrict__ x, const int incx,
 				const T beta, T* __restrict__ y, const int incy)
 		{
@@ -562,8 +562,8 @@ namespace bcs { namespace engine {
 			{
 				if (beta != 1)
 				{
-					if (incy == 1) mul_ker<T, M>::eval(beta, y);
-					else mul_ker<T, M>::eval(beta, y, incy);
+					if (incy == 1) mul_ker<T, N>::eval(beta, y);
+					else mul_ker<T, N>::eval(beta, y, incy);
 				}
 
 				if (incx == 1 && incy == 1)
