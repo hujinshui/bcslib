@@ -1,7 +1,7 @@
 /**
  * @file small_blasL2.h
  *
- * Small BLAS L2
+ * Small size matrix BLAS Level 2
  *
  * @author Dahua Lin
  */

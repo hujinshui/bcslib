@@ -38,12 +38,12 @@ namespace bcs
 
 
 	template<class Task>
-	inline bench_stats run_benchmark(Task& tsk, int n_warmup, int n_main)
+	inline bench_stats run_benchmark(Task& tsk, long n_warmup, long n_main)
 	{
-		for (int i = 0; i < n_warmup; ++i) tsk.run();
+		for (long i = 0; i < n_warmup; ++i) tsk.run();
 
 		timer tm(true);
-		for (int i = 0; i < n_main; ++i) tsk.run();
+		for (long i = 0; i < n_main; ++i) tsk.run();
 		double e = tm.elapsed_secs();
 
 		bench_stats bs;

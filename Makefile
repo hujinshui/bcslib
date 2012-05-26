@@ -163,7 +163,7 @@ all: test
 test: test_core test_matrix test_engine test_linalg
 
 .PHONY: bench
-bench: bench_matrix
+bench: bench_matrix bench_engine
 
 .PHONY: clean
 
@@ -186,7 +186,6 @@ test_matrix: \
 	$(BIN)/test_matrix_eval \
 	$(BIN)/test_matrix_reduc
 
-
 bench_matrix: \
 	$(BIN)/bench_matrix_access \
 	$(BIN)/bench_ewise_calc \
@@ -197,6 +196,10 @@ bench_matrix: \
 .PHONY: test_engine
 test_engine: \
 	$(BIN)/test_small_blas	
+	
+.PHONY: bench_engine
+bench_engine: \
+	$(BIN)/bench_small_mm
 	
 	
 #------ Linear Algebra tests --------
@@ -295,7 +298,10 @@ TEST_SMALL_BLAS_SOURCES = \
 
 $(BIN)/test_small_blas: $(BLAS_ENGINE_H) $(TEST_SMALL_BLAS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_SMALL_BLAS_SOURCES) $(MAIN_TEST_POST) -o $@
+	
 
+$(BIN)/bench_small_mm: $(BLAS_ENGINE_H) bench/bench_small_mm.cpp
+	$(CXX_FAST) $(CXXFLAGS_FAST) bench/bench_small_mm.cpp -o $@
 	
 #----------------------------------------------------------
 #
@@ -314,12 +320,6 @@ $(BIN)/test_matrix_blas: $(LINALG_H) $(TEST_MATRIX_BLAS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(BLAS_PATHS) $(MAIN_TEST_PRE) $(TEST_MATRIX_BLAS_SOURCES) $(BLAS_LNKS) $(MAIN_TEST_POST) -o $@
 	
 
-
-
-#---------- Sand box stuff -------------------
-
-sbin/smallmat_mul: sandbox/smallmat_mul.cpp
-	$(CXX_FAST) $(CXXFLAGS_FAST) $(BLAS_PATHS) sandbox/smallmat_mul.cpp $(BLAS_LNKS) -o $@
 
 
 
