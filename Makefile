@@ -290,7 +290,8 @@ $(BIN)/bench_matrix_reduction: $(MATRIX_BASE_H) bench/bench_matrix_reduction.cpp
 
 TEST_SMALL_BLAS_SOURCES = \
 	test/engine/test_small_blasL1.cpp \
-	test/engine/test_small_blasL2.cpp
+	test/engine/test_small_blasL2.cpp \
+	test/engine/test_small_gemm.cpp
 
 $(BIN)/test_small_blas: $(BLAS_ENGINE_H) $(TEST_SMALL_BLAS_SOURCES)
 	$(CXX) $(CXXFLAGS) $(MAIN_TEST_PRE) $(TEST_SMALL_BLAS_SOURCES) $(MAIN_TEST_POST) -o $@
