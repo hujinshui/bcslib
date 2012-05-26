@@ -1,7 +1,7 @@
 /**
  * @file small_blasL3.h
  *
- *  
+ * Small size matrix BLAS Level 3
  *
  * @author Dahua Lin
  */
@@ -10,8 +10,8 @@
 #pragma once
 #endif
 
-#ifndef SMALL_BLASL3_H_
-#define SMALL_BLASL3_H_
+#ifndef BCSLIB_SMALL_BLASL3_H_
+#define BCSLIB_SMALL_BLASL3_H_
 
 #include "small_blasL2.h"
 
